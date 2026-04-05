@@ -1,0 +1,171 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Edit Role-Specific Fields - BizHub{% endblock %}
+
+{% block content %}
+<div style="max-width:800px;margin:0 auto;padding:40px 5%;">
+    <div style="display:flex;align-items:center;gap:1rem;margin-bottom:2rem;">
+        <a href="{{ path('app_user_profile') }}" style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;background:var(--light-bg);border-radius:50%;text-decoration:none;color:var(--dark);font-size:1.2rem;transition:all 0.2s;" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background='var(--light-bg)';">
+            <i class="fa fa-arrow-left"></i>
+        </a>
+        <div>
+            <h2 style="font-size:1.8rem;color:var(--dark);margin:0;font-family:'Lora',serif;">Edit Role-Specific Information</h2>
+        </div>
+    </div>
+
+    <div style="background:rgba(255,190,51,0.08);border-left:4px solid var(--primary);padding:1.5rem;border-radius:8px;margin-bottom:2rem;">
+        <p style="margin:0;color:var(--dark);font-weight:500;">
+            <i class="fa fa-briefcase" style="color:var(--primary);margin-right:0.5rem;"></i>
+            Your Role: <strong style="text-transform:capitalize;">{{ app.user.userType }}</strong>
+        </p>
+        <p style="margin:0.5rem 0 0;color:var(--text-muted);font-size:0.9rem;">
+            Fill in the professional details specific to your role type
+        </p>
+    </div>
+
+    {% for message in app.flashes('error') %}
+        <div style="background:#fee;border:1px solid #fcc;color:#c33;padding:1rem;border-radius:8px;margin-bottom:1.5rem;">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('success') %}
+        <div style="background:#d4edda;border:1px solid #c3e6cb;color:#155724;padding:1rem;border-radius:8px;margin-bottom:1.5rem;">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    <div class="biz-form">
+        {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+        <div style="background:var(--light-bg);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin-bottom:2rem;">
+            {% if app.user.userType in ['startup', 'fournisseur'] %}
+                <!-- STARTUP & FOURNISSEUR: Company Information -->
+                <div class="form-group" style="margin-bottom:1.5rem;">
+                    {{ form_label(form.company_name, 'Company Name') }}
+                    {{ form_widget(form.company_name, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;'}}) }}
+                </div>
+
+                <div class="form-group" style="margin-bottom:1.5rem;">
+                    {{ form_label(form.sector, 'Sector') }}
+                    {{ form_widget(form.sector, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;'}}) }}
+                </div>
+
+                <div class="form-group" style="margin-bottom:1.5rem;">
+                    {{ form_label(form.company_description, 'Company Description') }}
+                    {{ form_widget(form.company_description, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;min-height:100px;'}}) }}
+                </div>
+            {% endif %}
+
+            {% if app.user.userType == 'startup' %}
+                <!-- STARTUP only -->
+                <hr style="margin:1.5rem 0;border:none;border-top:1px solid var(--border);">
+                <h4 style="margin:1.5rem 0 1rem;color:var(--dark);font-size:0.95rem;text-transform:uppercase;font-weight:600;letter-spacing:0.05em;">Startup-Specific Details</h4>
+
+                <div class="form-group" style="margin-bottom:1.5rem;">
+                    {{ form_label(form.website, 'Website') }}
+                    {{ form_widget(form.website, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;'}}) }}
+                </div>
+
+                <div class="form-group" style="margin-bottom:1.5rem;">
+                    {{ form_label(form.founding_date, 'Founding Date') }}
+                    {{ form_widget(form.founding_date, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;'}}) }}
+                </div>
+
+                <div class="form-group" style="margin-bottom:1.5rem;">
+                    {{ form_label(form.business_type, 'Business Type') }}
+                    {{ form_widget(form.business_type, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;'}}) }}
+                </div>
+            {% endif %}
+
+            {% if app.user.userType == 'fournisseur' %}
+                <!-- FOURNISSEUR only -->
+                <hr style="margin:1.5rem 0;border:none;border-top:1px solid var(--border);">
+                <h4 style="margin:1.5rem 0 1rem;color:var(--dark);font-size:0.95rem;text-transform:uppercase;font-weight:600;letter-spacing:0.05em;">Supplier-Specific Details</h4>
+
+                <div class="form-group" style="margin-bottom:1.5rem;">
+                    {{ form_label(form.delivery_zones, 'Delivery Zones') }}
+                    {{ form_widget(form.delivery_zones, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;min-height:100px;'}}) }}
+                </div>
+
+                <div class="form-group" style="margin-bottom:1.5rem;">
+                    {{ form_label(form.payment_methods, 'Payment Methods') }}
+                    {{ form_widget(form.payment_methods, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;'}}) }}
+                </div>
+
+                <div class="form-group" style="margin-bottom:1.5rem;">
+                    {{ form_label(form.return_policy, 'Return Policy') }}
+                    {{ form_widget(form.return_policy, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;min-height:100px;'}}) }}
+                </div>
+            {% endif %}
+
+            {% if app.user.userType == 'formateur' %}
+                <!-- FORMATEUR only -->
+                <h4 style="margin:0 0 1rem;color:var(--dark);font-size:0.95rem;text-transform:uppercase;font-weight:600;letter-spacing:0.05em;">Trainer-Specific Details</h4>
+
+                <div class="form-group" style="margin-bottom:1.5rem;">
+                    {{ form_label(form.specialty, 'Specialty') }}
+                    {{ form_widget(form.specialty, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;'}}) }}
+                </div>
+
+                <div class="form-group" style="margin-bottom:1.5rem;">
+                    {{ form_label(form.years_experience, 'Years of Experience') }}
+                    {{ form_widget(form.years_experience, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;'}}) }}
+                </div>
+
+                <div class="form-group" style="margin-bottom:1.5rem;">
+                    {{ form_label(form.hourly_rate, 'Hourly Rate (€)') }}
+                    {{ form_widget(form.hourly_rate, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;'}}) }}
+                </div>
+
+                <div class="form-group" style="margin-bottom:1.5rem;">
+                    {{ form_label(form.availability, 'Availability') }}
+                    {{ form_widget(form.availability, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;min-height:100px;'}}) }}
+                </div>
+
+                <div class="form-group" style="margin-bottom:1.5rem;">
+                    {{ form_label(form.cv_url, 'CV URL') }}
+                    {{ form_widget(form.cv_url, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;'}}) }}
+                </div>
+            {% endif %}
+
+            {% if app.user.userType == 'investisseur' %}
+                <!-- INVESTISSEUR only -->
+                <h4 style="margin:0 0 1rem;color:var(--dark);font-size:0.95rem;text-transform:uppercase;font-weight:600;letter-spacing:0.05em;">Investor-Specific Details</h4>
+
+                <div class="form-group" style="margin-bottom:1.5rem;">
+                    {{ form_label(form.represented_company, 'Represented Company') }}
+                    {{ form_widget(form.represented_company, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;'}}) }}
+                </div>
+
+                <div class="form-group" style="margin-bottom:1.5rem;">
+                    {{ form_label(form.investment_sector, 'Investment Sector') }}
+                    {{ form_widget(form.investment_sector, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;'}}) }}
+                </div>
+
+                <div class="form-group" style="margin-bottom:1.5rem;">
+                    {{ form_label(form.max_budget, 'Maximum Budget (€)') }}
+                    {{ form_widget(form.max_budget, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;'}}) }}
+                </div>
+
+                <div class="form-group" style="margin-bottom:1.5rem;">
+                    {{ form_label(form.years_experience, 'Years of Experience') }}
+                    {{ form_widget(form.years_experience, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;'}}) }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group" style="margin-bottom:1.5rem;">
+            {{ form_label(form.address, 'Address') }}
+            {{ form_widget(form.address, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;'}}) }}
+        </div>
+
+        <div style="display:flex;gap:1rem;margin-top:2rem;">
+            <button type="submit" class="form-submit" style="flex:1;">Save Changes</button>
+            <a href="{{ path('app_user_profile') }}" class="btn-outline-dark" style="flex:1;text-align:center;padding:15px 0;">Cancel</a>
+        </div>
+
+        {{ form_end(form, {'render_rest': false}) }}
+    </div>
+</div>
+{% endblock %}

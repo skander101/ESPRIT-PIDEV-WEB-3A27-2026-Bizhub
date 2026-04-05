@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <title>{% block title %}BizHub{% endblock %}</title>
+  <link rel="shortcut icon" href="{{ asset('assets/front/images/logo.png') }}" type="image/png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:      #ffbe33;
+      --primary-dark: #e0a820;
+      --dark:         #222831;
+      --dark2:        #1a1f27;
+      --white:        #ffffff;
+      --light-bg:     #f8f8f8;
+      --text-muted:   #666666;
+      --border:       #ebebeb;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Lora', serif;
+      background: var(--light-bg);
+      color: var(--dark);
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    main {
+      flex: 1;
+      padding-top: 72px;
+    }
+
+    /* ══════════════ NAV ══════════════ */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      padding: 0 5%;
+      background: rgba(34,40,49,0.97);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 2px 20px rgba(0,0,0,0.18);
+      justify-content: space-between;
+      transition: height 0.3s;
+    }
+    .navbar.scrolled { height: 60px; }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .nav-brand img { height: 36px; width: auto; }
+    .brand-name { font-size: 1.4rem; font-weight: 700; color: var(--white); letter-spacing: 0.08em; font-family: 'Josefin Sans', sans-serif; text-transform: uppercase; }
+    .brand-name span { color: var(--primary); }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.75);
+      text-decoration: none;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-family: 'Josefin Sans', sans-serif;
+      transition: color 0.2s;
+      position: relative;
+      padding-bottom: 4px;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 0; height: 2px;
+      background: var(--primary);
+      border-radius: 2px;
+      transition: width 0.25s ease;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--white); }
+    .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+    .nav-links .btn-nav {
+      background: var(--primary);
+      color: var(--dark) !important;
+      padding: 9px 22px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.82rem;
+    }
+    .nav-links .btn-nav::after { display: none; }
+    .nav-links .btn-nav:hover { background: var(--primary-dark); }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 8px;
+    }
+    .hamburger span { width: 24px; height: 2px; background: var(--white); display: block; border-radius: 2px; }
+
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: var(--dark2);
+      z-index: 999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+    }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav a { font-size: 1.6rem; font-weight: 700; color: var(--white); text-decoration: none; transition: color 0.2s; }
+    .mobile-nav a:hover { color: var(--primary); }
+    .mobile-close { position: absolute; top: 20px; right: 5%; background: none; border: none; color: var(--white); font-size: 1.5rem; cursor: pointer; }
+
+    /* ══════════════ BUTTONS ══════════════ */
+    .btn-yellow {
+      background: var(--primary);
+      color: var(--dark);
+      padding: 14px 32px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      border: none; cursor: pointer;
+      text-align: center;
+    }
+    .btn-yellow:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,190,51,0.4); }
+
+    .btn-outline-dark {
+      background: transparent;
+      color: var(--dark);
+      padding: 14px 32px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-decoration: none;
+      display: inline-block;
+      border: 1.5px solid var(--border);
+      transition: border-color 0.2s, background 0.2s;
+      text-align: center;
+    }
+    .btn-outline-dark:hover { border-color: var(--primary); background: rgba(255,190,51,0.05); }
+
+    /* ══════════════ PANELS & CARDS ══════════════ */
+    .dash-panel {
+      background: var(--white);
+      border-radius: 14px;
+      padding: 28px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      border: 1px solid var(--border);
+    }
+    .dash-panel h5 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.8rem;
+      border-bottom: 1px solid var(--border);
+      font-family: 'Josefin Sans', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* ══════════════ FORMS ══════════════ */
+    .biz-form {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 40px;
+      border: 1.5px solid var(--border);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-group { margin-bottom: 1.1rem; }
+    .form-group label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--dark); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-family: 'Lora', serif;
+      font-size: 0.88rem;
+      color: var(--dark);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { border-color: var(--primary); }
+    .form-group textarea { resize: vertical; min-height: 110px; }
+    .form-submit {
+      width: 100%;
+      background: var(--primary);
+      color: var(--dark);
+      border: none;
+      padding: 15px;
+      border-radius: 8px;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .form-submit:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+    /* ══════════════ QUICK LINKS ══════════════ */
+    .quick-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--light-bg);
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--dark);
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: background 0.2s, transform 0.15s;
+      margin-bottom: 0.6rem;
+    }
+    .quick-link:hover { background: rgba(255,190,51,0.15); transform: translateX(4px); }
+    .quick-link-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--primary);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--dark);
+      font-size: 0.9rem;
+    }
+
+    /* ══════════════ FOOTER ══════════════ */
+    footer { background: var(--dark2); color: var(--white); padding: 60px 5% 28px; margin-top: auto; }
+    .footer-grid { display: grid; grid-template-columns: 1.8fr 1fr 1fr 1fr; gap: 3rem; padding-bottom: 3rem; border-bottom: 1px solid rgba(255,255,255,0.07); }
+    .footer-brand-name { font-size: 1.4rem; font-weight: 700; font-family: 'Josefin Sans', sans-serif; letter-spacing: 0.1em; text-transform: uppercase; color: var(--white); display: inline-block; margin-bottom: 0.8rem; text-decoration: none; }
+    .footer-brand-name span { color: var(--primary); }
+    .footer-desc { font-size: 0.84rem; color: rgba(255,255,255,0.4); line-height: 1.7; max-width: 210px; margin-bottom: 1.2rem; font-family: 'Lora', serif; }
+    .footer-socials { display: flex; gap: 8px; }
+    .social-icon { width: 36px; height: 36px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.09); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.5); font-size: 0.85rem; text-decoration: none; transition: background 0.2s, color 0.2s, border-color 0.2s; }
+    .social-icon:hover { background: var(--primary); color: var(--dark); border-color: var(--primary); }
+    .footer-col h4 { font-size: 0.78rem; font-weight: 700; font-family: 'Josefin Sans', sans-serif; letter-spacing: 0.14em; text-transform: uppercase; color: var(--white); margin-bottom: 1.2rem; }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 0.55rem; }
+    .footer-col ul a { font-size: 0.85rem; font-family: 'Lora', serif; color: rgba(255,255,255,0.4); text-decoration: none; transition: color 0.2s; }
+    .footer-col ul a:hover { color: var(--primary); }
+    .footer-bottom { padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: rgba(255,255,255,0.25); flex-wrap: wrap; gap: 0.5rem; }
+
+    /* ══════════════ RESPONSIVE ══════════════ */
+    @media (max-width: 1024px) {
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .footer-grid { grid-template-columns: 1fr; }
+    }
+
+    {% block extra_styles %}{% endblock %}
+  </style>
+</head>
+<body>
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav" id="mobileNav">
+  <button class="mobile-close" id="mobileClose"><i class="fa fa-times"></i></button>
+  <a href="{{ path('app_front_index') }}">Home</a>
+  <a href="{{ path('app_user_profile') }}">Profil</a>
+  <a href="{{ path('app_avis_list') }}">Mes Avis</a>
+  <a href="{{ path('app_logout') }}" style="color:var(--primary)">Déconnexion</a>
+</div>
+
+<!-- NAV -->
+<nav class="navbar" id="mainNav">
+  <a href="{{ path('app_front_index') }}" class="nav-brand">
+    <span class="brand-name">Biz<span>Hub</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="{{ path('app_front_index') }}">Home</a></li>
+    <li><a href="{{ path('app_user_profile') }}">Profil</a></li>
+    <li><a href="{{ path('app_avis_list') }}">Mes Avis</a></li>
+    <li><a href="#">Forums</a></li>
+    <li><a href="#">Marketplace</a></li>
+    <li><a href="{{ path('app_logout') }}" class="btn-nav">Déconnexion</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<main>
+  {% block content %}{% endblock %}
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <a href="{{ path('app_front_index') }}" class="footer-brand-name">Biz<span>Hub</span></a>
+      <p class="footer-desc">Connecter entreprises, investisseurs, étudiants et créateurs pour collaborer, apprendre et grandir ensemble.</p>
+      <div class="footer-socials">
+        <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+        <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+        <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Plateforme</h4>
+      <ul>
+        <li><a href="{{ path('app_front_index') }}">Accueil</a></li>
+        <li><a href="{{ path('app_user_profile') }}">Profil</a></li>
+        <li><a href="{{ path('app_avis_list') }}">Mes Avis</a></li>
+        <li><a href="#">Marketplace</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Business</h4>
+      <ul>
+        <li><a href="#">Investissement</a></li>
+        <li><a href="#">Formations</a></li>
+        <li><a href="#">Incubation</a></li>
+        <li><a href="#">Partenaires</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Légal</h4>
+      <ul>
+        <li><a href="#">Confidentialité</a></li>
+        <li><a href="#">CGU</a></li>
+        <li><a href="#">Cookies</a></li>
+        <li><a href="#">À propos</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© <span id="displayYear"></span> BizHub Platform. Tous droits réservés.</span>
+    <span>Fait avec ♥ pour les entrepreneurs</span>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('displayYear').textContent = new Date().getFullYear();
+
+  document.getElementById('hamburger').addEventListener('click', () => {
+    document.getElementById('mobileNav').classList.add('open');
+  });
+  document.getElementById('mobileClose').addEventListener('click', () => {
+    document.getElementById('mobileNav').classList.remove('open');
+  });
+  document.querySelectorAll('.mobile-nav a').forEach(a => {
+    a.addEventListener('click', () => document.getElementById('mobileNav').classList.remove('open'));
+  });
+
+  window.addEventListener('scroll', () => {
+    document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 50);
+  });
+</script>
+
+{% block javascripts %}{% endblock %}
+</body>
+</html>

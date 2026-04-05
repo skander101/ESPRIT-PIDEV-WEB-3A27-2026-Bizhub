@@ -1,0 +1,96 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}User Details{% endblock %}
+{% block breadcrumb %}User Details{% endblock %}
+
+{% block content %}
+<div style="padding:2rem;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;">
+        <h2 style="font-size:1.5rem;color:var(--pg-text);">{{ user.fullName }}</h2>
+        <div style="display:flex;gap:0.8rem;">
+            <a href="{{ path('app_admin_user_edit', {'id': user.userId}) }}" style="background:#8b5cf6;color:white;padding:0.7rem 1.5rem;border-radius:6px;text-decoration:none;font-weight:700;">Edit User</a>
+            <a href="{{ path('app_admin_user_index') }}" style="background:var(--pg-surface);color:var(--pg-text);padding:0.7rem 1.5rem;border-radius:6px;text-decoration:none;font-weight:700;border:1px solid var(--pg-border);">Back</a>
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;margin-bottom:2rem;">
+        <div class="dash-panel">
+            <h5>Account Information</h5>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+                <div>
+                    <div style="font-size:0.75rem;color:var(--pg-muted);margin-bottom:0.5rem;text-transform:uppercase;font-weight:700;">Full Name</div>
+                    <div style="color:var(--pg-text);font-weight:500;">{{ user.fullName }}</div>
+                </div>
+                <div>
+                    <div style="font-size:0.75rem;color:var(--pg-muted);margin-bottom:0.5rem;text-transform:uppercase;font-weight:700;">Email</div>
+                    <div style="color:var(--pg-text);font-weight:500;">{{ user.email }}</div>
+                </div>
+                <div>
+                    <div style="font-size:0.75rem;color:var(--pg-muted);margin-bottom:0.5rem;text-transform:uppercase;font-weight:700;">User Type</div>
+                    <div style="display:inline-block;background:rgba(91,110,245,0.15);color:#5b6ef5;padding:0.3rem 0.8rem;border-radius:4px;font-size:0.85rem;font-weight:700;text-transform:capitalize;">
+                        {{ user.userType }}
+                    </div>
+                </div>
+                <div>
+                    <div style="font-size:0.75rem;color:var(--pg-muted);margin-bottom:0.5rem;text-transform:uppercase;font-weight:700;">Phone</div>
+                    <div style="color:var(--pg-text);font-weight:500;">{{ user.phone ?? 'Not provided' }}</div>
+                </div>
+                <div>
+                    <div style="font-size:0.75rem;color:var(--pg-muted);margin-bottom:0.5rem;text-transform:uppercase;font-weight:700;">Company</div>
+                    <div style="color:var(--pg-text);font-weight:500;">{{ user.companyName ?? 'Not provided' }}</div>
+                </div>
+                <div>
+                    <div style="font-size:0.75rem;color:var(--pg-muted);margin-bottom:0.5rem;text-transform:uppercase;font-weight:700;">Status</div>
+                    <div style="display:inline-block;background:{{ user.isActive ? 'rgba(6,214,160,0.15)' : 'rgba(200,0,0,0.15)' }};color:{{ user.isActive ? '#06d6a0' : '#c80000' }};padding:0.3rem 0.8rem;border-radius:4px;font-size:0.85rem;font-weight:700;">
+                        {{ user.isActive ? 'Active' : 'Inactive' }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dash-panel">
+            <h5>Activity</h5>
+            <div style="display:flex;flex-direction:column;gap:1rem;">
+                <div>
+                    <div style="font-size:0.75rem;color:var(--pg-muted);margin-bottom:0.5rem;text-transform:uppercase;font-weight:700;">Joined</div>
+                    <div style="color:var(--pg-text);font-weight:500;">{{ user.createdAt|date('M d, Y H:i') }}</div>
+                </div>
+                <div>
+                    <div style="font-size:0.75rem;color:var(--pg-muted);margin-bottom:0.5rem;text-transform:uppercase;font-weight:700;">Total Reviews</div>
+                    <div style="color:var(--pg-text);font-weight:500;">{{ user.avis|length }}</div>
+                </div>
+                <div>
+                    <div style="font-size:0.75rem;color:var(--pg-muted);margin-bottom:0.5rem;text-transform:uppercase;font-weight:700;">Verified Reviews</div>
+                    <div style="color:var(--pg-text);font-weight:500;">{{ user.avis|filter(a => a.isVerified)|length }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if user.avis|length > 0 %}
+        <div class="dash-panel">
+            <h5>User Reviews</h5>
+            <div style="display:flex;flex-direction:column;gap:0.8rem;">
+                {% for avi in user.avis|slice(0, 10) %}
+                    <div style="padding:1rem;background:var(--pg-surface);border-radius:6px;border-left:3px solid {{ avi.isVerified ? '#06d6a0' : '#666' }};">
+                        <div style="display:flex;justify-content:space-between;align-items:start;">
+                            <div style="flex:1;">
+                                <div style="color:var(--pg-text);margin-bottom:0.3rem;">
+                                    {% for i in 1..avi.rating %}<i class="fas fa-star" style="color:#ffbe33;"></i>{% endfor %}
+                                </div>
+                                <div style="color:var(--pg-muted2);font-size:0.85rem;margin-bottom:0.5rem;">{{ avi.comment|slice(0, 60) }}{% if avi.comment|length > 60 %}...{% endif %}</div>
+                                <div style="color:var(--pg-muted);font-size:0.75rem;">{{ avi.createdAt|date('M d, Y') }}</div>
+                            </div>
+                            <div style="text-align:right;">
+                                {% if avi.isVerified %}
+                                    <span style="background:rgba(6,214,160,0.2);color:#06d6a0;padding:0.2rem 0.6rem;border-radius:3px;font-size:0.75rem;display:inline-block;">Verified</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
