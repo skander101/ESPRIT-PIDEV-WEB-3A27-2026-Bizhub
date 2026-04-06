@@ -7,10 +7,69 @@
 <div style="padding:2rem;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;">
         <h2 style="font-size:1.5rem;color:var(--pg-text);">Users Management</h2>
-        <div style="display:flex;gap:1rem;">
-            <input type="text" id="searchUsers" placeholder="Search users..." style="background:var(--pg-surface);border:1px solid var(--pg-border);color:var(--pg-text);padding:0.7rem 1rem;border-radius:6px;width:250px;"/>
-        </div>
+        <form id="userFilterForm" method="get" action="{{ path('app_admin_user_index') }}" style="display:flex;gap:0.8rem;align-items:center;flex-wrap:nowrap;white-space:nowrap;">
+            <input
+                id="userSearchInput"
+                type="text"
+                name="search"
+                value="{{ search|default('') }}"
+                placeholder="Search by name or email..."
+                style="background:var(--pg-surface);border:1px solid var(--pg-border);color:var(--pg-text);padding:0.7rem 1rem;border-radius:6px;width:250px;"
+            />
+            <select id="sortSelect" name="sort" style="background:var(--pg-surface);border:1px solid var(--pg-border);color:var(--pg-text);padding:0.65rem 0.9rem;border-radius:6px;">
+                <option value="username" {{ (sort|default('created_at')) == 'username' ? 'selected' : '' }}>Sort: Name</option>
+                <option value="email" {{ (sort|default('created_at')) == 'email' ? 'selected' : '' }}>Sort: Email</option>
+                <option value="role" {{ (sort|default('created_at')) == 'role' ? 'selected' : '' }}>Sort: Role</option>
+                <option value="created_at" {{ (sort|default('created_at')) == 'created_at' ? 'selected' : '' }}>Sort: Creation Date</option>
+            </select>
+            <select id="directionSelect" name="direction" style="background:var(--pg-surface);border:1px solid var(--pg-border);color:var(--pg-text);padding:0.65rem 0.9rem;border-radius:6px;">
+                <option value="ASC" {{ (direction|default('DESC')) == 'ASC' ? 'selected' : '' }}>Ascending</option>
+                <option value="DESC" {{ (direction|default('DESC')) == 'DESC' ? 'selected' : '' }}>Descending</option>
+            </select>
+            <a href="{{ path('app_admin_user_index') }}" style="background:var(--pg-surface2);color:var(--pg-text);border:1px solid var(--pg-border);padding:0.65rem 1rem;border-radius:6px;font-weight:700;text-decoration:none;">Reset</a>
+            <a
+                href="{{ path('app_admin_user_export_pdf', {
+                    search: search|default(''),
+                    sort: sort|default('created_at'),
+                    direction: direction|default('DESC')
+                }) }}"
+                style="background:#0ea5a4;color:#fff;border:none;padding:0.65rem 1rem;border-radius:6px;font-weight:700;text-decoration:none;"
+            >
+                Export PDF
+            </a>
+        </form>
     </div>
+
+    <script>
+        (function () {
+            const form = document.getElementById('userFilterForm');
+            const searchInput = document.getElementById('userSearchInput');
+            const sortSelect = document.getElementById('sortSelect');
+            const directionSelect = document.getElementById('directionSelect');
+
+            if (!form || !searchInput || !sortSelect || !directionSelect) {
+                return;
+            }
+
+            let debounceId;
+            const submitForm = function () {
+                form.submit();
+            };
+
+            searchInput.addEventListener('keydown', function (event) {
+                if (event.key !== 'Enter') {
+                    return;
+                }
+
+                event.preventDefault();
+                window.clearTimeout(debounceId);
+                submitForm();
+            });
+
+            sortSelect.addEventListener('change', submitForm);
+            directionSelect.addEventListener('change', submitForm);
+        })();
+    </script>
 
     {% if users %}
         <div class="dash-panel">
@@ -18,11 +77,24 @@
                 <table style="width:100%;color:var(--pg-text);">
                     <thead>
                         <tr style="border-bottom:1px solid var(--pg-border);background:var(--pg-surface2);">
-                            <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);">Name</th>
-                            <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);">Email</th>
-                            <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);">Type</th>
+                            {% set nextDirectionName = (sort|default('created_at') == 'username' and direction|default('DESC') == 'ASC') ? 'DESC' : 'ASC' %}
+                            {% set nextDirectionEmail = (sort|default('created_at') == 'email' and direction|default('DESC') == 'ASC') ? 'DESC' : 'ASC' %}
+                            {% set nextDirectionRole = (sort|default('created_at') == 'role' and direction|default('DESC') == 'ASC') ? 'DESC' : 'ASC' %}
+                            {% set nextDirectionCreated = (sort|default('created_at') == 'created_at' and direction|default('DESC') == 'ASC') ? 'DESC' : 'ASC' %}
+
+                            <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);">
+                                <a href="{{ path('app_admin_user_index', {search: search|default(''), sort: 'username', direction: nextDirectionName}) }}" style="color:inherit;text-decoration:none;">Name</a>
+                            </th>
+                            <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);">
+                                <a href="{{ path('app_admin_user_index', {search: search|default(''), sort: 'email', direction: nextDirectionEmail}) }}" style="color:inherit;text-decoration:none;">Email</a>
+                            </th>
+                            <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);">
+                                <a href="{{ path('app_admin_user_index', {search: search|default(''), sort: 'role', direction: nextDirectionRole}) }}" style="color:inherit;text-decoration:none;">Type</a>
+                            </th>
                             <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);">Status</th>
-                            <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);">Joined</th>
+                            <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);">
+                                <a href="{{ path('app_admin_user_index', {search: search|default(''), sort: 'created_at', direction: nextDirectionCreated}) }}" style="color:inherit;text-decoration:none;">Joined</a>
+                            </th>
                             <th style="text-align:center;padding:1rem;font-weight:700;color:var(--pg-muted);">Actions</th>
                         </tr>
                     </thead>

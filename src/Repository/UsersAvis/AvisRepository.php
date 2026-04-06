@@ -83,4 +83,52 @@ class AvisRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
+
+    public function countUnverified(): int
+    {
+        return (int) $this->createQueryBuilder('a')
+            ->select('COUNT(a.avis_id)')
+            ->andWhere('a.is_verified = :verified OR a.is_verified IS NULL')
+            ->setParameter('verified', false)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function countDistinctReviewers(): int
+    {
+        return (int) $this->createQueryBuilder('a')
+            ->select('COUNT(DISTINCT IDENTITY(a.user))')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function getAverageRating(): float
+    {
+        $result = $this->createQueryBuilder('a')
+            ->select('AVG(a.rating) AS avg_rating')
+            ->andWhere('a.rating IS NOT NULL')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return round((float) $result, 2);
+    }
+
+    /**
+     * @return array<int, array{rating: int, total: int}>
+     */
+    public function getRatingDistribution(): array
+    {
+        $rows = $this->createQueryBuilder('a')
+            ->select('a.rating AS rating, COUNT(a.avis_id) AS total')
+            ->andWhere('a.rating IS NOT NULL')
+            ->groupBy('a.rating')
+            ->orderBy('a.rating', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
+
+        return array_map(static fn (array $row): array => [
+            'rating' => (int) $row['rating'],
+            'total' => (int) $row['total'],
+        ], $rows);
+    }
 }
