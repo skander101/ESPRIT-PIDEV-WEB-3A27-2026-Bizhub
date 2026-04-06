@@ -7,8 +7,6 @@
   <link rel="shortcut icon" href="{{ asset('assets/back/images/logo_dark.png') }}" type="image/png" />
   <title>Dashboard | BizHub</title>
   <link rel="stylesheet" href="{{ asset('assets/back/css/bootstrap.min.css') }}" />
-  <link rel="stylesheet" href="{{ asset('assets/back/css/lineicons.css') }}" />
-  <link rel="stylesheet" href="{{ asset('assets/back/css/materialdesignicons.min.css') }}" />
   <link rel="stylesheet" href="{{ asset('assets/back/css/main.css') }}" />
   <link rel="stylesheet" href="{{ asset('assets/back/css/dark-mode.css') }}" />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
@@ -106,9 +104,20 @@
     /* ═══════════════════════════════
        LAYOUT
     ═══════════════════════════════ */
-    .page-wrapper{display:flex;padding-top:0;min-height:100vh;}
-    .sidebar-nav-wrapper{position:fixed!important;top:0!important;height:100vh!important;}
-    .main-wrapper{margin-left:260px;flex:1;min-height:100vh;background:var(--pg-bg);padding:0;}
+    :root{--sb-collapsed:72px;--sb-expanded:260px;}
+    .page-wrapper{display:flex;padding-top:0;min-height:100vh;padding-left:var(--sb-collapsed);transition:padding-left .22s ease;}
+    .sidebar-nav-wrapper{
+      position:fixed!important;
+      top:0!important;
+      height:100vh!important;
+      width:var(--sb-expanded)!important;
+      transform:translateX(calc(-1 * (var(--sb-expanded) - var(--sb-collapsed))));
+      transition:transform .22s ease;
+      z-index:1200;
+    }
+    .sidebar-nav-wrapper:hover,.sidebar-nav-wrapper.open{transform:translateX(0);}
+    .main-wrapper{margin-left:0;flex:1;min-height:100vh;background:var(--pg-bg);padding:0;}
+    .sidebar-nav-wrapper:hover ~ .page-wrapper,.sidebar-nav-wrapper.open ~ .page-wrapper{padding-left:var(--sb-expanded);}
 
     /* ═══════════════════════════════
        DASHBOARD CONTENT
@@ -212,7 +221,8 @@
     .nb-footer a:hover{color:var(--pg-text);}
 
     @media(max-width:1200px){.kpi-grid{grid-template-columns:1fr 1fr;}.chart-grid{grid-template-columns:1fr;}.dash-row2{grid-template-columns:1fr;}}
-    @media(max-width:768px){.main-wrapper{margin-left:0;}.kpi-grid{grid-template-columns:1fr 1fr;}}
+    @media(max-width:992px){.sidebar-nav-wrapper{transform:translateX(-100%);}.sidebar-nav-wrapper.open{transform:translateX(0);}.page-wrapper{padding-left:0;}}
+    @media(max-width:768px){.kpi-grid{grid-template-columns:1fr 1fr;}}
   </style>
 </head>
 <body class="dark-mode">
@@ -407,7 +417,7 @@
 </div>
 
 <script src="{{ asset('assets/back/js/bootstrap.bundle.min.js') }}"></script>
-<script src="{{ asset('assets/back/js/Chart.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 <script src="{{ asset('assets/back/js/main.js') }}"></script>
 <script>
   // Page transition animation
