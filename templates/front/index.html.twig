@@ -144,7 +144,7 @@
     .hero-bg-img {
       position: absolute;
       inset: 0;
-      background: url('images/hero-bg1.png') center/cover no-repeat;
+      background: url('{{ asset('assets/front/images/hero-bg1.png') }}') center/cover no-repeat;
       opacity: 0.55;
     }
     .hero-overlay {
@@ -706,11 +706,12 @@
   </div>
 </section>
 
+
 <!-- ABOUT -->
 <section class="about-section" id="about">
   <div class="about-inner">
     <div class="about-img-wrap fade-up">
-      <img src="images/about-img.png" alt="À propos de BizHub">
+      <img src="{{ asset('assets/front/images/about-img.png') }}" alt="À propos de BizHub">
       <div class="about-badge">
         <strong>98%</strong>
         <span>Satisfaction</span>
