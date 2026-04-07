@@ -3,6 +3,7 @@
 {% block title %}My Reviews - BizHub{% endblock %}
 
 {% block content %}
+{% set moderatedComment = '<-this review has been removed by a moderator->' %}
 <div style="max-width:1000px;margin:0 auto;padding:40px 5%;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;">
         <div>
@@ -22,8 +23,12 @@
                         </div>
                     </div>
                     <div>
-                        <div style="font-weight:700;color:var(--dark);margin-bottom:0.5rem;font-size:0.95rem;">
-                            {{ aviItem.comment|slice(0, 80) }}{% if aviItem.comment|length > 80 %}...{% endif %}
+                        <div style="font-weight:700;color:{{ aviItem.comment == moderatedComment ? '#9ca3af' : 'var(--dark)' }};font-style:{{ aviItem.comment == moderatedComment ? 'italic' : 'normal' }};margin-bottom:0.5rem;font-size:0.95rem;">
+                            {% if aviItem.comment == moderatedComment %}
+                                {{ aviItem.comment }}
+                            {% else %}
+                                {{ aviItem.comment|slice(0, 80) }}{% if aviItem.comment|length > 80 %}...{% endif %}
+                            {% endif %}
                         </div>
                         <div style="font-size:0.85rem;color:var(--text-muted);">
                             Published {{ aviItem.createdAt|date('M d, Y') }}
