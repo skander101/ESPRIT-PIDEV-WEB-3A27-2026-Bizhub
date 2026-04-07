@@ -155,11 +155,6 @@
             {% endif %}
         </div>
 
-        <div class="form-group" style="margin-bottom:1.5rem;">
-            {{ form_label(form.address, 'Address') }}
-            {{ form_widget(form.address, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;'}}) }}
-        </div>
-
         <div style="display:flex;gap:1rem;margin-top:2rem;">
             <button type="submit" class="form-submit" style="flex:1;">Save Changes</button>
             <a href="{{ path('app_user_profile') }}" class="btn-outline-dark" style="flex:1;text-align:center;padding:15px 0;">Cancel</a>

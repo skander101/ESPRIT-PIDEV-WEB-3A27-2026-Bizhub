@@ -5,209 +5,146 @@ namespace App\Entity\Marketplace;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-
-use App\Repository\CommandeRepository;
+use App\Repository\Marketplace\CommandeRepository;
 
 #[ORM\Entity(repositoryClass: CommandeRepository::class)]
 #[ORM\Table(name: 'commande')]
+#[ORM\HasLifecycleCallbacks]
 class Commande
 {
+    const STATUT_ATTENTE   = 'en_attente';
+    const STATUT_CONFIRMEE = 'confirmee';
+    const STATUT_ANNULEE   = 'annulee';
+    const STATUT_LIVREE    = 'livree';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private ?int $id_commande = null;
+    #[ORM\Column(name: 'id_commande', type: 'integer')]
+    private ?int $idCommande = null;
 
-    public function getId_commande(): ?int
-    {
-        return $this->id_commande;
-    }
+    #[ORM\Column(name: 'id_client', type: 'integer', nullable: false)]
+    private ?int $idClient = null;
 
-    public function setId_commande(int $id_commande): self
-    {
-        $this->id_commande = $id_commande;
-        return $this;
-    }
+    #[ORM\Column(name: 'id_produit', type: 'integer', nullable: true)]
+    private ?int $idProduit = null;
 
-    #[ORM\Column(type: 'integer', nullable: false)]
-    private ?int $id_client = null;
-
-    public function getId_client(): ?int
-    {
-        return $this->id_client;
-    }
-
-    public function setId_client(int $id_client): self
-    {
-        $this->id_client = $id_client;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $id_produit = null;
-
-    public function getId_produit(): ?int
-    {
-        return $this->id_produit;
-    }
-
-    public function setId_produit(?int $id_produit): self
-    {
-        $this->id_produit = $id_produit;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Column(name: 'quantite', type: 'integer', nullable: true)]
     private ?int $quantite = null;
 
-    public function getQuantite(): ?int
+    #[ORM\Column(name: 'date_commande', type: 'datetime', nullable: false)]
+    private ?\DateTimeInterface $dateCommande = null;
+
+    #[ORM\Column(name: 'statut', type: 'string', length: 50, nullable: false)]
+    private string $statut = self::STATUT_ATTENTE;
+
+    #[ORM\Column(name: 'payment_status', type: 'string', length: 50, nullable: true)]
+    private ?string $paymentStatus = null;
+
+    #[ORM\Column(name: 'payment_ref', type: 'string', length: 255, nullable: true)]
+    private ?string $paymentRef = null;
+
+    #[ORM\Column(name: 'payment_url', type: 'text', nullable: true)]
+    private ?string $paymentUrl = null;
+
+    #[ORM\Column(name: 'est_payee', type: 'boolean', nullable: false, options: ['default' => false])]
+    private bool $estPayee = false;
+
+    #[ORM\Column(name: 'paid_at', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $paidAt = null;
+
+    #[ORM\Column(name: 'total_ht', type: 'decimal', precision: 10, scale: 3, nullable: true)]
+    private ?string $totalHt = null;
+
+    #[ORM\Column(name: 'total_tva', type: 'decimal', precision: 10, scale: 3, nullable: true)]
+    private ?string $totalTva = null;
+
+    #[ORM\Column(name: 'total_ttc', type: 'decimal', precision: 10, scale: 3, nullable: true)]
+    private ?string $totalTtc = null;
+
+    // Relation OneToMany vers CommandeLigne
+    #[ORM\OneToMany(
+        mappedBy: 'commande',
+        targetEntity: CommandeLigne::class,
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
+    )]
+    private Collection $lignes;
+
+    public function __construct()
     {
-        return $this->quantite;
+        $this->lignes       = new ArrayCollection();
+        $this->dateCommande = new \DateTime();
+        $this->estPayee     = false;
+        $this->statut       = self::STATUT_ATTENTE;
     }
 
-    public function setQuantite(?int $quantite): self
+    #[ORM\PrePersist]
+    public function onPrePersist(): void
     {
-        $this->quantite = $quantite;
+        if ($this->dateCommande === null) {
+            $this->dateCommande = new \DateTime();
+        }
+    }
+
+    // ── Getters / Setters ─────────────────────────────────────────────────
+
+    public function getIdCommande(): ?int { return $this->idCommande; }
+
+    public function getIdClient(): ?int { return $this->idClient; }
+    public function setIdClient(?int $v): self { $this->idClient = $v; return $this; }
+
+    public function getIdProduit(): ?int { return $this->idProduit; }
+    public function setIdProduit(?int $v): self { $this->idProduit = $v; return $this; }
+
+    public function getQuantite(): ?int { return $this->quantite; }
+    public function setQuantite(?int $v): self { $this->quantite = $v; return $this; }
+
+    public function getDateCommande(): ?\DateTimeInterface { return $this->dateCommande; }
+    public function setDateCommande(?\DateTimeInterface $v): self { $this->dateCommande = $v; return $this; }
+
+    public function getStatut(): string { return $this->statut; }
+    public function setStatut(string $v): self { $this->statut = $v; return $this; }
+
+    public function getPaymentStatus(): ?string { return $this->paymentStatus; }
+    public function setPaymentStatus(?string $v): self { $this->paymentStatus = $v; return $this; }
+
+    public function getPaymentRef(): ?string { return $this->paymentRef; }
+    public function setPaymentRef(?string $v): self { $this->paymentRef = $v; return $this; }
+
+    public function getPaymentUrl(): ?string { return $this->paymentUrl; }
+    public function setPaymentUrl(?string $v): self { $this->paymentUrl = $v; return $this; }
+
+    public function isEstPayee(): bool { return $this->estPayee; }
+    public function setEstPayee(bool $v): self { $this->estPayee = $v; return $this; }
+
+    public function getPaidAt(): ?\DateTimeInterface { return $this->paidAt; }
+    public function setPaidAt(?\DateTimeInterface $v): self { $this->paidAt = $v; return $this; }
+
+    public function getTotalHt(): ?string { return $this->totalHt; }
+    public function setTotalHt(?string $v): self { $this->totalHt = $v; return $this; }
+
+    public function getTotalTva(): ?string { return $this->totalTva; }
+    public function setTotalTva(?string $v): self { $this->totalTva = $v; return $this; }
+
+    public function getTotalTtc(): ?string { return $this->totalTtc; }
+    public function setTotalTtc(?string $v): self { $this->totalTtc = $v; return $this; }
+
+    public function getLignes(): Collection { return $this->lignes; }
+
+    public function addLigne(CommandeLigne $ligne): self
+    {
+        if (!$this->lignes->contains($ligne)) {
+            $this->lignes->add($ligne);
+            $ligne->setCommande($this);
+        }
         return $this;
     }
 
-    #[ORM\Column(type: 'datetime', nullable: false)]
-    private ?\DateTimeInterface $date_commande = null;
-
-    public function getDate_commande(): ?\DateTimeInterface
+    public function removeLigne(CommandeLigne $ligne): self
     {
-        return $this->date_commande;
-    }
-
-    public function setDate_commande(\DateTimeInterface $date_commande): self
-    {
-        $this->date_commande = $date_commande;
+        $this->lignes->removeElement($ligne);
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $statut = null;
-
-    public function getStatut(): ?string
-    {
-        return $this->statut;
-    }
-
-    public function setStatut(string $statut): self
-    {
-        $this->statut = $statut;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $payment_status = null;
-
-    public function getPayment_status(): ?string
-    {
-        return $this->payment_status;
-    }
-
-    public function setPayment_status(?string $payment_status): self
-    {
-        $this->payment_status = $payment_status;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $payment_ref = null;
-
-    public function getPayment_ref(): ?string
-    {
-        return $this->payment_ref;
-    }
-
-    public function setPayment_ref(?string $payment_ref): self
-    {
-        $this->payment_ref = $payment_ref;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $payment_url = null;
-
-    public function getPayment_url(): ?string
-    {
-        return $this->payment_url;
-    }
-
-    public function setPayment_url(?string $payment_url): self
-    {
-        $this->payment_url = $payment_url;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'boolean', nullable: false)]
-    private ?bool $est_payee = null;
-
-    public function isEst_payee(): ?bool
-    {
-        return $this->est_payee;
-    }
-
-    public function setEst_payee(bool $est_payee): self
-    {
-        $this->est_payee = $est_payee;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?\DateTimeInterface $paid_at = null;
-
-    public function getPaid_at(): ?\DateTimeInterface
-    {
-        return $this->paid_at;
-    }
-
-    public function setPaid_at(?\DateTimeInterface $paid_at): self
-    {
-        $this->paid_at = $paid_at;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'decimal', nullable: true)]
-    private ?float $total_ht = null;
-
-    public function getTotal_ht(): ?float
-    {
-        return $this->total_ht;
-    }
-
-    public function setTotal_ht(?float $total_ht): self
-    {
-        $this->total_ht = $total_ht;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'decimal', nullable: true)]
-    private ?float $total_tva = null;
-
-    public function getTotal_tva(): ?float
-    {
-        return $this->total_tva;
-    }
-
-    public function setTotal_tva(?float $total_tva): self
-    {
-        $this->total_tva = $total_tva;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'decimal', nullable: true)]
-    private ?float $total_ttc = null;
-
-    public function getTotal_ttc(): ?float
-    {
-        return $this->total_ttc;
-    }
-
-    public function setTotal_ttc(?float $total_ttc): self
-    {
-        $this->total_ttc = $total_ttc;
-        return $this;
-    }
-
+    public function __toString(): string { return 'Commande #' . $this->idCommande; }
 }

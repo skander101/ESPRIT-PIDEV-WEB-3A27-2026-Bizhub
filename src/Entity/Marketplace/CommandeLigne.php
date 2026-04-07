@@ -3,113 +3,83 @@
 namespace App\Entity\Marketplace;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-
-use App\Repository\CommandeLigneRepository;
+use App\Repository\Marketplace\CommandeLigneRepository;
 
 #[ORM\Entity(repositoryClass: CommandeLigneRepository::class)]
 #[ORM\Table(name: 'commande_ligne')]
+#[ORM\HasLifecycleCallbacks]
 class CommandeLigne
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private ?int $id_ligne = null;
+    #[ORM\Column(name: 'id_ligne', type: 'integer')]
+    private ?int $idLigne = null;
 
-    public function getId_ligne(): ?int
-    {
-        return $this->id_ligne;
-    }
+    // Relation ManyToOne vers Commande
+    #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: 'lignes')]
+    #[ORM\JoinColumn(name: 'id_commande', referencedColumnName: 'id_commande', nullable: false)]
+    private ?Commande $commande = null;
 
-    public function setId_ligne(int $id_ligne): self
-    {
-        $this->id_ligne = $id_ligne;
-        return $this;
-    }
+    #[ORM\Column(name: 'id_produit', type: 'integer', nullable: false)]
+    private ?int $idProduit = null;
 
-    #[ORM\Column(type: 'integer', nullable: false)]
-    private ?int $id_commande = null;
-
-    public function getId_commande(): ?int
-    {
-        return $this->id_commande;
-    }
-
-    public function setId_commande(int $id_commande): self
-    {
-        $this->id_commande = $id_commande;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'integer', nullable: false)]
-    private ?int $id_produit = null;
-
-    public function getId_produit(): ?int
-    {
-        return $this->id_produit;
-    }
-
-    public function setId_produit(int $id_produit): self
-    {
-        $this->id_produit = $id_produit;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'integer', nullable: false)]
+    #[ORM\Column(name: 'quantite', type: 'integer', nullable: false)]
     private ?int $quantite = null;
 
-    public function getQuantite(): ?int
+    #[ORM\Column(name: 'prix_ht_unitaire', type: 'decimal', precision: 10, scale: 3, nullable: false)]
+    private ?string $prixHtUnitaire = null;
+
+    #[ORM\Column(name: 'tva_rate', type: 'decimal', precision: 5, scale: 2, nullable: false, options: ['default' => '19.00'])]
+    private string $tvaRate = '19.00';
+
+    #[ORM\Column(name: 'created_at', type: 'datetime', nullable: false)]
+    private ?\DateTimeInterface $createdAt = null;
+
+    public function __construct()
     {
-        return $this->quantite;
+        $this->createdAt = new \DateTime();
+        $this->tvaRate   = '19.00';
     }
 
-    public function setQuantite(int $quantite): self
+    #[ORM\PrePersist]
+    public function onPrePersist(): void
     {
-        $this->quantite = $quantite;
-        return $this;
+        if ($this->createdAt === null) {
+            $this->createdAt = new \DateTime();
+        }
     }
 
-    #[ORM\Column(type: 'decimal', nullable: false)]
-    private ?float $prix_ht_unitaire = null;
+    // ── Computed ─────────────────────────────────────────────────────────
 
-    public function getPrix_ht_unitaire(): ?float
+    public function getTotalHt(): float
     {
-        return $this->prix_ht_unitaire;
+        return (float) $this->prixHtUnitaire * (int) $this->quantite;
     }
 
-    public function setPrix_ht_unitaire(float $prix_ht_unitaire): self
+    public function getTotalTtc(): float
     {
-        $this->prix_ht_unitaire = $prix_ht_unitaire;
-        return $this;
+        return $this->getTotalHt() * (1 + (float) $this->tvaRate / 100);
     }
 
-    #[ORM\Column(type: 'decimal', nullable: false)]
-    private ?float $tva_rate = null;
+    // ── Getters / Setters ─────────────────────────────────────────────────
 
-    public function getTva_rate(): ?float
-    {
-        return $this->tva_rate;
-    }
+    public function getIdLigne(): ?int { return $this->idLigne; }
 
-    public function setTva_rate(float $tva_rate): self
-    {
-        $this->tva_rate = $tva_rate;
-        return $this;
-    }
+    public function getCommande(): ?Commande { return $this->commande; }
+    public function setCommande(?Commande $v): self { $this->commande = $v; return $this; }
 
-    #[ORM\Column(type: 'datetime', nullable: false)]
-    private ?\DateTimeInterface $created_at = null;
+    public function getIdProduit(): ?int { return $this->idProduit; }
+    public function setIdProduit(?int $v): self { $this->idProduit = $v; return $this; }
 
-    public function getCreated_at(): ?\DateTimeInterface
-    {
-        return $this->created_at;
-    }
+    public function getQuantite(): ?int { return $this->quantite; }
+    public function setQuantite(?int $v): self { $this->quantite = $v; return $this; }
 
-    public function setCreated_at(\DateTimeInterface $created_at): self
-    {
-        $this->created_at = $created_at;
-        return $this;
-    }
+    public function getPrixHtUnitaire(): ?string { return $this->prixHtUnitaire; }
+    public function setPrixHtUnitaire(?string $v): self { $this->prixHtUnitaire = $v; return $this; }
 
+    public function getTvaRate(): string { return $this->tvaRate; }
+    public function setTvaRate(string $v): self { $this->tvaRate = $v; return $this; }
+
+    public function getCreatedAt(): ?\DateTimeInterface { return $this->createdAt; }
+    public function setCreatedAt(?\DateTimeInterface $v): self { $this->createdAt = $v; return $this; }
 }

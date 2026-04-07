@@ -5,6 +5,7 @@ namespace App\Controller\Investissement;
 use App\Entity\Investissement\Project;
 use App\Repository\InvestmentRepository;
 use App\Repository\ProjectRepository;
+use App\Service\MarketDataService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -13,8 +14,9 @@ use Symfony\Component\Routing\Attribute\Route;
 class DashboardController extends AbstractController
 {
     public function __construct(
-        private ProjectRepository $projectRepository,
+        private ProjectRepository    $projectRepository,
         private InvestmentRepository $investmentRepository,
+        private MarketDataService    $marketData,
     ) {}
 
     #[Route('', name: 'app_biz_dashboard', methods: ['GET'])]
@@ -64,6 +66,7 @@ class DashboardController extends AbstractController
             'derniers'            => $derniers,
             'projets_en_cours'    => $projetsEnCours,
             'par_secteur'         => $parSecteur,
+            'market'              => $this->marketData->getMarketData(),
         ]);
     }
 
@@ -115,6 +118,7 @@ class DashboardController extends AbstractController
             'projets_avec_progression'=> $projetsAvecProgression,
             'derniers_recus'          => $derniersRecus,
             'par_secteur'             => $parSecteur,
+            'market'                  => $this->marketData->getMarketData(),
         ]);
     }
 }

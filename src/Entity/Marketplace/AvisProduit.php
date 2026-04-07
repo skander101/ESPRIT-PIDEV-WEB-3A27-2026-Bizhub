@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 
 use App\Repository\AvisProduitRepository;
 use App\Entity\UsersAvis\User;
+use App\Entity\Marketplace\ProduitService;
 
 #[ORM\Entity(repositoryClass: AvisProduitRepository::class)]
 #[ORM\Table(name: 'avis_produit')]
@@ -44,16 +45,16 @@ class AvisProduit
         return $this;
     }
 
-    #[ORM\OneToOne(targetEntity: ProductService::class, inversedBy: 'avisProduit')]
+    #[ORM\OneToOne(targetEntity: ProduitService::class, inversedBy: 'avisProduit')]
     #[ORM\JoinColumn(name: 'product_id', referencedColumnName: 'product_id', unique: true)]
-    private ?ProductService $productService = null;
+    private ?ProduitService $productService = null;
 
-    public function getProductService(): ?ProductService
+    public function getProductService(): ?ProduitService
     {
         return $this->productService;
     }
 
-    public function setProductService(?ProductService $productService): self
+    public function setProductService(?ProduitService $productService): self
     {
         $this->productService = $productService;
         return $this;

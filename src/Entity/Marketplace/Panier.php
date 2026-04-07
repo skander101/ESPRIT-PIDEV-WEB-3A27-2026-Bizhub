@@ -3,85 +3,56 @@
 namespace App\Entity\Marketplace;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-
-use App\Repository\PanierRepository;
+use App\Repository\Marketplace\PanierRepository;
 
 #[ORM\Entity(repositoryClass: PanierRepository::class)]
 #[ORM\Table(name: 'panier')]
+#[ORM\HasLifecycleCallbacks]
 class Panier
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private ?int $id_panier = null;
+    #[ORM\Column(name: 'id_panier', type: 'integer')]
+    private ?int $idPanier = null;
 
-    public function getId_panier(): ?int
-    {
-        return $this->id_panier;
-    }
+    #[ORM\Column(name: 'id_client', type: 'integer', nullable: false)]
+    private ?int $idClient = null;
 
-    public function setId_panier(int $id_panier): self
-    {
-        $this->id_panier = $id_panier;
-        return $this;
-    }
+    #[ORM\Column(name: 'id_produit', type: 'integer', nullable: false)]
+    private ?int $idProduit = null;
 
-    #[ORM\Column(type: 'integer', nullable: false)]
-    private ?int $id_client = null;
-
-    public function getId_client(): ?int
-    {
-        return $this->id_client;
-    }
-
-    public function setId_client(int $id_client): self
-    {
-        $this->id_client = $id_client;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'integer', nullable: false)]
-    private ?int $id_produit = null;
-
-    public function getId_produit(): ?int
-    {
-        return $this->id_produit;
-    }
-
-    public function setId_produit(int $id_produit): self
-    {
-        $this->id_produit = $id_produit;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'integer', nullable: false)]
+    #[ORM\Column(name: 'quantite', type: 'integer', nullable: false)]
     private ?int $quantite = null;
 
-    public function getQuantite(): ?int
+    #[ORM\Column(name: 'date_ajout', type: 'datetime', nullable: false)]
+    private ?\DateTimeInterface $dateAjout = null;
+
+    public function __construct()
     {
-        return $this->quantite;
+        $this->dateAjout = new \DateTime();
     }
 
-    public function setQuantite(int $quantite): self
+    #[ORM\PrePersist]
+    public function onPrePersist(): void
     {
-        $this->quantite = $quantite;
-        return $this;
+        if ($this->dateAjout === null) {
+            $this->dateAjout = new \DateTime();
+        }
     }
 
-    #[ORM\Column(type: 'datetime', nullable: false)]
-    private ?\DateTimeInterface $date_ajout = null;
+    // ── Getters / Setters ─────────────────────────────────────────────────
 
-    public function getDate_ajout(): ?\DateTimeInterface
-    {
-        return $this->date_ajout;
-    }
+    public function getIdPanier(): ?int { return $this->idPanier; }
 
-    public function setDate_ajout(\DateTimeInterface $date_ajout): self
-    {
-        $this->date_ajout = $date_ajout;
-        return $this;
-    }
+    public function getIdClient(): ?int { return $this->idClient; }
+    public function setIdClient(?int $v): self { $this->idClient = $v; return $this; }
 
+    public function getIdProduit(): ?int { return $this->idProduit; }
+    public function setIdProduit(?int $v): self { $this->idProduit = $v; return $this; }
+
+    public function getQuantite(): ?int { return $this->quantite; }
+    public function setQuantite(?int $v): self { $this->quantite = $v; return $this; }
+
+    public function getDateAjout(): ?\DateTimeInterface { return $this->dateAjout; }
+    public function setDateAjout(?\DateTimeInterface $v): self { $this->dateAjout = $v; return $this; }
 }

@@ -23,63 +23,65 @@ class UserType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        // Basic fields for both registration and edit
-        $builder
-            ->add('email', EmailType::class, [
-                'label' => 'Email',
-                'constraints' => [
-                    new Assert\NotBlank(['message' => 'Email is required']),
-                    new Assert\Email(['message' => 'Please enter a valid email']),
-                ],
-            ])
-            ->add('full_name', TextType::class, [
-                'label' => 'Full Name',
-                'property_path' => 'full_name',
-                'constraints' => [
-                    new Assert\NotBlank(['message' => 'Full name is required']),
-                    new Assert\Length([
-                        'min' => 2,
-                        'max' => 255,
-                        'minMessage' => 'Name must be at least 2 characters',
-                        'maxMessage' => 'Name must not exceed 255 characters',
-                    ]),
-                ],
-            ])
-            ->add('phone', TextType::class, [
-                'label' => 'Phone Number',
-                'property_path' => 'phone',
-                'required' => false,
-                'constraints' => [
-                    new Assert\Length([
-                        'min' => 9,
-                        'max' => 20,
-                        'minMessage' => 'Phone number must be at least 9 digits',
-                        'maxMessage' => 'Phone number must not exceed 20 characters',
-                    ]),
-                ],
-            ])
-            ->add('address', TextType::class, [
-                'label' => 'Address',
-                'property_path' => 'address',
-                'required' => false,
-                'constraints' => [
-                    new Assert\Length([
-                        'max' => 255,
-                        'maxMessage' => 'Address must not exceed 255 characters',
-                    ]),
-                ],
-            ])
-            ->add('bio', TextareaType::class, [
-                'label' => 'Bio',
-                'property_path' => 'bio',
-                'required' => false,
-                'constraints' => [
-                    new Assert\Length([
-                        'max' => 1000,
-                        'maxMessage' => 'Bio must not exceed 1000 characters',
-                    ]),
-                ],
-            ]);
+        // Basic profile fields — not included in editSpecific (role-only form)
+        if ($options['mode'] !== 'editSpecific') {
+            $builder
+                ->add('email', EmailType::class, [
+                    'label' => 'Email',
+                    'constraints' => [
+                        new Assert\NotBlank(['message' => 'Email is required']),
+                        new Assert\Email(['message' => 'Please enter a valid email']),
+                    ],
+                ])
+                ->add('full_name', TextType::class, [
+                    'label' => 'Full Name',
+                    'property_path' => 'full_name',
+                    'constraints' => [
+                        new Assert\NotBlank(['message' => 'Full name is required']),
+                        new Assert\Length([
+                            'min' => 2,
+                            'max' => 255,
+                            'minMessage' => 'Name must be at least 2 characters',
+                            'maxMessage' => 'Name must not exceed 255 characters',
+                        ]),
+                    ],
+                ])
+                ->add('phone', TextType::class, [
+                    'label' => 'Phone Number',
+                    'property_path' => 'phone',
+                    'required' => false,
+                    'constraints' => [
+                        new Assert\Length([
+                            'min' => 9,
+                            'max' => 20,
+                            'minMessage' => 'Phone number must be at least 9 digits',
+                            'maxMessage' => 'Phone number must not exceed 20 characters',
+                        ]),
+                    ],
+                ])
+                ->add('address', TextType::class, [
+                    'label' => 'Address',
+                    'property_path' => 'address',
+                    'required' => false,
+                    'constraints' => [
+                        new Assert\Length([
+                            'max' => 255,
+                            'maxMessage' => 'Address must not exceed 255 characters',
+                        ]),
+                    ],
+                ])
+                ->add('bio', TextareaType::class, [
+                    'label' => 'Bio',
+                    'property_path' => 'bio',
+                    'required' => false,
+                    'constraints' => [
+                        new Assert\Length([
+                            'max' => 1000,
+                            'maxMessage' => 'Bio must not exceed 1000 characters',
+                        ]),
+                    ],
+                ]);
+        }
 
         // User type only during registration
         if ($options['mode'] === 'register') {
