@@ -1,362 +1,424 @@
 {% extends 'front/base.html.twig' %}
 
-{% block title %}Mon Dashboard Startup — BizHub{% endblock %}
+{% block title %}Dashboard Startup — BizHub{% endblock %}
 
 {% block extra_styles %}
-/* ── Page header ── */
-.dash-header {
-    background: linear-gradient(135deg, var(--dark) 0%, var(--dark2) 100%);
-    padding: 50px 5% 36px;
-}
-.dash-header h1 {
-    font-size: 1.8rem; color: var(--white);
-    font-family: 'Josefin Sans', sans-serif; font-weight: 700;
-}
-.dash-header p { color: rgba(255,255,255,0.5); margin-top: 0.3rem; font-size: 0.9rem; }
-.user-badge {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: rgba(91,110,245,0.2); border: 1px solid rgba(91,110,245,0.35);
-    color: #8b9ef5; border-radius: 20px; padding: 4px 14px;
-    font-size: 0.72rem; font-weight: 700; font-family: 'Josefin Sans', sans-serif;
-    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1rem;
-}
+/* ═══════════════════ LAYOUT ═══════════════════ */
+.d-body { max-width: 1240px; margin: 0 auto; padding: 36px 5% 60px; }
 
-/* ── Layout ── */
-.dash-body { max-width: 1200px; margin: 0 auto; padding: 32px 5%; }
+/* ═══════════════════ HERO ═══════════════════ */
+.d-hero {
+  background: linear-gradient(135deg, #0f172a 0%, #1e2533 50%, #242e42 100%);
+  padding: 52px 5% 44px; position: relative; overflow: hidden;
+}
+.d-hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 50% 80% at 90% 40%, rgba(139,92,246,0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+.d-hero-inner { max-width: 1240px; margin: 0 auto; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1.5rem; position: relative; }
+.d-hero-role {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.3);
+  color: #a78bfa; border-radius: 100px; padding: 5px 16px;
+  font-size: 0.68rem; font-weight: 700; font-family: 'Josefin Sans', sans-serif;
+  text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.9rem; width: fit-content;
+}
+.d-hero h1 { font-family: 'Josefin Sans', sans-serif; font-size: 2rem; font-weight: 700; color: #fff; line-height: 1.2; margin-bottom: 0.4rem; }
+.d-hero h1 span { color: #ffbe33; }
+.d-hero p { color: rgba(255,255,255,0.4); font-size: 0.88rem; }
+.d-hero-actions { display: flex; gap: 0.8rem; align-items: center; }
 
-/* ── KPI cards ── */
-.kpi-grid {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    gap: 1.2rem; margin-bottom: 2rem;
+/* ═══════════════════ KPI CARDS ═══════════════════ */
+.kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; margin-bottom: 1.8rem; }
+.kpi {
+  background: #fff; border-radius: 16px; padding: 20px 20px 18px;
+  border: 1px solid #eef0f5;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 8px 28px rgba(0,0,0,0.04);
+  position: relative; overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
-.kpi-card {
-    background: var(--white); border-radius: 14px;
-    border: 1.5px solid var(--border); padding: 20px 22px;
-    display: flex; align-items: center; gap: 14px;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+.kpi:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.09); }
+.kpi::before {
+  content: ''; position: absolute; top: 0; left: 0;
+  width: 4px; height: 100%; border-radius: 16px 0 0 16px;
 }
-.kpi-card:hover { border-color: var(--primary); box-shadow: 0 6px 24px rgba(255,190,51,0.1); }
+.kpi.gold::before  { background: linear-gradient(180deg,#ffbe33,#e0a820); }
+.kpi.blue::before  { background: linear-gradient(180deg,#3b82f6,#1d4ed8); }
+.kpi.green::before { background: linear-gradient(180deg,#10b981,#059669); }
+.kpi.purple::before{ background: linear-gradient(180deg,#8b5cf6,#7c3aed); }
 .kpi-icon {
-    width: 48px; height: 48px; border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.2rem; flex-shrink: 0;
+  width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 1rem;
+  margin-bottom: 12px;
 }
-.kpi-icon.yellow { background: rgba(255,190,51,0.12); color: var(--primary); }
-.kpi-icon.blue   { background: rgba(91,110,245,0.12); color: #5b6ef5; }
-.kpi-icon.green  { background: rgba(6,214,160,0.12);  color: #06d6a0; }
-.kpi-icon.red    { background: rgba(239,68,68,0.1);   color: #ef4444; }
-.kpi-num {
-    font-family: 'Josefin Sans', sans-serif; font-size: 1.7rem;
-    font-weight: 700; color: var(--dark); line-height: 1;
-}
-.kpi-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+.kpi.gold  .kpi-icon { background: rgba(255,190,51,0.12); color: #d97706; }
+.kpi.blue  .kpi-icon { background: rgba(59,130,246,0.1);  color: #2563eb; }
+.kpi.green .kpi-icon { background: rgba(16,185,129,0.1);  color: #059669; }
+.kpi.purple .kpi-icon{ background: rgba(139,92,246,0.1);  color: #7c3aed; }
+.kpi-val  { font-family: 'Josefin Sans', sans-serif; font-size: 1.65rem; font-weight: 700; color: #1e2533; line-height: 1; }
+.kpi-lbl  { font-size: 0.72rem; color: #6b7280; margin-top: 5px; font-weight: 500; }
 
-/* ── Panels ── */
-.dash-row   { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
-.dash-row-3 { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+/* ═══════════════════ GLOBAL PROGRESS ═══════════════════ */
+.global-prog {
+  background: linear-gradient(135deg, #1e2533, #242e42);
+  border-radius: 16px; padding: 26px 28px; margin-bottom: 1.4rem;
+  display: flex; align-items: center; gap: 2.5rem; flex-wrap: wrap;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+}
+.global-prog-pct {
+  font-family: 'Josefin Sans', sans-serif; font-size: 3rem; font-weight: 700;
+  color: #ffbe33; line-height: 1; flex-shrink: 0;
+}
+.global-prog-info { flex: 1; min-width: 180px; }
+.global-prog-label { font-family: 'Josefin Sans', sans-serif; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); margin-bottom: 0.5rem; }
+.global-bar-wrap { height: 10px; background: rgba(255,255,255,0.1); border-radius: 5px; overflow: hidden; margin-bottom: 8px; }
+.global-bar-fill { height: 100%; background: linear-gradient(90deg, #ffbe33, #e0a820); border-radius: 5px; transition: width 1s ease; }
+.global-prog-sub { display: flex; justify-content: space-between; font-size: 0.75rem; color: rgba(255,255,255,0.35); }
+
+/* ═══════════════════ PANELS ═══════════════════ */
+.d-grid-main  { display: grid; grid-template-columns: 1fr 300px; gap: 1.4rem; margin-bottom: 1.4rem; }
 .panel {
-    background: var(--white); border-radius: 14px;
-    border: 1.5px solid var(--border); padding: 24px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  background: #fff; border-radius: 16px; padding: 26px;
+  border: 1px solid #eef0f5;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 24px rgba(0,0,0,0.04);
+  margin-bottom: 1.4rem;
+}
+.panel:last-child { margin-bottom: 0; }
+.panel-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1.2rem; padding-bottom: 0.9rem; border-bottom: 1.5px solid #f0f2f5;
 }
 .panel-title {
-    font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.1em; font-family: 'Josefin Sans', sans-serif;
-    color: var(--dark); margin-bottom: 1.1rem; padding-bottom: 0.7rem;
-    border-bottom: 1.5px solid var(--border);
-    display: flex; align-items: center; gap: 8px;
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.78rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em; color: #1e2533;
+  display: flex; align-items: center; gap: 8px;
 }
-.panel-title i { color: var(--primary); }
+.panel-title i { color: #ffbe33; font-size: 0.9rem; }
+.panel-link {
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.7rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: #ffbe33; text-decoration: none; display: flex; align-items: center; gap: 4px;
+  transition: gap 0.2s;
+}
+.panel-link:hover { gap: 7px; color: #d97706; }
 
-/* ── Progression projet ── */
-.projet-prog {
-    padding: 14px 0; border-bottom: 1px solid var(--border);
+/* ═══════════════════ PROGRESSION PROJET ═══════════════════ */
+.proj-prog {
+  padding: 14px 0; border-bottom: 1px solid #f5f6f8;
 }
-.projet-prog:last-child { border-bottom: none; }
-.projet-prog-top {
-    display: flex; justify-content: space-between; align-items: flex-start;
-    margin-bottom: 6px; gap: 1rem;
-}
-.projet-prog-title {
-    font-size: 0.88rem; font-weight: 700; color: var(--dark);
-    font-family: 'Josefin Sans', sans-serif; text-decoration: none;
-}
-.projet-prog-title:hover { color: var(--primary); }
-.pct-text {
-    font-family: 'Josefin Sans', sans-serif; font-size: 0.85rem;
-    font-weight: 700; color: var(--primary); white-space: nowrap;
-}
-.prog-bar-wrap { height: 7px; background: var(--border); border-radius: 4px; overflow: hidden; margin: 4px 0; }
-.prog-bar-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary-dark)); border-radius: 4px; }
-.prog-amounts { display: flex; justify-content: space-between; font-size: 0.74rem; color: var(--text-muted); margin-top: 3px; }
+.proj-prog:last-child { border-bottom: none; }
+.proj-prog-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 6px; }
+.proj-prog-title { font-family: 'Josefin Sans', sans-serif; font-size: 0.88rem; font-weight: 700; color: #1e2533; text-decoration: none; display: block; }
+.proj-prog-title:hover { color: #ffbe33; }
+.proj-pct { font-family: 'Josefin Sans', sans-serif; font-size: 0.85rem; font-weight: 700; color: #ffbe33; white-space: nowrap; }
+.proj-bar-wrap { height: 6px; background: #f0f2f5; border-radius: 3px; overflow: hidden; margin: 5px 0; }
+.proj-bar-fill { height: 100%; background: linear-gradient(90deg, #ffbe33, #d97706); border-radius: 3px; transition: width 0.8s ease; }
+.proj-amounts { display: flex; justify-content: space-between; font-size: 0.72rem; color: #9ca3af; }
 
-/* ── Statut badges ── */
-.status-badge { font-size: 0.68rem; font-weight: 700; padding: 2px 9px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.06em; font-family: 'Josefin Sans', sans-serif; display: inline-block; }
-.status-brouillon  { background: rgba(107,114,128,0.12); color: #6b7280; }
-.status-publie     { background: rgba(59,130,246,0.12);  color: #3b82f6; }
-.status-en_cours   { background: rgba(91,110,245,0.12);  color: #5b6ef5; }
-.status-finance    { background: rgba(6,214,160,0.15);   color: #06d6a0; }
-.status-ferme      { background: rgba(239,68,68,0.08);   color: #ef4444; }
-
-/* ── Répartition statuts ── */
-.statut-row {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 0.84rem;
+/* ═══════════════════ STATUS BADGES ═══════════════════ */
+.sb {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.65rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.07em; padding: 3px 9px;
+  border-radius: 100px; border: 1px solid;
 }
-.statut-row:last-child { border-bottom: none; }
-.statut-count { font-family: 'Josefin Sans', sans-serif; font-weight: 700; font-size: 1rem; color: var(--dark); }
+.sb::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+/* Statuts projet */
+.sb-brouillon { background: #f9fafb; color: #6b7280; border-color: #e5e7eb; }
+.sb-publie    { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+.sb-en_cours  { background: #f5f3ff; color: #7c3aed; border-color: #ddd6fe; }
+.sb-finance   { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
+.sb-ferme     { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+/* Statuts investissement */
+.sb-en_attente     { background: #fef9ec; color: #d97706; border-color: #fde68a; }
+.sb-en_negociation { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+.sb-accepte        { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
+.sb-refuse         { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+.sb-contrat_genere { background: #f5f3ff; color: #7c3aed; border-color: #ddd6fe; }
+.sb-signe          { background: #ecfdf5; color: #065f46; border-color: #6ee7b7; }
+.sb-termine        { background: #f9fafb; color: #6b7280; border-color: #e5e7eb; }
 
-/* ── Tableau investissements reçus ── */
-.dash-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
-.dash-table th {
-    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.08em; font-family: 'Josefin Sans', sans-serif;
-    color: var(--text-muted); padding: 0 0 10px 0;
-    border-bottom: 1.5px solid var(--border); text-align: left;
+/* ═══════════════════ STATUT BREAKDOWN ═══════════════════ */
+.stat-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f5f6f8; gap: 1rem; }
+.stat-row:last-child { border-bottom: none; }
+.stat-bar-wrap { flex: 1; height: 5px; background: #f0f2f5; border-radius: 3px; overflow: hidden; margin: 0 8px; }
+.stat-bar-fill { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
+.stat-count { font-family: 'Josefin Sans', sans-serif; font-weight: 700; font-size: 0.9rem; color: #1e2533; min-width: 20px; text-align: right; }
+
+/* ═══════════════════ TABLE ═══════════════════ */
+.d-table { width: 100%; border-collapse: collapse; }
+.d-table th {
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.67rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em; color: #9ca3af;
+  padding: 0 10px 10px 0; border-bottom: 1.5px solid #f0f2f5; text-align: left;
 }
-.dash-table td { padding: 11px 0; border-bottom: 1px solid var(--border); vertical-align: middle; }
-.dash-table tr:last-child td { border-bottom: none; }
-.dash-table .amount { font-family: 'Josefin Sans', sans-serif; font-weight: 700; color: var(--primary); }
-.dash-table .muted  { color: var(--text-muted); font-size: 0.78rem; }
+.d-table td { padding: 11px 10px 11px 0; border-bottom: 1px solid #f5f6f8; vertical-align: middle; font-size: 0.83rem; color: #1e2533; }
+.d-table tr:last-child td { border-bottom: none; }
+.d-table tbody tr { transition: background 0.15s; }
+.d-table tbody tr:hover td { background: #fafbfc; }
+.d-table .t-amount { font-family: 'Josefin Sans', sans-serif; font-weight: 700; color: #ffbe33; text-align: right; }
+.d-table .t-muted  { color: #9ca3af; font-size: 0.75rem; }
+.d-table .t-link   { font-weight: 600; color: #1e2533; text-decoration: none; }
+.d-table .t-link:hover { color: #ffbe33; }
 
-/* ── Barre financement global ── */
-.global-progress {
-    background: var(--white); border-radius: 14px; border: 1.5px solid var(--border);
-    padding: 24px; margin-bottom: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-}
-.global-prog-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-.global-prog-label { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; font-family: 'Josefin Sans', sans-serif; color: var(--dark); }
-.global-prog-pct { font-family: 'Josefin Sans', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--primary); }
-.global-bar-wrap { height: 12px; background: var(--border); border-radius: 6px; overflow: hidden; margin: 4px 0 8px; }
-.global-bar-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary-dark)); border-radius: 6px; transition: width 1s ease; }
-.global-amounts { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); }
+/* ═══════════════════ EMPTY STATE ═══════════════════ */
+.d-empty { text-align: center; padding: 32px 20px; }
+.d-empty-icon { font-size: 2.2rem; color: #d1d5db; margin-bottom: 0.8rem; }
+.d-empty p { color: #9ca3af; font-size: 0.85rem; }
 
-.voir-tout {
-    display: inline-flex; align-items: center; gap: 5px;
-    font-size: 0.75rem; font-weight: 700; font-family: 'Josefin Sans', sans-serif;
-    text-transform: uppercase; letter-spacing: 0.08em;
-    color: var(--primary); text-decoration: none; margin-top: 1rem;
-}
-.voir-tout:hover { color: var(--primary-dark); }
-.empty-text { color: var(--text-muted); font-size: 0.85rem; font-style: italic; text-align: center; padding: 20px 0; }
-
-@media (max-width: 1024px) { .kpi-grid { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 768px)  { .dash-row, .dash-row-3 { grid-template-columns: 1fr; } }
-@media (max-width: 480px)  { .kpi-grid { grid-template-columns: 1fr; } }
+/* ═══════════════════ RESPONSIVE ═══════════════════ */
+@media (max-width: 1100px) { .kpi-row { grid-template-columns: 1fr 1fr; } .d-grid-main { grid-template-columns: 1fr; } }
+@media (max-width: 700px)  { .kpi-row { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px)  { .kpi-row { grid-template-columns: 1fr; } }
 {% endblock %}
 
 {% block content %}
-{# ── Header ── #}
-<div class="dash-header">
-    <div style="max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;">
-        <div>
-            <div class="user-badge"><i class="fa fa-rocket"></i> Startup</div>
-            <h1><i class="fa fa-tachometer-alt" style="color:var(--primary);margin-right:0.5rem;"></i>Mon Dashboard</h1>
-            <p>Bonjour <strong style="color:var(--white);">{{ app.user.fullName }}</strong> — voici l'état de vos projets et financements.</p>
-        </div>
-        <a href="{{ path('app_front_projet_new') }}" class="btn-yellow" style="display:flex;align-items:center;gap:8px;">
-            <i class="fa fa-plus"></i> Nouveau projet
-        </a>
+
+{# ══════════════════════════════════════════════════
+   HERO BANNER
+══════════════════════════════════════════════════ #}
+<div class="d-hero">
+  <div class="d-hero-inner">
+    <div>
+      <div class="d-hero-role"><i class="fa fa-rocket"></i> Startup</div>
+      <h1>Bonjour, <span>{{ app.user.fullName }}</span> 🚀</h1>
+      <p>Voici l'état de vos projets et de votre financement sur BizHub.</p>
     </div>
+    <div class="d-hero-actions">
+      <a href="{{ path('app_front_projet_new') }}" class="btn-yellow" style="display:flex;align-items:center;gap:8px;">
+        <i class="fa fa-plus"></i> Nouveau projet
+      </a>
+    </div>
+  </div>
 </div>
 
-<div class="dash-body">
+<div class="d-body">
 
-    {# ── KPI cards ── #}
-    <div class="kpi-grid">
-        <div class="kpi-card">
-            <div class="kpi-icon yellow"><i class="fa fa-folder"></i></div>
-            <div>
-                <div class="kpi-num">{{ projets|length }}</div>
-                <div class="kpi-label">Projet(s) créé(s)</div>
-            </div>
-        </div>
-        <div class="kpi-card">
-            <div class="kpi-icon blue"><i class="fa fa-coins"></i></div>
-            <div>
-                <div class="kpi-num">{{ total_demande|number_format(0, ',', ' ') }}</div>
-                <div class="kpi-label">TND demandés au total</div>
-            </div>
-        </div>
-        <div class="kpi-card">
-            <div class="kpi-icon green"><i class="fa fa-hand-holding-usd"></i></div>
-            <div>
-                <div class="kpi-num">{{ total_finance|number_format(0, ',', ' ') }}</div>
-                <div class="kpi-label">TND reçus au total</div>
-            </div>
-        </div>
-        <div class="kpi-card">
-            <div class="kpi-icon yellow"><i class="fa fa-percentage"></i></div>
-            <div>
-                <div class="kpi-num">{{ pourcentage_global }}%</div>
-                <div class="kpi-label">Taux de financement global</div>
-            </div>
-        </div>
+  {# ══════════════════════════════════════════════════
+     KPI CARDS
+  ══════════════════════════════════════════════════ #}
+  <div class="kpi-row">
+
+    <div class="kpi gold">
+      <div class="kpi-icon"><i class="fa fa-folder"></i></div>
+      <div class="kpi-val">{{ projets|length }}</div>
+      <div class="kpi-lbl">Projet(s) créé(s)</div>
     </div>
 
-    {# ── Barre de financement global ── #}
-    <div class="global-progress">
-        <div class="global-prog-header">
-            <span class="global-prog-label"><i class="fa fa-chart-line" style="margin-right:6px;color:var(--primary);"></i>Financement global</span>
-            <span class="global-prog-pct">{{ pourcentage_global }}%</span>
-        </div>
-        <div class="global-bar-wrap">
-            <div class="global-bar-fill" style="width:{{ pourcentage_global }}%;"></div>
-        </div>
-        <div class="global-amounts">
-            <span>{{ total_finance|number_format(0, ',', ' ') }} TND collectés</span>
-            <span>Objectif : {{ total_demande|number_format(0, ',', ' ') }} TND</span>
-        </div>
+    <div class="kpi blue">
+      <div class="kpi-icon"><i class="fa fa-coins"></i></div>
+      <div class="kpi-val">{{ total_demande|number_format(0, ',', ' ') }}</div>
+      <div class="kpi-lbl">TND demandés au total</div>
     </div>
 
-    {# ── Ligne 1 : Progression par projet + Répartition statuts ── #}
-    <div class="dash-row-3">
-
-        {# Progression par projet #}
-        <div class="panel">
-            <div class="panel-title"><i class="fa fa-tasks"></i>Progression par projet</div>
-            {% if projets_avec_progression|length > 0 %}
-                {% for item in projets_avec_progression %}
-                    <div class="projet-prog">
-                        <div class="projet-prog-top">
-                            <div>
-                                <a href="{{ path('app_front_projet_show', {'id': item.projet.project_id}) }}" class="projet-prog-title">
-                                    {{ item.projet.title }}
-                                </a>
-                                <div style="margin-top:3px;">
-                                    <span class="status-badge status-{{ item.projet.status }}">
-                                        {% if item.projet.status == 'brouillon' %}Brouillon
-                                        {% elseif item.projet.status == 'publie' %}Publié
-                                        {% elseif item.projet.status == 'en_cours' %}En cours
-                                        {% elseif item.projet.status == 'finance' %}Financé
-                                        {% elseif item.projet.status == 'ferme' %}Fermé
-                                        {% else %}{{ item.projet.status }}{% endif %}
-                                    </span>
-                                </div>
-                            </div>
-                            <span class="pct-text">{{ item.pct }}%</span>
-                        </div>
-                        <div class="prog-bar-wrap">
-                            <div class="prog-bar-fill" style="width:{{ item.pct }}%;"></div>
-                        </div>
-                        <div class="prog-amounts">
-                            <span>{{ item.investi|number_format(0, ',', ' ') }} TND reçus</span>
-                            <span>{{ item.projet.requiredBudget|number_format(0, ',', ' ') }} TND requis</span>
-                        </div>
-                    </div>
-                {% endfor %}
-                <a href="{{ path('app_front_projet_index') }}" class="voir-tout">
-                    <i class="fa fa-arrow-right"></i> Gérer mes projets
-                </a>
-            {% else %}
-                <div class="empty-text">Aucun projet créé pour l'instant.</div>
-                <div style="text-align:center;margin-top:1rem;">
-                    <a href="{{ path('app_front_projet_new') }}" class="btn-yellow" style="font-size:0.8rem;padding:10px 20px;">
-                        <i class="fa fa-plus" style="margin-right:5px;"></i>Créer mon premier projet
-                    </a>
-                </div>
-            {% endif %}
-        </div>
-
-        {# Répartition par statut #}
-        <div class="panel">
-            <div class="panel-title"><i class="fa fa-chart-pie"></i>Statuts projets</div>
-            {% if par_statut|length > 0 %}
-                {% set labels = {
-                    'brouillon':  'Brouillon',
-                    'publie':     'Publié',
-                    'en_cours':   'En cours',
-                    'finance':    'Financé',
-                    'ferme':      'Fermé'
-                } %}
-                {% for statut, count in par_statut %}
-                    <div class="statut-row">
-                        <span class="status-badge status-{{ statut }}">
-                            {{ labels[statut] ?? statut }}
-                        </span>
-                        <span class="statut-count">{{ count }}</span>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <div class="empty-text">Aucune donnée.</div>
-            {% endif %}
-        </div>
-
+    <div class="kpi green">
+      <div class="kpi-icon"><i class="fa fa-hand-holding-usd"></i></div>
+      <div class="kpi-val">{{ total_finance|number_format(0, ',', ' ') }}</div>
+      <div class="kpi-lbl">TND reçus au total</div>
     </div>
 
-    {# ── Ligne 2 : Derniers investissements reçus ── #}
+    <div class="kpi purple">
+      <div class="kpi-icon"><i class="fa fa-percentage"></i></div>
+      <div class="kpi-val">{{ pourcentage_global }}%</div>
+      <div class="kpi-lbl">Taux de financement</div>
+    </div>
+
+  </div>
+
+  {# ══════════════════════════════════════════════════
+     BARRE DE FINANCEMENT GLOBAL
+  ══════════════════════════════════════════════════ #}
+  <div class="global-prog">
+    <div class="global-prog-pct">{{ pourcentage_global }}%</div>
+    <div class="global-prog-info">
+      <div class="global-prog-label"><i class="fa fa-chart-line" style="margin-right:5px;"></i>Financement global de tous vos projets</div>
+      <div class="global-bar-wrap">
+        <div class="global-bar-fill" style="width:{{ pourcentage_global }}%;"></div>
+      </div>
+      <div class="global-prog-sub">
+        <span>{{ total_finance|number_format(0, ',', ' ') }} TND collectés</span>
+        <span>Objectif : {{ total_demande|number_format(0, ',', ' ') }} TND</span>
+      </div>
+    </div>
+  </div>
+
+  {# ══════════════════════════════════════════════════
+     LIGNE : Progression + Répartition statuts
+  ══════════════════════════════════════════════════ #}
+  <div class="d-grid-main">
+
+    {# Progression par projet #}
     <div class="panel">
-        <div class="panel-title"><i class="fa fa-users"></i>Derniers investissements reçus</div>
-        {% if derniers_recus|length > 0 %}
-            <table class="dash-table">
-                <thead>
-                    <tr>
-                        <th>Investisseur</th>
-                        <th>Projet</th>
-                        <th>Date</th>
-                        <th>Statut</th>
-                        <th style="text-align:right;">Montant</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for inv in derniers_recus %}
-                        <tr>
-                            <td style="font-weight:600;">
-                                {{ inv.user ? inv.user.fullName : 'Investisseur anonyme' }}
-                            </td>
-                            <td>
-                                {% if inv.project %}
-                                    <a href="{{ path('app_front_projet_show', {'id': inv.project.project_id}) }}"
-                                       style="color:var(--dark);text-decoration:none;font-size:0.82rem;">
-                                        {{ inv.project.title|slice(0,25) }}{% if inv.project.title|length > 25 %}…{% endif %}
-                                    </a>
-                                {% else %}
-                                    <span class="muted">—</span>
-                                {% endif %}
-                            </td>
-                            <td class="muted">
-                                {{ inv.investmentDate ? inv.investmentDate|date('d/m/Y') : inv.createdAt|date('d/m/Y') }}
-                            </td>
-                            <td>
-                                {% set s = inv.statut ?? 'en_attente' %}
-                                <span class="status-badge" style="
-                                    {% if s == 'accepte' or s == 'signe' %}background:rgba(6,214,160,0.15);color:#06d6a0;
-                                    {% elseif s == 'refuse' %}background:rgba(239,68,68,0.1);color:#ef4444;
-                                    {% elseif s == 'en_negociation' %}background:rgba(59,130,246,0.12);color:#3b82f6;
-                                    {% else %}background:rgba(255,190,51,0.15);color:#b8860b;{% endif %}
-                                ">
-                                    {% if s == 'en_attente' %}En attente
-                                    {% elseif s == 'en_negociation' %}Négociation
-                                    {% elseif s == 'accepte' %}Accepté
-                                    {% elseif s == 'refuse' %}Refusé
-                                    {% elseif s == 'contrat_genere' %}Contrat
-                                    {% elseif s == 'signe' %}Signé
-                                    {% elseif s == 'termine' %}Terminé
-                                    {% else %}{{ s }}{% endif %}
-                                </span>
-                            </td>
-                            <td style="text-align:right;" class="amount">
-                                {{ inv.amount|number_format(0, ',', ' ') }} TND
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <div class="empty-text">
-                Aucun investissement reçu pour l'instant.
-                {% if projets|length == 0 %}
-                    Créez votre premier projet pour commencer.
-                {% elseif par_statut['en_cours'] is not defined %}
-                    Publiez un projet avec le statut <strong>En cours</strong> pour recevoir des investissements.
-                {% endif %}
+      <div class="panel-head">
+        <div class="panel-title"><i class="fa fa-tasks"></i>Progression par projet</div>
+        <a href="{{ path('app_front_projet_index') }}" class="panel-link">Gérer mes projets <i class="fa fa-arrow-right"></i></a>
+      </div>
+      {% if projets_avec_progression|length > 0 %}
+        {% for item in projets_avec_progression %}
+          <div class="proj-prog">
+            <div class="proj-prog-head">
+              <div>
+                <a href="{{ path('app_front_projet_show', {'id': item.projet.project_id}) }}" class="proj-prog-title">
+                  {{ item.projet.title }}
+                </a>
+                <div style="margin-top:4px;">
+                  <span class="sb sb-{{ item.projet.status }}">
+                    {% if item.projet.status == 'brouillon' %}Brouillon
+                    {% elseif item.projet.status == 'publie' %}Publié
+                    {% elseif item.projet.status == 'en_cours' %}En cours
+                    {% elseif item.projet.status == 'finance' %}Financé
+                    {% elseif item.projet.status == 'ferme' %}Fermé
+                    {% else %}{{ item.projet.status }}{% endif %}
+                  </span>
+                </div>
+              </div>
+              <span class="proj-pct">{{ item.pct }}%</span>
             </div>
-        {% endif %}
+            <div class="proj-bar-wrap">
+              <div class="proj-bar-fill" style="width:{{ item.pct }}%;"></div>
+            </div>
+            <div class="proj-amounts">
+              <span>{{ item.investi|number_format(0, ',', ' ') }} TND reçus</span>
+              <span>{{ item.projet.requiredBudget|number_format(0, ',', ' ') }} TND requis</span>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="d-empty">
+          <div class="d-empty-icon"><i class="fa fa-folder-open"></i></div>
+          <p>Aucun projet créé pour l'instant.</p>
+          <a href="{{ path('app_front_projet_new') }}" class="btn-yellow" style="margin-top:1rem;font-size:0.8rem;padding:10px 20px;display:inline-flex;align-items:center;gap:6px;">
+            <i class="fa fa-plus"></i> Créer mon premier projet
+          </a>
+        </div>
+      {% endif %}
     </div>
 
-    {# ── Graphique : Projets par secteur ── #}
-    {% include 'front/dashboard/_secteur_chart.html.twig' %}
+    {# Répartition par statut des projets #}
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title"><i class="fa fa-chart-pie"></i>Statuts projets</div>
+      </div>
+      {% if par_statut|length > 0 %}
+        {% set total_p = 0 %}
+        {% for c in par_statut %}{% set total_p = total_p + c %}{% endfor %}
+        {% set proj_statut_info = {
+          'brouillon': {'color': '#6b7280'},
+          'publie':    {'color': '#2563eb'},
+          'en_cours':  {'color': '#7c3aed'},
+          'finance':   {'color': '#059669'},
+          'ferme':     {'color': '#dc2626'}
+        } %}
+        {% for statut, count in par_statut %}
+          {% set info = proj_statut_info[statut] ?? {'color': '#9ca3af'} %}
+          {% set pct = total_p > 0 ? ((count / total_p) * 100)|round(0) : 0 %}
+          <div class="stat-row">
+            <span class="sb sb-{{ statut }}" style="min-width:80px;">
+              {% if statut == 'brouillon' %}Brouillon
+              {% elseif statut == 'publie' %}Publié
+              {% elseif statut == 'en_cours' %}En cours
+              {% elseif statut == 'finance' %}Financé
+              {% elseif statut == 'ferme' %}Fermé
+              {% else %}{{ statut }}{% endif %}
+            </span>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar-fill" style="width:{{ pct }}%;background:{{ info.color }};"></div>
+            </div>
+            <span class="stat-count">{{ count }}</span>
+          </div>
+        {% endfor %}
+        <div style="margin-top:1rem;padding-top:0.8rem;border-top:1px solid #f0f2f5;font-size:0.74rem;color:#9ca3af;text-align:right;">
+          {{ total_p }} projet(s) au total
+        </div>
+      {% else %}
+        <div class="d-empty">
+          <div class="d-empty-icon"><i class="fa fa-chart-pie"></i></div>
+          <p>Aucune donnée disponible.</p>
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+
+  {# ══════════════════════════════════════════════════
+     DERNIERS INVESTISSEMENTS REÇUS
+  ══════════════════════════════════════════════════ #}
+  <div class="panel">
+    <div class="panel-head">
+      <div class="panel-title"><i class="fa fa-users"></i>Derniers investissements reçus</div>
+    </div>
+    {% if derniers_recus|length > 0 %}
+      <table class="d-table">
+        <thead>
+          <tr>
+            <th>Investisseur</th>
+            <th>Projet</th>
+            <th>Date</th>
+            <th>Statut</th>
+            <th style="text-align:right;">Montant</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for inv in derniers_recus %}
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:9px;">
+                  <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#ffbe33,#d97706);display:flex;align-items:center;justify-content:center;font-family:'Josefin Sans',sans-serif;font-size:0.7rem;font-weight:700;color:#1e2533;flex-shrink:0;">
+                    {{ inv.user ? inv.user.fullName|slice(0,1)|upper : '?' }}
+                  </div>
+                  <span style="font-weight:600;font-size:0.84rem;">{{ inv.user ? inv.user.fullName : 'Anonyme' }}</span>
+                </div>
+              </td>
+              <td>
+                {% if inv.project %}
+                  <a href="{{ path('app_front_projet_show', {'id': inv.project.project_id}) }}" class="t-link">
+                    {{ inv.project.title|slice(0,22) }}{% if inv.project.title|length > 22 %}…{% endif %}
+                  </a>
+                {% else %}
+                  <span class="t-muted">—</span>
+                {% endif %}
+              </td>
+              <td class="t-muted">
+                {{ inv.investmentDate ? inv.investmentDate|date('d/m/Y') : inv.createdAt|date('d/m/Y') }}
+              </td>
+              <td>
+                {% set s = inv.statut ?? 'en_attente' %}
+                <span class="sb sb-{{ s }}">
+                  {% if s == 'en_attente' %}En attente
+                  {% elseif s == 'en_negociation' %}Négociation
+                  {% elseif s == 'accepte' %}Accepté
+                  {% elseif s == 'refuse' %}Refusé
+                  {% elseif s == 'contrat_genere' %}Contrat
+                  {% elseif s == 'signe' %}Signé
+                  {% elseif s == 'termine' %}Terminé
+                  {% else %}{{ s }}{% endif %}
+                </span>
+              </td>
+              <td class="t-amount">{{ inv.amount|number_format(0, ',', ' ') }} TND</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="d-empty">
+        <div class="d-empty-icon"><i class="fa fa-inbox"></i></div>
+        <p>
+          Aucun investissement reçu.
+          {% if projets|length == 0 %}
+            Créez votre premier projet pour commencer.
+          {% else %}
+            Publiez un projet pour attirer les investisseurs.
+          {% endif %}
+        </p>
+      </div>
+    {% endif %}
+  </div>
+
+  {# ══════════════════════════════════════════════════
+     GRAPHIQUE SECTEURS
+  ══════════════════════════════════════════════════ #}
+  {% include 'front/dashboard/_secteur_chart.html.twig' %}
 
 </div>
 {% endblock %}

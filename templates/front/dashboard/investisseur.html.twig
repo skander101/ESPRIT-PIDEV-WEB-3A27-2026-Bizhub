@@ -1,312 +1,401 @@
 {% extends 'front/base.html.twig' %}
 
-{% block title %}Mon Dashboard — BizHub{% endblock %}
+{% block title %}Dashboard Investisseur — BizHub{% endblock %}
 
 {% block extra_styles %}
-/* ── Page header ── */
-.dash-header {
-    background: linear-gradient(135deg, var(--dark) 0%, var(--dark2) 100%);
-    padding: 50px 5% 36px;
-}
-.dash-header h1 {
-    font-size: 1.8rem; color: var(--white);
-    font-family: 'Josefin Sans', sans-serif; font-weight: 700;
-}
-.dash-header p { color: rgba(255,255,255,0.5); margin-top: 0.3rem; font-size: 0.9rem; }
-.user-badge {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: rgba(255,190,51,0.15); border: 1px solid rgba(255,190,51,0.3);
-    color: var(--primary); border-radius: 20px; padding: 4px 14px;
-    font-size: 0.72rem; font-weight: 700; font-family: 'Josefin Sans', sans-serif;
-    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1rem;
-}
+/* ═══════════════════ LAYOUT ═══════════════════ */
+.d-body { max-width: 1240px; margin: 0 auto; padding: 36px 5% 60px; background: transparent; }
 
-/* ── Layout principal ── */
-.dash-body { max-width: 1200px; margin: 0 auto; padding: 32px 5%; }
+/* ═══════════════════ HEADER BANNER ═══════════════════ */
+.d-hero {
+  background: linear-gradient(135deg, #151b26 0%, #1e2533 55%, #242e42 100%);
+  padding: 52px 5% 44px; position: relative; overflow: hidden;
+}
+.d-hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(255,190,51,0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+.d-hero-inner { max-width: 1240px; margin: 0 auto; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1.5rem; position: relative; }
+.d-hero-role {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(255,190,51,0.12); border: 1px solid rgba(255,190,51,0.25);
+  color: #ffbe33; border-radius: 100px; padding: 5px 16px;
+  font-size: 0.68rem; font-weight: 700; font-family: 'Josefin Sans', sans-serif;
+  text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.9rem; width: fit-content;
+}
+.d-hero h1 {
+  font-family: 'Josefin Sans', sans-serif; font-size: 2rem; font-weight: 700;
+  color: #fff; line-height: 1.2; margin-bottom: 0.4rem;
+}
+.d-hero h1 span { color: #ffbe33; }
+.d-hero p { color: rgba(255,255,255,0.45); font-size: 0.88rem; }
+.d-hero-quick {
+  display: flex; gap: 2rem; flex-wrap: wrap;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px; padding: 16px 24px; backdrop-filter: blur(4px);
+}
+.d-hero-qs { }
+.d-hero-qs-v { font-family: 'Josefin Sans', sans-serif; font-size: 1.5rem; font-weight: 700; color: #ffbe33; line-height: 1; }
+.d-hero-qs-l { font-size: 0.68rem; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 3px; }
 
-/* ── KPI cards ── */
-.kpi-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 1.2rem; margin-bottom: 2rem;
+/* ═══════════════════ KPI CARDS ═══════════════════ */
+.kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; margin-bottom: 1.8rem; }
+.kpi {
+  background: #fff; border-radius: 16px; padding: 22px 22px 20px;
+  border: 1px solid #eef0f5;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 8px 28px rgba(0,0,0,0.04);
+  display: flex; gap: 16px; align-items: flex-start;
+  position: relative; overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
-.kpi-card {
-    background: var(--white); border-radius: 14px;
-    border: 1.5px solid var(--border); padding: 22px 24px;
-    display: flex; align-items: center; gap: 16px;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+.kpi:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.09); }
+.kpi::before {
+  content: ''; position: absolute; top: 0; left: 0;
+  width: 4px; height: 100%; border-radius: 16px 0 0 16px;
 }
-.kpi-card:hover { border-color: var(--primary); box-shadow: 0 6px 24px rgba(255,190,51,0.1); }
+.kpi.gold::before  { background: linear-gradient(180deg, #ffbe33, #e0a820); }
+.kpi.blue::before  { background: linear-gradient(180deg, #3b82f6, #1d4ed8); }
+.kpi.green::before { background: linear-gradient(180deg, #10b981, #059669); }
+.kpi.purple::before{ background: linear-gradient(180deg, #8b5cf6, #7c3aed); }
 .kpi-icon {
-    width: 52px; height: 52px; border-radius: 12px;
-    background: rgba(255,190,51,0.12); display: flex;
-    align-items: center; justify-content: center;
-    font-size: 1.3rem; color: var(--primary); flex-shrink: 0;
+  width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 1.15rem;
 }
-.kpi-num {
-    font-family: 'Josefin Sans', sans-serif; font-size: 1.9rem;
-    font-weight: 700; color: var(--dark); line-height: 1;
-}
-.kpi-label { font-size: 0.77rem; color: var(--text-muted); margin-top: 4px; }
+.kpi.gold  .kpi-icon { background: rgba(255,190,51,0.12); color: #d97706; }
+.kpi.blue  .kpi-icon { background: rgba(59,130,246,0.1);  color: #2563eb; }
+.kpi.green .kpi-icon { background: rgba(16,185,129,0.1);  color: #059669; }
+.kpi.purple.kpi-icon { background: rgba(139,92,246,0.1);  color: #7c3aed; }
+.kpi-body { flex: 1; }
+.kpi-val  { font-family: 'Josefin Sans', sans-serif; font-size: 1.85rem; font-weight: 700; color: #1e2533; line-height: 1; }
+.kpi-lbl  { font-size: 0.74rem; color: #6b7280; margin-top: 5px; font-weight: 500; }
+.kpi-sub  { font-size: 0.7rem; color: #9ca3af; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f0f2f5; }
+.kpi-sub i { color: #ffbe33; margin-right: 3px; }
 
-/* ── Panels ── */
-.dash-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
-.dash-row-3 { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+/* ═══════════════════ PANELS ═══════════════════ */
+.d-grid-main  { display: grid; grid-template-columns: 1fr 320px; gap: 1.4rem; margin-bottom: 1.4rem; }
+.d-grid-2     { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; margin-bottom: 1.4rem; }
 .panel {
-    background: var(--white); border-radius: 14px;
-    border: 1.5px solid var(--border); padding: 24px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  background: #fff; border-radius: 16px; padding: 26px;
+  border: 1px solid #eef0f5;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 24px rgba(0,0,0,0.04);
+  margin-bottom: 1.4rem;
+}
+.panel:last-child { margin-bottom: 0; }
+.panel-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1.2rem; padding-bottom: 0.9rem;
+  border-bottom: 1.5px solid #f0f2f5;
 }
 .panel-title {
-    font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.1em; font-family: 'Josefin Sans', sans-serif;
-    color: var(--dark); margin-bottom: 1.1rem; padding-bottom: 0.7rem;
-    border-bottom: 1.5px solid var(--border);
-    display: flex; align-items: center; gap: 8px;
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.78rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em; color: #1e2533;
+  display: flex; align-items: center; gap: 8px;
 }
-.panel-title i { color: var(--primary); }
+.panel-title i { color: #ffbe33; font-size: 0.9rem; }
+.panel-link {
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.7rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: #ffbe33; text-decoration: none; display: flex; align-items: center; gap: 4px;
+  transition: gap 0.2s;
+}
+.panel-link:hover { gap: 7px; color: #d97706; }
 
-/* ── Statut badges ── */
-.statut-badge {
-    font-size: 0.68rem; font-weight: 700; padding: 2px 9px;
-    border-radius: 20px; text-transform: uppercase; letter-spacing: 0.06em;
-    font-family: 'Josefin Sans', sans-serif; display: inline-block;
+/* ═══════════════════ TABLE ═══════════════════ */
+.d-table { width: 100%; border-collapse: collapse; }
+.d-table th {
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.67rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em; color: #9ca3af;
+  padding: 0 12px 10px 0; border-bottom: 1.5px solid #f0f2f5; text-align: left;
 }
-.sb-en_attente    { background: rgba(255,190,51,0.15); color: #b8860b; }
-.sb-en_negociation{ background: rgba(59,130,246,0.12); color: #3b82f6; }
-.sb-accepte       { background: rgba(6,214,160,0.15);  color: #06d6a0; }
-.sb-refuse        { background: rgba(239,68,68,0.1);   color: #ef4444; }
-.sb-contrat_genere{ background: rgba(139,92,246,0.12); color: #8b5cf6; }
-.sb-signe         { background: rgba(6,214,160,0.2);   color: #06a87e; }
-.sb-termine       { background: rgba(107,114,128,0.12);color: #6b7280; }
+.d-table td { padding: 11px 12px 11px 0; border-bottom: 1px solid #f5f6f8; vertical-align: middle; font-size: 0.84rem; color: #1e2533; }
+.d-table tr:last-child td { border-bottom: none; }
+.d-table tbody tr { transition: background 0.15s; }
+.d-table tbody tr:hover td { background: #fafbfc; }
+.d-table .t-amount { font-family: 'Josefin Sans', sans-serif; font-weight: 700; color: #ffbe33; text-align: right; }
+.d-table .t-muted  { color: #9ca3af; font-size: 0.77rem; }
+.d-table .t-name   { font-weight: 600; color: #1e2533; text-decoration: none; }
+.d-table .t-name:hover { color: #ffbe33; }
 
-/* ── Tableau ── */
-.dash-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-.dash-table th {
-    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.08em; font-family: 'Josefin Sans', sans-serif;
-    color: var(--text-muted); padding: 0 0 10px 0;
-    border-bottom: 1.5px solid var(--border); text-align: left;
+/* ═══════════════════ STATUT BADGES ═══════════════════ */
+.sb {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.65rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.07em; padding: 3px 9px;
+  border-radius: 100px; border: 1px solid;
 }
-.dash-table td {
-    padding: 12px 0; border-bottom: 1px solid var(--border);
-    color: var(--dark); vertical-align: middle;
-}
-.dash-table tr:last-child td { border-bottom: none; }
-.dash-table .amount { font-family: 'Josefin Sans', sans-serif; font-weight: 700; color: var(--primary); }
-.dash-table .muted  { color: var(--text-muted); font-size: 0.78rem; }
+.sb::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+.sb-en_attente     { background: #fef9ec; color: #d97706; border-color: #fde68a; }
+.sb-en_negociation { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+.sb-accepte        { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
+.sb-refuse         { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+.sb-contrat_genere { background: #f5f3ff; color: #7c3aed; border-color: #ddd6fe; }
+.sb-signe          { background: #ecfdf5; color: #065f46; border-color: #6ee7b7; }
+.sb-termine        { background: #f9fafb; color: #6b7280; border-color: #e5e7eb; }
 
-/* ── Répartition statut ── */
-.statut-row {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 0.84rem;
+/* ═══════════════════ STATUT BREAKDOWN ═══════════════════ */
+.stat-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 9px 0; border-bottom: 1px solid #f5f6f8; gap: 1rem;
 }
-.statut-row:last-child { border-bottom: none; }
-.statut-count {
-    font-family: 'Josefin Sans', sans-serif; font-weight: 700;
-    font-size: 1rem; color: var(--dark);
-}
+.stat-row:last-child { border-bottom: none; }
+.stat-bar-wrap { flex: 1; height: 5px; background: #f0f2f5; border-radius: 3px; overflow: hidden; margin: 0 10px; }
+.stat-bar-fill { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
+.stat-count { font-family: 'Josefin Sans', sans-serif; font-weight: 700; font-size: 0.9rem; color: #1e2533; min-width: 24px; text-align: right; }
 
-/* ── Projet card mini ── */
-.projet-mini {
-    display: flex; justify-content: space-between; align-items: flex-start;
-    padding: 12px 0; border-bottom: 1px solid var(--border); gap: 1rem;
+/* ═══════════════════ PROJET MINI CARD ═══════════════════ */
+.proj-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+.proj-card {
+  border: 1.5px solid #eef0f5; border-radius: 12px; padding: 16px 18px;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
-.projet-mini:last-child { border-bottom: none; }
-.projet-mini-title {
-    font-size: 0.88rem; font-weight: 700; color: var(--dark);
-    font-family: 'Josefin Sans', sans-serif; text-decoration: none;
-    display: block; margin-bottom: 3px;
+.proj-card:hover { border-color: #ffbe33; box-shadow: 0 4px 18px rgba(255,190,51,0.08); }
+.proj-card-title { font-family: 'Josefin Sans', sans-serif; font-size: 0.92rem; font-weight: 700; color: #1e2533; text-decoration: none; display: block; margin-bottom: 4px; }
+.proj-card-title:hover { color: #ffbe33; }
+.proj-card-meta { font-size: 0.77rem; color: #9ca3af; margin-bottom: 12px; }
+.proj-prog-bar { height: 5px; background: #f0f2f5; border-radius: 3px; overflow: hidden; margin-bottom: 8px; }
+.proj-prog-fill { height: 100%; background: linear-gradient(90deg, #ffbe33, #d97706); border-radius: 3px; }
+.proj-card-footer { display: flex; justify-content: space-between; align-items: center; }
+.proj-investors { font-size: 0.73rem; color: #9ca3af; }
+.btn-inv {
+  background: #ffbe33; color: #1e2533; padding: 6px 14px; border-radius: 7px;
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.7rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em; text-decoration: none;
+  display: inline-flex; align-items: center; gap: 5px; transition: background 0.2s;
 }
-.projet-mini-title:hover { color: var(--primary); }
-.projet-mini-budget { font-size: 0.78rem; color: var(--text-muted); }
-.btn-investir-mini {
-    background: var(--primary); color: var(--dark); padding: 6px 14px;
-    border-radius: 6px; font-size: 0.72rem; font-weight: 700;
-    font-family: 'Josefin Sans', sans-serif; text-transform: uppercase;
-    letter-spacing: 0.06em; text-decoration: none; white-space: nowrap;
-    flex-shrink: 0;
-}
-.btn-investir-mini:hover { background: var(--primary-dark); }
+.btn-inv:hover { background: #e0a820; }
 
-/* ── Lien "Voir tout" ── */
-.voir-tout {
-    display: inline-flex; align-items: center; gap: 5px;
-    font-size: 0.75rem; font-weight: 700; font-family: 'Josefin Sans', sans-serif;
-    text-transform: uppercase; letter-spacing: 0.08em;
-    color: var(--primary); text-decoration: none; margin-top: 1rem;
-}
-.voir-tout:hover { color: var(--primary-dark); }
+/* ═══════════════════ EMPTY STATE ═══════════════════ */
+.d-empty { text-align: center; padding: 32px 20px; }
+.d-empty-icon { font-size: 2.2rem; color: #d1d5db; margin-bottom: 0.8rem; }
+.d-empty p { color: #9ca3af; font-size: 0.85rem; }
 
-.empty-text { color: var(--text-muted); font-size: 0.85rem; font-style: italic; text-align: center; padding: 20px 0; }
-
-@media (max-width: 900px) { .kpi-grid { grid-template-columns: 1fr 1fr; } .dash-row, .dash-row-3 { grid-template-columns: 1fr; } }
-@media (max-width: 500px) { .kpi-grid { grid-template-columns: 1fr; } }
+/* ═══════════════════ RESPONSIVE ═══════════════════ */
+@media (max-width: 1024px) { .d-grid-main { grid-template-columns: 1fr; } }
+@media (max-width: 900px)  { .kpi-row { grid-template-columns: 1fr 1fr; } .d-grid-2 { grid-template-columns: 1fr; } }
+@media (max-width: 480px)  { .kpi-row { grid-template-columns: 1fr; } }
 {% endblock %}
 
 {% block content %}
-{# ── Header ── #}
-<div class="dash-header">
-    <div style="max-width:1200px;margin:0 auto;">
-        <div class="user-badge"><i class="fa fa-user-tie"></i> Investisseur</div>
-        <h1><i class="fa fa-chart-pie" style="color:var(--primary);margin-right:0.5rem;"></i>Mon Dashboard</h1>
-        <p>Bonjour <strong style="color:var(--white);">{{ app.user.fullName }}</strong> — voici un résumé de votre activité d'investissement.</p>
+
+{# ══════════════════════════════════════════════════
+   HERO BANNER
+══════════════════════════════════════════════════ #}
+<div class="d-hero">
+  <div class="d-hero-inner">
+    <div>
+      <div class="d-hero-role"><i class="fa fa-user-tie"></i> Investisseur</div>
+      <h1>Bonjour, <span>{{ app.user.fullName }}</span> 👋</h1>
+      <p>Voici un aperçu de votre activité d'investissement sur BizHub.</p>
     </div>
+    <div class="d-hero-quick">
+      <div class="d-hero-qs">
+        <div class="d-hero-qs-v">{{ total_investi|number_format(0, ',', ' ') }}</div>
+        <div class="d-hero-qs-l">TND investis</div>
+      </div>
+      <div class="d-hero-qs">
+        <div class="d-hero-qs-v">{{ nb_investissements }}</div>
+        <div class="d-hero-qs-l">Investissements</div>
+      </div>
+      <div class="d-hero-qs">
+        <div class="d-hero-qs-v">{{ nb_projets }}</div>
+        <div class="d-hero-qs-l">Projets</div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="dash-body">
+<div class="d-body">
 
-    {# ── KPI cards ── #}
-    <div class="kpi-grid">
-        <div class="kpi-card">
-            <div class="kpi-icon"><i class="fa fa-coins"></i></div>
-            <div>
-                <div class="kpi-num">{{ total_investi|number_format(0, ',', ' ') }}</div>
-                <div class="kpi-label">TND investis au total</div>
-            </div>
-        </div>
-        <div class="kpi-card">
-            <div class="kpi-icon"><i class="fa fa-hand-holding-usd"></i></div>
-            <div>
-                <div class="kpi-num">{{ nb_investissements }}</div>
-                <div class="kpi-label">Investissement(s) réalisé(s)</div>
-            </div>
-        </div>
-        <div class="kpi-card">
-            <div class="kpi-icon"><i class="fa fa-folder-open"></i></div>
-            <div>
-                <div class="kpi-num">{{ nb_projets }}</div>
-                <div class="kpi-label">Projet(s) financé(s)</div>
-            </div>
-        </div>
+  {# ══════════════════════════════════════════════════
+     KPI CARDS
+  ══════════════════════════════════════════════════ #}
+  <div class="kpi-row">
+
+    <div class="kpi gold">
+      <div class="kpi-icon"><i class="fa fa-coins"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-val">{{ total_investi|number_format(0, ',', ' ') }}</div>
+        <div class="kpi-lbl">TND investis au total</div>
+        <div class="kpi-sub"><i class="fa fa-info-circle"></i> Cumulé sur tous vos investissements</div>
+      </div>
     </div>
 
-    {# ── Ligne 1 : Derniers investissements + Répartition statuts ── #}
-    <div class="dash-row-3">
-
-        {# Derniers investissements #}
-        <div class="panel">
-            <div class="panel-title"><i class="fa fa-history"></i>Derniers investissements</div>
-            {% if derniers|length > 0 %}
-                <table class="dash-table">
-                    <thead>
-                        <tr>
-                            <th>Projet</th>
-                            <th>Date</th>
-                            <th>Statut</th>
-                            <th style="text-align:right;">Montant</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for inv in derniers %}
-                            <tr>
-                                <td>
-                                    {% if inv.project %}
-                                        <a href="{{ path('app_front_projet_show', {'id': inv.project.project_id}) }}"
-                                           style="color:var(--dark);font-weight:600;text-decoration:none;font-size:0.85rem;">
-                                            {{ inv.project.title|slice(0,30) }}{% if inv.project.title|length > 30 %}…{% endif %}
-                                        </a>
-                                    {% else %}
-                                        <span class="muted">Projet supprimé</span>
-                                    {% endif %}
-                                </td>
-                                <td class="muted">
-                                    {{ inv.investmentDate ? inv.investmentDate|date('d/m/Y') : inv.createdAt|date('d/m/Y') }}
-                                </td>
-                                <td>
-                                    <span class="statut-badge sb-{{ inv.statut ?? 'en_attente' }}">
-                                        {% if inv.statut == 'en_attente' %}En attente
-                                        {% elseif inv.statut == 'en_negociation' %}Négociation
-                                        {% elseif inv.statut == 'accepte' %}Accepté
-                                        {% elseif inv.statut == 'refuse' %}Refusé
-                                        {% elseif inv.statut == 'contrat_genere' %}Contrat
-                                        {% elseif inv.statut == 'signe' %}Signé
-                                        {% elseif inv.statut == 'termine' %}Terminé
-                                        {% else %}{{ inv.statut }}{% endif %}
-                                    </span>
-                                </td>
-                                <td style="text-align:right;" class="amount">
-                                    {{ inv.amount|number_format(0, ',', ' ') }} TND
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                <a href="{{ path('app_front_investissement_index') }}" class="voir-tout">
-                    <i class="fa fa-arrow-right"></i> Voir tous mes investissements
-                </a>
-            {% else %}
-                <div class="empty-text">Aucun investissement pour l'instant.</div>
-                <div style="text-align:center;margin-top:1rem;">
-                    <a href="{{ path('app_front_projet_index') }}" class="btn-yellow" style="font-size:0.8rem;padding:10px 20px;">
-                        <i class="fa fa-search" style="margin-right:5px;"></i>Explorer les projets
-                    </a>
-                </div>
-            {% endif %}
-        </div>
-
-        {# Répartition par statut #}
-        <div class="panel">
-            <div class="panel-title"><i class="fa fa-chart-bar"></i>Par statut</div>
-            {% if par_statut|length > 0 %}
-                {% set labels = {
-                    'en_attente':     'En attente',
-                    'en_negociation': 'Négociation',
-                    'accepte':        'Accepté',
-                    'refuse':         'Refusé',
-                    'contrat_genere': 'Contrat',
-                    'signe':          'Signé',
-                    'termine':        'Terminé'
-                } %}
-                {% for statut, count in par_statut %}
-                    <div class="statut-row">
-                        <span class="statut-badge sb-{{ statut }}">
-                            {{ labels[statut] ?? statut }}
-                        </span>
-                        <span class="statut-count">{{ count }}</span>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <div class="empty-text">Aucune donnée.</div>
-            {% endif %}
-        </div>
-
+    <div class="kpi blue">
+      <div class="kpi-icon" style="background:rgba(59,130,246,0.1);color:#2563eb;"><i class="fa fa-hand-holding-usd"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-val">{{ nb_investissements }}</div>
+        <div class="kpi-lbl">Investissement(s) réalisé(s)</div>
+        <div class="kpi-sub"><i class="fa fa-info-circle"></i> Nombre de transactions effectuées</div>
+      </div>
     </div>
 
-    {# ── Ligne 2 : Opportunités ── #}
+    <div class="kpi green">
+      <div class="kpi-icon" style="background:rgba(16,185,129,0.1);color:#059669;"><i class="fa fa-folder-open"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-val">{{ nb_projets }}</div>
+        <div class="kpi-lbl">Projet(s) distincts financés</div>
+        <div class="kpi-sub"><i class="fa fa-info-circle"></i> Diversification de votre portfolio</div>
+      </div>
+    </div>
+
+  </div>
+
+  {# ══════════════════════════════════════════════════
+     LIGNE : Derniers investissements + Répartition
+  ══════════════════════════════════════════════════ #}
+  <div class="d-grid-main">
+
+    {# Derniers investissements #}
     <div class="panel">
-        <div class="panel-title"><i class="fa fa-rocket"></i>Projets ouverts à l'investissement</div>
-        {% if projets_en_cours|length > 0 %}
-            {% for projet in projets_en_cours %}
-                <div class="projet-mini">
-                    <div style="flex:1;">
-                        <a href="{{ path('app_front_projet_show', {'id': projet.project_id}) }}" class="projet-mini-title">
-                            {{ projet.title }}
-                        </a>
-                        <div class="projet-mini-budget">
-                            <i class="fa fa-coins" style="color:var(--primary);margin-right:4px;"></i>
-                            Objectif : {{ projet.requiredBudget|number_format(0, ',', ' ') }} TND
-                            {% if projet.secteur %}
-                                &nbsp;·&nbsp;<i class="fa fa-tag" style="color:var(--primary);"></i> {{ projet.secteur|capitalize }}
-                            {% endif %}
-                            &nbsp;·&nbsp;{{ projet.investments|length }} investisseur(s)
-                        </div>
-                    </div>
-                    <a href="{{ path('app_front_investir', {'id': projet.project_id}) }}" class="btn-investir-mini">
-                        <i class="fa fa-hand-holding-usd"></i> Investir
+      <div class="panel-head">
+        <div class="panel-title"><i class="fa fa-history"></i>Derniers investissements</div>
+        <a href="{{ path('app_front_investissement_index') }}" class="panel-link">Voir tout <i class="fa fa-arrow-right"></i></a>
+      </div>
+      {% if derniers|length > 0 %}
+        <table class="d-table">
+          <thead>
+            <tr>
+              <th>Projet</th>
+              <th>Date</th>
+              <th>Statut</th>
+              <th style="text-align:right;">Montant</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for inv in derniers %}
+              <tr>
+                <td>
+                  {% if inv.project %}
+                    <a href="{{ path('app_front_projet_show', {'id': inv.project.project_id}) }}" class="t-name">
+                      {{ inv.project.title|slice(0,28) }}{% if inv.project.title|length > 28 %}…{% endif %}
                     </a>
-                </div>
+                  {% else %}
+                    <span class="t-muted">Projet supprimé</span>
+                  {% endif %}
+                </td>
+                <td class="t-muted">
+                  {{ inv.investmentDate ? inv.investmentDate|date('d/m/Y') : inv.createdAt|date('d/m/Y') }}
+                </td>
+                <td>
+                  <span class="sb sb-{{ inv.statut ?? 'en_attente' }}">
+                    {% if inv.statut == 'en_attente' %}En attente
+                    {% elseif inv.statut == 'en_negociation' %}Négociation
+                    {% elseif inv.statut == 'accepte' %}Accepté
+                    {% elseif inv.statut == 'refuse' %}Refusé
+                    {% elseif inv.statut == 'contrat_genere' %}Contrat
+                    {% elseif inv.statut == 'signe' %}Signé
+                    {% elseif inv.statut == 'termine' %}Terminé
+                    {% else %}{{ inv.statut }}{% endif %}
+                  </span>
+                </td>
+                <td class="t-amount">{{ inv.amount|number_format(0, ',', ' ') }} TND</td>
+              </tr>
             {% endfor %}
-            <a href="{{ path('app_front_projet_index') }}" class="voir-tout">
-                <i class="fa fa-arrow-right"></i> Explorer tous les projets
-            </a>
-        {% else %}
-            <div class="empty-text">Aucun projet en cours pour l'instant.</div>
-        {% endif %}
+          </tbody>
+        </table>
+      {% else %}
+        <div class="d-empty">
+          <div class="d-empty-icon"><i class="fa fa-receipt"></i></div>
+          <p>Aucun investissement pour l'instant.</p>
+          <a href="{{ path('app_front_projet_index') }}" class="btn-yellow" style="margin-top:1rem;font-size:0.8rem;padding:10px 20px;display:inline-flex;align-items:center;gap:6px;">
+            <i class="fa fa-search"></i> Explorer les projets
+          </a>
+        </div>
+      {% endif %}
     </div>
 
-    {# ── Graphique : Projets par secteur ── #}
-    {% include 'front/dashboard/_secteur_chart.html.twig' %}
+    {# Répartition par statut #}
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title"><i class="fa fa-chart-bar"></i>Répartition statuts</div>
+      </div>
+      {% if par_statut|length > 0 %}
+        {% set total_inv = 0 %}
+        {% for c in par_statut %}{% set total_inv = total_inv + c %}{% endfor %}
+        {% set statut_labels = {
+          'en_attente':     {'label': 'En attente',   'color': '#d97706'},
+          'en_negociation': {'label': 'Négociation',  'color': '#2563eb'},
+          'accepte':        {'label': 'Accepté',      'color': '#059669'},
+          'refuse':         {'label': 'Refusé',       'color': '#dc2626'},
+          'contrat_genere': {'label': 'Contrat',      'color': '#7c3aed'},
+          'signe':          {'label': 'Signé',        'color': '#065f46'},
+          'termine':        {'label': 'Terminé',      'color': '#6b7280'}
+        } %}
+        {% for statut, count in par_statut %}
+          {% set info = statut_labels[statut] ?? {'label': statut, 'color': '#9ca3af'} %}
+          {% set pct = total_inv > 0 ? ((count / total_inv) * 100)|round(0) : 0 %}
+          <div class="stat-row">
+            <span class="sb sb-{{ statut }}" style="min-width:90px;">{{ info.label }}</span>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar-fill" style="width:{{ pct }}%;background:{{ info.color }};"></div>
+            </div>
+            <span class="stat-count">{{ count }}</span>
+          </div>
+        {% endfor %}
+        <div style="margin-top:1rem;padding-top:0.8rem;border-top:1px solid #f0f2f5;font-size:0.74rem;color:#9ca3af;text-align:right;">
+          {{ total_inv }} investissement(s) au total
+        </div>
+      {% else %}
+        <div class="d-empty">
+          <div class="d-empty-icon"><i class="fa fa-chart-bar"></i></div>
+          <p>Aucune donnée disponible.</p>
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+
+  {# ══════════════════════════════════════════════════
+     PROJETS OUVERTS À L'INVESTISSEMENT
+  ══════════════════════════════════════════════════ #}
+  <div class="panel">
+    <div class="panel-head">
+      <div class="panel-title"><i class="fa fa-rocket"></i>Opportunités d'investissement</div>
+      <a href="{{ path('app_front_projet_index') }}" class="panel-link">Explorer tout <i class="fa fa-arrow-right"></i></a>
+    </div>
+    {% if projets_en_cours|length > 0 %}
+      <div class="proj-cards">
+        {% for projet in projets_en_cours %}
+          {% set investi = 0 %}
+          {% for inv in projet.investments %}{% set investi = investi + inv.amount %}{% endfor %}
+          {% set rawPct = projet.requiredBudget > 0 ? (investi / projet.requiredBudget * 100)|round(1) : 0 %}
+          {% set pct = rawPct > 100 ? 100 : rawPct %}
+          <div class="proj-card">
+            <a href="{{ path('app_front_projet_show', {'id': projet.project_id}) }}" class="proj-card-title">
+              {{ projet.title }}
+            </a>
+            <div class="proj-card-meta">
+              {% if projet.secteur %}<i class="fa fa-tag" style="color:#ffbe33;margin-right:3px;"></i>{{ projet.secteur|capitalize }} &nbsp;·&nbsp; {% endif %}
+              <i class="fa fa-coins" style="color:#ffbe33;margin-right:3px;"></i>{{ projet.requiredBudget|number_format(0,',',' ') }} TND
+            </div>
+            <div class="proj-prog-bar">
+              <div class="proj-prog-fill" style="width:{{ pct }}%;"></div>
+            </div>
+            <div class="proj-card-footer">
+              <span class="proj-investors">
+                <i class="fa fa-users" style="color:#9ca3af;margin-right:3px;"></i>{{ projet.investments|length }} investisseur(s)
+                &nbsp;·&nbsp; {{ pct }}%
+              </span>
+              <a href="{{ path('app_front_investir', {'id': projet.project_id}) }}" class="btn-inv">
+                <i class="fa fa-hand-holding-usd"></i> Investir
+              </a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="d-empty">
+        <div class="d-empty-icon"><i class="fa fa-folder-open"></i></div>
+        <p>Aucun projet ouvert à l'investissement pour l'instant.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  {# ══════════════════════════════════════════════════
+     GRAPHIQUE SECTEURS
+  ══════════════════════════════════════════════════ #}
+  {% include 'front/dashboard/_secteur_chart.html.twig' %}
 
 </div>
 {% endblock %}

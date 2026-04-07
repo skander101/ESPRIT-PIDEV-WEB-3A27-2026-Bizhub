@@ -141,6 +141,24 @@ class Investment
     public function getCommentaire(): ?string { return $this->commentaire; }
     public function setCommentaire(?string $commentaire): self { $this->commentaire = $commentaire; return $this; }
 
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    private ?string $type_investissement = null;
+
+    public function getTypeInvestissement(): ?string { return $this->type_investissement; }
+    public function setTypeInvestissement(?string $type_investissement): self { $this->type_investissement = $type_investissement; return $this; }
+
+    #[ORM\Column(type: 'string', length: 20, nullable: true)]
+    private ?string $duree_souhaitee = null;
+
+    public function getDureeSouhaitee(): ?string { return $this->duree_souhaitee; }
+    public function setDureeSouhaitee(?string $duree_souhaitee): self { $this->duree_souhaitee = $duree_souhaitee; return $this; }
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $conditions_particulieres = null;
+
+    public function getConditionsParticulieres(): ?string { return $this->conditions_particulieres; }
+    public function setConditionsParticulieres(?string $conditions_particulieres): self { $this->conditions_particulieres = $conditions_particulieres; return $this; }
+
     #[ORM\Column(type: 'datetime', nullable: false)]
     private ?\DateTimeInterface $created_at = null;
 
