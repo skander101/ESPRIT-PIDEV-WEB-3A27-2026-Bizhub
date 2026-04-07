@@ -1,0 +1,193 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Investir dans {{ projet.title }} — BizHub{% endblock %}
+
+{% block extra_styles %}
+.page-body {
+    max-width: 960px; margin: 0 auto;
+    padding: 40px 5%;
+    display: grid; grid-template-columns: 1fr 300px;
+    gap: 2rem; align-items: start;
+}
+.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.project-summary {
+    background: var(--white); border-radius: var(--radius-lg);
+    border: 1.5px solid var(--border); padding: 24px;
+    box-shadow: var(--shadow-md); position: sticky; top: 90px;
+}
+.summary-title {
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.1em; font-family: 'Josefin Sans', sans-serif;
+    color: var(--text-muted); margin-bottom: 1rem; padding-bottom: 0.6rem;
+    border-bottom: 1.5px solid var(--border);
+}
+.info-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 0; border-bottom: 1px solid var(--border-light);
+    font-size: 0.83rem;
+}
+.info-row:last-child { border-bottom: none; }
+.info-label { color: var(--text-muted); }
+.info-value { font-weight: 700; color: var(--text); font-family: 'Josefin Sans', sans-serif; }
+.back-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    color: rgba(255,255,255,0.4); text-decoration: none; font-size: 0.75rem;
+    margin-bottom: 1.2rem; transition: color var(--transition);
+    font-family: 'Josefin Sans', sans-serif; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.08em;
+}
+.back-link:hover { color: var(--primary); }
+.notice-box {
+    background: rgba(255,190,51,0.07); border: 1px solid rgba(255,190,51,0.2);
+    border-radius: var(--radius-md); padding: 14px 18px;
+    margin-bottom: 1.5rem; font-size: 0.82rem; color: #92650a;
+    display: flex; gap: 10px; align-items: flex-start; line-height: 1.6;
+}
+.notice-box i { color: var(--primary); flex-shrink: 0; margin-top: 2px; }
+@media (max-width: 768px) { .page-body { grid-template-columns: 1fr; } .form-row-2 { grid-template-columns: 1fr; } }
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div style="max-width:960px;margin:0 auto;">
+        <a href="{{ path('app_front_projet_show', {'id': projet.project_id}) }}" class="back-link">
+            <i class="fa fa-arrow-left"></i> Retour au projet
+        </a>
+        <h1>
+            <i class="fa fa-hand-holding-usd" style="color:var(--primary);margin-right:0.5rem;"></i>
+            Investir dans ce projet
+        </h1>
+        <p>{{ projet.title }}</p>
+    </div>
+</div>
+
+<div class="page-body">
+
+    {# ── Formulaire ── #}
+    <div>
+        <div class="biz-form">
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+            {# Montant + Date #}
+            <div class="form-row-2">
+                <div class="form-group">
+                    {{ form_label(form.amount) }}
+                    {{ form_widget(form.amount, {'attr': {'placeholder': '10 000'}}) }}
+                    {{ form_errors(form.amount) }}
+                    <div class="form-hint"><i class="fa fa-info-circle"></i> Minimum 100 TND</div>
+                </div>
+                <div class="form-group">
+                    {{ form_label(form.investment_date) }}
+                    {{ form_widget(form.investment_date) }}
+                    {{ form_errors(form.investment_date) }}
+                </div>
+            </div>
+
+            {# Mode de paiement + Statut #}
+            <div class="form-row-2">
+                <div class="form-group">
+                    {{ form_label(form.payment_mode) }}
+                    {{ form_widget(form.payment_mode) }}
+                    {{ form_errors(form.payment_mode) }}
+                </div>
+                <div class="form-group">
+                    {{ form_label(form.statut) }}
+                    {{ form_widget(form.statut) }}
+                    {{ form_errors(form.statut) }}
+                </div>
+            </div>
+
+            {# URL contrat #}
+            <div class="form-group">
+                {{ form_label(form.contract_url) }}
+                {{ form_widget(form.contract_url, {'attr': {'placeholder': 'https://…'}}) }}
+                {{ form_errors(form.contract_url) }}
+                <div class="form-hint"><i class="fa fa-link"></i> Optionnel — lien vers votre contrat signé</div>
+            </div>
+
+            {# Commentaire #}
+            <div class="form-group">
+                {{ form_label(form.commentaire) }}
+                {{ form_widget(form.commentaire, {'attr': {'placeholder': 'Remarques, conditions particulières…', 'rows': 3}}) }}
+                {{ form_errors(form.commentaire) }}
+            </div>
+
+            {# Notice #}
+            <div class="notice-box">
+                <i class="fa fa-shield-alt"></i>
+                <span>
+                    En confirmant, vous acceptez de réaliser cet investissement dans le projet
+                    <strong>{{ projet.title }}</strong>. Cette action sera enregistrée sur la plateforme.
+                </span>
+            </div>
+
+            <button type="submit" class="form-submit">
+                <i class="fa fa-check-circle"></i> Confirmer l'investissement
+            </button>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+
+    {# ── Résumé projet ── #}
+    <div class="project-summary">
+        <div class="summary-title"><i class="fa fa-folder-open" style="color:var(--primary);margin-right:6px;"></i>Résumé du projet</div>
+
+        <div style="font-weight:700;font-size:0.95rem;margin-bottom:0.5rem;color:var(--dark);">{{ projet.title }}</div>
+
+        <div style="margin-bottom:1rem;">
+            <span class="badge badge-{{ projet.status }}">
+                {% if projet.status == 'en_cours' %}En cours
+                {% elseif projet.status == 'finance' %}Financé
+                {% else %}{{ projet.status }}{% endif %}
+            </span>
+        </div>
+
+        {% if projet.description %}
+            <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.6;margin-bottom:1rem;">
+                {{ projet.description|slice(0,120) }}{% if projet.description|length > 120 %}…{% endif %}
+            </p>
+        {% endif %}
+
+        {# Barre de progression #}
+        <div class="progress-wrap" style="margin:0.8rem 0 0.4rem;">
+            <div class="progress-fill" style="width:{{ pourcentage }}%;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:0.74rem;color:var(--text-muted);margin-bottom:1rem;">
+            <span>{{ total_investi|number_format(0,',',' ') }} TND</span>
+            <span>{{ pourcentage }}%</span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">Objectif</span>
+            <span class="info-value">{{ projet.requiredBudget|number_format(0,',',' ') }} TND</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Investisseurs</span>
+            <span class="info-value">{{ projet.investments|length }}</span>
+        </div>
+        {% if projet.secteur %}
+        <div class="info-row">
+            <span class="info-label">Secteur</span>
+            <span class="info-value">{{ projet.secteur|capitalize }}</span>
+        </div>
+        {% endif %}
+        {% if projet.user %}
+        <div class="info-row">
+            <span class="info-label">Startup</span>
+            <span class="info-value">{{ projet.user.fullName }}</span>
+        </div>
+        {% endif %}
+        <div class="info-row">
+            <span class="info-label">Créé le</span>
+            <span class="info-value">{{ projet.createdAt ? projet.createdAt|date('d/m/Y') : '—' }}</span>
+        </div>
+
+        <a href="{{ path('app_front_projet_show', {'id': projet.project_id}) }}"
+           class="btn-ghost" style="width:100%;justify-content:center;margin-top:1.2rem;">
+            <i class="fa fa-eye"></i> Voir le projet complet
+        </a>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,175 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}{{ projet.title }} — BizHub{% endblock %}
+
+{% block extra_styles %}
+.project-hero {
+    background: linear-gradient(135deg, var(--dark) 0%, var(--dark2) 100%);
+    padding: 60px 5% 50px;
+}
+.project-hero-inner { max-width: 1000px; margin: 0 auto; }
+.back-link { display: inline-flex; align-items: center; gap: 6px; color: rgba(255,255,255,0.45); text-decoration: none; font-size: 0.8rem; margin-bottom: 1.5rem; transition: color 0.2s; font-family: 'Josefin Sans', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+.back-link:hover { color: var(--primary); }
+.project-title { font-size: 2rem; color: var(--white); font-family: 'Josefin Sans', sans-serif; font-weight: 700; margin-bottom: 0.5rem; }
+.status-badge { font-size: 0.72rem; font-weight: 700; padding: 5px 14px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.08em; font-family: 'Josefin Sans', sans-serif; display: inline-block; margin-bottom: 1rem; }
+.status-brouillon  { background: rgba(107,114,128,0.2); color: #9ca3af; }
+.status-publie     { background: rgba(59,130,246,0.2);  color: #60a5fa; }
+.status-en_cours   { background: rgba(91,110,245,0.2);  color: #8b9ef5; }
+.status-finance    { background: rgba(6,214,160,0.2);   color: #06d6a0; }
+.status-ferme      { background: rgba(239,68,68,0.15);  color: #f87171; }
+.hero-meta { display: flex; gap: 2rem; flex-wrap: wrap; margin-top: 1.5rem; }
+.hero-stat { }
+.hero-stat-label { font-size: 0.72rem; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'Josefin Sans', sans-serif; }
+.hero-stat-value { font-size: 1.4rem; font-weight: 700; color: var(--white); font-family: 'Josefin Sans', sans-serif; }
+.hero-stat-value span { color: var(--primary); }
+.page-body { max-width: 1000px; margin: 0 auto; padding: 40px 5%; display: grid; grid-template-columns: 1fr 340px; gap: 2rem; }
+.progress-section { margin-bottom: 1.5rem; }
+.progress-bar-wrap { height: 10px; background: var(--border); border-radius: 5px; overflow: hidden; margin: 0.6rem 0; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary-dark)); border-radius: 5px; transition: width 1s ease; }
+.progress-labels { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); }
+.section-title { font-size: 0.8rem; font-weight: 700; color: var(--dark); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'Josefin Sans', sans-serif; margin-bottom: 1rem; padding-bottom: 0.6rem; border-bottom: 1.5px solid var(--border); }
+.inv-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.inv-row:last-child { border-bottom: none; }
+.inv-name { font-weight: 600; font-size: 0.88rem; color: var(--dark); }
+.inv-date { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+.inv-amount { font-weight: 700; font-size: 1rem; color: var(--primary); font-family: 'Josefin Sans', sans-serif; }
+.action-panel { background: var(--white); border-radius: 14px; border: 1.5px solid var(--border); padding: 24px; box-shadow: 0 4px 18px rgba(0,0,0,0.06); position: sticky; top: 90px; align-self: start; }
+.flash-msg { padding: 14px 20px; border-radius: 10px; margin-bottom: 1.5rem; font-size: 0.9rem; font-weight: 600; }
+.flash-success { background: rgba(6,214,160,0.1); color: #06d6a0; border: 1px solid rgba(6,214,160,0.3); }
+.flash-error   { background: rgba(239,68,68,0.08); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
+@media (max-width: 768px) { .page-body { grid-template-columns: 1fr; } }
+{% endblock %}
+
+{% block content %}
+<div class="project-hero">
+    <div class="project-hero-inner">
+        <a href="{{ path('app_front_projet_index') }}" class="back-link"><i class="fa fa-arrow-left"></i> Retour</a>
+        <span class="status-badge status-{{ projet.status }}">
+            {% if projet.status == 'brouillon' %}Brouillon
+            {% elseif projet.status == 'publie' %}Publié
+            {% elseif projet.status == 'en_cours' %}En cours
+            {% elseif projet.status == 'finance' %}Financé
+            {% elseif projet.status == 'ferme' %}Fermé
+            {% else %}{{ projet.status }}{% endif %}
+        </span>
+        <div class="project-title">{{ projet.title }}</div>
+        <div class="hero-meta">
+            <div class="hero-stat">
+                <div class="hero-stat-label">Budget requis</div>
+                <div class="hero-stat-value"><span>{{ projet.requiredBudget|number_format(0, ',', ' ') }}</span> TND</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-label">Déjà investi</div>
+                <div class="hero-stat-value"><span>{{ total_investi|number_format(0, ',', ' ') }}</span> TND</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-label">Investisseurs</div>
+                <div class="hero-stat-value"><span>{{ investissements|length }}</span></div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-label">Progression</div>
+                <div class="hero-stat-value"><span>{{ pourcentage }}</span>%</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="page-body">
+    <div>
+        {# Description #}
+        <div class="dash-panel" style="margin-bottom:1.5rem;">
+            <div class="section-title"><i class="fa fa-align-left" style="margin-right:6px;color:var(--primary);"></i>Description</div>
+            {% if projet.description %}
+                <p style="line-height:1.8;color:var(--text-muted);font-size:0.92rem;">{{ projet.description }}</p>
+            {% else %}
+                <p style="color:var(--text-muted);font-style:italic;">Aucune description fournie.</p>
+            {% endif %}
+        </div>
+
+        {# Barre de progression #}
+        <div class="dash-panel" style="margin-bottom:1.5rem;">
+            <div class="section-title"><i class="fa fa-chart-line" style="margin-right:6px;color:var(--primary);"></i>Financement</div>
+            <div class="progress-section">
+                <div class="progress-bar-wrap">
+                    <div class="progress-bar-fill" style="width:{{ pourcentage }}%;"></div>
+                </div>
+                <div class="progress-labels">
+                    <span>{{ total_investi|number_format(0, ',', ' ') }} TND collectés</span>
+                    <span>{{ pourcentage }}% de l'objectif</span>
+                </div>
+            </div>
+        </div>
+
+        {# Investissements reçus (visible uniquement pour le propriétaire startup) #}
+        {% if is_owner %}
+        <div class="dash-panel">
+            <div class="section-title"><i class="fa fa-users" style="margin-right:6px;color:var(--primary);"></i>Investissements reçus ({{ investissements|length }})</div>
+            {% if investissements|length > 0 %}
+                {% for inv in investissements %}
+                    <div class="inv-row">
+                        <div>
+                            <div class="inv-name">{{ inv.user ? inv.user.fullName : 'Investisseur anonyme' }}</div>
+                            <div class="inv-date">{{ inv.investmentDate ? inv.investmentDate|date('d/m/Y') : inv.createdAt|date('d/m/Y') }}</div>
+                        </div>
+                        <div class="inv-amount">{{ inv.amount|number_format(0, ',', ' ') }} TND</div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p style="color:var(--text-muted);font-style:italic;text-align:center;padding:1.5rem 0;">Aucun investissement reçu pour l'instant.</p>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    {# Panneau latéral d'actions #}
+    <div>
+        <div class="action-panel">
+            {% if is_owner %}
+                <div style="font-size:0.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;font-family:'Josefin Sans',sans-serif;font-weight:700;margin-bottom:1rem;">Gérer mon projet</div>
+                <a href="{{ path('app_front_projet_edit', {'id': projet.project_id}) }}" class="btn-yellow" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:0.7rem;width:100%;">
+                    <i class="fa fa-pen"></i> Modifier le projet
+                </a>
+                <form method="post" action="{{ path('app_front_projet_delete', {'id': projet.project_id}) }}"
+                      onsubmit="return confirm('Supprimer définitivement ce projet ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete_projet_' ~ projet.project_id) }}">
+                    <button type="submit" style="width:100%;padding:12px;background:rgba(239,68,68,0.08);color:#ef4444;border:1.5px solid rgba(239,68,68,0.2);border-radius:8px;font-family:'Josefin Sans',sans-serif;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+                        <i class="fa fa-trash"></i> Supprimer
+                    </button>
+                </form>
+            {% elseif app.user and app.user.userType == 'investisseur' %}
+                <div style="font-size:0.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;font-family:'Josefin Sans',sans-serif;font-weight:700;margin-bottom:1rem;">Investir dans ce projet</div>
+                {% if projet.status in ['finance', 'ferme'] %}
+                    <div style="padding:14px;background:rgba(239,68,68,0.06);border-radius:8px;text-align:center;color:#ef4444;font-size:0.88rem;border:1px solid rgba(239,68,68,0.15);">
+                        <i class="fa fa-lock" style="margin-right:5px;"></i>Ce projet n'accepte plus d'investissements.
+                    </div>
+                {% elseif projet.status not in ['en_cours', 'publie'] %}
+                    <div style="padding:14px;background:rgba(91,110,245,0.07);border-radius:8px;text-align:center;color:#5b6ef5;font-size:0.88rem;border:1px solid rgba(91,110,245,0.2);">
+                        <i class="fa fa-clock" style="margin-right:5px;"></i>Ce projet n'est pas encore ouvert aux investissements.
+                    </div>
+                {% elseif deja_investi %}
+                    <div style="padding:14px;background:rgba(6,214,160,0.08);border-radius:8px;text-align:center;color:#06d6a0;font-size:0.88rem;font-weight:600;border:1px solid rgba(6,214,160,0.2);">
+                        <i class="fa fa-check-circle" style="margin-right:6px;"></i>Vous avez déjà investi dans ce projet.
+                    </div>
+                    <a href="{{ path('app_front_investir', {'id': projet.project_id}) }}" class="btn-yellow" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:0.8rem;width:100%;">
+                        <i class="fa fa-plus"></i> Investir à nouveau
+                    </a>
+                {% else %}
+                    <a href="{{ path('app_front_investir', {'id': projet.project_id}) }}" class="btn-yellow" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font-size:1rem;padding:16px;">
+                        <i class="fa fa-hand-holding-usd"></i> Investir maintenant
+                    </a>
+                {% endif %}
+            {% endif %}
+
+            <div style="margin-top:1.5rem;padding-top:1.2rem;border-top:1px solid var(--border);">
+                <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;font-family:'Josefin Sans',sans-serif;font-weight:700;margin-bottom:0.8rem;">Infos projet</div>
+                <div style="font-size:0.84rem;color:var(--text-muted);line-height:2;">
+                    <div><i class="fa fa-calendar" style="width:18px;color:var(--primary);"></i> Créé le {{ projet.createdAt ? projet.createdAt|date('d/m/Y') : '—' }}</div>
+                    {% if projet.user %}
+                    <div><i class="fa fa-user" style="width:18px;color:var(--primary);"></i> {{ projet.user.fullName }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

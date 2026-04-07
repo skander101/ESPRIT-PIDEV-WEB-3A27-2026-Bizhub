@@ -1,0 +1,312 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Mon Dashboard — BizHub{% endblock %}
+
+{% block extra_styles %}
+/* ── Page header ── */
+.dash-header {
+    background: linear-gradient(135deg, var(--dark) 0%, var(--dark2) 100%);
+    padding: 50px 5% 36px;
+}
+.dash-header h1 {
+    font-size: 1.8rem; color: var(--white);
+    font-family: 'Josefin Sans', sans-serif; font-weight: 700;
+}
+.dash-header p { color: rgba(255,255,255,0.5); margin-top: 0.3rem; font-size: 0.9rem; }
+.user-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,190,51,0.15); border: 1px solid rgba(255,190,51,0.3);
+    color: var(--primary); border-radius: 20px; padding: 4px 14px;
+    font-size: 0.72rem; font-weight: 700; font-family: 'Josefin Sans', sans-serif;
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1rem;
+}
+
+/* ── Layout principal ── */
+.dash-body { max-width: 1200px; margin: 0 auto; padding: 32px 5%; }
+
+/* ── KPI cards ── */
+.kpi-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1.2rem; margin-bottom: 2rem;
+}
+.kpi-card {
+    background: var(--white); border-radius: 14px;
+    border: 1.5px solid var(--border); padding: 22px 24px;
+    display: flex; align-items: center; gap: 16px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+}
+.kpi-card:hover { border-color: var(--primary); box-shadow: 0 6px 24px rgba(255,190,51,0.1); }
+.kpi-icon {
+    width: 52px; height: 52px; border-radius: 12px;
+    background: rgba(255,190,51,0.12); display: flex;
+    align-items: center; justify-content: center;
+    font-size: 1.3rem; color: var(--primary); flex-shrink: 0;
+}
+.kpi-num {
+    font-family: 'Josefin Sans', sans-serif; font-size: 1.9rem;
+    font-weight: 700; color: var(--dark); line-height: 1;
+}
+.kpi-label { font-size: 0.77rem; color: var(--text-muted); margin-top: 4px; }
+
+/* ── Panels ── */
+.dash-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+.dash-row-3 { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+.panel {
+    background: var(--white); border-radius: 14px;
+    border: 1.5px solid var(--border); padding: 24px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+}
+.panel-title {
+    font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.1em; font-family: 'Josefin Sans', sans-serif;
+    color: var(--dark); margin-bottom: 1.1rem; padding-bottom: 0.7rem;
+    border-bottom: 1.5px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+}
+.panel-title i { color: var(--primary); }
+
+/* ── Statut badges ── */
+.statut-badge {
+    font-size: 0.68rem; font-weight: 700; padding: 2px 9px;
+    border-radius: 20px; text-transform: uppercase; letter-spacing: 0.06em;
+    font-family: 'Josefin Sans', sans-serif; display: inline-block;
+}
+.sb-en_attente    { background: rgba(255,190,51,0.15); color: #b8860b; }
+.sb-en_negociation{ background: rgba(59,130,246,0.12); color: #3b82f6; }
+.sb-accepte       { background: rgba(6,214,160,0.15);  color: #06d6a0; }
+.sb-refuse        { background: rgba(239,68,68,0.1);   color: #ef4444; }
+.sb-contrat_genere{ background: rgba(139,92,246,0.12); color: #8b5cf6; }
+.sb-signe         { background: rgba(6,214,160,0.2);   color: #06a87e; }
+.sb-termine       { background: rgba(107,114,128,0.12);color: #6b7280; }
+
+/* ── Tableau ── */
+.dash-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.dash-table th {
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; font-family: 'Josefin Sans', sans-serif;
+    color: var(--text-muted); padding: 0 0 10px 0;
+    border-bottom: 1.5px solid var(--border); text-align: left;
+}
+.dash-table td {
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+    color: var(--dark); vertical-align: middle;
+}
+.dash-table tr:last-child td { border-bottom: none; }
+.dash-table .amount { font-family: 'Josefin Sans', sans-serif; font-weight: 700; color: var(--primary); }
+.dash-table .muted  { color: var(--text-muted); font-size: 0.78rem; }
+
+/* ── Répartition statut ── */
+.statut-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 0.84rem;
+}
+.statut-row:last-child { border-bottom: none; }
+.statut-count {
+    font-family: 'Josefin Sans', sans-serif; font-weight: 700;
+    font-size: 1rem; color: var(--dark);
+}
+
+/* ── Projet card mini ── */
+.projet-mini {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 12px 0; border-bottom: 1px solid var(--border); gap: 1rem;
+}
+.projet-mini:last-child { border-bottom: none; }
+.projet-mini-title {
+    font-size: 0.88rem; font-weight: 700; color: var(--dark);
+    font-family: 'Josefin Sans', sans-serif; text-decoration: none;
+    display: block; margin-bottom: 3px;
+}
+.projet-mini-title:hover { color: var(--primary); }
+.projet-mini-budget { font-size: 0.78rem; color: var(--text-muted); }
+.btn-investir-mini {
+    background: var(--primary); color: var(--dark); padding: 6px 14px;
+    border-radius: 6px; font-size: 0.72rem; font-weight: 700;
+    font-family: 'Josefin Sans', sans-serif; text-transform: uppercase;
+    letter-spacing: 0.06em; text-decoration: none; white-space: nowrap;
+    flex-shrink: 0;
+}
+.btn-investir-mini:hover { background: var(--primary-dark); }
+
+/* ── Lien "Voir tout" ── */
+.voir-tout {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 0.75rem; font-weight: 700; font-family: 'Josefin Sans', sans-serif;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--primary); text-decoration: none; margin-top: 1rem;
+}
+.voir-tout:hover { color: var(--primary-dark); }
+
+.empty-text { color: var(--text-muted); font-size: 0.85rem; font-style: italic; text-align: center; padding: 20px 0; }
+
+@media (max-width: 900px) { .kpi-grid { grid-template-columns: 1fr 1fr; } .dash-row, .dash-row-3 { grid-template-columns: 1fr; } }
+@media (max-width: 500px) { .kpi-grid { grid-template-columns: 1fr; } }
+{% endblock %}
+
+{% block content %}
+{# ── Header ── #}
+<div class="dash-header">
+    <div style="max-width:1200px;margin:0 auto;">
+        <div class="user-badge"><i class="fa fa-user-tie"></i> Investisseur</div>
+        <h1><i class="fa fa-chart-pie" style="color:var(--primary);margin-right:0.5rem;"></i>Mon Dashboard</h1>
+        <p>Bonjour <strong style="color:var(--white);">{{ app.user.fullName }}</strong> — voici un résumé de votre activité d'investissement.</p>
+    </div>
+</div>
+
+<div class="dash-body">
+
+    {# ── KPI cards ── #}
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-icon"><i class="fa fa-coins"></i></div>
+            <div>
+                <div class="kpi-num">{{ total_investi|number_format(0, ',', ' ') }}</div>
+                <div class="kpi-label">TND investis au total</div>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon"><i class="fa fa-hand-holding-usd"></i></div>
+            <div>
+                <div class="kpi-num">{{ nb_investissements }}</div>
+                <div class="kpi-label">Investissement(s) réalisé(s)</div>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon"><i class="fa fa-folder-open"></i></div>
+            <div>
+                <div class="kpi-num">{{ nb_projets }}</div>
+                <div class="kpi-label">Projet(s) financé(s)</div>
+            </div>
+        </div>
+    </div>
+
+    {# ── Ligne 1 : Derniers investissements + Répartition statuts ── #}
+    <div class="dash-row-3">
+
+        {# Derniers investissements #}
+        <div class="panel">
+            <div class="panel-title"><i class="fa fa-history"></i>Derniers investissements</div>
+            {% if derniers|length > 0 %}
+                <table class="dash-table">
+                    <thead>
+                        <tr>
+                            <th>Projet</th>
+                            <th>Date</th>
+                            <th>Statut</th>
+                            <th style="text-align:right;">Montant</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inv in derniers %}
+                            <tr>
+                                <td>
+                                    {% if inv.project %}
+                                        <a href="{{ path('app_front_projet_show', {'id': inv.project.project_id}) }}"
+                                           style="color:var(--dark);font-weight:600;text-decoration:none;font-size:0.85rem;">
+                                            {{ inv.project.title|slice(0,30) }}{% if inv.project.title|length > 30 %}…{% endif %}
+                                        </a>
+                                    {% else %}
+                                        <span class="muted">Projet supprimé</span>
+                                    {% endif %}
+                                </td>
+                                <td class="muted">
+                                    {{ inv.investmentDate ? inv.investmentDate|date('d/m/Y') : inv.createdAt|date('d/m/Y') }}
+                                </td>
+                                <td>
+                                    <span class="statut-badge sb-{{ inv.statut ?? 'en_attente' }}">
+                                        {% if inv.statut == 'en_attente' %}En attente
+                                        {% elseif inv.statut == 'en_negociation' %}Négociation
+                                        {% elseif inv.statut == 'accepte' %}Accepté
+                                        {% elseif inv.statut == 'refuse' %}Refusé
+                                        {% elseif inv.statut == 'contrat_genere' %}Contrat
+                                        {% elseif inv.statut == 'signe' %}Signé
+                                        {% elseif inv.statut == 'termine' %}Terminé
+                                        {% else %}{{ inv.statut }}{% endif %}
+                                    </span>
+                                </td>
+                                <td style="text-align:right;" class="amount">
+                                    {{ inv.amount|number_format(0, ',', ' ') }} TND
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <a href="{{ path('app_front_investissement_index') }}" class="voir-tout">
+                    <i class="fa fa-arrow-right"></i> Voir tous mes investissements
+                </a>
+            {% else %}
+                <div class="empty-text">Aucun investissement pour l'instant.</div>
+                <div style="text-align:center;margin-top:1rem;">
+                    <a href="{{ path('app_front_projet_index') }}" class="btn-yellow" style="font-size:0.8rem;padding:10px 20px;">
+                        <i class="fa fa-search" style="margin-right:5px;"></i>Explorer les projets
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        {# Répartition par statut #}
+        <div class="panel">
+            <div class="panel-title"><i class="fa fa-chart-bar"></i>Par statut</div>
+            {% if par_statut|length > 0 %}
+                {% set labels = {
+                    'en_attente':     'En attente',
+                    'en_negociation': 'Négociation',
+                    'accepte':        'Accepté',
+                    'refuse':         'Refusé',
+                    'contrat_genere': 'Contrat',
+                    'signe':          'Signé',
+                    'termine':        'Terminé'
+                } %}
+                {% for statut, count in par_statut %}
+                    <div class="statut-row">
+                        <span class="statut-badge sb-{{ statut }}">
+                            {{ labels[statut] ?? statut }}
+                        </span>
+                        <span class="statut-count">{{ count }}</span>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-text">Aucune donnée.</div>
+            {% endif %}
+        </div>
+
+    </div>
+
+    {# ── Ligne 2 : Opportunités ── #}
+    <div class="panel">
+        <div class="panel-title"><i class="fa fa-rocket"></i>Projets ouverts à l'investissement</div>
+        {% if projets_en_cours|length > 0 %}
+            {% for projet in projets_en_cours %}
+                <div class="projet-mini">
+                    <div style="flex:1;">
+                        <a href="{{ path('app_front_projet_show', {'id': projet.project_id}) }}" class="projet-mini-title">
+                            {{ projet.title }}
+                        </a>
+                        <div class="projet-mini-budget">
+                            <i class="fa fa-coins" style="color:var(--primary);margin-right:4px;"></i>
+                            Objectif : {{ projet.requiredBudget|number_format(0, ',', ' ') }} TND
+                            {% if projet.secteur %}
+                                &nbsp;·&nbsp;<i class="fa fa-tag" style="color:var(--primary);"></i> {{ projet.secteur|capitalize }}
+                            {% endif %}
+                            &nbsp;·&nbsp;{{ projet.investments|length }} investisseur(s)
+                        </div>
+                    </div>
+                    <a href="{{ path('app_front_investir', {'id': projet.project_id}) }}" class="btn-investir-mini">
+                        <i class="fa fa-hand-holding-usd"></i> Investir
+                    </a>
+                </div>
+            {% endfor %}
+            <a href="{{ path('app_front_projet_index') }}" class="voir-tout">
+                <i class="fa fa-arrow-right"></i> Explorer tous les projets
+            </a>
+        {% else %}
+            <div class="empty-text">Aucun projet en cours pour l'instant.</div>
+        {% endif %}
+    </div>
+
+    {# ── Graphique : Projets par secteur ── #}
+    {% include 'front/dashboard/_secteur_chart.html.twig' %}
+
+</div>
+{% endblock %}
