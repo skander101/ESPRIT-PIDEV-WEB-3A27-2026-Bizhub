@@ -80,23 +80,15 @@
 
 <div class="page-body">
 
-    {% for type, messages in app.flashes %}
-        {% for msg in messages %}
-            <div class="flash-msg flash-{{ type }}">
-                <i class="fa fa-{{ type == 'success' ? 'check-circle' : 'exclamation-circle' }}" style="margin-right:8px;"></i>{{ msg }}
-            </div>
-        {% endfor %}
-    {% endfor %}
-
     {% if investissements|length > 0 %}
 
         <div style="background:rgba(255,190,51,0.07);border:1px solid rgba(255,190,51,0.2);border-radius:10px;padding:12px 18px;margin-bottom:1.5rem;font-size:0.84rem;color:#b8860b;display:flex;align-items:center;gap:8px;">
             <i class="fa fa-info-circle"></i>
-            Vous pouvez <strong>modifier ou supprimer</strong> uniquement les investissements dont le projet est <strong>En cours</strong>.
+            Vous pouvez <strong>modifier ou supprimer</strong> uniquement les investissements avec le statut <strong>En attente</strong>.
         </div>
 
         {% for inv in investissements %}
-            {% set editable = inv.project and inv.project.status == 'en_cours' %}
+            {% set editable = inv.statut == 'en_attente' %}
             <div class="inv-card">
                 <div class="inv-card-body">
                     <div>
@@ -123,6 +115,16 @@
                             {% if inv.project and inv.project.user %}
                                 <span><i class="fa fa-building" style="color:var(--primary);"></i> {{ inv.project.user.fullName }}</span>
                             {% endif %}
+                            {% if inv.paymentMode %}
+                                <span><i class="fa fa-credit-card" style="color:var(--primary);"></i>
+                                    {% if inv.paymentMode == 'virement' %}Virement
+                                    {% elseif inv.paymentMode == 'cheque' %}Chèque
+                                    {% elseif inv.paymentMode == 'especes' %}Espèces
+                                    {% elseif inv.paymentMode == 'carte' %}Carte
+                                    {% elseif inv.paymentMode == 'crypto' %}Crypto
+                                    {% else %}{{ inv.paymentMode }}{% endif %}
+                                </span>
+                            {% endif %}
                             {% if inv.contractUrl %}
                                 <span>
                                     <a href="{{ inv.contractUrl }}" target="_blank" style="color:var(--primary);text-decoration:none;">
@@ -130,6 +132,19 @@
                                     </a>
                                 </span>
                             {% endif %}
+                        </div>
+                        {# Statut de l'investissement #}
+                        <div style="margin-top:0.5rem;">
+                            <span class="badge badge-{{ inv.statut ?? 'en_attente' }}">
+                                {% if inv.statut == 'en_attente' %}En attente
+                                {% elseif inv.statut == 'en_negociation' %}En négociation
+                                {% elseif inv.statut == 'accepte' %}Accepté
+                                {% elseif inv.statut == 'refuse' %}Refusé
+                                {% elseif inv.statut == 'contrat_genere' %}Contrat généré
+                                {% elseif inv.statut == 'signe' %}Signé
+                                {% elseif inv.statut == 'termine' %}Terminé
+                                {% else %}{{ inv.statut }}{% endif %}
+                            </span>
                         </div>
                     </div>
 
@@ -154,8 +169,9 @@
                     </a>
                     <form method="post"
                           action="{{ path('app_front_investissement_delete', {'id': inv.investment_id}) }}"
-                          onsubmit="return confirm('Supprimer cet investissement ? Cette action est irréversible.');"
-                          style="margin:0;">
+                          style="margin:0;"
+                          data-confirm="Votre investissement de {{ inv.amount|number_format(0,',',' ') }} TND dans « {{ inv.project ? inv.project.title : 'ce projet' }} » sera supprimé définitivement."
+                          data-confirm-title="Supprimer cet investissement ?">
                         <input type="hidden" name="_token" value="{{ csrf_token('delete_investment_' ~ inv.investment_id) }}">
                         <button type="submit" class="btn-sm btn-delete">
                             <i class="fa fa-trash"></i> Supprimer

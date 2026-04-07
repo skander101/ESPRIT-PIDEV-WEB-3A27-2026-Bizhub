@@ -17,9 +17,15 @@ class ProjectRepository extends ServiceEntityRepository
         parent::__construct($registry, Project::class);
     }
 
+    /**
+     * Projets visibles dans la vue "Explorer" (investisseur).
+     * Exclut les brouillons — ils sont privés à la startup.
+     */
     public function findAllWithInvestments(): array
     {
         return $this->createQueryBuilder('p')
+            ->andWhere('p.status != :brouillon')
+            ->setParameter('brouillon', Project::STATUS_BROUILLON)
             ->orderBy('p.created_at', 'DESC')
             ->getQuery()
             ->getResult();
@@ -50,6 +56,8 @@ class ProjectRepository extends ServiceEntityRepository
     public function search(array $filters): array
     {
         $qb = $this->createQueryBuilder('p')
+            ->andWhere('p.status != :brouillon')
+            ->setParameter('brouillon', Project::STATUS_BROUILLON)
             ->orderBy('p.created_at', 'DESC');
 
         // Mot-clé dans le titre ou la description

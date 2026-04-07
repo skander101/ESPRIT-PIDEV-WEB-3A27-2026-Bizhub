@@ -127,7 +127,9 @@
                             <i class="fa fa-pen"></i> Modifier
                         </a>
                         <form method="post" action="{{ path('app_front_projet_delete', {'id': projet.project_id}) }}"
-                              style="flex:1;" onsubmit="return confirm('Supprimer ce projet ? Cette action est irréversible.');">
+                              style="flex:1;"
+                              data-confirm="Le projet « {{ projet.title }} » sera supprimé définitivement."
+                              data-confirm-title="Supprimer ce projet ?">
                             <input type="hidden" name="_token" value="{{ csrf_token('delete_projet_' ~ projet.project_id) }}">
                             <button type="submit" class="btn-sm btn-delete" style="width:100%;">
                                 <i class="fa fa-trash"></i> Suppr.

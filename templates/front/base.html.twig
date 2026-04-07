@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Josefin+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <style>
     /* ═══════════════════════════════════════════════
@@ -734,6 +735,50 @@
        EXTRA STYLES (block override par page)
     ═══════════════════════════════════════════════ */
     {% block extra_styles %}{% endblock %}
+
+  /* ── SweetAlert2 — thème BizHub ── */
+  .biz-swal {
+    font-family: 'Inter', sans-serif !important;
+    border-radius: 18px !important;
+    padding: 2rem !important;
+  }
+  .biz-swal .swal2-icon { border-color: rgba(239,68,68,0.3) !important; }
+  .biz-swal .swal2-icon.swal2-warning { color: #ef4444 !important; border-color: rgba(239,68,68,0.3) !important; }
+  .biz-swal .swal2-title {
+    font-family: 'Josefin Sans', sans-serif !important;
+    color: #1e2533 !important;
+    font-size: 1.2rem !important;
+    font-weight: 700 !important;
+  }
+  .biz-swal .swal2-html-container {
+    color: #6b7280 !important;
+    font-size: 0.9rem !important;
+    line-height: 1.6 !important;
+  }
+  .biz-swal .swal2-actions { gap: 0.7rem !important; margin-top: 1.5rem !important; }
+  .biz-swal .swal2-confirm,
+  .biz-swal .swal2-cancel {
+    font-family: 'Josefin Sans', sans-serif !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.07em !important;
+    font-size: 0.78rem !important;
+    padding: 11px 22px !important;
+    border-radius: 8px !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+  .biz-swal .swal2-confirm {
+    background: #ef4444 !important;
+    color: #fff !important;
+  }
+  .biz-swal .swal2-confirm:hover { background: #dc2626 !important; }
+  .biz-swal .swal2-cancel {
+    background: #f4f6fa !important;
+    color: #1e2533 !important;
+    border: 1.5px solid #e5e7eb !important;
+  }
+  .biz-swal .swal2-cancel:hover { background: #e5e7eb !important; }
   </style>
 </head>
 <body>
@@ -886,21 +931,49 @@
     }, 5000);
   });
 
-  /* ── Confirmation suppression ── */
-  document.querySelectorAll('[data-confirm]').forEach(el => {
-    el.addEventListener('click', function(e) {
-      if (!confirm(this.dataset.confirm || 'Confirmer cette action ?')) {
-        e.preventDefault();
-      }
+  /* ── Confirmation SweetAlert2 — helper central ── */
+  function bizConfirm({ title, text, confirmLabel, icon } = {}) {
+    return Swal.fire({
+      title:             title       || 'Confirmer la suppression',
+      text:              text        || 'Cette action est irréversible.',
+      icon:              icon        || 'warning',
+      iconColor:         '#ef4444',
+      showCancelButton:  true,
+      confirmButtonText: confirmLabel || '<i class="fa fa-trash-alt"></i>&nbsp;Supprimer',
+      cancelButtonText:  '<i class="fa fa-times"></i>&nbsp;Annuler',
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor:  '#6b7280',
+      reverseButtons:    true,
+      focusCancel:       true,
+      customClass:       { popup: 'biz-swal' },
+    });
+  }
+
+  /* ── Formulaires avec data-confirm ── */
+  document.querySelectorAll('form[data-confirm]').forEach(form => {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const f = this;
+      bizConfirm({
+        title:        f.dataset.confirmTitle,
+        text:         f.dataset.confirm,
+        confirmLabel: f.dataset.confirmLabel,
+        icon:         f.dataset.confirmIcon,
+      }).then(r => { if (r.isConfirmed) f.submit(); });
     });
   });
 
-  /* ── Confirmation forms de suppression ── */
-  document.querySelectorAll('form[data-confirm]').forEach(form => {
-    form.addEventListener('submit', function(e) {
-      if (!confirm(this.dataset.confirm || 'Supprimer ? Cette action est irréversible.')) {
-        e.preventDefault();
-      }
+  /* ── Liens / boutons avec data-confirm ── */
+  document.querySelectorAll('a[data-confirm]').forEach(el => {
+    el.addEventListener('click', function(e) {
+      e.preventDefault();
+      const href = this.href;
+      bizConfirm({
+        title:        this.dataset.confirmTitle,
+        text:         this.dataset.confirm,
+        confirmLabel: this.dataset.confirmLabel,
+        icon:         this.dataset.confirmIcon,
+      }).then(r => { if (r.isConfirmed) window.location.href = href; });
     });
   });
 </script>

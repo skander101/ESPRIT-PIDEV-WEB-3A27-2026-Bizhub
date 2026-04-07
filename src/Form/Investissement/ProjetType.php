@@ -27,17 +27,29 @@ class ProjetType extends AbstractType
             ])
             ->add('description', TextareaType::class, [
                 'label'    => 'Description',
-                'required' => false,
-                'attr'     => ['rows' => 5, 'placeholder' => 'Décrivez votre projet…'],
+                'required' => true,
+                'attr'     => ['rows' => 5, 'placeholder' => 'Décrivez votre projet, votre vision, votre marché cible…', 'maxlength' => 5000],
                 'constraints' => [
-                    new Assert\Length(['max' => 5000]),
+                    new Assert\NotBlank(
+                        message: 'La description est obligatoire.',
+                        normalizer: 'trim',
+                    ),
+                    new Assert\Length([
+                        'min'        => 20,
+                        'max'        => 5000,
+                        'minMessage' => 'La description doit contenir au moins {{ limit }} caractères.',
+                        'maxMessage' => 'La description ne peut pas dépasser {{ limit }} caractères.',
+                    ]),
                 ],
             ])
             ->add('secteur', ChoiceType::class, [
                 'label'       => "Secteur d'activité",
-                'required'    => false,
+                'required'    => true,
                 'placeholder' => '— Choisir un secteur —',
                 'choices'     => Project::SECTEURS,
+                'constraints' => [
+                    new Assert\NotBlank(message: 'Veuillez sélectionner un secteur.'),
+                ],
             ])
             ->add('required_budget', MoneyType::class, [
                 'label'    => 'Budget requis (TND)',

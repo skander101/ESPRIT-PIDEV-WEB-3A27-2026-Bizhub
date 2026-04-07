@@ -42,18 +42,6 @@
 </div>
 
 <div class="page-body">
-    {% for message in app.flashes('success') %}
-        <div class="flash-msg flash-success">
-            <i class="fa fa-check-circle" style="margin-right:8px;"></i>{{ message }}
-        </div>
-    {% endfor %}
-
-    {% for message in app.flashes('error') %}
-        <div class="flash-msg flash-error">
-            <i class="fa fa-exclamation-circle" style="margin-right:8px;"></i>{{ message }}
-        </div>
-    {% endfor %}
-
     <div class="form-card">
         {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
 

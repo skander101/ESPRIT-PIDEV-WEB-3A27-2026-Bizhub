@@ -141,8 +141,8 @@ class Project
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $status = null;
+    #[ORM\Column(type: 'string', length: 30, nullable: true, options: ['default' => 'brouillon'])]
+    private ?string $status = self::STATUS_BROUILLON;
 
     public function getStatus(): ?string
     {

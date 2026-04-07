@@ -2,10 +2,8 @@
 
 namespace App\Controller\Investissement;
 
-use App\Entity\Investissement\Investment;
 use App\Entity\Investissement\Project;
 // Project::STATUTS et Project::SECTEURS utilisés dans index()
-use App\Form\Investissement\InvestissementFrontType;
 use App\Form\Investissement\ProjetType;
 use App\Repository\InvestmentRepository;
 use App\Repository\ProjectRepository;
@@ -59,11 +57,17 @@ class FrontProjetController extends AbstractController
             ? $this->projectRepository->search($filters)
             : $this->projectRepository->findAllWithInvestments();
 
+        // Statuts visibles dans le filtre investisseur (sans brouillon — privé)
+        $statutsFiltre = array_filter(
+            Project::STATUTS,
+            fn($v) => $v !== Project::STATUS_BROUILLON
+        );
+
         return $this->render('front/projet/browse.html.twig', [
             'projets'  => $projets,
             'filters'  => $filters,
             'secteurs' => Project::SECTEURS,
-            'statuts'  => Project::STATUTS,
+            'statuts'  => $statutsFiltre,
         ]);
     }
 
@@ -169,65 +173,5 @@ class FrontProjetController extends AbstractController
         return $this->redirectToRoute('app_front_projet_index');
     }
 
-    #[Route('/{id}/investir', name: 'app_front_investir', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
-    public function investir(Request $request, int $id): Response
-    {
-        // 1. L'utilisateur doit être connecté
-        $user = $this->getUser();
-        if (!$user) {
-            $this->addFlash('warning', 'Vous devez être connecté pour investir.');
-            return $this->redirectToRoute('app_login');
-        }
-
-        // 2. Le projet doit exister
-        $projet = $this->projectRepository->find($id);
-        if (!$projet) {
-            $this->addFlash('error', 'Projet introuvable.');
-            return $this->redirectToRoute('app_front_projet_index');
-        }
-
-        // 3. Seuls les projets publiés ou en cours acceptent des investissements
-        $statutsOuverts = [Project::STATUS_PUBLIE, Project::STATUS_EN_COURS];
-        if (!in_array($projet->getStatus(), $statutsOuverts)) {
-            $this->addFlash('error', 'Ce projet n\'accepte pas d\'investissements pour l\'instant.');
-            return $this->redirectToRoute('app_front_projet_show', ['id' => $id]);
-        }
-
-        // 4. Une startup ne peut pas investir dans son propre projet
-        if ($projet->getUser() && $projet->getUser()->getUserId() === $user->getUserId()) {
-            $this->addFlash('error', 'Vous ne pouvez pas investir dans votre propre projet.');
-            return $this->redirectToRoute('app_front_projet_show', ['id' => $id]);
-        }
-
-        // 5. Créer l'investissement
-        $investment = new Investment();
-        $investment->setProject($projet);
-        $investment->setUser($user);
-        $investment->setCreated_at(new \DateTime());
-        $investment->setInvestment_date(new \DateTime());
-
-        $form = $this->createForm(InvestissementFrontType::class, $investment);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->entityManager->persist($investment);
-            $this->entityManager->flush();
-
-            $this->addFlash('success', 'Investissement enregistré avec succès ! Merci pour votre confiance.');
-            // Redirection vers "Mes investissements" après succès
-            return $this->redirectToRoute('app_front_investissement_index');
-        }
-
-        $totalInvesti = $this->investmentRepository->getTotalInvestedByProject($projet);
-        $pourcentage  = $projet->getRequiredBudget() > 0
-            ? min(100, round(($totalInvesti / $projet->getRequiredBudget()) * 100, 1))
-            : 0;
-
-        return $this->render('front/investissement/invest.html.twig', [
-            'form'          => $form->createView(),
-            'projet'        => $projet,
-            'total_investi' => $totalInvesti,
-            'pourcentage'   => $pourcentage,
-        ]);
-    }
 }
+
