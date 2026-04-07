@@ -4,6 +4,7 @@
 {% block breadcrumb %}Edit Review{% endblock %}
 
 {% block content %}
+{% set moderatedComment = '<-this review has been removed by a moderator->' %}
 <div style="padding:2rem;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;">
         <h2 style="font-size:1.5rem;color:var(--pg-text);">Edit Review</h2>
@@ -42,7 +43,7 @@
                     </div>
                     <div>
                         <div style="font-size:0.75rem;color:var(--pg-muted);margin-bottom:0.5rem;text-transform:uppercase;font-weight:700;">Comment</div>
-                        <div style="color:var(--pg-text);padding:1rem;background:var(--pg-surface);border-radius:6px;line-height:1.6;max-height:200px;overflow-y:auto;">
+                        <div style="color:{{ avi.comment == moderatedComment ? '#9ca3af' : 'var(--pg-text)' }};font-style:{{ avi.comment == moderatedComment ? 'italic' : 'normal' }};padding:1rem;background:var(--pg-surface);border-radius:6px;line-height:1.6;max-height:200px;overflow-y:auto;">
                             {{ avi.comment|nl2br }}
                         </div>
                     </div>

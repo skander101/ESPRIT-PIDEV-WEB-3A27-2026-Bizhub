@@ -6,6 +6,7 @@ use App\Entity\UsersAvis\User;
 use App\Entity\UsersAvis\Avis;
 use App\Repository\UsersAvis\UserRepository;
 use App\Repository\UsersAvis\AvisRepository;
+use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -438,6 +439,33 @@ class AdminController extends AbstractController
         ]);
     }
 
+    #[Route('/user/{id}/delete', name: 'app_admin_user_delete', methods: ['POST'], requirements: ['id' => '\\d+'])]
+    public function userDelete(Request $request, User $user): Response
+    {
+        $token = (string) $request->request->get('_token');
+        if (!$this->isCsrfTokenValid('delete_user_' . $user->getUserId(), $token)) {
+            $this->addFlash('error', 'Invalid CSRF token.');
+            return $this->redirectToRoute('app_admin_user_index');
+        }
+
+        $currentUser = $this->getUser();
+        if ($currentUser instanceof User && $currentUser->getUserId() === $user->getUserId()) {
+            $this->addFlash('error', 'You cannot delete your own account.');
+            return $this->redirectToRoute('app_admin_user_index');
+        }
+
+        try {
+            $this->entityManager->remove($user);
+            $this->entityManager->flush();
+            $this->addFlash('success', 'User deleted successfully!');
+        } catch (ForeignKeyConstraintViolationException) {
+            $this->entityManager->clear();
+            $this->addFlash('error', 'This user cannot be deleted because related records exist. Remove related data first.');
+        }
+
+        return $this->redirectToRoute('app_admin_user_index');
+    }
+
     #[Route('/avis', name: 'app_admin_avis_index', methods: ['GET'])]
     public function avisIndex(): Response
     {
@@ -491,9 +519,9 @@ class AdminController extends AbstractController
             return $this->redirectToRoute('app_admin_avis_index');
         }
 
-        $this->entityManager->remove($avi);
+        $avi->setComment('<-this review has been removed by a moderator->');
         $this->entityManager->flush();
-        $this->addFlash('success', 'Review deleted successfully!');
+        $this->addFlash('success', 'Review content removed successfully!');
 
         return $this->redirectToRoute('app_admin_avis_index');
     }

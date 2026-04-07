@@ -4,6 +4,7 @@
 {% block breadcrumb %}Review Details{% endblock %}
 
 {% block content %}
+{% set moderatedComment = '<-this review has been removed by a moderator->' %}
 <div style="padding:2rem;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;">
         <h2 style="font-size:1.5rem;color:var(--pg-text);">Review Details</h2>
@@ -11,9 +12,9 @@
             <a href="{{ path('app_admin_avis_edit', {'id': avi.avisId}) }}" style="background:#8b5cf6;color:white;padding:0.7rem 1.5rem;border-radius:6px;text-decoration:none;font-weight:700;">
                 {{ avi.isVerified ? 'Mark as Pending' : 'Verify Review' }}
             </a>
-            <form method="POST" action="{{ path('app_admin_avis_delete', {'id': avi.avisId}) }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this review?');">
+            <form method="POST" action="{{ path('app_admin_avis_delete', {'id': avi.avisId}) }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to remove this review content?');">
                 <input type="hidden" name="_token" value="{{ csrf_token('delete_avis') }}">
-                <button type="submit" style="background:#da3c3c;color:white;padding:0.7rem 1.5rem;border-radius:6px;text-decoration:none;font-weight:700;border:none;cursor:pointer;">Delete</button>
+                <button type="submit" style="background:#da3c3c;color:white;padding:0.7rem 1.5rem;border-radius:6px;text-decoration:none;font-weight:700;border:none;cursor:pointer;">Remove Content</button>
             </form>
             <a href="{{ path('app_admin_avis_index') }}" style="background:var(--pg-surface);color:var(--pg-text);padding:0.7rem 1.5rem;border-radius:6px;text-decoration:none;font-weight:700;border:1px solid var(--pg-border);">Back</a>
         </div>
@@ -31,7 +32,7 @@
                 </div>
                 <div>
                     <div style="font-size:0.75rem;color:var(--pg-muted);margin-bottom:0.5rem;text-transform:uppercase;font-weight:700;">Comment</div>
-                    <div style="color:var(--pg-text);padding:1rem;background:var(--pg-surface);border-radius:6px;line-height:1.6;">
+                    <div style="color:{{ avi.comment == moderatedComment ? '#9ca3af' : 'var(--pg-text)' }};font-style:{{ avi.comment == moderatedComment ? 'italic' : 'normal' }};padding:1rem;background:var(--pg-surface);border-radius:6px;line-height:1.6;">
                         {{ avi.comment|nl2br }}
                     </div>
                 </div>

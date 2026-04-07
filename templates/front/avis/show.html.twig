@@ -3,6 +3,7 @@
 {% block title %}Review - BizHub{% endblock %}
 
 {% block content %}
+{% set moderatedComment = '<-this review has been removed by a moderator->' %}
 <div style="max-width:900px;margin:0 auto;padding:40px 5%;">
     <a href="{{ path('app_avis_list') }}" style="color:var(--primary);text-decoration:none;font-weight:700;margin-bottom:1.5rem;display:inline-flex;align-items:center;gap:0.5rem;">
         <i class="fa fa-arrow-left"></i> Back to Reviews
@@ -35,7 +36,7 @@
             </div>
         {% endif %}
 
-        <div style="padding:1.5rem;background:var(--light-bg);border-radius:8px;line-height:1.8;">
+        <div style="padding:1.5rem;background:var(--light-bg);border-radius:8px;line-height:1.8;color:{{ avis.comment == moderatedComment ? '#9ca3af' : 'inherit' }};font-style:{{ avis.comment == moderatedComment ? 'italic' : 'normal' }};">
             {{ avis.comment|nl2br }}
         </div>
 
