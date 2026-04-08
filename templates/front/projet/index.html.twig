@@ -1,0 +1,151 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Mes Projets — BizHub{% endblock %}
+
+{% block extra_styles %}
+.page-header {
+    background: linear-gradient(135deg, var(--dark) 0%, var(--dark2) 100%);
+    padding: 60px 5% 40px;
+    margin-bottom: 0;
+}
+.page-header h1 { font-size: 2rem; color: var(--white); font-family: 'Josefin Sans', sans-serif; font-weight: 700; letter-spacing: 0.04em; }
+.page-header p { color: rgba(255,255,255,0.55); margin-top: 0.4rem; font-size: 0.95rem; }
+.page-body { max-width: 1100px; margin: 0 auto; padding: 40px 5%; }
+.projets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
+.projet-card {
+    background: var(--white);
+    border-radius: 14px;
+    border: 1.5px solid var(--border);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+.projet-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.1); }
+.projet-card-header { padding: 22px 22px 14px; border-bottom: 1px solid var(--border); }
+.projet-card-title { font-size: 1.05rem; font-weight: 700; color: var(--dark); margin-bottom: 0.5rem; font-family: 'Josefin Sans', sans-serif; }
+.projet-card-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
+.projet-card-body { padding: 18px 22px; flex: 1; }
+.projet-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.budget-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; font-family: 'Josefin Sans', sans-serif; }
+.budget-value { font-size: 1.1rem; font-weight: 700; color: var(--dark); margin-top: 2px; }
+.status-badge {
+    font-size: 0.72rem; font-weight: 700; padding: 4px 12px; border-radius: 20px;
+    text-transform: uppercase; letter-spacing: 0.08em; font-family: 'Josefin Sans', sans-serif;
+}
+/* Badges via base.html.twig */
+.progress-bar-wrap { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 0.4rem; }
+.progress-bar-fill { height: 100%; background: var(--primary); border-radius: 3px; transition: width 0.6s ease; }
+.progress-label { font-size: 0.75rem; color: var(--text-muted); }
+.projet-card-footer { padding: 14px 22px; border-top: 1px solid var(--border); display: flex; gap: 0.6rem; }
+.btn-sm {
+    flex: 1; padding: 9px 12px; border-radius: 7px; font-size: 0.78rem; font-weight: 700;
+    font-family: 'Josefin Sans', sans-serif; text-transform: uppercase; letter-spacing: 0.08em;
+    text-decoration: none; text-align: center; cursor: pointer; border: none; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.btn-view   { background: var(--primary); color: var(--dark); }
+.btn-view:hover { background: var(--primary-dark); }
+.btn-edit   { background: var(--light-bg); color: var(--dark); border: 1.5px solid var(--border); }
+.btn-edit:hover { border-color: var(--primary); background: rgba(255,190,51,0.08); }
+.btn-delete { background: rgba(239,68,68,0.08); color: #ef4444; border: 1.5px solid rgba(239,68,68,0.2); }
+.btn-delete:hover { background: rgba(239,68,68,0.18); }
+.empty-state { text-align: center; padding: 60px 20px; }
+.empty-icon { font-size: 3rem; color: var(--text-muted); opacity: 0.35; margin-bottom: 1.2rem; }
+.flash-msg { padding: 14px 20px; border-radius: 10px; margin-bottom: 1.5rem; font-size: 0.9rem; font-weight: 600; }
+.flash-success { background: rgba(6,214,160,0.1); color: #06d6a0; border: 1px solid rgba(6,214,160,0.3); }
+.flash-error   { background: rgba(239,68,68,0.08); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div style="max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;">
+        <div>
+            <h1><i class="fa fa-rocket" style="color:var(--primary);margin-right:0.5rem;"></i>Mes Projets</h1>
+            <p>{{ projets|length }} projet(s) enregistré(s)</p>
+        </div>
+        <a href="{{ path('app_front_projet_new') }}" class="btn-yellow" style="display:flex;align-items:center;gap:8px;">
+            <i class="fa fa-plus"></i> Nouveau projet
+        </a>
+    </div>
+</div>
+
+<div class="page-body">
+
+    {% for type, messages in app.flashes %}
+        {% for msg in messages %}
+            <div class="flash-msg flash-{{ type }}">
+                <i class="fa fa-{{ type == 'success' ? 'check-circle' : 'exclamation-circle' }}" style="margin-right:8px;"></i>{{ msg }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    {% if projets|length > 0 %}
+        <div class="projets-grid">
+            {% for projet in projets %}
+                <div class="projet-card">
+                    <div class="projet-card-header">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.5rem;margin-bottom:0.6rem;">
+                            <div class="projet-card-title">{{ projet.title }}</div>
+                            <span class="badge badge-{{ projet.status }}">
+                                {% if projet.status == 'brouillon' %}Brouillon
+                                {% elseif projet.status == 'publie' %}Publié
+                                {% elseif projet.status == 'en_cours' %}En cours
+                                {% elseif projet.status == 'finance' %}Financé
+                                {% elseif projet.status == 'ferme' %}Fermé
+                                {% else %}{{ projet.status }}{% endif %}
+                            </span>
+                        </div>
+                        {% if projet.description %}
+                            <div class="projet-card-desc">{{ projet.description|slice(0, 90) }}{% if projet.description|length > 90 %}…{% endif %}</div>
+                        {% endif %}
+                    </div>
+                    <div class="projet-card-body">
+                        <div class="projet-meta">
+                            <div>
+                                <div class="budget-label">Budget requis</div>
+                                <div class="budget-value">{{ projet.requiredBudget|number_format(0, ',', ' ') }} TND</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div class="budget-label">Créé le</div>
+                                <div style="font-size:0.85rem;font-weight:600;color:var(--dark);margin-top:2px;">
+                                    {{ projet.createdAt ? projet.createdAt|date('d/m/Y') : '—' }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="progress-bar-wrap">
+                            <div class="progress-bar-fill" style="width:{{ projet.investments|length > 0 ? '40' : '0' }}%"></div>
+                        </div>
+                        <div class="progress-label">{{ projet.investments|length }} investissement(s) reçu(s)</div>
+                    </div>
+                    <div class="projet-card-footer">
+                        <a href="{{ path('app_front_projet_show', {'id': projet.project_id}) }}" class="btn-sm btn-view">
+                            <i class="fa fa-eye"></i> Voir
+                        </a>
+                        <a href="{{ path('app_front_projet_edit', {'id': projet.project_id}) }}" class="btn-sm btn-edit">
+                            <i class="fa fa-pen"></i> Modifier
+                        </a>
+                        <form method="post" action="{{ path('app_front_projet_delete', {'id': projet.project_id}) }}"
+                              style="flex:1;"
+                              data-confirm="Le projet « {{ projet.title }} » sera supprimé définitivement."
+                              data-confirm-title="Supprimer ce projet ?">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete_projet_' ~ projet.project_id) }}">
+                            <button type="submit" class="btn-sm btn-delete" style="width:100%;">
+                                <i class="fa fa-trash"></i> Suppr.
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state dash-panel">
+            <div class="empty-icon"><i class="fa fa-folder-open"></i></div>
+            <h3 style="font-family:'Josefin Sans',sans-serif;font-size:1.1rem;margin-bottom:0.7rem;">Aucun projet pour l'instant</h3>
+            <p style="color:var(--text-muted);margin-bottom:1.8rem;font-size:0.9rem;">Créez votre premier projet et commencez à attirer des investisseurs.</p>
+            <a href="{{ path('app_front_projet_new') }}" class="btn-yellow"><i class="fa fa-plus" style="margin-right:6px;"></i>Créer mon premier projet</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Formations — Admin{% endblock %}
+{% block breadcrumb %}E-Learning / Formations{% endblock %}
+
+{% block content %}
+<div style="padding:2rem;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;">
+    <h2 style="font-size:1.5rem;color:var(--pg-text);margin:0;">Formations</h2>
+    <a href="{{ path('app_admin_formation_new') }}" class="btn btn-primary">+ Nouvelle formation</a>
+  </div>
+
+  {% for label, messages in app.flashes %}
+    {% for message in messages %}
+      <div class="alert alert-{{ label == 'error' ? 'danger' : label }} mb-3" role="alert">{{ message }}</div>
+    {% endfor %}
+  {% endfor %}
+
+  <div class="dash-panel">
+    {% if formations|length > 0 %}
+      <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle mb-0" style="color:var(--pg-text);">
+          <thead>
+            <tr>
+              <th>Titre</th>
+              <th>Formateur</th>
+              <th>Début</th>
+              <th>Fin</th>
+              <th>Coût</th>
+              <th>Lieu</th>
+              <th>En ligne</th>
+              <th class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for f in formations %}
+              <tr>
+                <td><strong>{{ f.title }}</strong></td>
+                <td>{{ f.user ? f.user.fullName : '—' }}</td>
+                <td>{{ f.start_date ? f.start_date|date('d/m/Y') : '—' }}</td>
+                <td>{{ f.end_date ? f.end_date|date('d/m/Y') : '—' }}</td>
+                <td>{{ f.cost ?? '0.00' }}</td>
+                <td>{{ f.lieu }}</td>
+                <td>{{ f.enligne ? 'Oui' : 'Non' }}</td>
+                <td class="text-center">
+                  <div class="d-flex flex-wrap gap-1 justify-content-center">
+                    <a href="{{ path('app_admin_formation_participants', { formation_id: f.formation_id }) }}" class="btn btn-sm btn-outline-info">Participants</a>
+                    <a href="{{ path('app_admin_formation_edit', { formation_id: f.formation_id }) }}" class="btn btn-sm btn-outline-primary">Modifier</a>
+                    <form method="post" action="{{ path('app_admin_formation_delete', { formation_id: f.formation_id }) }}" class="d-inline" onsubmit="return confirm('Supprimer cette formation ?');">
+                      <input type="hidden" name="_token" value="{{ csrf_token('delete_formation_' ~ f.formation_id) }}">
+                      <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-muted text-center py-5 mb-0">Aucune formation.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

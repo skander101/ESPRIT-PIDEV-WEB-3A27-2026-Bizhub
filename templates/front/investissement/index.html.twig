@@ -1,0 +1,196 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Mes Investissements — BizHub{% endblock %}
+
+{% block extra_styles %}
+.page-header { background: linear-gradient(135deg, var(--dark) 0%, var(--dark2) 100%); padding: 60px 5% 40px; }
+.page-header h1 { font-size: 2rem; color: var(--white); font-family: 'Josefin Sans', sans-serif; font-weight: 700; }
+.page-header p { color: rgba(255,255,255,0.55); margin-top: 0.4rem; }
+.stats-bar { background: rgba(255,190,51,0.08); border-bottom: 1px solid rgba(255,190,51,0.15); padding: 20px 5%; }
+.stats-bar-inner { max-width: 1000px; margin: 0 auto; display: flex; gap: 2.5rem; flex-wrap: wrap; }
+.stat-item-label { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'Josefin Sans', sans-serif; }
+.stat-item-value { font-size: 1.3rem; font-weight: 700; color: var(--dark); font-family: 'Josefin Sans', sans-serif; }
+.stat-item-value span { color: var(--primary); }
+.page-body { max-width: 1000px; margin: 0 auto; padding: 40px 5%; }
+.inv-card {
+    background: var(--white);
+    border-radius: 14px;
+    border: 1.5px solid var(--border);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+    margin-bottom: 1rem;
+    padding: 22px;
+    transition: border-color 0.2s;
+}
+.inv-card:hover { border-color: var(--primary); }
+.inv-card-body { display: grid; grid-template-columns: 1fr auto; gap: 1.5rem; align-items: center; }
+.inv-projet-title { font-size: 1rem; font-weight: 700; color: var(--dark); margin-bottom: 0.3rem; font-family: 'Josefin Sans', sans-serif; }
+.inv-meta { font-size: 0.82rem; color: var(--text-muted); display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.4rem; }
+.inv-meta span { display: flex; align-items: center; gap: 4px; }
+.inv-amount-block { text-align: right; }
+.inv-amount { font-size: 1.4rem; font-weight: 700; color: var(--primary); font-family: 'Josefin Sans', sans-serif; }
+.inv-amount-label { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; font-family: 'Josefin Sans', sans-serif; }
+.inv-actions { display: flex; gap: 0.5rem; margin-top: 1rem; padding-top: 0.9rem; border-top: 1px solid var(--border); flex-wrap: wrap; }
+.btn-sm {
+    padding: 8px 16px; border-radius: 7px; font-size: 0.78rem; font-weight: 700;
+    font-family: 'Josefin Sans', sans-serif; text-transform: uppercase; letter-spacing: 0.06em;
+    text-decoration: none; cursor: pointer; border: none; transition: all 0.2s;
+    display: inline-flex; align-items: center; gap: 5px;
+}
+.btn-edit   { background: var(--light-bg); color: var(--dark); border: 1.5px solid var(--border); }
+.btn-edit:hover { border-color: var(--primary); background: rgba(255,190,51,0.08); }
+.btn-delete { background: rgba(239,68,68,0.08); color: #ef4444; border: 1.5px solid rgba(239,68,68,0.2); }
+.btn-delete:hover { background: rgba(239,68,68,0.18); }
+.badge-editable { display: inline-flex; align-items: center; gap: 4px; font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; background: rgba(6,214,160,0.12); color: #06d6a0; border: 1px solid rgba(6,214,160,0.25); font-family: 'Josefin Sans', sans-serif; text-transform: uppercase; letter-spacing: 0.06em; }
+.badge-locked { display: inline-flex; align-items: center; gap: 4px; font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; background: rgba(107,114,128,0.1); color: #9ca3af; border: 1px solid rgba(107,114,128,0.2); font-family: 'Josefin Sans', sans-serif; text-transform: uppercase; letter-spacing: 0.06em; }
+.status-badge { font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.08em; font-family: 'Josefin Sans', sans-serif; display: inline-block; margin-top: 0.4rem; }
+/* Badges via base.html.twig */
+.flash-msg { padding: 14px 20px; border-radius: 10px; margin-bottom: 1.5rem; font-size: 0.9rem; font-weight: 600; }
+.flash-success { background: rgba(6,214,160,0.1); color: #06d6a0; border: 1px solid rgba(6,214,160,0.3); }
+.flash-error   { background: rgba(239,68,68,0.08); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
+@media (max-width: 600px) { .inv-card-body { grid-template-columns: 1fr; } .inv-amount-block { text-align: left; } }
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div style="max-width:1000px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;">
+        <div>
+            <h1><i class="fa fa-chart-pie" style="color:var(--primary);margin-right:0.5rem;"></i>Mes Investissements</h1>
+            <p>{{ investissements|length }} investissement(s) au total</p>
+        </div>
+        <a href="{{ path('app_front_projet_index') }}" class="btn-yellow" style="display:flex;align-items:center;gap:8px;">
+            <i class="fa fa-search"></i> Explorer les projets
+        </a>
+    </div>
+</div>
+
+{% if investissements|length > 0 %}
+<div class="stats-bar">
+    <div class="stats-bar-inner">
+        <div>
+            <div class="stat-item-label">Total investi</div>
+            <div class="stat-item-value"><span>{{ total_investi|number_format(0, ',', ' ') }}</span> TND</div>
+        </div>
+        <div>
+            <div class="stat-item-label">Nombre de projets</div>
+            <div class="stat-item-value"><span>{{ investissements|length }}</span></div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="page-body">
+
+    {% if investissements|length > 0 %}
+
+        <div style="background:rgba(255,190,51,0.07);border:1px solid rgba(255,190,51,0.2);border-radius:10px;padding:12px 18px;margin-bottom:1.5rem;font-size:0.84rem;color:#b8860b;display:flex;align-items:center;gap:8px;">
+            <i class="fa fa-info-circle"></i>
+            Vous pouvez <strong>modifier ou supprimer</strong> uniquement les investissements avec le statut <strong>En attente</strong>.
+        </div>
+
+        {% for inv in investissements %}
+            {% set editable = inv.statut == 'en_attente' %}
+            <div class="inv-card">
+                <div class="inv-card-body">
+                    <div>
+                        {% if inv.project %}
+                            <a href="{{ path('app_front_projet_show', {'id': inv.project.project_id}) }}" style="text-decoration:none;">
+                                <div class="inv-projet-title">{{ inv.project.title }}</div>
+                            </a>
+                            <span class="badge badge-{{ inv.project.status }}">
+                                {% if inv.project.status == 'brouillon' %}Brouillon
+                                {% elseif inv.project.status == 'publie' %}Publié
+                                {% elseif inv.project.status == 'en_cours' %}En cours
+                                {% elseif inv.project.status == 'finance' %}Financé
+                                {% elseif inv.project.status == 'ferme' %}Fermé
+                                {% else %}{{ inv.project.status }}{% endif %}
+                            </span>
+                        {% else %}
+                            <div class="inv-projet-title" style="color:var(--text-muted);">Projet supprimé</div>
+                        {% endif %}
+
+                        <div class="inv-meta">
+                            <span><i class="fa fa-calendar" style="color:var(--primary);"></i>
+                                {{ inv.investmentDate ? inv.investmentDate|date('d/m/Y') : inv.createdAt|date('d/m/Y') }}
+                            </span>
+                            {% if inv.project and inv.project.user %}
+                                <span><i class="fa fa-building" style="color:var(--primary);"></i> {{ inv.project.user.fullName }}</span>
+                            {% endif %}
+                            {% if inv.paymentMode %}
+                                <span><i class="fa fa-credit-card" style="color:var(--primary);"></i>
+                                    {% if inv.paymentMode == 'virement' %}Virement
+                                    {% elseif inv.paymentMode == 'cheque' %}Chèque
+                                    {% elseif inv.paymentMode == 'especes' %}Espèces
+                                    {% elseif inv.paymentMode == 'carte' %}Carte
+                                    {% elseif inv.paymentMode == 'crypto' %}Crypto
+                                    {% else %}{{ inv.paymentMode }}{% endif %}
+                                </span>
+                            {% endif %}
+                            {% if inv.contractUrl %}
+                                <span>
+                                    <a href="{{ inv.contractUrl }}" target="_blank" style="color:var(--primary);text-decoration:none;">
+                                        <i class="fa fa-file-contract"></i> Contrat
+                                    </a>
+                                </span>
+                            {% endif %}
+                        </div>
+                        {# Statut de l'investissement #}
+                        <div style="margin-top:0.5rem;">
+                            <span class="badge badge-{{ inv.statut ?? 'en_attente' }}">
+                                {% if inv.statut == 'en_attente' %}En attente
+                                {% elseif inv.statut == 'en_negociation' %}En négociation
+                                {% elseif inv.statut == 'accepte' %}Accepté
+                                {% elseif inv.statut == 'refuse' %}Refusé
+                                {% elseif inv.statut == 'contrat_genere' %}Contrat généré
+                                {% elseif inv.statut == 'signe' %}Signé
+                                {% elseif inv.statut == 'termine' %}Terminé
+                                {% else %}{{ inv.statut }}{% endif %}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="inv-amount-block">
+                        <div class="inv-amount-label">Montant</div>
+                        <div class="inv-amount">{{ inv.amount|number_format(0, ',', ' ') }}</div>
+                        <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;">TND</div>
+                        <div style="margin-top:8px;">
+                            {% if editable %}
+                                <span class="badge-editable"><i class="fa fa-unlock-alt"></i> Modifiable</span>
+                            {% else %}
+                                <span class="badge-locked"><i class="fa fa-lock"></i> Verrouillé</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if editable %}
+                <div class="inv-actions">
+                    <a href="{{ path('app_front_investissement_edit', {'id': inv.investment_id}) }}" class="btn-sm btn-edit">
+                        <i class="fa fa-pen"></i> Modifier
+                    </a>
+                    <form method="post"
+                          action="{{ path('app_front_investissement_delete', {'id': inv.investment_id}) }}"
+                          style="margin:0;"
+                          data-confirm="Votre investissement de {{ inv.amount|number_format(0,',',' ') }} TND dans « {{ inv.project ? inv.project.title : 'ce projet' }} » sera supprimé définitivement."
+                          data-confirm-title="Supprimer cet investissement ?">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete_investment_' ~ inv.investment_id) }}">
+                        <button type="submit" class="btn-sm btn-delete">
+                            <i class="fa fa-trash"></i> Supprimer
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+    {% else %}
+        <div class="dash-panel" style="text-align:center;padding:60px 20px;">
+            <div style="font-size:3rem;color:var(--text-muted);opacity:0.35;margin-bottom:1.2rem;"><i class="fa fa-chart-pie"></i></div>
+            <h3 style="font-family:'Josefin Sans',sans-serif;font-size:1.1rem;margin-bottom:0.7rem;">Aucun investissement pour l'instant</h3>
+            <p style="color:var(--text-muted);margin-bottom:1.8rem;font-size:0.9rem;">Explorez les projets disponibles et commencez à investir dès aujourd'hui.</p>
+            <a href="{{ path('app_front_projet_index') }}" class="btn-yellow">
+                <i class="fa fa-search" style="margin-right:6px;"></i>Explorer les projets
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,146 @@
+{% extends 'front/marketplace/base_marketplace.html.twig' %}
+
+{% block title %}Mes Produits{% endblock %}
+{% block hero_eyebrow %}Investisseur{% endblock %}
+{% block hero_title %}Mes <span>Produits & Services</span>{% endblock %}
+{% block breadcrumb_extra %}
+  <i class="fa fa-chevron-right" style="font-size:.55rem"></i> Mes produits
+{% endblock %}
+
+{% block body %}
+<div style="max-width:1200px; margin:0 auto; padding:60px 5%;">
+
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem; flex-wrap:wrap; gap:1rem;">
+    <div>
+      <h2 style="font-family:'Lora',serif; font-weight:700; font-size:1.6rem; margin-bottom:0.3rem;">Mes produits publiés</h2>
+      <p style="color:var(--muted); font-size:0.85rem;">{{ produits|length }} produit{{ produits|length != 1 ? 's' : '' }} au total</p>
+    </div>
+    <a href="{{ path('produit_new') }}" class="btn-yellow">
+      <i class="fa fa-plus"></i> Nouveau produit
+    </a>
+  </div>
+
+  {# ALERTE STOCK FAIBLE #}
+  {% if stock_alerte_ids|length > 0 %}
+  <div style="background:rgba(255,193,7,0.12); border:1.5px solid #ffc107; border-radius:10px; padding:14px 18px; margin-bottom:1.5rem; display:flex; align-items:center; gap:12px;">
+    <i class="fa fa-exclamation-triangle" style="color:#b45309; font-size:1.2rem; flex-shrink:0;"></i>
+    <div>
+      <span style="font-family:'Josefin Sans',sans-serif; font-weight:700; font-size:0.8rem; color:#92400e; text-transform:uppercase; letter-spacing:0.05em;">Stock faible</span>
+      <span style="font-size:0.85rem; color:#78350f; margin-left:8px;">{{ stock_alerte_ids|length }} produit{{ stock_alerte_ids|length > 1 ? 's' : '' }} avec ≤ {{ stock_seuil }} unités en stock — pensez à réapprovisionner.</span>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if produits is empty %}
+  <div style="text-align:center; padding:80px 20px; background:var(--light-bg); border-radius:16px; border:1.5px dashed var(--border);">
+    <div style="font-size:4rem; color:rgba(255,190,51,0.3); margin-bottom:1.2rem;"><i class="fa fa-store-slash"></i></div>
+    <h3 style="font-family:'Lora',serif; font-size:1.3rem; font-weight:700; margin-bottom:0.5rem;">Aucun produit publié</h3>
+    <p style="color:var(--muted); margin-bottom:1.5rem;">Publiez votre premier produit ou service pour le proposer aux startups.</p>
+    <a href="{{ path('produit_new') }}" class="btn-yellow"><i class="fa fa-plus"></i> Publier maintenant</a>
+  </div>
+
+  {% else %}
+  <div style="background:var(--white); border-radius:14px; border:1.5px solid var(--border); overflow:hidden;">
+    <table class="biz-table">
+      <thead>
+        <tr>
+          <th>Produit</th>
+          <th>Catégorie</th>
+          <th>Prix</th>
+          <th>Stock</th>
+          <th>Statut</th>
+          <th style="text-align:center">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for p in produits %}
+      <tr>
+        <td>
+          <div style="display:flex; align-items:center; gap:10px;">
+            {% if p.imagePath %}
+              <img src="{{ asset('assets/images/productimages/' ~ p.imagePath) }}" alt="{{ p.nom }}" style="width:42px; height:42px; object-fit:cover; border-radius:6px; border:1.5px solid var(--border); flex-shrink:0;">
+            {% else %}
+              <div style="width:42px; height:42px; background:var(--light-bg); border-radius:6px; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <i class="fa fa-cube" style="color:rgba(255,190,51,0.5); font-size:1.1rem;"></i>
+              </div>
+            {% endif %}
+            <div>
+              <div style="font-weight:700; color:var(--dark);">{{ p.nom }}</div>
+              {% if p.description %}
+              <div style="font-size:0.78rem; color:var(--muted); margin-top:2px;">
+                {{ p.description|slice(0,60) }}{% if p.description|length > 60 %}…{% endif %}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </td>
+        <td>
+          {% if p.categorie %}
+          <span class="tag">{{ p.categorie }}</span>
+          {% else %}
+          <span style="color:var(--muted); font-size:0.8rem;">—</span>
+          {% endif %}
+        </td>
+        <td>
+          <span style="font-family:'Josefin Sans',sans-serif; font-weight:800; font-size:1rem;">
+            {{ p.prix }}
+          </span>
+          <span style="font-size:0.72rem; color:var(--muted);"> TND</span>
+        </td>
+        <td>
+          <span style="font-family:'Josefin Sans',sans-serif; font-weight:700; color:{{ p.idProduit in stock_alerte_ids ? '#b45309' : 'inherit' }};">
+            {{ p.quantite }}
+          </span>
+          {% if p.idProduit in stock_alerte_ids %}
+            <span style="display:inline-block; margin-left:4px; background:#ffc107; color:#78350f; font-size:0.6rem; font-weight:700; padding:2px 6px; border-radius:4px; text-transform:uppercase; vertical-align:middle;">
+              <i class="fa fa-exclamation-triangle"></i> Faible
+            </span>
+          {% endif %}
+        </td>
+        <td>
+          <span class="statut-pill {{ p.disponible ? 'statut-confirmee' : 'statut-annulee' }}">
+            <i class="fa fa-{{ p.disponible ? 'check' : 'times' }}"></i>
+            {{ p.disponible ? 'Disponible' : 'Indisponible' }}
+          </span>
+        </td>
+        <td style="text-align:center;">
+          <div style="display:flex; gap:6px; justify-content:center; flex-wrap:wrap;">
+            <a href="{{ path('produit_show', {id: p.idProduit}) }}" class="btn-ghost btn-sm" title="Voir">
+              <i class="fa fa-eye"></i>
+            </a>
+            <a href="{{ path('produit_edit', {id: p.idProduit}) }}" class="btn-yellow btn-sm" title="Modifier">
+              <i class="fa fa-pen"></i>
+            </a>
+            <form method="post" action="{{ path('produit_toggle', {id: p.idProduit}) }}" style="display:inline;">
+              <button type="submit" class="btn-ghost btn-sm" title="{{ p.disponible ? 'Désactiver' : 'Activer' }}">
+                <i class="fa fa-{{ p.disponible ? 'eye-slash' : 'eye' }}"></i>
+              </button>
+            </form>
+            <form method="post" action="{{ path('produit_delete', {id: p.idProduit}) }}"
+                  data-confirm="Supprimer définitivement «{{ p.nom }}» ? Cette action est irréversible."
+                  data-confirm-type="danger">
+              <input type="hidden" name="_token" value="{{ csrf_token('delete_produit_' ~ p.idProduit) }}">
+              <button type="submit" class="btn-danger btn-sm" title="Supprimer">
+                <i class="fa fa-trash"></i>
+              </button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  <div style="margin-top:2rem; display:flex; gap:1rem; flex-wrap:wrap;">
+    <a href="{{ path('commande_investisseur_recues') }}" class="btn-outline">
+      <i class="fa fa-inbox"></i> Commandes reçues
+    </a>
+    <a href="{{ path('produit_index') }}" class="btn-ghost">
+      <i class="fa fa-store"></i> Voir le catalogue
+    </a>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Participants — {{ formation.title }}{% endblock %}
+{% block breadcrumb %}E-Learning / {{ formation.title }} / Participants{% endblock %}
+
+{% block content %}
+<div style="padding:2rem;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;">
+    <div>
+      <a href="{{ path('app_admin_formation_index') }}" class="text-decoration-none text-muted small">← Formations</a>
+      <h2 style="font-size:1.5rem;color:var(--pg-text);margin:0.5rem 0 0;">Participants : {{ formation.title }}</h2>
+    </div>
+    <a href="{{ path('app_admin_participation_new', { formation_id: formation.formation_id }) }}" class="btn btn-primary">+ Ajouter une participation</a>
+  </div>
+
+  {% for label, messages in app.flashes %}
+    {% for message in messages %}
+      <div class="alert alert-{{ label == 'error' ? 'danger' : label }} mb-3" role="alert">{{ message }}</div>
+    {% endfor %}
+  {% endfor %}
+
+  <div class="dash-panel">
+    {% if participations|length > 0 %}
+      <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Participant</th>
+              <th>Email</th>
+              <th>Date affectation</th>
+              <th>Montant</th>
+              <th>Statut</th>
+              <th class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in participations %}
+              <tr>
+                <td>{{ p.user ? p.user.fullName : '—' }}</td>
+                <td>{{ p.user ? p.user.email : '—' }}</td>
+                <td>{{ p.date_affectation ? p.date_affectation|date('d/m/Y H:i') : '—' }}</td>
+                <td>{{ p.amount }}</td>
+                <td><span class="badge bg-secondary">{{ p.payment_status }}</span></td>
+                <td class="text-center">
+                  <a href="{{ path('app_admin_participation_edit', { id_candidature: p.id_candidature }) }}" class="btn btn-sm btn-outline-primary">Modifier</a>
+                  <form method="post" action="{{ path('app_admin_participation_delete', { id_candidature: p.id_candidature }) }}" class="d-inline" onsubmit="return confirm('Supprimer cette participation ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete_participation_' ~ p.id_candidature) }}">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-muted text-center py-5 mb-0">Aucun participant pour cette formation.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
