@@ -1,0 +1,227 @@
+{% extends 'front/Marketplace/base_marketplace.html.twig' %}
+
+{% block title %}{{ titre }}{% endblock %}
+{% block hero_eyebrow %}{{ mode == 'edit' ? 'Modifier' : 'Publier' }}{% endblock %}
+{% block hero_title %}<span>{{ titre }}</span>{% endblock %}
+
+{% block body %}
+<div style="max-width:720px; margin:0 auto; padding:60px 5%;">
+
+  <div style="display:flex; align-items:center; gap:1rem; margin-bottom:2rem;">
+    <a href="{{ path('produit_mes') }}" class="btn-ghost btn-sm">
+      <i class="fa fa-arrow-left"></i> Mes produits
+    </a>
+    <h2 style="font-family:'Lora',serif; font-weight:700; font-size:1.4rem;">{{ titre }}</h2>
+  </div>
+
+  <div class="biz-card">
+    <div class="biz-card-body" style="padding:36px;">
+
+      {{ form_start(form, {attr: {novalidate: 'novalidate', class: '', enctype: 'multipart/form-data'}}) }}
+
+      {# Nom #}
+      <div class="biz-form-group">
+        <label class="biz-label" for="{{ form.nom.vars.id }}">
+          <i class="fa fa-tag" style="color:var(--primary);"></i> Nom du produit / service *
+        </label>
+        {{ form_widget(form.nom, {attr: {class: 'biz-input', placeholder: 'ex: Développement Web, Design UI…'}}) }}
+        {% if form.nom.vars.errors|length %}
+          <span class="biz-error">{{ form_errors(form.nom) }}</span>
+        {% endif %}
+      </div>
+
+      {# Description #}
+      <div class="biz-form-group">
+        <label class="biz-label" for="{{ form.description.vars.id }}">
+          <i class="fa fa-align-left" style="color:var(--primary);"></i> Description
+          <span style="font-weight:400; text-transform:none; letter-spacing:0; color:var(--muted);"> (optionnel)</span>
+        </label>
+        {{ form_widget(form.description, {attr: {class: 'biz-textarea', placeholder: 'Décrivez votre produit ou service…', rows: 4}}) }}
+        {% if form.description.vars.errors|length %}
+          <span class="biz-error">{{ form_errors(form.description) }}</span>
+        {% endif %}
+      </div>
+
+      {# Prix + Quantité #}
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.2rem;">
+        <div class="biz-form-group">
+          <label class="biz-label" for="{{ form.prix.vars.id }}">
+            <i class="fa fa-coins" style="color:var(--primary);"></i> Prix *
+          </label>
+          <div class="biz-input-group">
+            {{ form_widget(form.prix, {attr: {class: 'biz-input', placeholder: '49.900'}}) }}
+            <span class="biz-input-group-text">TND</span>
+          </div>
+          {% if form.prix.vars.errors|length %}
+            <span class="biz-error">{{ form_errors(form.prix) }}</span>
+          {% endif %}
+        </div>
+
+        <div class="biz-form-group">
+          <label class="biz-label" for="{{ form.quantite.vars.id }}">
+            <i class="fa fa-boxes" style="color:var(--primary);"></i> Quantité *
+          </label>
+          {{ form_widget(form.quantite, {attr: {class: 'biz-input', placeholder: '10', min: 0}}) }}
+          {% if form.quantite.vars.errors|length %}
+            <span class="biz-error">{{ form_errors(form.quantite) }}</span>
+          {% endif %}
+        </div>
+      </div>
+
+      {# Catégorie #}
+      <div class="biz-form-group">
+        <label class="biz-label" for="{{ form.categorie.vars.id }}">
+          <i class="fa fa-folder" style="color:var(--primary);"></i> Catégorie
+        </label>
+        {{ form_widget(form.categorie, {attr: {class: 'biz-input', placeholder: 'ex: design, consulting, math…'}}) }}
+        {% if form.categorie.vars.errors|length %}
+          <span class="biz-error">{{ form_errors(form.categorie) }}</span>
+        {% endif %}
+      </div>
+
+      {# Photo du produit #}
+      <div class="biz-form-group">
+        <label class="biz-label" for="{{ form.imagePath.vars.id }}">
+          <i class="fa fa-image" style="color:var(--primary);"></i> Photo du produit
+          <span style="font-weight:400; text-transform:none; letter-spacing:0; color:var(--muted);"> (optionnel)</span>
+        </label>
+        {% if mode == 'edit' and produit is defined and produit.imagePath %}
+          <div style="margin-bottom:10px;">
+            <img src="{{ asset('assets/images/productimages/' ~ produit.imagePath) }}"
+                 alt="Photo actuelle"
+                 style="max-height:140px; max-width:100%; border-radius:8px; border:1.5px solid var(--border); object-fit:cover;">
+            <p style="font-size:0.75rem; color:var(--muted); margin-top:4px;">Image actuelle — choisissez-en une nouvelle pour la remplacer.</p>
+          </div>
+        {% endif %}
+        {{ form_widget(form.imagePath, {attr: {class: 'biz-input', id: 'produit_image_input'}}) }}
+        <div id="image-preview-wrap" style="margin-top:10px; display:none;">
+          <img id="image-preview" src="#" alt="Aperçu" style="max-height:140px; max-width:100%; border-radius:8px; border:1.5px solid var(--border); object-fit:cover;">
+        </div>
+        {% if form.imagePath.vars.errors|length %}
+          <span class="biz-error">{{ form_errors(form.imagePath) }}</span>
+        {% endif %}
+      </div>
+
+      {# Disponible #}
+      <div class="biz-form-group" style="display:flex; align-items:center; gap:10px; padding:14px 16px; background:var(--light-bg); border-radius:8px; border:1.5px solid var(--border);">
+        {{ form_widget(form.disponible, {attr: {style: 'width:18px;height:18px;accent-color:var(--primary);cursor:pointer;'}}) }}
+        <label for="{{ form.disponible.vars.id }}" style="font-family:'Josefin Sans',sans-serif; font-size:0.78rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--dark); cursor:pointer; margin:0;">
+          Rendre ce produit disponible immédiatement
+        </label>
+      </div>
+
+      {# Submit #}
+      <div style="display:flex; gap:1rem; margin-top:2rem; flex-wrap:wrap;">
+        <button type="submit" class="btn-yellow" style="flex:1; justify-content:center;">
+          <i class="fa fa-{{ mode == 'edit' ? 'save' : 'upload' }}"></i>
+          {{ mode == 'edit' ? 'Enregistrer les modifications' : 'Publier le produit' }}
+        </button>
+        <a href="{{ path('produit_mes') }}" class="btn-outline">
+          <i class="fa fa-times"></i> Annuler
+        </a>
+      </div>
+
+      {{ form_end(form) }}
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ── Image preview ── */
+document.getElementById('produit_image_input').addEventListener('change', function () {
+  const wrap = document.getElementById('image-preview-wrap');
+  const preview = document.getElementById('image-preview');
+  const file = this.files[0];
+  if (file) { preview.src = URL.createObjectURL(file); wrap.style.display = 'block'; }
+  else { wrap.style.display = 'none'; }
+});
+
+/* ── Validation temps réel ── */
+(function () {
+  function setFieldState(input, ok, msg) {
+    var group = input.closest('.biz-form-group');
+    if (!group) return;
+    var fb = group.querySelector('.biz-live-feedback');
+    if (!fb) {
+      fb = document.createElement('span');
+      fb.className = 'biz-live-feedback';
+      fb.style.cssText = 'font-size:0.76rem; margin-top:4px; display:flex; align-items:center; gap:4px;';
+      group.appendChild(fb);
+    }
+    if (ok === null) { fb.innerHTML = ''; input.style.borderColor = ''; return; }
+    fb.innerHTML = ok
+      ? '<i class="fa fa-check-circle" style="color:#16a34a"></i><span style="color:#16a34a">' + msg + '</span>'
+      : '<i class="fa fa-times-circle" style="color:#dc2626"></i><span style="color:#dc2626">' + msg + '</span>';
+    input.style.borderColor = ok ? '#22c55e' : '#ef4444';
+  }
+
+  /* NOM */
+  var nom = document.querySelector('input[id$="_nom"]');
+  if (nom) nom.addEventListener('input', function () {
+    var v = this.value.trim();
+    if (!v) return setFieldState(this, false, 'Le nom est obligatoire.');
+    if (v.length < 2) return setFieldState(this, false, 'Minimum 2 caractères (' + v.length + '/2).');
+    if (v.length > 200) return setFieldState(this, false, 'Maximum 200 caractères.');
+    if (/^\d+$/.test(v)) return setFieldState(this, false, 'Le nom ne peut pas être uniquement des chiffres.');
+    setFieldState(this, true, 'Nom valide.');
+  });
+
+  /* PRIX */
+  var prix = document.querySelector('input[id$="_prix"]');
+  if (prix) prix.addEventListener('input', function () {
+    var v = this.value.trim();
+    if (!v) return setFieldState(this, false, 'Le prix est obligatoire.');
+    if (!/^\d+(\.\d{1,3})?$/.test(v)) return setFieldState(this, false, 'Format invalide — ex: 49.900 (max 3 décimales).');
+    if (parseFloat(v) <= 0) return setFieldState(this, false, 'Le prix doit être > 0.');
+    setFieldState(this, true, parseFloat(v).toFixed(3) + ' TND — valide.');
+  });
+
+  /* QUANTITÉ */
+  var qte = document.querySelector('input[id$="_quantite"]');
+  if (qte) qte.addEventListener('input', function () {
+    var v = parseInt(this.value);
+    if (isNaN(v)) return setFieldState(this, false, 'Entrez un nombre entier.');
+    if (v < 0) return setFieldState(this, false, 'La quantité doit être ≥ 0.');
+    if (v > 999999) return setFieldState(this, false, 'Maximum 999 999 unités.');
+    setFieldState(this, true, v + ' unité' + (v > 1 ? 's' : '') + ' en stock.');
+  });
+
+  /* DESCRIPTION — compteur */
+  var desc = document.querySelector('textarea[id$="_description"]');
+  if (desc) {
+    var counter = document.createElement('div');
+    counter.style.cssText = 'font-size:0.72rem; color:var(--muted); text-align:right; margin-top:3px;';
+    desc.parentNode.insertBefore(counter, desc.nextSibling);
+    function updateCounter() {
+      var len = desc.value.length;
+      counter.textContent = len + ' / 1000';
+      counter.style.color = len > 900 ? '#dc2626' : (len > 700 ? '#b45309' : 'var(--muted)');
+    }
+    desc.addEventListener('input', updateCounter);
+    updateCounter();
+  }
+
+  /* CATÉGORIE */
+  var cat = document.querySelector('input[id$="_categorie"]');
+  if (cat) cat.addEventListener('input', function () {
+    var v = this.value.trim();
+    if (!v) return setFieldState(this, null, '');
+    if (v.length > 100) return setFieldState(this, false, 'Maximum 100 caractères.');
+    setFieldState(this, true, 'Catégorie valide.');
+  });
+
+  /* IMAGE — validation taille/type côté client */
+  var imgInput = document.getElementById('produit_image_input');
+  if (imgInput) imgInput.addEventListener('change', function () {
+    var file = this.files[0];
+    if (!file) return setFieldState(this, null, '');
+    var allowed = ['image/jpeg','image/png','image/gif','image/webp'];
+    if (!allowed.includes(file.type)) return setFieldState(this, false, 'Format non accepté — JPEG, PNG, GIF ou WebP uniquement.');
+    if (file.size > 5 * 1024 * 1024) return setFieldState(this, false, 'Fichier trop lourd — max 5 Mo (actuel : ' + (file.size/1024/1024).toFixed(1) + ' Mo).');
+    setFieldState(this, true, file.name + ' (' + (file.size/1024).toFixed(0) + ' Ko) — OK.');
+  });
+})();
+</script>
+{% endblock %}

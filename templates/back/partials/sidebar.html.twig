@@ -1,0 +1,91 @@
+{# Back sidebar partial - unified navigation #}
+<aside class="sidebar-nav-wrapper">
+  <div class="navbar-logo"><a href="{{ path('app_admin_index') }}" style="display:flex;align-items:center;gap:0.75rem;">
+    <img rel="shortcut icon" src  ="{{ asset('assets/front/images/logo.png') }}" type="image/png" height="64" width="64"/>
+    <div class="nb-site-title"><span style="color:#ffbe33 !important;">Biz</span><span style="color:#ffffff !important;">Hub</span></div>
+</a></div>
+  <nav class="sidebar-nav">
+    <ul>
+     
+
+      {# Users & Avis Module #}
+      <li class="nav-item nav-item-has-children">
+        <a href="#0" data-bs-toggle="collapse" data-bs-target="#ddmenu_users">
+          <span class="icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M2 17a5 5 0 0 1 10 0v1H2v-1Z"/></svg></span>
+          <span class="text">Users & Reviews</span>
+        </a>
+        <ul id="ddmenu_users" class="collapse dropdown-nav">
+          <li><a href="{{ path('app_admin_user_index') }}">Users</a></li>
+          <li><a href="{{ path('app_admin_avis_index') }}">Reviews</a></li>
+        </ul>
+      </li>
+
+      {# E-Learning Module #}
+      <li class="nav-item nav-item-has-children">
+        <a href="#0" data-bs-toggle="collapse" data-bs-target="#ddmenu_elearning">
+          <span class="icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M2 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4Z"/></svg></span>
+          <span class="text">E-Learning</span>
+        </a>
+        <ul id="ddmenu_elearning" class="collapse dropdown-nav">
+          <li><a href="#">Formations</a></li>
+          <li><a href="#">Participations</a></li>
+          <li><a href="#">Payments</a></li>
+        </ul>
+      </li>
+
+      {# Marketplace Module #}
+      <li class="nav-item nav-item-has-children">
+        <a href="#0" data-bs-toggle="collapse" data-bs-target="#ddmenu_marketplace">
+          <span class="icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 1a1 1 0 0 0-1 1v1h16V2a1 1 0 0 0-1-1H3Z"/><path d="M3 5h14v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5Z"/></svg></span>
+          <span class="text">Marketplace</span>
+        </a>
+        <ul id="ddmenu_marketplace" class="collapse dropdown-nav">
+          <li><a href="#">Products</a></li>
+          <li><a href="#">Cart</a></li>
+          <li><a href="#">Orders</a></li>
+        </ul>
+      </li>
+
+      {# Investment Module #}
+      <li class="nav-item nav-item-has-children">
+        <a href="#0" data-bs-toggle="collapse" data-bs-target="#ddmenu_investment">
+          <span class="icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M2 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5Z"/></svg></span>
+          <span class="text">Investment</span>
+        </a>
+        <ul id="ddmenu_investment" class="collapse dropdown-nav">
+          <li><a href="#">Projects</a></li>
+          <li><a href="#">Investments</a></li>
+          <li><a href="#">Negotiations</a></li>
+          <li><a href="#">Deals</a></li>
+        </ul>
+      </li>
+
+      {# Community Module #}
+      <li class="nav-item nav-item-has-children">
+        <a href="#0" data-bs-toggle="collapse" data-bs-target="#ddmenu_community">
+          <span class="icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M2 7a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v6a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V7Z"/></svg></span>
+          <span class="text">Community</span>
+        </a>
+        <ul id="ddmenu_community" class="collapse dropdown-nav">
+          <li><a href="#">Posts</a></li>
+          <li><a href="#">Comments</a></li>
+          <li><a href="#">Reactions</a></li>
+          <li><a href="#">Media</a></li>
+        </ul>
+      </li>
+
+      <span class="divider"><hr/></span>
+
+      {# Auth Section #}
+      
+
+    </ul>
+  </nav>
+  <div style="position:absolute;bottom:1.5rem;left:0;right:0;padding:0 1rem;">
+    <a href="{{ path('app_logout') }}" style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:9px;color:#f87171;text-decoration:none;font-size:13px;font-weight:500;transition:all .2s;" onmouseover="this.style.background='rgba(239,68,68,.2)'" onmouseout="this.style.background='rgba(239,68,68,.1)'">
+      <span style="display:flex;align-items:center;justify-content:center;width:20px;height:20px;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M13.5 7.5l3 3m0 0l-3 3m3-3H6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.5 2.5A2 2 0 0 1 9.5 0h6a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2h-6a2 2 0 0 1-2-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span>Disconnect</span>
+    </a>
+  </div>
+</aside>
+<div class="overlay"></div>

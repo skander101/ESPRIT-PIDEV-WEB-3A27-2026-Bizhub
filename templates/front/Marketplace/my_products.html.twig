@@ -1,0 +1,79 @@
+{% extends 'front/base.html.twig' %}
+{% block title %}Mes produits — BizHub{% endblock %}
+
+{% block extra_styles %}
+.mp-body { max-width:1100px; margin:36px auto; padding:0 5%; }
+.mp-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1.4rem; }
+.mp-card { background:#fff; border-radius:14px; border:1.5px solid var(--border); overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,.04); }
+.mp-img { height:150px; background:#f3f4f6; display:flex; align-items:center; justify-content:center; font-size:3rem; color:#d1d5db; overflow:hidden; }
+.mp-img img { width:100%; height:150px; object-fit:cover; }
+.mp-body-inner { padding:14px 16px; }
+.mp-name { font-weight:700; font-size:.9rem; color:var(--dark); margin-bottom:5px; }
+.mp-price { font-family:'Josefin Sans',sans-serif; font-weight:700; font-size:1rem; color:var(--dark); }
+.mp-stat { display:flex; gap:.6rem; margin-top:8px; flex-wrap:wrap; }
+.mp-tag { font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; padding:3px 9px; border-radius:100px; font-family:'Josefin Sans',sans-serif; }
+.tag-active   { background:rgba(16,185,129,.1); color:#059669; }
+.tag-inactive { background:rgba(239,68,68,.1);  color:#dc2626; }
+.tag-low      { background:rgba(234,179,8,.1);  color:#b45309; }
+.mp-actions { display:flex; gap:.6rem; padding:12px 16px; border-top:1px solid var(--border); }
+.btn-edit { flex:1; text-align:center; padding:8px; background:#f3f4f6; border-radius:8px; text-decoration:none; font-size:.78rem; font-weight:700; color:var(--dark); font-family:'Josefin Sans',sans-serif; }
+.btn-edit:hover { background:#e5e7eb; }
+{% endblock %}
+
+{% block content %}
+<div class="mp-body">
+
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:2rem;">
+    <div>
+      <h1 style="font-family:'Josefin Sans',sans-serif;font-size:1.7rem;font-weight:700;color:var(--dark);margin:0 0 .3rem;">Mes produits</h1>
+      <p style="color:var(--text-muted);font-size:.85rem;margin:0;">{{ produits|length }} produit(s) publié(s)</p>
+    </div>
+    <a href="{{ path('app_marketplace_produit_new') }}" class="btn-yellow">
+      <i class="fa fa-plus"></i> Nouveau produit
+    </a>
+  </div>
+
+  {% if produits is empty %}
+    <div style="text-align:center;padding:60px;color:var(--text-muted);background:#fff;border-radius:14px;border:1.5px solid var(--border);">
+      <i class="fa fa-box-open" style="font-size:3rem;display:block;margin-bottom:1rem;"></i>
+      <p>Vous n'avez pas encore publié de produit.</p>
+      <a href="{{ path('app_marketplace_produit_new') }}" class="btn-yellow" style="display:inline-block;margin-top:1rem;">Créer mon premier produit</a>
+    </div>
+  {% else %}
+    <div class="mp-grid">
+      {% for p in produits %}
+        <div class="mp-card">
+          <div class="mp-img">
+            {% if p.imageUrl %}<img src="{{ p.imageUrl }}" alt="{{ p.name }}">
+            {% else %}<i class="fa fa-box"></i>{% endif %}
+          </div>
+          <div class="mp-body-inner">
+            <div class="mp-name">{{ p.name }}</div>
+            <div class="mp-price">{{ p.price|number_format(2,',',' ') }} TND</div>
+            <div class="mp-stat">
+              <span class="mp-tag {{ p.status == 'active' ? 'tag-active' : 'tag-inactive' }}">
+                {{ p.status == 'active' ? 'Actif' : 'Inactif' }}
+              </span>
+              <span class="mp-tag {{ p.stock <= 5 ? 'tag-low' : 'tag-active' }}">
+                <i class="fa fa-warehouse"></i> {{ p.stock }}
+              </span>
+              {% if p.category %}<span class="mp-tag" style="background:#f3f4f6;color:var(--text-muted);">{{ p.category }}</span>{% endif %}
+            </div>
+          </div>
+          <div class="mp-actions">
+            <a href="{{ path('app_marketplace_show', {id: p.productId}) }}" class="btn-edit"><i class="fa fa-eye"></i> Voir</a>
+            <a href="{{ path('app_marketplace_produit_edit', {id: p.productId}) }}" class="btn-edit"><i class="fa fa-edit"></i> Modifier</a>
+            <form method="post" action="{{ path('app_marketplace_produit_delete', {id: p.productId}) }}" data-confirm data-confirm-title="Supprimer ce produit ?" style="flex:1;margin:0;">
+              <input type="hidden" name="_token" value="{{ csrf_token('delete_produit_' ~ p.productId) }}">
+              <button type="submit" style="width:100%;background:rgba(239,68,68,.08);border:none;border-radius:8px;color:#dc2626;padding:8px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:'Josefin Sans',sans-serif;">
+                <i class="fa fa-trash-alt"></i> Suppr.
+              </button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}
