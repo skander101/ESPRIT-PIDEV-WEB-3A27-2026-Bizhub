@@ -1,0 +1,78 @@
+{% extends 'front/base.html.twig' %}
+{% block title %}{{ page_title }} — BizHub{% endblock %}
+
+{% block extra_styles %}
+.pf-body { max-width:700px; margin:36px auto; padding:0 5%; }
+.pf-hint { font-size:.74rem; color:var(--text-muted); margin-top:5px; display:flex; align-items:center; gap:5px; }
+{% endblock %}
+
+{% block content %}
+<div class="pf-body">
+  <a href="{{ path('app_marketplace_mes_produits') }}" style="font-size:.78rem;color:var(--text-muted);text-decoration:none;display:inline-flex;align-items:center;gap:5px;margin-bottom:1rem;">
+    <i class="fa fa-arrow-left"></i> Mes produits
+  </a>
+
+  <h1 style="font-family:'Josefin Sans',sans-serif;font-size:1.6rem;font-weight:700;color:var(--dark);margin:0 0 1.8rem;">
+    <i class="fa fa-store" style="color:var(--primary);margin-right:.5rem;"></i>{{ page_title }}
+  </h1>
+
+  <div class="biz-form">
+    {{ form_start(form, {attr: {novalidate: 'novalidate'}}) }}
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:0;">
+      <div class="form-group">
+        {{ form_label(form.nom) }}
+        {{ form_widget(form.nom) }}
+        {{ form_errors(form.nom) }}
+      </div>
+      <div class="form-group">
+        {{ form_label(form.prix) }}
+        {{ form_widget(form.prix) }}
+        {{ form_errors(form.prix) }}
+        <div class="pf-hint"><i class="fa fa-info-circle"></i> Prix en dinars tunisiens (TND)</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      {{ form_label(form.description) }}
+      {{ form_widget(form.description) }}
+      {{ form_errors(form.description) }}
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
+      <div class="form-group">
+        {{ form_label(form.categorie) }}
+        {{ form_widget(form.categorie) }}
+        {{ form_errors(form.categorie) }}
+      </div>
+      <div class="form-group">
+        {{ form_label(form.quantite) }}
+        {{ form_widget(form.quantite) }}
+        {{ form_errors(form.quantite) }}
+      </div>
+      <div class="form-group">
+        {{ form_label(form.status) }}
+        {{ form_widget(form.status) }}
+        {{ form_errors(form.status) }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      {{ form_label(form.image_url) }}
+      {{ form_widget(form.image_url) }}
+      {{ form_errors(form.image_url) }}
+      <div class="pf-hint"><i class="fa fa-image"></i> Lien vers une image (https://…)</div>
+      {% if produit and produit.imageUrl %}
+        <img src="{{ produit.imageUrl }}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;margin-top:8px;border:1px solid var(--border);" alt="Aperçu">
+      {% endif %}
+    </div>
+
+    <button type="submit" class="form-submit">
+      <i class="fa fa-check-circle"></i>
+      {{ produit ? 'Enregistrer les modifications' : 'Publier le produit' }}
+    </button>
+
+    {{ form_end(form) }}
+  </div>
+</div>
+{% endblock %}

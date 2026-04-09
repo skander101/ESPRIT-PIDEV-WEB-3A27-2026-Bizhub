@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php bin/console doctrine:schema:update --dump-sql)",
+      "Bash(php bin/console doctrine:database:create --if-not-exists)",
+      "Bash(php -r \"echo 'DB connection OK';\")",
+      "Bash(php bin/console dbal:run-sql \"SHOW TABLES LIKE 'project'\")",
+      "Bash(php bin/console dbal:run-sql \"SHOW TABLES\")",
+      "Bash(php bin/console debug:router)"
+    ]
+  }
+}
