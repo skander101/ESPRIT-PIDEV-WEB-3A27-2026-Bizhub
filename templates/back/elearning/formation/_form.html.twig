@@ -1,0 +1,35 @@
+{{ form_start(form, { attr: { novalidate: 'novalidate', class: 'elearning-validated-form', 'data-validate-mode': form_js_mode|default('formation-new') } }) }}
+  <div class="row g-3">
+    <div class="col-md-12">
+      {{ form_row(form.title) }}
+    </div>
+    <div class="col-md-12">
+      {{ form_row(form.description) }}
+    </div>
+    <div class="col-md-12">
+      {{ form_row(form.user) }}
+    </div>
+    <div class="col-md-6">
+      {{ form_row(form.start_date) }}
+    </div>
+    <div class="col-md-6">
+      {{ form_row(form.end_date) }}
+    </div>
+    <div class="col-md-6">
+      {{ form_row(form.cost) }}
+    </div>
+    <div class="col-md-6">
+      {{ form_row(form.lieu) }}
+    </div>
+    <div class="col-12">
+      <div class="form-check">
+        {{ form_widget(form.enligne) }}
+        {{ form_label(form.enligne, null, { label_attr: { class: 'form-check-label' } }) }}
+      </div>
+    </div>
+  </div>
+  <div class="mt-4 d-flex gap-2">
+    <button type="submit" class="btn btn-primary">Enregistrer</button>
+    <a href="{{ path('app_admin_formation_index') }}" class="btn btn-outline-secondary">Annuler</a>
+  </div>
+{{ form_end(form) }}
