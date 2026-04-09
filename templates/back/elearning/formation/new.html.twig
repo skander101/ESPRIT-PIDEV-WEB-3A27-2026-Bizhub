@@ -1,0 +1,23 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Nouvelle formation{% endblock %}
+{% block breadcrumb %}E-Learning / Formations / Nouveau{% endblock %}
+
+{% block content %}
+<div style="padding:2rem;max-width:900px;">
+  <h2 style="font-size:1.5rem;color:var(--pg-text);margin-bottom:1.5rem;">Créer une formation</h2>
+  {% for label, messages in app.flashes %}
+    {% for message in messages %}
+      <div class="alert alert-{{ label == 'error' ? 'danger' : label }} mb-3" role="alert">{{ message }}</div>
+    {% endfor %}
+  {% endfor %}
+  <div class="dash-panel" style="padding:1.5rem;">
+    {% include 'back/elearning/formation/_form.html.twig' %}
+  </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+  {{ parent() }}
+  <script src="{{ asset('js/elearning-forms-validation.js') }}"></script>
+{% endblock %}
