@@ -1,33 +1,8 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
-  <title>BizHub - Profil</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-  
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --primary:      #ffbe33;
-    --primary-dark: #e0a820;
-    --dark:         #222831;
-    --dark2:        #1a1f27;
-    --white:        #ffffff;
-    --light-bg:     #f8f8f8;
-    --text-muted:   #666666;
-    --border:       #ebebeb;
-  }
-  html { scroll-behavior: smooth; }
-  body { font-family: 'Lora', serif; background: var(--white); color: var(--dark); overflow-x: hidden; }
+{% extends 'front/base.html.twig' %}
 
-  /* NAV */
-  .navbar {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-    height: 72px; display: flex; align-items: center; padding: 0 5%;
-    background: rgba(34,40,49,0.97); backdrop-filter: blur(10px);
+{% block title %}Reviews - BizHub{% endblock %}
+
+{% block content %}
     box-shadow: 0 2px 20px rgba(0,0,0,0.18);
     justify-content: space-between; transition: height 0.3s;
   }
@@ -311,4 +286,4 @@
   window.addEventListener('scroll', () => document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 50));
   const obs = new IntersectionObserver(entries => { entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); } }); }, {threshold:0.1});
   document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
-</script></body></html>
+{% endblock %}

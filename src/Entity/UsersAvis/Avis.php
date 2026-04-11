@@ -23,8 +23,8 @@ class Avis
     #[ORM\JoinColumn(name: 'reviewer_id', referencedColumnName: 'user_id', nullable: false)]
     private ?User $user = null;
 
-    #[ORM\OneToOne(targetEntity: Formation::class, inversedBy: 'avi')]
-    #[ORM\JoinColumn(name: 'formation_id', referencedColumnName: 'formation_id', unique: true)]
+        #[ORM\ManyToOne(targetEntity: Formation::class, inversedBy: 'avis')]
+        #[ORM\JoinColumn(name: 'formation_id', referencedColumnName: 'formation_id', nullable: false)]
     #[Assert\NotNull(message: 'Please select a formation.')]
     private ?Formation $formation = null;
 

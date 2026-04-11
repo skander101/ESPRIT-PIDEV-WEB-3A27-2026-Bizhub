@@ -8,6 +8,8 @@ framework:
     #esi: true
     #fragments: true
 
+    trusted_proxies: '*'
+
 when@test:
     framework:
         test: true

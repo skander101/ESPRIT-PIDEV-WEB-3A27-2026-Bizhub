@@ -3,8 +3,60 @@
 {% block title %}Formations — Admin{% endblock %}
 {% block breadcrumb %}E-Learning / Formations{% endblock %}
 
+{% block extra_stylesheets %}
+  <style>
+    .formation-page .dash-panel {
+      border: 1px solid var(--pg-border);
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(20,24,38,.86), rgba(12,16,30,.92));
+      box-shadow: 0 18px 45px rgba(0,0,0,.24);
+      overflow: hidden;
+    }
+    .formation-page .table {
+      --bs-table-bg: transparent;
+      --bs-table-striped-bg: rgba(255,255,255,.02);
+      --bs-table-hover-bg: rgba(91,110,245,.08);
+      --bs-table-color: var(--pg-text);
+      margin-bottom: 0;
+    }
+    .formation-page .table thead th {
+      color: #c8d0ff;
+      font-weight: 600;
+      border-bottom: 1px solid var(--pg-border2);
+      background: rgba(91,110,245,.1);
+      letter-spacing: .01em;
+    }
+    .formation-page .table td {
+      border-color: var(--pg-border);
+      vertical-align: middle;
+    }
+    .formation-page .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: .24rem .58rem;
+      border-radius: 999px;
+      font-size: .74rem;
+      font-weight: 600;
+      border: 1px solid transparent;
+      text-transform: uppercase;
+      letter-spacing: .02em;
+      line-height: 1.1;
+      white-space: nowrap;
+    }
+    .formation-page .tag-online { background: rgba(6,214,160,.16); color: #53e2c0; border-color: rgba(6,214,160,.36); }
+    .formation-page .tag-offline { background: rgba(148,163,184,.14); color: #c2ccd8; border-color: rgba(148,163,184,.34); }
+    .formation-page .tag-money { background: rgba(255,190,51,.16); color: #ffd27b; border-color: rgba(255,190,51,.36); }
+    .formation-page .tag-location { background: rgba(91,110,245,.16); color: #aeb9ff; border-color: rgba(91,110,245,.36); }
+    .formation-page .tag-trainers { background: rgba(139,92,246,.16); color: #cab6ff; border-color: rgba(139,92,246,.36); }
+    .formation-page .table-title {
+      color: #f6f8ff;
+      font-weight: 700;
+    }
+  </style>
+{% endblock %}
+
 {% block content %}
-<div style="padding:2rem;">
+<div class="formation-page" style="padding:2rem;">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;">
     <h2 style="font-size:1.5rem;color:var(--pg-text);margin:0;">Formations</h2>
     <a href="{{ path('app_admin_formation_new') }}" class="btn btn-primary">+ Nouvelle formation</a>
@@ -19,7 +71,7 @@
   <div class="dash-panel">
     {% if formations|length > 0 %}
       <div class="table-responsive">
-        <table class="table table-dark table-hover align-middle mb-0" style="color:var(--pg-text);">
+        <table class="table table-hover align-middle">
           <thead>
             <tr>
               <th>Titre</th>
@@ -29,19 +81,23 @@
               <th>Coût</th>
               <th>Lieu</th>
               <th>En ligne</th>
+              <th>Max formateurs</th>
               <th class="text-center">Actions</th>
             </tr>
           </thead>
           <tbody>
             {% for f in formations %}
               <tr>
-                <td><strong>{{ f.title }}</strong></td>
+                <td><span class="table-title">{{ f.title }}</span></td>
                 <td>{{ f.user ? f.user.fullName : '—' }}</td>
                 <td>{{ f.start_date ? f.start_date|date('d/m/Y') : '—' }}</td>
                 <td>{{ f.end_date ? f.end_date|date('d/m/Y') : '—' }}</td>
-                <td>{{ f.cost ?? '0.00' }}</td>
-                <td>{{ f.lieu }}</td>
-                <td>{{ f.enligne ? 'Oui' : 'Non' }}</td>
+                <td><span class="tag tag-money">{{ f.cost ?? '0.00' }} DT</span></td>
+                <td><span class="tag tag-location">{{ f.lieu ?: 'N/A' }}</span></td>
+                <td>
+                  <span class="tag {{ f.enLigne ? 'tag-online' : 'tag-offline' }}">{{ f.enLigne ? 'En ligne' : 'Présentiel' }}</span>
+                </td>
+                <td><span class="tag tag-trainers">{{ f.maxFormateurs }}</span></td>
                 <td class="text-center">
                   <div class="d-flex flex-wrap gap-1 justify-content-center">
                     <a href="{{ path('app_admin_formation_participants', { formation_id: f.formation_id }) }}" class="btn btn-sm btn-outline-info">Participants</a>

@@ -16,13 +16,16 @@ class AvisType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('formation', EntityType::class, [
+        if ($options['include_formation']) {
+            $builder->add('formation', EntityType::class, [
                 'label' => 'Formation',
                 'class' => Formation::class,
                 'choice_label' => 'title',
                 'placeholder' => '-- Select a formation --',
-            ])
+            ]);
+        }
+
+        $builder
             ->add('rating', ChoiceType::class, [
                 'label' => 'Rating',
                 'choices' => [
@@ -57,6 +60,7 @@ class AvisType extends AbstractType
             ->setDefaults([
                 'data_class' => Avis::class,
                 'allow_admin_fields' => false,
+                'include_formation' => true,
             ]);
     }
 }

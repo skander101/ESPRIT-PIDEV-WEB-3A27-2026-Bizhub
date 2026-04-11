@@ -841,6 +841,7 @@
     <li><a href="{{ path('app_avis_list') }}" {% if app.request.get('_route') == 'app_avis_list' %}class="active"{% endif %}>Mes Avis</a></li>
     <li><a href="{{ path('produit_index') }}" {% if 'produit_' in app.request.get('_route') or 'commande_' in app.request.get('_route') or 'panier_' in app.request.get('_route') %}class="active"{% endif %}>Marketplace</a></li>
     <li><a href="{{ path('app_front_projet_index') }}" {% if 'projet' in app.request.get('_route') or 'investir' in app.request.get('_route') %}class="active"{% endif %}>Investissement</a></li>
+    <li><a href="{{ path('app_front_formations_index') }}" {% if 'formations' in app.request.get('_route') %}class="active"{% endif %}>Formations</a></li>
     {% if app.user and app.user.userType == 'investisseur' %}
     <li><a href="{{ path('app_front_investissement_index') }}" {% if 'investissement_index' in app.request.get('_route') or 'investissement_edit' in app.request.get('_route') %}class="active"{% endif %}>Mes Investissements</a></li>
     {% endif %}
@@ -886,10 +887,7 @@
       <ul>
         <li><a href="{{ path('produit_index') }}">Marketplace</a></li>
         <li><a href="{{ path('app_front_projet_index') }}">Investissement</a></li>
-        {% if app.user and app.user.userType == 'investisseur' %}
-        <li><a href="{{ path('app_front_investissement_index') }}">Mes Investissements</a></li>
-        {% endif %}
-        <li><a href="#">Formations</a></li>
+        <li><a href="{{ path('app_front_formations_index') }}">Formations</a></li>
         <li><a href="#">Incubation</a></li>
       </ul>
     </div>
