@@ -5,6 +5,7 @@ namespace App\Entity\UsersAvis;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Scheb\TwoFactorBundle\Model\Totp\TwoFactorInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -17,7 +18,7 @@ use App\Repository\UsersAvis\UserRepository;
 #[ORM\Table(name: 'user')]
 #[UniqueConstraint(name: 'email_unique', columns: ['email'])]
 #[UniqueEntity(fields: ['email'], message: 'This email is already used.')]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFactorInterface
 {
     public const USER_TYPES = [
         'startup' => 'startup',
@@ -153,6 +154,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string', nullable: true)]
     private ?string $face_token = null;
 
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $face_enrolled_at = null;
+
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    private ?bool $is_verified = false;
+
     #[ORM\OneToMany(targetEntity: Avis::class, mappedBy: 'user')]
     private Collection $avis;
 
@@ -281,9 +288,41 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getTotp_secret(): ?string { return $this->totp_secret; }
     public function setTotp_secret(?string $totp_secret): self { $this->totp_secret = $totp_secret; return $this; }
+    public function getTotpSecret(): ?string { return $this->totp_secret; }
 
     public function getFace_token(): ?string { return $this->face_token; }
     public function setFace_token(?string $face_token): self { $this->face_token = $face_token; return $this; }
+    public function getFaceToken(): ?string { return $this->face_token; }
+
+    public function getFaceEnrolledAt(): ?\DateTimeImmutable { return $this->face_enrolled_at; }
+    public function setFaceEnrolledAt(?\DateTimeImmutable $face_enrolled_at): self { $this->face_enrolled_at = $face_enrolled_at; return $this; }
+
+    public function isVerified(): bool { return $this->is_verified ?? false; }
+    public function getIsVerified(): bool { return $this->is_verified ?? false; }
+    public function setIsVerified(bool $is_verified): self { $this->is_verified = $is_verified; return $this; }
+
+    public function getTotpAuthenticationConfiguration(): ?\Scheb\TwoFactorBundle\Model\Totp\TotpConfiguration
+    {
+        if ($this->totp_secret === null) {
+            return null;
+        }
+        return new \Scheb\TwoFactorBundle\Model\Totp\TotpConfiguration(
+            $this->totp_secret,
+            \Scheb\TwoFactorBundle\Model\Totp\TotpConfiguration::ALGORITHM_SHA1,
+            30,
+            6
+        );
+    }
+
+    public function isTotpAuthenticationEnabled(): bool
+    {
+        return $this->totp_secret !== null;
+    }
+
+    public function getTotpAuthenticationUsername(): string
+    {
+        return $this->email ?? '';
+    }
 
     /** @return Collection<int, Avis> */
     public function getAvis(): Collection

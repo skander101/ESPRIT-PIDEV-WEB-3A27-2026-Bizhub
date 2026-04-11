@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Compte cree - BizHub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --primary:      #ffbe33;
+            --primary-dark: #e0a820;
+            --dark:         #222831;
+            --dark2:        #1a1f27;
+            --white:        #ffffff;
+            --light-bg:     #f8f8f8;
+            --text-muted:   #666666;
+            --border:       #ebebeb;
+            --success-bg:   #ecfdf3;
+            --success-text: #0c6b3d;
+        }
+        body {
+            font-family: 'Lora', serif;
+            background: var(--dark2);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 20%, rgba(255,190,51,0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 80%, rgba(255,190,51,0.05) 0%, transparent 40%);
+            pointer-events: none;
+        }
+        .auth-wrapper {
+            width: 100%;
+            max-width: 480px;
+            position: relative;
+            z-index: 1;
+        }
+        .auth-brand {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .auth-brand a {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--white);
+            letter-spacing: 0.1em;
+            font-family: 'Josefin Sans', sans-serif;
+            text-transform: uppercase;
+            text-decoration: none;
+        }
+        .auth-brand a span { color: var(--primary); }
+        .auth-container {
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+            padding: 48px 40px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--success-bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+        }
+        .success-icon i {
+            font-size: 2.5rem;
+            color: var(--success-text);
+        }
+        .auth-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 1rem;
+            font-family: 'Lora', serif;
+        }
+        .auth-subtitle {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        .email-box {
+            background: var(--light-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        .next-steps {
+            text-align: left;
+            background: #f0f7ff;
+            padding: 1.25rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #1166ff;
+        }
+        .next-steps h4 {
+            font-family: 'Josefin Sans', sans-serif;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #1166ff;
+            margin-bottom: 0.75rem;
+        }
+        .next-steps ul {
+            margin: 0;
+            padding-left: 1.25rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        .next-steps li { margin-bottom: 0.4rem; }
+        .resend-box {
+            border: 1px dashed var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        .resend-box p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+        .resend-box form {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .resend-box input[type="email"] {
+            flex: 1;
+            padding: 0.6rem 0.8rem;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            font-size: 0.85rem;
+        }
+        .resend-box button {
+            border: 0;
+            background: var(--dark);
+            color: #fff;
+            border-radius: 6px;
+            padding: 0.6rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .auth-footer {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+        .auth-footer a {
+            color: var(--primary-dark);
+            text-decoration: none;
+            font-weight: 700;
+        }
+        .flash-box {
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+        .flash-success { background: var(--success-bg); color: var(--success-text); border: 1px solid rgba(12,107,61,0.2); }
+        .flash-error { background: #fff1f2; color: #9f1239; border: 1px solid rgba(159,18,57,0.2); }
+    </style>
+</head>
+<body>
+    <div class="auth-wrapper">
+        <div class="auth-brand">
+            <a href="{{ path('app_index') }}">Biz<span>Hub</span></a>
+        </div>
+
+        <div class="auth-container">
+            {% for message in app.flashes('success') %}
+                <div class="flash-box flash-success">{{ message }}</div>
+            {% endfor %}
+
+            <div class="success-icon">
+                <i class="fa-solid fa-envelope-circle-check"></i>
+            </div>
+
+            <h1 class="auth-title">Verifiez votre email</h1>
+            <p class="auth-subtitle">
+                Un lien de verification a ete envoye a votre adresse email. 
+                Cliquez sur ce lien pour activer votre compte.
+            </p>
+
+            <div class="email-box">
+                <i class="fa-solid fa-envelope"></i> {{ email }}
+            </div>
+
+            <div class="next-steps">
+                <h4>Prochaines etapes</h4>
+                <ul>
+                    <li>Ouvrez votre boite email</li>
+                    <li>Cherchez le message de BizHub</li>
+                    <li>Cliquez sur le lien de verification</li>
+                    <li>Completez la configuration MFA</li>
+                </ul>
+            </div>
+
+            <div class="resend-box">
+                <p>Vous n'avez pas recu l'email ?</p>
+                <form method="post" action="{{ path('app_verify_email_resend') }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('resend_verification_email') }}" />
+                    <input type="email" name="email" placeholder="Votre email" value="{{ email }}" required />
+                    <button type="submit">Renvoyer</button>
+                </form>
+            </div>
+
+            <div class="auth-footer">
+                Deja verifie ? <a href="{{ path('app_login') }}">Se connecter</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -6,10 +6,13 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
-use App\Repository\ParticipationRepository;
+use App\Repository\Elearning\ParticipationRepository;
+use App\Entity\UsersAvis\User;
+use App\Entity\Elearning\Formation;
 
 #[ORM\Entity(repositoryClass: ParticipationRepository::class)]
 #[ORM\Table(name: 'participation')]
+#[ORM\HasLifecycleCallbacks]
 class Participation
 {
     #[ORM\Column(type: 'integer', nullable: false)]
@@ -34,9 +37,21 @@ class Participation
         return $this->date_affectation;
     }
 
+    public function getDateAffectation(): ?\DateTimeInterface
+    {
+        return $this->date_affectation;
+    }
+
     public function setDate_affectation(?\DateTimeInterface $date_affectation): self
     {
         $this->date_affectation = $date_affectation;
+        return $this;
+    }
+
+    public function setDateAffectation(?\DateTimeInterface $dateAffectation): self
+    {
+        $this->date_affectation = $dateAffectation;
+
         return $this;
     }
 
@@ -62,9 +77,21 @@ class Participation
         return $this->payment_status;
     }
 
+    public function getPaymentStatus(): ?string
+    {
+        return $this->payment_status;
+    }
+
     public function setPayment_status(string $payment_status): self
     {
         $this->payment_status = $payment_status;
+        return $this;
+    }
+
+    public function setPaymentStatus(?string $paymentStatus): self
+    {
+        $this->payment_status = $paymentStatus;
+
         return $this;
     }
 
@@ -76,9 +103,21 @@ class Participation
         return $this->payment_provider;
     }
 
+    public function getPaymentProvider(): ?string
+    {
+        return $this->payment_provider;
+    }
+
     public function setPayment_provider(?string $payment_provider): self
     {
         $this->payment_provider = $payment_provider;
+        return $this;
+    }
+
+    public function setPaymentProvider(?string $paymentProvider): self
+    {
+        $this->payment_provider = $paymentProvider;
+
         return $this;
     }
 
@@ -90,9 +129,21 @@ class Participation
         return $this->payment_ref;
     }
 
+    public function getPaymentRef(): ?string
+    {
+        return $this->payment_ref;
+    }
+
     public function setPayment_ref(?string $payment_ref): self
     {
         $this->payment_ref = $payment_ref;
+        return $this;
+    }
+
+    public function setPaymentRef(?string $paymentRef): self
+    {
+        $this->payment_ref = $paymentRef;
+
         return $this;
     }
 
@@ -118,9 +169,21 @@ class Participation
         return $this->paid_at;
     }
 
+    public function getPaidAt(): ?\DateTimeInterface
+    {
+        return $this->paid_at;
+    }
+
     public function setPaid_at(?\DateTimeInterface $paid_at): self
     {
         $this->paid_at = $paid_at;
+        return $this;
+    }
+
+    public function setPaidAt(?\DateTimeInterface $paidAt): self
+    {
+        $this->paid_at = $paidAt;
+
         return $this;
     }
 
@@ -143,6 +206,20 @@ class Participation
     #[ORM\Column(type: 'integer', nullable: false)]
     private ?int $formation_id = null;
 
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'user_id')]
+    private ?User $user = null;
+
+    #[ORM\ManyToOne(targetEntity: Formation::class)]
+    #[ORM\JoinColumn(name: 'formation_id', referencedColumnName: 'formation_id')]
+    private ?Formation $formation = null;
+
+    public function getUser(): ?User { return $this->user; }
+    public function setUser(?User $v): self { $this->user = $v; return $this; }
+
+    public function getFormation(): ?Formation { return $this->formation; }
+    public function setFormation(?Formation $v): self { $this->formation = $v; return $this; }
+
     public function getFormation_id(): ?int
     {
         return $this->formation_id;
@@ -153,5 +230,16 @@ class Participation
         $this->formation_id = $formation_id;
         return $this;
     }
+
+    #[ORM\Column(type: 'datetime', nullable: false)]
+    private ?\DateTimeInterface $created_at = null;
+
+    #[ORM\PrePersist]
+    public function setCreatedAt(): void
+    {
+        $this->created_at = new \DateTime();
+    }
+
+    public function getCreated_at(): ?\DateTimeInterface { return $this->created_at; }
 
 }

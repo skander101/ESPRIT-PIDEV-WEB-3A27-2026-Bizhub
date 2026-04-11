@@ -12,11 +12,11 @@ class TrainingRequest
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(name: 'request_id', type: 'integer')]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'user_id', nullable: false)]
+    #[ORM\JoinColumn(name: 'startup_id', referencedColumnName: 'user_id', nullable: false)]
     private ?User $user = null;
 
     #[ORM\ManyToOne(targetEntity: Formation::class, inversedBy: 'trainingRequests')]
@@ -24,13 +24,10 @@ class TrainingRequest
     private ?Formation $formation = null;
 
     #[ORM\Column(type: 'string', length: 50, nullable: false)]
-    private ?string $status = 'pending'; // pending, approved, rejected, completed
+    private ?string $status = 'pending'; // pending, accepted, rejected, completed
 
-    #[ORM\Column(type: 'datetime', nullable: false)]
+    #[ORM\Column(name: 'request_date', type: 'datetime', nullable: false)]
     private ?\DateTimeInterface $created_at = null;
-
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?\DateTimeInterface $updated_at = null;
 
     public function __construct()
     {
@@ -86,14 +83,4 @@ class TrainingRequest
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeInterface
-    {
-        return $this->updated_at;
-    }
-
-    public function setUpdatedAt(?\DateTimeInterface $updated_at): self
-    {
-        $this->updated_at = $updated_at;
-        return $this;
-    }
 }

@@ -143,6 +143,40 @@
     width: 100%; height: 44px; border-radius: 10px; border: none; background: #1e2533; color: #fff;
     font-weight: 600; font-size: 0.85rem; cursor: pointer; margin-top: 0.5rem;
   }
+  .formation-reviews {
+    margin-top: 0.9rem; padding-top: 0.9rem; border-top: 1px solid #f0f2f5;
+  }
+  .formation-review-form {
+    display: grid; gap: 0.55rem;
+  }
+  .formation-review-stars {
+    display: flex; gap: 0.55rem; align-items: center;
+  }
+  .formation-review-stars label {
+    font-size: 0.82rem; color: #4b5563; min-width: 2.2rem;
+  }
+  .formation-review-stars select,
+  .formation-review-form textarea {
+    width: 100%; border: 1px solid #e5e7eb; border-radius: 10px; background: #fff; color: #1f2937;
+    font-size: 0.82rem; padding: 0.55rem 0.7rem;
+  }
+  .formation-review-form textarea { min-height: 84px; resize: vertical; }
+  .formation-review-submit {
+    height: 40px; border: none; border-radius: 10px; background: #2563eb; color: #fff;
+    font-weight: 700; font-size: 0.78rem; letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer;
+  }
+  .formation-review-list { margin-top: 0.75rem; display: grid; gap: 0.65rem; }
+  .formation-review-item {
+    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 0.65rem 0.75rem;
+  }
+  .formation-review-head {
+    display: flex; justify-content: space-between; gap: 0.5rem; align-items: center; margin-bottom: 0.25rem;
+  }
+  .formation-review-author { font-size: 0.78rem; font-weight: 700; color: #1f2937; }
+  .formation-review-date { font-size: 0.72rem; color: #6b7280; }
+  .formation-review-rating { color: #f59e0b; font-size: 0.8rem; letter-spacing: 0.04em; }
+  .formation-review-comment { font-size: 0.8rem; color: #374151; line-height: 1.45; white-space: pre-wrap; }
+  .formation-review-empty { font-size: 0.78rem; color: #6b7280; }
   .formations-empty {
     text-align: center; padding: 3rem 1.5rem; background: #fff; border-radius: 16px;
     border: 1px dashed #e5e7eb; color: #6b7280;
@@ -191,9 +225,9 @@
       <div class="formations-grid">
         {% for f in formations %}
           <article class="formation-card">
-            <div class="formation-card-accent {{ f.enligne ? 'formation-card-accent--online' : 'formation-card-accent--present' }}"></div>
+            <div class="formation-card-accent {{ f.enLigne ? 'formation-card-accent--online' : 'formation-card-accent--present' }}"></div>
             <div class="formation-card-body">
-              <div class="formation-tag {{ f.enligne ? 'online' : '' }}">{{ f.enligne ? 'En ligne' : 'Présentiel' }}</div>
+              <div class="formation-tag {{ f.enLigne ? 'online' : '' }}">{{ f.enLigne ? 'En ligne' : 'Présentiel' }}</div>
               <h2 class="formation-title">{{ f.title }}</h2>
               {% if f.description %}
                 <p class="formation-desc">{{ f.description }}</p>
@@ -218,22 +252,93 @@
                   <span class="formation-meta-text">{{ f.user.fullName }}</span>
                 </div>
               {% endif %}
+                <div class="formation-meta-row">
+                  <span class="formation-meta-icon user"><i class="fa-solid fa-user-check"></i></span>
+                  <span class="formation-meta-text">Formateurs acceptes: {{ approved_formateurs_by_formation[f.formation_id]|default(0) }} / {{ f.maxFormateurs }}</span>
+                </div>
             </div>
             <div class="formation-actions">
-              {% if already_participating[f.formation_id] %}
-                <button type="button" class="formation-btn-inscrit" disabled>Déjà inscrit</button>
-              {% else %}
-                <button type="button" class="formation-btn-participate nb-toggle-participation" data-target="participation-panel-{{ f.formation_id }}">Participer</button>
-                <div id="participation-panel-{{ f.formation_id }}" class="formation-panel" style="display:none;">
-                  {{ form_start(forms[f.formation_id], { action: path('app_front_formation_participate', { formation_id: f.formation_id }), attr: { novalidate: 'novalidate', class: 'elearning-validated-form', 'data-validate-mode': 'participation-front' } }) }}
+                {% if is_formateur %}
+                  {% set req = trainer_requests[f.formation_id]|default(null) %}
+                  {% if req and req.status == 'accepted' %}
+                    <button type="button" class="formation-btn-inscrit" disabled>Demande acceptee</button>
+                  {% elseif req and req.status == 'pending' %}
+                    <button type="button" class="formation-btn-inscrit" disabled>Demande en attente</button>
+                  {% elseif approved_formateurs_by_formation[f.formation_id]|default(0) >= f.maxFormateurs %}
+                    <button type="button" class="formation-btn-inscrit" disabled>Quota formateurs atteint</button>
+                  {% else %}
+                    <form method="post" action="{{ path('app_front_formation_apply', { formation_id: f.formation_id }) }}">
+                      <input type="hidden" name="_token" value="{{ csrf_token('formation_apply_' ~ f.formation_id) }}">
+                      {% if search_query|default('')|trim != '' %}
+                        <input type="hidden" name="q" value="{{ search_query|e('html_attr') }}">
+                      {% endif %}
+                      <button type="submit" class="formation-btn-participate">Demander cette formation</button>
+                    </form>
+                  {% endif %}
+                {% else %}
+                  {% if already_participating[f.formation_id] %}
+                    <button type="button" class="formation-btn-inscrit" disabled>Déjà inscrit</button>
+                  {% else %}
+                    <button type="button" class="formation-btn-participate nb-toggle-participation" data-target="participation-panel-{{ f.formation_id }}">Participer</button>
+                    <div id="participation-panel-{{ f.formation_id }}" class="formation-panel" style="display:none;">
+                      {{ form_start(forms[f.formation_id], { action: path('app_front_formation_participate', { formation_id: f.formation_id }), attr: { novalidate: 'novalidate', class: 'elearning-validated-form', 'data-validate-mode': 'participation-front' } }) }}
+                        {% if search_query|default('')|trim != '' %}
+                          <input type="hidden" name="q" value="{{ search_query|e('html_attr') }}">
+                        {% endif %}
+                        {{ form_row(forms[f.formation_id].remarques) }}
+                        <button type="submit" class="btn-submit-msg">Envoyer la demande</button>
+                      {{ form_end(forms[f.formation_id]) }}
+                    </div>
+                  {% endif %}
+                {% endif %}
+
+              <div class="formation-reviews">
+                  {% if (not is_formateur) and already_participating[f.formation_id] %}
+                  {% set currentReview = user_reviews[f.formation_id]|default(null) %}
+                  <form method="post" action="{{ path('app_front_formation_review', { formation_id: f.formation_id }) }}" class="formation-review-form">
+                    <input type="hidden" name="_token" value="{{ csrf_token('formation_review_' ~ f.formation_id) }}">
                     {% if search_query|default('')|trim != '' %}
                       <input type="hidden" name="q" value="{{ search_query|e('html_attr') }}">
                     {% endif %}
-                    {{ form_row(forms[f.formation_id].remarques) }}
-                    <button type="submit" class="btn-submit-msg">Envoyer la demande</button>
-                  {{ form_end(forms[f.formation_id]) }}
-                </div>
-              {% endif %}
+                    <div class="formation-review-stars">
+                      <label for="review-rating-{{ f.formation_id }}">Note</label>
+                      <select id="review-rating-{{ f.formation_id }}" name="rating" required>
+                        <option value="">Choisir</option>
+                        {% for i in 1..5 %}
+                          <option value="{{ i }}" {% if currentReview and currentReview.rating == i %}selected{% endif %}>{{ i }} / 5</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <textarea name="comment" maxlength="1000" placeholder="Partagez votre retour sur cette formation...">{{ currentReview ? currentReview.comment : '' }}</textarea>
+                    <button type="submit" class="formation-review-submit">{{ currentReview ? 'Mettre a jour mon avis' : 'Publier mon avis' }}</button>
+                  </form>
+                {% endif %}
+
+                {% set reviews = reviews_by_formation[f.formation_id]|default([]) %}
+                {% if reviews is not empty %}
+                  <div class="formation-review-list">
+                    {% for r in reviews %}
+                      <article class="formation-review-item">
+                        <div class="formation-review-head">
+                          <span class="formation-review-author">{{ r.user.fullName|default(r.user.email) }}</span>
+                          <span class="formation-review-date">{{ r.createdAt ? r.createdAt|date('d/m/Y') : '' }}</span>
+                        </div>
+                        <div class="formation-review-rating">
+                          {% set stars = r.rating|default(0) %}
+                          {% for i in 1..5 %}
+                            {{ i <= stars ? '★' : '☆' }}
+                          {% endfor %}
+                        </div>
+                        {% if r.displayComment %}
+                          <p class="formation-review-comment">{{ r.displayComment }}</p>
+                        {% endif %}
+                      </article>
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  <p class="formation-review-empty">Aucun avis pour le moment.</p>
+                {% endif %}
+              </div>
             </div>
           </article>
         {% endfor %}

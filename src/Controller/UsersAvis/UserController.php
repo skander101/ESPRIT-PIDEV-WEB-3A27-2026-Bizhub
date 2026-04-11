@@ -5,9 +5,16 @@ namespace App\Controller\UsersAvis;
 use App\Entity\UsersAvis\User;
 use App\Form\UsersAvis\UserType;
 use App\Form\UsersAvis\AvatarType;
+use App\Form\Auth\TotpLoginType;
 use App\Repository\UsersAvis\UserRepository;
+use App\Service\Auth\AuthMailerService;
+use App\Service\Auth\SecureTokenService;
+use App\Service\Auth\UserAuthStateService;
+use App\Service\FacePlusPlus\FaceRecognitionService;
+use App\Service\FacePlusPlus\ImagePreprocessingService;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,6 +23,9 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('')]
@@ -26,6 +36,13 @@ class UserController extends AbstractController
         private UserRepository $userRepository,
         private UserPasswordHasherInterface $passwordHasher,
         private SluggerInterface $slugger,
+        private SecureTokenService $tokenService,
+        private UserAuthStateService $userAuthStateService,
+        private AuthMailerService $authMailerService,
+        private FaceRecognitionService $faceRecognitionService,
+        private ImagePreprocessingService $imagePreprocessingService,
+        private LoggerInterface $logger,
+        private TokenStorageInterface $tokenStorage,
     ) {
     }
 
@@ -54,6 +71,15 @@ class UserController extends AbstractController
 
             // Save user
             $this->entityManager->persist($user);
+
+            $verificationToken = $this->tokenService->generateToken();
+            $verificationExpiresAt = (new \DateTimeImmutable())->modify('+15 minutes');
+            $authState = $this->userAuthStateService->getOrCreate($user);
+            $authState
+                ->setIsVerified(false)
+                ->setVerificationToken($verificationToken)
+                ->setVerificationTokenExpiresAt($verificationExpiresAt);
+
             try {
                 $this->entityManager->flush();
             } catch (UniqueConstraintViolationException) {
@@ -62,9 +88,18 @@ class UserController extends AbstractController
                 return $this->render('signup.html.twig', ['form' => $form]);
             }
 
-            $this->addFlash('success', 'Account created successfully! Please log in with your credentials.');
+            $verificationUrl = $this->generateUrl('app_verify_email', ['token' => $verificationToken], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
+            $this->logger->info('Dispatching verification email after registration.', [
+                'flow' => 'email_verification_register',
+                'recipient' => (string) $user->getEmail(),
+            ]);
+            $this->authMailerService->sendEmailVerification($user, $verificationUrl, 15);
 
-            return $this->redirectToRoute('app_login');
+            $this->addFlash('success', 'Account created successfully! Please verify your email to activate your account.');
+
+            return $this->render('auth/register_success.html.twig', [
+                'email' => $user->getEmail(),
+            ]);
         }
 
         return $this->render('signup.html.twig', ['form' => $form]);
@@ -91,6 +126,126 @@ class UserController extends AbstractController
     {
         // This method will be intercepted by the logout key on the firewall
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on the firewall.');
+    }
+
+    #[Route('/login/totp', name: 'app_login_totp', methods: ['GET', 'POST'])]
+    public function loginWithTotp(Request $request): Response
+    {
+        if ($this->getUser()) {
+            return $this->redirectToRoute('app_user_dashboard');
+        }
+
+        $form = $this->createForm(TotpLoginType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            $email = trim((string) $data['email']);
+            $otp = (string) $data['otp'];
+
+            $user = $this->userRepository->findByEmail($email);
+
+            if (!$user instanceof User || !$this->userAuthStateService->isVerified($user) || !$this->userAuthStateService->isMfaEnabled($user) || $user->getTotp_secret() === null) {
+                $this->addFlash('error', 'TOTP login failed. Check your email/code or use password login.');
+                return $this->redirectToRoute('app_login_totp');
+            }
+
+            $request->getSession()->set('login_via_totp', true);
+
+            return $this->redirectToRoute('app_login');
+        }
+
+        return $this->render('auth/totp_login.html.twig', ['form' => $form]);
+    }
+
+    #[Route('/login/face', name: 'app_login_face', methods: ['GET', 'POST'])]
+    public function loginWithFace(Request $request): Response
+    {
+        if ($this->getUser()) {
+            return $this->redirectToRoute('app_user_dashboard');
+        }
+
+        if ($request->isMethod('GET')) {
+            return $this->render('auth/face_login.html.twig');
+        }
+
+        $base64Image = (string) $request->request->get('image', '');
+        if ($base64Image === '') {
+            $this->addFlash('error', 'Please capture a photo first.');
+            return $this->redirectToRoute('app_login_face');
+        }
+
+        if (str_starts_with($base64Image, 'data:')) {
+            $base64Image = preg_replace('#^data:image/[^;]+;base64,#', '', $base64Image) ?: '';
+        }
+
+        try {
+            $processedBase64 = $this->imagePreprocessingService->toGrayscaleBase64($base64Image);
+        } catch (\InvalidArgumentException|\RuntimeException $e) {
+            $this->addFlash('error', 'Failed to process image: ' . $e->getMessage());
+            return $this->redirectToRoute('app_login_face');
+        }
+
+        $faceUsers = $this->userRepository->findActiveWithFaceEnrollment();
+        if ($faceUsers === []) {
+            $this->addFlash('error', 'No face-enrolled account is available for face login.');
+            return $this->redirectToRoute('app_login');
+        }
+
+        $bestUser = null;
+        $bestConfidence = 0.0;
+        $faceDir = $this->getParameter('kernel.project_dir') . '/var/face_images';
+
+        foreach ($faceUsers as $faceUser) {
+            if (!$this->userAuthStateService->isVerified($faceUser)) {
+                continue;
+            }
+
+            $storedImagePath = sprintf('%s/%d.jpg', $faceDir, $faceUser->getUserId());
+            if (!file_exists($storedImagePath)) {
+                $this->logger->warning('Face image file missing', ['path' => $storedImagePath]);
+                continue;
+            }
+
+            $storedBase64 = base64_encode((string) file_get_contents($storedImagePath));
+            
+            $this->logger->debug('Comparing faces', [
+                'user_id' => $faceUser->getUserId(),
+                'stored_size' => strlen($storedBase64),
+                'input_size' => strlen($processedBase64),
+            ]);
+
+            try {
+                $confidence = $this->faceRecognitionService->compareFaces($storedBase64, $processedBase64);
+            } catch (\App\Exception\FacePlusPlus\FaceComparisonException) {
+                continue;
+            }
+
+            if ($confidence > $bestConfidence) {
+                $bestConfidence = $confidence;
+                $bestUser = $faceUser;
+            }
+        }
+
+        if (!$bestUser instanceof User || $bestConfidence < 60.0) {
+            $this->addFlash('error', sprintf('Face login failed (confidence: %.1f%%). Please try again or use email/password login.', $bestConfidence));
+            return $this->redirectToRoute('app_login_face');
+        }
+
+        $request->getSession()->set('login_via_face', true);
+
+        return $this->authenticateUser($bestUser, $request);
+    }
+
+    private function authenticateUser(User $user, Request $request): Response
+    {
+        $token = new UsernamePasswordToken($user, 'main', $user->getRoles());
+        $this->tokenStorage->setToken($token);
+        
+        $request->getSession()->set('_security_main', serialize($token));
+        $request->getSession()->set('login_via_face', true);
+        
+        return $this->redirectToRoute('app_user_dashboard');
     }
 
     #[Route('/dashboard', name: 'app_user_dashboard', methods: ['GET'])]

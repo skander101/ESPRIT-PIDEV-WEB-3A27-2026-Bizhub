@@ -40,7 +40,11 @@
                     </div>
                     <div style="text-align:right;">
                         {% if not aviItem.isRemoved %}
-                            <a href="{{ path('app_avis_edit', {'id': aviItem.avisId}) }}" style="color:var(--primary);text-decoration:none;font-weight:700;display:block;margin-bottom:0.5rem;">Edit</a>
+                            <form method="post" action="{{ path('app_avis_edit_select') }}" style="display:inline;" onsubmit="event.stopPropagation();">
+                                <input type="hidden" name="review_id" value="{{ aviItem.avisId }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('select_edit_' ~ aviItem.avisId) }}">
+                                <button type="submit" style="color:var(--primary);text-decoration:none;font-weight:700;display:block;margin-bottom:0.5rem;background:none;border:none;cursor:pointer;padding:0;">Edit</button>
+                            </form>
                         {% endif %}
                     </div>
                 </a>

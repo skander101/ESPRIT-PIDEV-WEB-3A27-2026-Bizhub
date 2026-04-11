@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Email Verification Pending - BizHub{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-warning">
+                    <h4>Email Verification Required</h4>
+                </div>
+                <div class="card-body">
+                    <p>Please verify your email address to access all features.</p>
+                    
+                    <p>A verification email has been sent to: <strong>{{ user.email }}</strong></p>
+                    
+                    <hr>
+                    
+                    <form method="post" action="{{ path('app_verify_email_resend') }}">
+                        <input type="hidden" name="email" value="{{ user.email }}">
+                        <button type="submit" class="btn btn-primary w-100">Resend Verification Email</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

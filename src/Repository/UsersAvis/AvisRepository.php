@@ -2,6 +2,7 @@
 
 namespace App\Repository\UsersAvis;
 
+use App\Entity\Elearning\Formation;
 use App\Entity\UsersAvis\Avis;
 use App\Entity\UsersAvis\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -25,6 +26,55 @@ class AvisRepository extends ServiceEntityRepository
             ->orderBy('a.created_at', 'DESC')
             ->getQuery()
             ->getResult();
+    }
+
+    public function findOneByUserAndFormation(User $user, Formation $formation): ?Avis
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.user = :user')
+            ->andWhere('a.formation = :formation')
+            ->setParameter('user', $user)
+            ->setParameter('formation', $formation)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * @param list<Formation> $formations
+     * @return array<int, list<Avis>>
+     */
+    public function findVisibleGroupedByFormations(array $formations): array
+    {
+        if ($formations === []) {
+            return [];
+        }
+
+        $rows = $this->createQueryBuilder('a')
+            ->leftJoin('a.user', 'u')
+            ->addSelect('u')
+            ->andWhere('a.formation IN (:formations)')
+            ->andWhere('a.is_removed = false OR a.is_removed IS NULL')
+            ->setParameter('formations', $formations)
+            ->orderBy('a.created_at', 'DESC')
+            ->getQuery()
+            ->getResult();
+
+        $grouped = [];
+        foreach ($rows as $row) {
+            $formation = $row->getFormation();
+            if ($formation === null || $formation->getFormation_id() === null) {
+                continue;
+            }
+
+            $formationId = $formation->getFormation_id();
+            if (!isset($grouped[$formationId])) {
+                $grouped[$formationId] = [];
+            }
+            $grouped[$formationId][] = $row;
+        }
+
+        return $grouped;
     }
 
     public function findVerified(): array

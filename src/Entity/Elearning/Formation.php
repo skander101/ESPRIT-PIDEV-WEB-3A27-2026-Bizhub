@@ -82,7 +82,18 @@ class Formation
         return $this->start_date;
     }
 
+    public function getStartDate(): ?\DateTimeInterface
+    {
+        return $this->start_date;
+    }
+
     public function setStart_date(\DateTimeInterface $start_date): self
+    {
+        $this->start_date = $start_date;
+        return $this;
+    }
+
+    public function setStartDate(\DateTimeInterface $start_date): self
     {
         $this->start_date = $start_date;
         return $this;
@@ -96,7 +107,18 @@ class Formation
         return $this->end_date;
     }
 
+    public function getEndDate(): ?\DateTimeInterface
+    {
+        return $this->end_date;
+    }
+
     public function setEnd_date(\DateTimeInterface $end_date): self
+    {
+        $this->end_date = $end_date;
+        return $this;
+    }
+
+    public function setEndDate(\DateTimeInterface $end_date): self
     {
         $this->end_date = $end_date;
         return $this;
@@ -133,7 +155,20 @@ class Formation
     #[ORM\Column(type: 'boolean', nullable: false)]
     private ?bool $en_ligne = null;
 
+    #[ORM\Column(type: 'integer', options: ['default' => 1])]
+    private int $max_formateurs = 1;
+
     public function isEn_ligne(): ?bool
+    {
+        return $this->en_ligne;
+    }
+
+    public function isEnLigne(): ?bool
+    {
+        return $this->en_ligne;
+    }
+
+    public function getEnLigne(): ?bool
     {
         return $this->en_ligne;
     }
@@ -144,17 +179,67 @@ class Formation
         return $this;
     }
 
-    #[ORM\OneToOne(targetEntity: Avis::class, mappedBy: 'formation')]
-    private ?Avis $avi = null;
+    public function setEnLigne(bool $en_ligne): self
+    {
+        $this->en_ligne = $en_ligne;
+        return $this;
+    }
+
+    public function getMaxFormateurs(): int
+    {
+        return $this->max_formateurs;
+    }
+
+    public function setMaxFormateurs(int $max_formateurs): self
+    {
+        $this->max_formateurs = max(1, $max_formateurs);
+
+        return $this;
+    }
+
+    #[ORM\OneToMany(targetEntity: Avis::class, mappedBy: 'formation')]
+    private Collection $avis;
+
+    /**
+     * @return Collection<int, Avis>
+     */
+    public function getAvis(): Collection
+    {
+        if (!$this->avis instanceof Collection) {
+            $this->avis = new ArrayCollection();
+        }
+
+        return $this->avis;
+    }
+
+    public function addAvis(Avis $avi): self
+    {
+        if (!$this->getAvis()->contains($avi)) {
+            $this->getAvis()->add($avi);
+            $avi->setFormation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAvis(Avis $avi): self
+    {
+        $this->getAvis()->removeElement($avi);
+
+        return $this;
+    }
 
     public function getAvi(): ?Avis
     {
-        return $this->avi;
+        return $this->getAvis()->first() ?: null;
     }
 
     public function setAvi(?Avis $avi): self
     {
-        $this->avi = $avi;
+        if ($avi !== null) {
+            $this->addAvis($avi);
+        }
+
         return $this;
     }
 

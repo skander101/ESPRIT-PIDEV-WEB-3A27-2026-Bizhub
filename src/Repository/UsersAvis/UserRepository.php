@@ -25,6 +25,19 @@ class UserRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    /**
+     * @return User[]
+     */
+    public function findActiveWithFaceEnrollment(): array
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.is_active = :active')
+            ->andWhere('u.face_token IS NOT NULL')
+            ->setParameter('active', true)
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findActive(): array
     {
         return $this->createQueryBuilder('u')

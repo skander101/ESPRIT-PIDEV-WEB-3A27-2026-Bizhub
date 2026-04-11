@@ -1,29 +1,10 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <title>BizHub - Business Collaboration Platform</title>
+{% extends 'front/base.html.twig' %}
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+{% block title %}BizHub - Business Collaboration Platform{% endblock %}
+
+{% block content %}
 
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --primary:      #ffbe33;
-      --primary-dark: #e0a820;
-      --dark:         #222831;
-      --dark2:        #1a1f27;
-      --white:        #ffffff;
-      --light-bg:     #f8f8f8;
-      --text-muted:   #666666;
-      --border:       #ebebeb;
-    }
-
     html { scroll-behavior: smooth; }
 
     body {
@@ -534,11 +515,11 @@
 <!-- MOBILE NAV -->
 <div class="mobile-nav" id="mobileNav">
   <button class="mobile-close" id="mobileClose"><i class="fa fa-times"></i></button>
-  <a href="{{ path('app_user_dashboard') }}">Dashboard</a>
+  <a href="{{ path('app_front_dashboard') }}">Dashboard</a>
   <a href="#">Forums</a>
   <a href="{{ path('produit_index') }}">Marketplace</a>
   <a href="{{ path('app_front_projet_index') }}">Investissement</a>
-  <a href="#">Formations</a>
+  <a href="{{ path('app_front_formations_index') }}">Formations</a>
   <a href="#contact" style="color:var(--primary)">Nous contacter</a>
 </div>
 
@@ -550,12 +531,12 @@
   </a>
   <ul class="nav-links">
     <li><a href="{{ path('app_front_index') }}" class="active">Home</a></li>
-    <li><a href="{{ path('app_user_dashboard') }}">Dashboard</a></li>
+    <li><a href="{{ path('app_front_dashboard') }}">Dashboard</a></li>
     <li><a href="{{ path('app_user_profile') }}">Profil</a></li>
     <li><a href="#">Forums</a></li>
     <li><a href="{{ path('produit_index') }}">Marketplace</a></li>
     <li><a href="{{ path('app_front_projet_index') }}">Investissement</a></li>
-    <li><a href="#">Formations</a></li>
+    <li><a href="{{ path('app_front_formations_index') }}">Formations</a></li>
     <li><a href="#contact" class="btn-nav">Contact</a></li>
   </ul>
   <button class="hamburger" id="hamburger">
@@ -837,7 +818,7 @@
     <div class="footer-col">
       <h4>Plateforme</h4>
       <ul>
-        <li><a href="{{ path('app_user_dashboard') }}">Dashboard</a></li>
+        <li><a href="{{ path('app_front_dashboard') }}">Dashboard</a></li>
         <li><a href="{{ path('app_user_profile') }}">Profil</a></li>
         <li><a href="#">Marketplace</a></li>
         <li><a href="#">Forums</a></li>
@@ -921,4 +902,4 @@
   document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 </script>
 </body>
-</html>
+{% endblock %}
