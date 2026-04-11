@@ -14,8 +14,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class FaceRecognitionService
 {
-    private const string DETECT_URL = 'https://api-us.faceplusplus.com/facepp/v3/detect';
-    private const string COMPARE_URL = 'https://api-us.faceplusplus.com/facepp/v3/compare';
+    private const DETECT_URL = 'https://api-us.faceplusplus.com/facepp/v3/detect';
+    private const COMPARE_URL = 'https://api-us.faceplusplus.com/facepp/v3/compare';
 
     public function __construct(
         private readonly LoggerInterface $logger,

@@ -9,6 +9,7 @@
 /var/
 /vendor/
 /.env
+/env.txt
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###

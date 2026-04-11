@@ -14,7 +14,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class EmailVerificationListener implements EventSubscriberInterface
 {
-    private const array EXCLUDED_ROUTES = [
+    private const EXCLUDED_ROUTES = [
         'app_verify_email',
         'app_verify_email_resend',
         'app_logout',
