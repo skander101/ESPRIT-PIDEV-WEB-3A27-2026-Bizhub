@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/verify/face')]
 class FaceVerificationController extends AbstractController
 {
-    private const float CONFIDENCE_THRESHOLD = 70.0;
+    private const CONFIDENCE_THRESHOLD = 70.0;
 
     public function __construct(
         private readonly FaceRecognitionService $faceRecognitionService,
