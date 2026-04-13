@@ -10,9 +10,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 
-/**
- * Controls post-login routing and initializes MFA session state.
- */
 class LoginSuccessHandler implements AuthenticationSuccessHandlerInterface
 {
     public function __construct(
@@ -30,17 +27,16 @@ class LoginSuccessHandler implements AuthenticationSuccessHandlerInterface
             $request->getSession()->remove('login_via_totp');
             $request->getSession()->set('mfa_verified', true);
 
-            return new RedirectResponse($this->urlGenerator->generate('app_user_dashboard'));
+            return new RedirectResponse($this->urlGenerator->generate('app_index'));
         }
 
         if ((bool) $request->getSession()->get('login_via_face', false)) {
             $request->getSession()->remove('login_via_face');
             $request->getSession()->set('mfa_verified', true);
 
-            return new RedirectResponse($this->urlGenerator->generate('app_user_dashboard'));
+            return new RedirectResponse($this->urlGenerator->generate('app_index'));
         }
 
-        // Default: go to dashboard - MFA and face are optional via profile
-        return new RedirectResponse($this->urlGenerator->generate('app_user_dashboard'));
+        return new RedirectResponse($this->urlGenerator->generate('app_index'));
     }
 }

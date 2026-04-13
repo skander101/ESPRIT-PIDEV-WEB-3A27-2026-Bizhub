@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\UsersAvis\User;
+use App\Service\Auth\UserAuthStateService;
 use Doctrine\ORM\EntityManagerInterface;
 use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Totp\TotpAuthenticator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,7 +22,19 @@ class TotpController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
+        private readonly UserAuthStateService $userAuthStateService,
     ) {
+    }
+
+    public function render2faForm(Request $request): Response
+    {
+        $error = $request->attributes->get('authenticationError');
+        $errorMessage = $error ? $error->getMessageKey() : null;
+        
+        return $this->render('security/2fa_form.html.twig', [
+            'authenticationError' => $errorMessage,
+            'check_path_url' => $this->generateUrl('2fa_login_check'),
+        ]);
     }
 
     #[Route('/setup', name: 'app_2fa_setup', methods: ['GET'])]
@@ -107,6 +120,11 @@ class TotpController extends AbstractController
 
         $user->setTotp_secret($secret);
         $this->entityManager->flush();
+
+        $authState = $this->userAuthStateService->getOrCreate($user);
+        $authState->setMfaEnabled(true);
+        $this->entityManager->flush();
+
         $request->getSession()->remove('totp_secret_pending');
 
         $this->addFlash('success', 'TOTP is now enabled.');
@@ -138,9 +156,19 @@ class TotpController extends AbstractController
                     6
                 );
             }
+
+            public function isTotpAuthenticationEnabled(): bool {
+                return true;
+            }
+
+            public function getTotpAuthenticationUsername(): string {
+                return $this->user->getEmail() ?? '';
+            }
         };
 
-        return $totpAuthenticator->checkCode($tempUser, $code);
+        $valid = $totpAuthenticator->checkCode($tempUser, $code);
+
+        return $valid;
     }
 
     #[Route('/disable', name: 'app_2fa_disable', methods: ['POST'])]
@@ -160,6 +188,10 @@ class TotpController extends AbstractController
         }
 
         $user->setTotp_secret(null);
+        $entityManager->flush();
+
+        $authState = $this->userAuthStateService->getOrCreate($user);
+        $authState->setMfaEnabled(false);
         $entityManager->flush();
 
         $this->addFlash('success', 'TOTP has been disabled.');

@@ -15,6 +15,7 @@ use App\Service\FacePlusPlus\ImagePreprocessingService;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Totp\TotpAuthenticator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
@@ -43,6 +44,8 @@ class UserController extends AbstractController
         private ImagePreprocessingService $imagePreprocessingService,
         private LoggerInterface $logger,
         private TokenStorageInterface $tokenStorage,
+        private TotpAuthenticator $totpAuthenticator,
+        private UserAuthenticatorInterface $userAuthenticator,
     ) {
     }
 
@@ -145,14 +148,54 @@ class UserController extends AbstractController
 
             $user = $this->userRepository->findByEmail($email);
 
-            if (!$user instanceof User || !$this->userAuthStateService->isVerified($user) || !$this->userAuthStateService->isMfaEnabled($user) || $user->getTotp_secret() === null) {
+            if (!$user instanceof User || !$this->userAuthStateService->isVerified($user) || $user->getTotp_secret() === null) {
                 $this->addFlash('error', 'TOTP login failed. Check your email/code or use password login.');
+                return $this->redirectToRoute('app_login_totp');
+            }
+
+            $secret = $user->getTotp_secret();
+            $tempUser = new class($secret, $user) implements \Scheb\TwoFactorBundle\Model\Totp\TwoFactorInterface {
+                private string $secret;
+                private User $user;
+
+                public function __construct(string $secret, User $user) {
+                    $this->secret = $secret;
+                    $this->user = $user;
+                }
+
+                public function getTotpAuthenticationConfiguration(): \Scheb\TwoFactorBundle\Model\Totp\TotpConfiguration {
+                    return new \Scheb\TwoFactorBundle\Model\Totp\TotpConfiguration(
+                        $this->secret,
+                        \Scheb\TwoFactorBundle\Model\Totp\TotpConfiguration::ALGORITHM_SHA1,
+                        30,
+                        6
+                    );
+                }
+
+                public function isTotpAuthenticationEnabled(): bool {
+                    return true;
+                }
+
+                public function getTotpAuthenticationUsername(): string {
+                    return $this->user->getEmail() ?? '';
+                }
+            };
+
+            $isCodeValid = $this->totpAuthenticator->checkCode($tempUser, $otp);
+
+            if (!$isCodeValid) {
+                $this->logger->info('TOTP validation failed', [
+                    'email' => $email,
+                    'secret_length' => strlen($secret ?? ''),
+                    'code_length' => strlen($otp),
+                ]);
+                $this->addFlash('error', 'Invalid authentication code. Please try again.');
                 return $this->redirectToRoute('app_login_totp');
             }
 
             $request->getSession()->set('login_via_totp', true);
 
-            return $this->redirectToRoute('app_login');
+            return $this->redirectToRoute('app_index');
         }
 
         return $this->render('auth/totp_login.html.twig', ['form' => $form]);
@@ -244,8 +287,9 @@ class UserController extends AbstractController
         
         $request->getSession()->set('_security_main', serialize($token));
         $request->getSession()->set('login_via_face', true);
+        $request->getSession()->set('mfa_verified', true);
         
-        return $this->redirectToRoute('app_user_dashboard');
+        return $this->redirectToRoute('app_index');
     }
 
     #[Route('/dashboard', name: 'app_user_dashboard', methods: ['GET'])]
