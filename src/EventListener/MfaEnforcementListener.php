@@ -60,12 +60,16 @@ class MfaEnforcementListener
             return;
         }
 
-        // Only enforce TOTP for users who have enabled it via Scheb (totp_secret is set)
         if (!$user->isTotpAuthenticationEnabled()) {
             return;
         }
 
         if ((bool) $request->getSession()->get('mfa_verified', false)) {
+            return;
+        }
+
+        if ((bool) $request->getSession()->get('login_via_face', false)) {
+            $request->getSession()->set('mfa_verified', true);
             return;
         }
 
