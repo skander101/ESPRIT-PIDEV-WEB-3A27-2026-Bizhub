@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 08, 2026 at 10:49 AM
+-- Generation Time: Apr 11, 2026 at 11:13 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -64,19 +64,21 @@ CREATE TABLE `avis` (
   `rating` int(11) DEFAULT NULL CHECK (`rating` >= 1 and `rating` <= 5),
   `comment` text DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
-  `is_verified` tinyint(1) DEFAULT 0
+  `is_verified` tinyint(1) DEFAULT 0,
+  `is_edited` tinyint(1) DEFAULT NULL,
+  `is_removed` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `avis`
 --
 
-INSERT INTO `avis` (`avis_id`, `reviewer_id`, `formation_id`, `rating`, `comment`, `created_at`, `is_verified`) VALUES
-(2, 8, 2, 4, 'better but still too serious', '2026-02-06 05:52:06', 0),
-(10, 10, 3, 5, 'hi', '2026-03-04 14:38:24', 0),
-(11, 10, 9, 5, 'funny', '2026-03-04 19:54:01', 0),
-(12, 10, 10, 5, '<-this review has been removed by a moderator->', '2026-03-04 19:59:04', 0),
-(13, 28, 11, 5, 'hi', '2026-03-05 12:08:32', 1);
+INSERT INTO `avis` (`avis_id`, `reviewer_id`, `formation_id`, `rating`, `comment`, `created_at`, `is_verified`, `is_edited`, `is_removed`) VALUES
+(2, 8, 2, 4, 'better but still too serious', '2026-02-06 05:52:06', 0, 0, NULL),
+(10, 10, 3, 5, 'hi', '2026-03-04 14:38:24', 0, 0, NULL),
+(11, 10, 9, 5, 'funny', '2026-03-04 19:54:01', 0, 0, NULL),
+(14, 36, 4, 1, 'brobro', '2026-04-09 03:16:32', NULL, 1, NULL),
+(16, 7, 3, 2, 'duuuuuuude', '2026-04-10 08:36:28', 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -169,7 +171,7 @@ CREATE TABLE `commande` (
   `id_produit` int(11) DEFAULT NULL,
   `quantite` int(11) DEFAULT NULL,
   `date_commande` datetime NOT NULL DEFAULT current_timestamp(),
-  `statut` enum('en_attente','confirmee','livree','annule') NOT NULL DEFAULT 'en_attente',
+  `statut` enum('en_attente','confirmee','annulee','livree') NOT NULL DEFAULT 'en_attente',
   `payment_status` varchar(20) DEFAULT 'non_initie',
   `payment_ref` varchar(255) DEFAULT NULL,
   `payment_url` text DEFAULT NULL,
@@ -188,13 +190,13 @@ INSERT INTO `commande` (`id_commande`, `id_client`, `id_produit`, `quantite`, `d
 (1, 13, 2, 45, '2026-02-11 22:44:10', 'livree', 'non_initie', NULL, NULL, 0, NULL, NULL, NULL, NULL),
 (2, 13, 2, 5, '2026-02-12 13:56:16', 'confirmee', 'non_initie', NULL, NULL, 0, NULL, NULL, NULL, NULL),
 (3, 10, 2, 25, '2026-02-17 00:53:13', 'livree', 'non_initie', NULL, NULL, 0, NULL, NULL, NULL, NULL),
-(6, 14, 2, 25, '2026-02-18 21:16:56', 'annule', 'non_initie', NULL, NULL, 0, NULL, NULL, NULL, NULL),
-(9, 14, 5, 256, '2026-02-19 12:25:27', 'annule', 'non_initie', NULL, NULL, 0, NULL, NULL, NULL, NULL),
-(12, 14, 5, 100, '2026-02-22 00:24:41', 'annule', 'non_initie', NULL, NULL, 0, NULL, NULL, NULL, NULL),
+(6, 14, 2, 25, '2026-02-18 21:16:56', '', 'non_initie', NULL, NULL, 0, NULL, NULL, NULL, NULL),
+(9, 14, 5, 256, '2026-02-19 12:25:27', '', 'non_initie', NULL, NULL, 0, NULL, NULL, NULL, NULL),
+(12, 14, 5, 100, '2026-02-22 00:24:41', '', 'non_initie', NULL, NULL, 0, NULL, NULL, NULL, NULL),
 (14, 14, 6, 256, '2026-02-22 01:09:02', 'confirmee', 'en_cours', 'cs_test_a1451TyzmXY7ArBizfBUEKisjY46dWbnJiifDrVajwWjcEF0DG4j5xwdj7', 'https://checkout.stripe.com/c/pay/cs_test_a1451TyzmXY7ArBizfBUEKisjY46dWbnJiifDrVajwWjcEF0DG4j5xwdj7#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWjA0UTZtNmNGXEhudGJ1MDdiQnNUX1NhY102NlM0c01NS1JGUFFvaHdjY2NBU2BHPEk0Y3QydnZhSU5ucGRjUmRhV0BVMXFRUmZAXDFoc0ZuYjxocj00UmZLNTVSRjBQTF1hXycpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl', 0, NULL, NULL, NULL, NULL),
 (15, 14, 5, 7852, '2026-02-22 02:29:15', 'confirmee', 'en_cours', 'cs_test_a14Cb11VibemMgm9A6LzTYkIy0u7CQODpKNdPLQWGHGc8x4kAVCx36agNU', 'https://checkout.stripe.com/c/pay/cs_test_a14Cb11VibemMgm9A6LzTYkIy0u7CQODpKNdPLQWGHGc8x4kAVCx36agNU#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWjA0UTZtNmNGXEhudGJ1MDdiQnNUX1NhY102NlM0c01NS1JGUFFvaHdjY2NBU2BHPEk0Y3QydnZhSU5ucGRjUmRhV0BVMXFRUmZAXDFoc0ZuYjxocj00UmZLNTVSRjBQTF1hXycpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl', 0, NULL, NULL, NULL, NULL),
 (16, 14, 6, 5698, '2026-02-22 02:35:38', 'confirmee', 'en_cours', 'cs_test_a1U9InXn3bf3dxoJe9bwcrTHuVhy0kDNkQy3KMw0KWRDMLipcx5WkU8K70', 'https://checkout.stripe.com/c/pay/cs_test_a1U9InXn3bf3dxoJe9bwcrTHuVhy0kDNkQy3KMw0KWRDMLipcx5WkU8K70#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWjA0UTZtNmNGXEhudGJ1MDdiQnNUX1NhY102NlM0c01NS1JGUFFvaHdjY2NBU2BHPEk0Y3QydnZhSU5ucGRjUmRhV0BVMXFRUmZAXDFoc0ZuYjxocj00UmZLNTVSRjBQTF1hXycpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl', 0, NULL, NULL, NULL, NULL),
-(17, 14, 5, 2, '2026-02-22 02:37:54', 'annule', 'non_initie', NULL, NULL, 0, NULL, NULL, NULL, NULL),
+(17, 14, 5, 2, '2026-02-22 02:37:54', '', 'non_initie', NULL, NULL, 0, NULL, NULL, NULL, NULL),
 (18, 14, 5, 1256, '2026-02-22 03:13:44', 'confirmee', 'en_cours', 'cs_test_a13OKyD4edZO0aa3tH6T4XKKJpza5jCyW30jVFVqBkWBC19a5mLBavMrLf', 'https://checkout.stripe.com/c/pay/cs_test_a13OKyD4edZO0aa3tH6T4XKKJpza5jCyW30jVFVqBkWBC19a5mLBavMrLf#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWjA0UTZtNmNGXEhudGJ1MDdiQnNUX1NhY102NlM0c01NS1JGUFFvaHdjY2NBU2BHPEk0Y3QydnZhSU5ucGRjUmRhV0BVMXFRUmZAXDFoc0ZuYjxocj00UmZLNTVSRjBQTF1hXycpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl', 0, NULL, NULL, NULL, NULL),
 (19, 14, 6, 8965, '2026-02-22 03:31:52', 'confirmee', 'en_cours', 'cs_test_a1QGRxgQeR4asN5NQ1qXQxwOIP6EW6nvvvprUJDRfGSxE18kk2b8Ryi7UJ', 'https://checkout.stripe.com/c/pay/cs_test_a1QGRxgQeR4asN5NQ1qXQxwOIP6EW6nvvvprUJDRfGSxE18kk2b8Ryi7UJ#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWjA0UTZtNmNGXEhudGJ1MDdiQnNUX1NhY102NlM0c01NS1JGUFFvaHdjY2NBU2BHPEk0Y3QydnZhSU5ucGRjUmRhV0BVMXFRUmZAXDFoc0ZuYjxocj00UmZLNTVSRjBQTF1hXycpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl', 0, NULL, NULL, NULL, NULL),
 (20, 14, 5, 9985, '2026-02-22 20:02:48', 'confirmee', 'en_cours', 'cs_test_a1l6U3CGj875c9nOPA5ghFwW1LVodD59PJURge5rI3eNGbuE1OCpVzJbU3', 'https://checkout.stripe.com/c/pay/cs_test_a1l6U3CGj875c9nOPA5ghFwW1LVodD59PJURge5rI3eNGbuE1OCpVzJbU3#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWjA0UTZtNmNGXEhudGJ1MDdiQnNUX1NhY102NlM0c01NS1JGUFFvaHdjY2NBU2BHPEk0Y3QydnZhSU5ucGRjUmRhV0BVMXFRUmZAXDFoc0ZuYjxocj00UmZLNTVSRjBQTF1hXycpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl', 0, NULL, NULL, NULL, NULL),
@@ -227,8 +229,8 @@ INSERT INTO `commande` (`id_commande`, `id_client`, `id_produit`, `quantite`, `d
 (47, 14, 6, 258, '2026-03-01 00:04:56', 'confirmee', 'en_cours', 'cs_test_a1ZpDQHqLV7RSoaTPj1urYiD0wblCERgJskXzcs8tkljFLiQdTj86z4lG4', 'https://checkout.stripe.com/c/pay/cs_test_a1ZpDQHqLV7RSoaTPj1urYiD0wblCERgJskXzcs8tkljFLiQdTj86z4lG4#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWjA0UTZtNmNGXEhudGJ1MDdiQnNUX1NhY102NlM0c01NS1JGUFFvaHdjY2NBU2BHPEk0Y3QydnZhSU5ucGRjUmRhV0BVMXFRUmZAXDFoc0ZuYjxocj00UmZLNTVSRjBQTF1hXycpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl', 0, NULL, NULL, NULL, NULL),
 (48, 14, 8, 125, '2026-03-01 00:11:38', 'confirmee', 'paid', 'cs_test_a16cRp1YbK8taYAB0QkTnvGeqLIsDAbsgfO1Rdlp0f9Zjs6klvTq196TcR', 'https://checkout.stripe.com/c/pay/cs_test_a16cRp1YbK8taYAB0QkTnvGeqLIsDAbsgfO1Rdlp0f9Zjs6klvTq196TcR#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWjA0UTZtNmNGXEhudGJ1MDdiQnNUX1NhY102NlM0c01NS1JGUFFvaHdjY2NBU2BHPEk0Y3QydnZhSU5ucGRjUmRhV0BVMXFRUmZAXDFoc0ZuYjxocj00UmZLNTVSRjBQTF1hXycpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl', 1, '2026-03-01 00:33:08', NULL, NULL, NULL),
 (49, 14, 6, 256, '2026-03-01 00:52:55', 'confirmee', 'en_cours', 'cs_test_a17CMOyT25M5POTLAGEV5UpInVZWWNuKreeYM1lreltA5ESElVcdCZCkiX', 'https://checkout.stripe.com/c/pay/cs_test_a17CMOyT25M5POTLAGEV5UpInVZWWNuKreeYM1lreltA5ESElVcdCZCkiX#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWjA0UTZtNmNGXEhudGJ1MDdiQnNUX1NhY102NlM0c01NS1JGUFFvaHdjY2NBU2BHPEk0Y3QydnZhSU5ucGRjUmRhV0BVMXFRUmZAXDFoc0ZuYjxocj00UmZLNTVSRjBQTF1hXycpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl', 0, NULL, NULL, NULL, NULL),
-(59, 14, NULL, NULL, '2026-03-01 02:02:58', 'annule', 'non_initie', NULL, NULL, 0, NULL, 26130.00, 4964.70, 31094.70),
-(60, 14, NULL, NULL, '2026-03-01 13:53:30', 'annule', 'non_initie', NULL, NULL, 0, NULL, 26880.00, 5107.20, 31987.20),
+(59, 14, NULL, NULL, '2026-03-01 02:02:58', '', 'non_initie', NULL, NULL, 0, NULL, 26130.00, 4964.70, 31094.70),
+(60, 14, NULL, NULL, '2026-03-01 13:53:30', '', 'non_initie', NULL, NULL, 0, NULL, 26880.00, 5107.20, 31987.20),
 (68, 14, 6, 126, '2026-03-02 00:39:08', 'en_attente', 'non_initie', NULL, NULL, 0, NULL, 322938.00, 61358.22, 384296.22),
 (69, 14, 6, 1, '2026-03-02 00:40:04', 'en_attente', 'non_initie', NULL, NULL, 0, NULL, 3163.00, 600.97, 3763.97),
 (70, 8, 6, 2, '2026-03-02 23:49:53', 'confirmee', 'en_cours', 'cs_test_a1TQs3di7fE3LyeFQd9nBgMsGLMeEVD2q4Sr9GoQKP9XfnpyyAxUHSzPki', 'https://checkout.stripe.com/c/pay/cs_test_a1TQs3di7fE3LyeFQd9nBgMsGLMeEVD2q4Sr9GoQKP9XfnpyyAxUHSzPki#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWjA0UTZtNmNGXEhudGJ1MDdiQnNUX1NhY102NlM0c01NS1JGUFFvaHdjY2NBU2BHPEk0Y3QydnZhSU5ucGRjUmRhV0BVMXFRUmZAXDFoc0ZuYjxocj00UmZLNTVSRjBQTF1hXycpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl', 0, NULL, NULL, NULL, NULL),
@@ -238,7 +240,15 @@ INSERT INTO `commande` (`id_commande`, `id_client`, `id_produit`, `quantite`, `d
 (74, 8, 10, 5, '2026-03-05 11:30:41', 'en_attente', 'non_initie', NULL, NULL, 0, NULL, NULL, NULL, NULL),
 (75, 8, 8, 1500, '2026-03-05 11:32:57', 'en_attente', 'non_initie', NULL, NULL, 0, NULL, NULL, NULL, NULL),
 (79, 8, 10, 1500, '2026-03-05 11:41:31', 'en_attente', 'non_initie', NULL, NULL, 0, NULL, NULL, NULL, NULL),
-(80, 8, 8, 5000, '2026-03-05 11:52:18', 'en_attente', 'non_initie', NULL, NULL, 0, NULL, NULL, NULL, NULL);
+(80, 8, 8, 5000, '2026-03-05 11:52:18', 'en_attente', 'non_initie', NULL, NULL, 0, NULL, NULL, NULL, NULL),
+(81, 37, NULL, NULL, '2026-04-07 22:22:42', '', NULL, NULL, NULL, 0, NULL, 10.00, 1.90, 11.90),
+(82, 37, NULL, NULL, '2026-04-07 22:53:29', 'en_attente', NULL, NULL, NULL, 0, NULL, 1200.00, 228.00, 1428.00),
+(83, 37, NULL, NULL, '2026-04-07 22:55:08', 'livree', NULL, NULL, NULL, 0, NULL, 10.00, 1.90, 11.90),
+(84, 37, NULL, NULL, '2026-04-08 09:10:40', 'confirmee', NULL, NULL, NULL, 0, NULL, 10.00, 1.90, 11.90),
+(85, 37, NULL, NULL, '2026-04-08 09:42:49', 'confirmee', NULL, NULL, NULL, 0, NULL, 123.00, 23.37, 146.37),
+(86, 37, NULL, NULL, '2026-04-08 10:16:52', 'confirmee', NULL, NULL, NULL, 0, NULL, 202.00, 38.38, 240.38),
+(87, 37, NULL, NULL, '2026-04-08 10:17:13', 'annulee', NULL, NULL, NULL, 0, NULL, 602.00, 114.38, 716.38),
+(88, 59, NULL, NULL, '2026-04-11 14:34:47', 'en_attente', NULL, NULL, NULL, 0, NULL, 179.00, 34.01, 213.01);
 
 -- --------------------------------------------------------
 
@@ -269,7 +279,17 @@ INSERT INTO `commande_ligne` (`id_ligne`, `id_commande`, `id_produit`, `quantite
 (17, 69, 6, 1, 2563.00, 0.19, '2026-03-02 00:40:04'),
 (18, 69, 8, 12, 50.00, 0.19, '2026-03-02 00:40:04'),
 (19, 71, 8, 1, 50.00, 0.19, '2026-03-02 23:50:19'),
-(20, 78, 8, 1, 50.00, 0.19, '2026-03-05 11:39:38');
+(20, 78, 8, 1, 50.00, 0.19, '2026-03-05 11:39:38'),
+(21, 81, 23, 1, 10.00, 19.00, '2026-04-07 22:22:42'),
+(22, 82, 20, 1, 1200.00, 19.00, '2026-04-07 22:53:29'),
+(23, 83, 23, 1, 10.00, 19.00, '2026-04-07 22:55:08'),
+(24, 84, 24, 1, 10.00, 19.00, '2026-04-08 09:10:40'),
+(25, 85, 25, 1, 123.00, 19.00, '2026-04-08 09:42:49'),
+(26, 86, 8, 1, 50.00, 19.00, '2026-04-08 10:16:52'),
+(27, 86, 26, 1, 152.00, 19.00, '2026-04-08 10:16:52'),
+(28, 87, 26, 1, 152.00, 19.00, '2026-04-08 10:17:13'),
+(29, 87, 16, 1, 450.00, 19.00, '2026-04-08 10:17:13'),
+(30, 88, 19, 1, 179.00, 19.00, '2026-04-11 14:34:47');
 
 -- --------------------------------------------------------
 
@@ -357,23 +377,24 @@ CREATE TABLE `formation` (
   `end_date` date NOT NULL,
   `cost` decimal(10,2) DEFAULT 0.00,
   `lieu` varchar(300) NOT NULL,
-  `en_ligne` tinyint(1) NOT NULL
+  `en_ligne` tinyint(1) NOT NULL,
+  `max_formateurs` int(11) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `formation`
 --
 
-INSERT INTO `formation` (`formation_id`, `title`, `description`, `trainer_id`, `start_date`, `end_date`, `cost`, `lieu`, `en_ligne`) VALUES
-(2, 'TestFormation', 'Plz work i\'m tired of you', 7, '2026-02-06', '2026-02-07', 50.00, '', 0),
-(3, 'f2', 'lol', 7, '2026-02-09', '2026-02-12', 758.00, '', 0),
-(4, 'francais', 'ameliore ton francais', 7, '2026-02-04', '2026-02-14', 750.00, '', 0),
-(6, 'hggg', 'hhhh', 7, '2026-02-02', '2026-02-05', 0.01, '', 0),
-(7, 'allem', 'ameliore ton allemand', 7, '2026-02-02', '2026-02-13', 100.00, '', 0),
-(9, 'aaa', 'azaa', 7, '2026-03-11', '2026-03-27', 0.00, '36.78564171960743, 10.186042785644533', 0),
-(10, 'frfffffbro', 'aaa', 7, '2026-01-26', '2026-02-23', 0.00, '36.82343950570948, 10.09969711303711', 0),
-(11, 'aaazeaz', 'aaaa', 7, '2026-03-02', '2026-03-03', 0.00, '36.81038419804105, 10.167846679687502', 0),
-(12, 'formation', 'ghassen', 7, '2026-03-05', '2026-03-06', 200.00, '36.80792748993257, 10.175464153289797', 1);
+INSERT INTO `formation` (`formation_id`, `title`, `description`, `trainer_id`, `start_date`, `end_date`, `cost`, `lieu`, `en_ligne`, `max_formateurs`) VALUES
+(2, 'TestFormation', 'Plz work i\'m tired of you', 7, '2026-02-06', '2026-02-07', 50.00, '', 0, 0),
+(3, 'f2', 'lol', 7, '2026-02-09', '2026-02-12', 758.00, '', 0, 0),
+(4, 'francais', 'ameliore ton francais', 7, '2026-02-04', '2026-02-14', 750.00, '', 0, 0),
+(6, 'hggg', 'hhhh', 7, '2026-02-02', '2026-02-05', 0.01, '', 0, 0),
+(7, 'allem', 'ameliore ton allemand', 7, '2026-02-02', '2026-02-13', 100.00, '', 0, 0),
+(9, 'aaa', 'azaa', 6, '2026-03-11', '2026-03-27', 0.00, '36.78564171960743, 10.186042785644533', 1, 2),
+(10, 'frfffffbro', 'aaa', 7, '2026-01-26', '2026-02-23', 0.00, '36.82343950570948, 10.09969711303711', 0, 0),
+(11, 'aaazeaz', 'aaaa', 7, '2026-03-02', '2026-03-03', 0.00, '36.81038419804105, 10.167846679687502', 0, 0),
+(12, 'formation', 'ghassen', 7, '2026-03-05', '2026-03-06', 200.00, '36.80792748993257, 10.175464153289797', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -5871,6 +5892,32 @@ CREATE TABLE `investment` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `investment`
+--
+
+INSERT INTO `investment` (`investment_id`, `project_id`, `investor_id`, `amount`, `investment_date`, `contract_url`, `payment_mode`, `statut`, `commentaire`, `type_investissement`, `duree_souhaitee`, `conditions_particulieres`, `created_at`) VALUES
+(31, 1, 9, 500000.00, '2026-03-03 20:50:19', NULL, 'virement', 'en_attente', NULL, NULL, NULL, NULL, '2026-03-03 20:50:19'),
+(32, 8, 6, 5000.00, '2026-03-04 12:30:00', NULL, 'virement', 'en_attente', NULL, NULL, NULL, NULL, '2026-03-04 12:30:56'),
+(40, 9, 36, 1000000.00, '2026-04-07 13:01:00', NULL, 'cheque', 'accepte', 'Bonjour,\nJe suis intéressé par votre projet et son potentiel de croissance.\nJ’aimerais en savoir plus sur votre stratégie et l’utilisation des fonds.\nCordialement.', 'pret_convertible', '24m', 'Retour sur investissement attendu de 15% sur 3 ans.\nPossibilité de convertir en parts de la société en cas de levée de fonds.\nSuivi trimestriel des performances.', '2026-04-07 13:01:06'),
+(42, 25, 36, 4545656.00, '2026-04-07 23:09:00', NULL, 'especes', 'accepte', NULL, 'prise_participation', '12m', 'lx,w:,c', '2026-04-07 23:09:08');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `messenger_messages`
+--
+
+CREATE TABLE `messenger_messages` (
+  `id` bigint(20) NOT NULL,
+  `body` longtext NOT NULL,
+  `headers` longtext NOT NULL,
+  `queue_name` varchar(190) NOT NULL,
+  `created_at` datetime NOT NULL,
+  `available_at` datetime NOT NULL,
+  `delivered_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- --------------------------------------------------------
 
 --
@@ -5895,11 +5942,9 @@ CREATE TABLE `negotiation` (
 
 INSERT INTO `negotiation` (`negotiation_id`, `project_id`, `investor_id`, `startup_id`, `status`, `proposed_amount`, `final_amount`, `created_at`, `updated_at`) VALUES
 (1, 11, 6, 6, 'open', 400.00, NULL, '2026-03-01 12:49:20', '2026-03-01 12:49:20'),
-(15, 13, 15, 13, 'open', 40.00, NULL, '2026-03-02 23:40:04', '2026-03-02 23:40:04'),
-(16, 13, 16, 13, 'open', 20.00, NULL, '2026-03-02 23:40:20', '2026-03-02 23:40:20'),
-(17, 13, 15, 13, 'open', 40.00, NULL, '2026-03-02 23:42:23', '2026-03-02 23:42:23'),
-(18, 14, 16, 15, 'accepted', 2000.00, 2000.00, '2026-03-02 23:50:56', '2026-03-02 23:52:11'),
-(19, 14, 10, 15, 'open', 80000.00, NULL, '2026-03-04 12:44:58', '2026-03-04 12:44:58');
+(2, 11, 11, 6, 'open', 150.00, NULL, '2026-03-01 13:27:05', '2026-03-01 13:27:05'),
+(3, 12, 11, 12, 'accepted', 100000.00, 100000.00, '2026-03-01 13:31:19', '2026-03-01 13:41:37'),
+(14, 12, 11, 12, 'accepted', 150000.00, 150000.00, '2026-03-02 22:38:45', '2026-03-02 22:41:26');
 
 -- --------------------------------------------------------
 
@@ -5924,16 +5969,19 @@ CREATE TABLE `negotiation_message` (
 
 INSERT INTO `negotiation_message` (`message_id`, `negotiation_id`, `sender_id`, `message`, `message_type`, `proposed_amount`, `sentiment`, `created_at`) VALUES
 (1, 1, 6, 'I\'d like to invest 400.00 EUR in this project.', 'offer', 400.00, NULL, '2026-03-01 12:49:20'),
-(40, 15, 15, 'I\'d like to invest 40 EUR in this project.', 'offer', 40.00, NULL, '2026-03-02 23:40:04'),
-(41, 16, 16, 'I\'d like to invest 20 EUR in this project.', 'offer', 20.00, NULL, '2026-03-02 23:40:20'),
-(42, 16, 16, 'Thank you for the offer. To fully realize the project\'s potential and meet the outlined budget requirements, I propose investing the full €24.00. If needed, we can discuss a phased payment structure tied to key milestones to ensure both parties feel comfortable with the cash flow.', 'text', NULL, NULL, '2026-03-02 23:41:13'),
-(43, 17, 15, 'I\'d like to invest 40 EUR in this project.', 'offer', 40.00, NULL, '2026-03-02 23:42:23'),
-(44, 17, 15, 'je veux 500000', 'text', NULL, NULL, '2026-03-02 23:43:12'),
-(45, 18, 16, 'I\'d like to invest 2000 EUR in this project.', 'offer', 2000.00, NULL, '2026-03-02 23:50:56'),
-(46, 18, 15, 'no i want more', 'text', NULL, NULL, '2026-03-02 23:51:38'),
-(47, 18, 16, 'Deal accepted! Moving to payment.', 'text', NULL, NULL, '2026-03-02 23:52:11'),
-(48, 19, 10, 'I\'d like to invest 80000.00 EUR in this project.', 'offer', 80000.00, NULL, '2026-03-04 12:44:58'),
-(49, 19, 10, 'I propose 80000 EUR for this investment.', 'offer', 80000.00, NULL, '2026-03-04 12:45:30');
+(2, 2, 11, 'I\'d like to invest 150 EUR in this project.', 'offer', 150.00, NULL, '2026-03-01 13:27:05'),
+(3, 2, 11, 'so ?', 'text', NULL, NULL, '2026-03-01 13:28:02'),
+(4, 3, 11, 'I\'d like to invest 100000 EUR in this project.', 'offer', 100000.00, NULL, '2026-03-01 13:31:19'),
+(5, 3, 12, 'hmm i think if you give more is better', 'text', NULL, NULL, '2026-03-01 13:31:57'),
+(6, 3, 11, 'so what about 105000', 'text', NULL, NULL, '2026-03-01 13:38:57'),
+(7, 3, 12, 'we are in a good way give me 120000', 'text', NULL, NULL, '2026-03-01 13:39:59'),
+(8, 3, 11, 'Deal accepted! Moving to payment.', 'text', NULL, NULL, '2026-03-01 13:41:37'),
+(34, 14, 11, 'I\'d like to invest 150000.00 EUR in this project.', 'offer', 150000.00, NULL, '2026-03-02 22:38:45'),
+(35, 14, 12, 'its not enough give me more', 'text', NULL, NULL, '2026-03-02 22:39:14'),
+(36, 14, 11, 'make this one', 'offer', 180000.00, NULL, '2026-03-02 22:39:47'),
+(37, 14, 12, 'give me more', 'text', NULL, NULL, '2026-03-02 22:40:27'),
+(38, 14, 11, 'Thank you for the opportunity. To fully support the project\'s objectives and ensure all critical components are covered, I propose an investment of €175,000. This amount reflects a realistic commitment while leaving room for collaborative refinement.', 'text', NULL, NULL, '2026-03-02 22:40:54'),
+(39, 14, 12, 'Deal accepted! Moving to payment.', 'text', NULL, NULL, '2026-03-02 22:41:26');
 
 -- --------------------------------------------------------
 
@@ -5950,8 +5998,15 @@ CREATE TABLE `order` (
   `total_price` decimal(10,2) GENERATED ALWAYS AS (`quantity` * `unit_price`) STORED,
   `order_date` datetime DEFAULT current_timestamp(),
   `delivery_address` varchar(255) DEFAULT NULL,
-  `status` enum('pending','confirmed','shipped','delivered','cancelled') DEFAULT 'pending'
+  `status` varchar(30) DEFAULT 'en_attente'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `order`
+--
+
+INSERT INTO `order` (`order_id`, `buyer_id`, `product_id`, `quantity`, `unit_price`, `order_date`, `delivery_address`, `status`) VALUES
+(1, 37, 4, 2, 450.00, '2026-04-07 22:13:02', 'ariana', 'en_attente');
 
 -- --------------------------------------------------------
 
@@ -5983,35 +6038,38 @@ CREATE TABLE `participation` (
   `amount` decimal(10,2) NOT NULL DEFAULT 0.00,
   `paid_at` datetime DEFAULT NULL,
   `id_candidature` int(11) NOT NULL,
-  `formation_id` int(11) NOT NULL
+  `formation_id` int(11) NOT NULL,
+  `created_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `participation`
 --
 
-INSERT INTO `participation` (`user_id`, `date_affectation`, `remarques`, `payment_status`, `payment_provider`, `payment_ref`, `amount`, `paid_at`, `id_candidature`, `formation_id`) VALUES
-(6, '2026-02-28 03:34:00', 'bbbb', 'PENDING', NULL, NULL, 0.00, NULL, 1, 6),
-(7, '2026-03-08 03:32:00', 'sssss', 'PENDING', NULL, NULL, 0.00, NULL, 2, 3),
-(8, '2026-02-04 03:33:00', 'ttt', 'PENDING', NULL, NULL, 0.00, NULL, 3, 3),
-(10, '2026-03-02 01:44:21', '', 'PAID', 'MOCK', 'MOCK-4ecdcc10-8ace-4efb-87bf-b053d6ae38ec', 0.00, '2026-03-02 01:44:27', 4, 10),
-(7, '2026-03-02 01:44:43', '', 'PENDING', NULL, NULL, 0.00, NULL, 5, 10),
-(10, '2026-03-02 01:44:57', '', 'PENDING', NULL, NULL, 0.01, NULL, 6, 6),
-(7, '2026-03-02 01:45:32', '', 'PENDING', NULL, NULL, 0.00, NULL, 7, 9),
-(10, '2026-03-02 01:58:15', '', 'PAID', 'MOCK', 'MOCK-74978dc5-24dc-414e-afed-3d41e3adebfe', 100.00, '2026-03-02 01:58:17', 8, 7),
-(6, '2026-03-02 01:59:24', '', 'PAID', 'MOCK', 'MOCK-4e979a45-8c4c-4789-9bf3-b4f01e6ee882', 0.00, '2026-03-02 01:59:27', 9, 9),
-(10, '2026-03-02 02:05:13', '', 'PAID', 'MOCK', 'MOCK-ca00163f-0423-48fe-a12c-816aea55a3a5', 750.00, '2026-03-02 02:05:17', 10, 3),
-(6, '2026-03-02 02:06:51', '', 'PAID', 'MOCK', 'MOCK-9cfafaea-a0fd-4037-91af-1ba55d0f31c1', 750.00, '2026-03-02 02:07:00', 11, 3),
-(8, '2026-03-02 02:08:05', '', 'PAID', 'MOCK', 'MOCK-bd4f0d56-5620-4883-84a5-972f171d58c6', 0.00, '2026-03-02 02:08:07', 12, 9),
-(9, '2026-03-02 02:08:23', '', 'PAID', 'MOCK', 'MOCK-acd02032-dc0d-42a9-b4ac-6be1f59d8504', 0.00, '2026-03-02 02:08:25', 13, 10),
-(8, '2026-03-02 02:12:51', '', 'PAID', 'MOCK', 'MOCK-c1a52ce7-fb29-4b6b-9272-8c65e42a6aab', 100.00, '2026-03-02 02:12:52', 14, 7),
-(8, '2026-03-02 02:18:05', '', 'PAID', 'MOCK', 'MOCK-ebe4af05-99ae-40a1-9a77-ea23cb482f9f', 0.01, '2026-03-02 02:18:06', 15, 6),
-(10, '2026-03-02 02:18:33', '', 'PAID', 'MOCK', 'MOCK-fd175865-9c29-4ddf-94b7-f70846c6b089', 0.00, '2026-03-02 02:18:34', 16, 9),
-(6, '2026-03-02 02:23:39', '', 'PAID', 'MOCK', 'MOCK-6776cfc9-4261-4d0d-a588-f3d1c4c7d48a', 0.00, '2026-03-02 02:23:41', 17, 10),
-(8, '2026-03-02 02:23:49', '', 'PAID', 'MOCK', 'MOCK-2a34488a-3541-4e2b-ab85-75374d2a4630', 0.00, '2026-03-02 02:24:00', 18, 10),
-(9, '2026-03-02 02:33:14', '', 'PAID', 'MOCK', 'MOCK-bb22c28a-d71f-4add-8a2a-d957401262a7', 0.01, '2026-03-02 02:33:18', 19, 6),
-(10, '2026-03-02 02:53:28', '', 'PAID', 'MOCK', 'MOCK-581184b5-b810-4292-b646-bd050847eb81', 0.00, '2026-03-02 02:53:30', 20, 11),
-(10, '2026-03-04 20:01:09', '', 'PAID', 'MOCK', 'MOCK-e28e5217-6951-4a0c-a160-02745f1f7434', 750.00, '2026-03-04 20:01:15', 21, 4);
+INSERT INTO `participation` (`user_id`, `date_affectation`, `remarques`, `payment_status`, `payment_provider`, `payment_ref`, `amount`, `paid_at`, `id_candidature`, `formation_id`, `created_at`) VALUES
+(6, '2026-02-28 03:34:00', 'bbbb', 'PENDING', NULL, NULL, 0.00, NULL, 1, 6, '0000-00-00 00:00:00'),
+(7, '2026-03-08 03:32:00', 'sssss', 'PENDING', NULL, NULL, 0.00, NULL, 2, 3, '0000-00-00 00:00:00'),
+(8, '2026-02-04 03:33:00', 'ttt', 'PENDING', NULL, NULL, 0.00, NULL, 3, 3, '0000-00-00 00:00:00'),
+(10, '2026-03-02 01:44:21', '', 'PAID', 'MOCK', 'MOCK-4ecdcc10-8ace-4efb-87bf-b053d6ae38ec', 0.00, '2026-03-02 01:44:27', 4, 10, '0000-00-00 00:00:00'),
+(7, '2026-03-02 01:44:43', '', 'PENDING', NULL, NULL, 0.00, NULL, 5, 10, '0000-00-00 00:00:00'),
+(10, '2026-03-02 01:44:57', '', 'PENDING', NULL, NULL, 0.01, NULL, 6, 6, '0000-00-00 00:00:00'),
+(7, '2026-03-02 01:45:00', NULL, 'FAILED', NULL, NULL, 0.00, NULL, 7, 9, '0000-00-00 00:00:00'),
+(10, '2026-03-02 01:58:15', '', 'PAID', 'MOCK', 'MOCK-74978dc5-24dc-414e-afed-3d41e3adebfe', 100.00, '2026-03-02 01:58:17', 8, 7, '0000-00-00 00:00:00'),
+(6, '2026-03-02 01:59:00', NULL, 'PAID', 'MOCK', 'MOCK-4e979a45-8c4c-4789-9bf3-b4f01e6ee882', 0.00, '2026-03-02 01:59:00', 9, 9, '0000-00-00 00:00:00'),
+(10, '2026-03-02 02:05:13', '', 'PAID', 'MOCK', 'MOCK-ca00163f-0423-48fe-a12c-816aea55a3a5', 750.00, '2026-03-02 02:05:17', 10, 3, '0000-00-00 00:00:00'),
+(6, '2026-03-02 02:06:51', '', 'PAID', 'MOCK', 'MOCK-9cfafaea-a0fd-4037-91af-1ba55d0f31c1', 750.00, '2026-03-02 02:07:00', 11, 3, '0000-00-00 00:00:00'),
+(8, '2026-03-02 02:08:05', '', 'PAID', 'MOCK', 'MOCK-bd4f0d56-5620-4883-84a5-972f171d58c6', 0.00, '2026-03-02 02:08:07', 12, 9, '0000-00-00 00:00:00'),
+(9, '2026-03-02 02:08:23', '', 'PAID', 'MOCK', 'MOCK-acd02032-dc0d-42a9-b4ac-6be1f59d8504', 0.00, '2026-03-02 02:08:25', 13, 10, '0000-00-00 00:00:00'),
+(8, '2026-03-02 02:12:51', '', 'PAID', 'MOCK', 'MOCK-c1a52ce7-fb29-4b6b-9272-8c65e42a6aab', 100.00, '2026-03-02 02:12:52', 14, 7, '0000-00-00 00:00:00'),
+(8, '2026-03-02 02:18:05', '', 'PAID', 'MOCK', 'MOCK-ebe4af05-99ae-40a1-9a77-ea23cb482f9f', 0.01, '2026-03-02 02:18:06', 15, 6, '0000-00-00 00:00:00'),
+(10, '2026-03-02 02:18:33', '', 'PAID', 'MOCK', 'MOCK-fd175865-9c29-4ddf-94b7-f70846c6b089', 0.00, '2026-03-02 02:18:34', 16, 9, '0000-00-00 00:00:00'),
+(6, '2026-03-02 02:23:39', '', 'PAID', 'MOCK', 'MOCK-6776cfc9-4261-4d0d-a588-f3d1c4c7d48a', 0.00, '2026-03-02 02:23:41', 17, 10, '0000-00-00 00:00:00'),
+(8, '2026-03-02 02:23:49', '', 'PAID', 'MOCK', 'MOCK-2a34488a-3541-4e2b-ab85-75374d2a4630', 0.00, '2026-03-02 02:24:00', 18, 10, '0000-00-00 00:00:00'),
+(9, '2026-03-02 02:33:14', '', 'PAID', 'MOCK', 'MOCK-bb22c28a-d71f-4add-8a2a-d957401262a7', 0.01, '2026-03-02 02:33:18', 19, 6, '0000-00-00 00:00:00'),
+(10, '2026-03-02 02:53:28', '', 'PAID', 'MOCK', 'MOCK-581184b5-b810-4292-b646-bd050847eb81', 0.00, '2026-03-02 02:53:30', 20, 11, '0000-00-00 00:00:00'),
+(10, '2026-03-04 20:01:09', '', 'PAID', 'MOCK', 'MOCK-e28e5217-6951-4a0c-a160-02745f1f7434', 750.00, '2026-03-04 20:01:15', 21, 4, '0000-00-00 00:00:00'),
+(7, NULL, NULL, 'PENDING', NULL, NULL, 200.00, NULL, 22, 12, '2026-04-10 08:27:51'),
+(7, NULL, NULL, 'PENDING', NULL, NULL, 0.00, NULL, 23, 11, '2026-04-10 08:35:50');
 
 -- --------------------------------------------------------
 
@@ -6103,15 +6161,34 @@ INSERT INTO `post` (`post_id`, `user_id`, `title`, `content`, `category`, `creat
 
 CREATE TABLE `product_service` (
   `product_id` int(11) NOT NULL,
-  `fournisseur_id` int(11) NOT NULL,
+  `seller_id` int(11) DEFAULT NULL,
   `name` varchar(200) NOT NULL,
   `description` text DEFAULT NULL,
   `price` decimal(10,2) NOT NULL,
   `category` varchar(100) DEFAULT NULL,
-  `stock_quantity` int(11) DEFAULT 0,
-  `is_available` tinyint(1) DEFAULT 1,
+  `image_url` varchar(500) DEFAULT NULL,
+  `status` varchar(20) NOT NULL DEFAULT 'active',
+  `stock` int(11) NOT NULL DEFAULT 0,
   `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `product_service`
+--
+
+INSERT INTO `product_service` (`product_id`, `seller_id`, `name`, `description`, `price`, `category`, `image_url`, `status`, `stock`, `created_at`) VALUES
+(3, 38, 'Suite de Gestion de Projets', 'Suivi de projets complet avec collaboration équipe, gestion de timeline et tableaux Kanban pour équipes agiles.', 299.00, 'informatique', 'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=600&q=80', 'active', 25, '2026-04-07 22:02:58'),
+(4, 38, 'Consulting Stratégie Business', 'Conseils d\'experts sur expansion marché, stratégies de croissance et optimisation des processus business.', 450.00, 'services', 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&q=80', 'active', 8, '2026-04-07 22:02:58'),
+(5, 38, 'Pack Identité Visuelle & Logo', 'Logo professionnel, charte graphique complète et identité visuelle pour une première impression mémorable.', 750.00, 'services', 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=600&q=80', 'active', 8, '2026-04-07 22:02:58'),
+(6, 38, 'Outils d\'Intégration API', 'Connecteurs API personnalisés pour automatiser vos workflows et intégrer tous vos outils business.', 199.00, 'informatique', 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&q=80', 'active', 50, '2026-04-07 22:02:58'),
+(7, 38, 'Dashboard Analytics Avancé', 'Intelligence business en temps réel. Suivez vos KPIs et prenez des décisions data-driven avec précision.', 179.00, 'informatique', 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80', 'active', 30, '2026-04-07 22:02:58'),
+(8, 38, 'Développement Site Web Pro', 'Sites web responsive avec design moderne, optimisation SEO et intégration CMS pour votre présence en ligne.', 1200.00, 'services', 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=600&q=80', 'active', 5, '2026-04-07 22:02:58'),
+(9, 38, 'Laptop Professionnel i7', 'Ordinateur portable haute performance Intel i7, 16Go RAM, SSD 512Go. Idéal pour les professionnels.', 2890.00, 'electronique', 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&q=80', 'active', 12, '2026-04-07 22:02:58'),
+(10, 38, 'Pack Mobilier Bureau Ergonomique', 'Bureau réglable en hauteur + chaise ergonomique + support écran. Confort optimal pour votre productivité.', 1450.00, 'mobilier', 'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=600&q=80', 'active', 7, '2026-04-07 22:02:58'),
+(11, 38, 'Formation Marketing Digital', 'Programme complet 20h : SEO, réseaux sociaux, email marketing, publicité en ligne. Certification incluse.', 390.00, 'services', 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&q=80', 'active', 100, '2026-04-07 22:02:58'),
+(12, 38, 'Casque Audio Pro Bluetooth', 'Casque sans fil réduction bruit active 30h d\'autonomie. Son cristallin pour vos réunions et présentations.', 289.00, 'electronique', 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80', 'active', 20, '2026-04-07 22:02:58'),
+(13, 38, 'Pack Santé & Bien-être Bureau', 'Tapis de yoga, balle anti-stress, diffuseur aromathérapie. Prenez soin de vous au travail.', 149.00, 'sante', 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&q=80', 'active', 35, '2026-04-07 22:02:58'),
+(14, 38, 'Équipement Sport Professionnel', 'Tenue de sport premium, sac de gym + accessoires fitness pour maintenir votre forme tout en travaillant.', 220.00, 'sport', 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&q=80', 'active', 15, '2026-04-07 22:02:58');
 
 -- --------------------------------------------------------
 
@@ -6129,7 +6206,7 @@ CREATE TABLE `produit_service` (
   `categorie` varchar(100) DEFAULT NULL,
   `disponible` tinyint(1) NOT NULL DEFAULT 1,
   `owner_user_id` int(11) NOT NULL,
-  `image_path` varchar(200) NOT NULL
+  `image_path` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -6137,12 +6214,21 @@ CREATE TABLE `produit_service` (
 --
 
 INSERT INTO `produit_service` (`id_produit`, `id_profile`, `nom`, `description`, `prix`, `quantite`, `categorie`, `disponible`, `owner_user_id`, `image_path`) VALUES
-(2, 55, 'hhh', '', 55.00, 56, 'design', 1, 0, ''),
-(5, 25, 'iram', '', 2365.00, 223, 'math', 1, 10, ''),
-(6, 100, 'trabelsi', '', 2563.00, 10, 'design', 1, 10, ''),
-(8, 12, 'fatha', '', 50.00, 360, 'faza', 1, 12, ''),
-(10, 12, 'fatha', '', 50.00, 360, 'faza', 1, 12, ''),
-(11, 11, 'iram2', '', 2365.00, 223, 'math', 1, 11, '');
+(5, 25, 'iram', '', 2365.00, 223, 'math', 1, 10, NULL),
+(8, 12, 'fatha', '', 50.00, 357, 'faza', 1, 35, NULL),
+(11, 11, 'iram2', '', 2365.00, 223, 'math', 1, 11, NULL),
+(13, 35, 'skander', NULL, 10.00, 5, NULL, 1, 35, 'Capture-d-ecran-2026-04-06-093129-69d4c80d90a1b.png'),
+(14, 35, 'feryel', NULL, 10.00, 95, 'design', 1, 35, NULL),
+(15, 8, 'Suite de Gestion de Projets', 'Suivi de projets complet avec collaboration équipe et tableaux Kanban pour équipes agiles.', 299.00, 25, 'Logiciels', 1, 8, NULL),
+(16, 8, 'Consulting Stratégie Business', 'Conseils d\'experts sur expansion marché et stratégies de croissance.', 450.00, 10, 'Consulting', 1, 8, NULL),
+(17, 8, 'Pack Identité Visuelle', 'Logo professionnel, charte graphique et identité visuelle complète.', 750.00, 8, 'Design', 1, 8, NULL),
+(18, 8, 'Outils d\'Intégration API', 'Connecteurs API personnalisés pour automatiser vos workflows.', 199.00, 50, 'Logiciels', 1, 8, NULL),
+(19, 8, 'Dashboard Analytics Avancé', 'Intelligence business en temps réel. Suivez vos KPIs.', 179.00, 30, 'Logiciels', 1, 8, NULL),
+(20, 8, 'Développement Site Web Pro', 'Sites web responsive avec design moderne et optimisation SEO.', 1200.00, 5, 'Développement', 1, 8, NULL),
+(21, 9, 'Formation Marketing Digital', 'Programme complet 20h : SEO, réseaux sociaux, email marketing.', 390.00, 100, 'Formation', 1, 9, NULL),
+(22, 9, 'Audit Financier Startup', 'Analyse complète de la santé financière et recommandations.', 850.00, 15, 'Finance', 1, 9, NULL),
+(25, 36, 'iraam', NULL, 123.00, 9, 'desi', 1, 36, NULL),
+(26, 36, 'fate', NULL, 152.00, 11, 'math', 1, 36, 'cHNhbGN-removebg-preview-69d62a2ad514a.png');
 
 -- --------------------------------------------------------
 
@@ -6156,7 +6242,7 @@ CREATE TABLE `project` (
   `title` varchar(200) NOT NULL,
   `description` text DEFAULT NULL,
   `required_budget` decimal(15,2) NOT NULL,
-  `status` enum('pending','funded','in_progress','completed') DEFAULT 'pending',
+  `status` varchar(30) DEFAULT 'brouillon',
   `secteur` varchar(100) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -6166,14 +6252,14 @@ CREATE TABLE `project` (
 --
 
 INSERT INTO `project` (`project_id`, `startup_id`, `title`, `description`, `required_budget`, `status`, `secteur`, `created_at`) VALUES
-(1, 6, 'hekzrje', 'dezdez', 15.20, 'funded', NULL, '2026-02-11 21:04:33'),
-(7, 6, 'AAA', 'AAA', 200000.00, 'pending', NULL, '2026-02-25 06:18:37'),
-(8, 6, 'azazaz', 'ZZZZZ', 100000000.00, 'in_progress', NULL, '2026-02-25 06:24:24'),
-(9, 6, 'aa', 'aaaaa', 200000000000.00, 'pending', NULL, '2026-02-25 06:57:57'),
-(10, 6, 'aa', 'aaaaa', 200000000000.00, 'pending', NULL, '2026-02-25 06:57:57'),
-(11, 6, 'fatma', 'fatma', 400.00, 'in_progress', NULL, '2026-02-27 00:06:48'),
-(13, 13, 'web dev project', 'une boite developpent des solutions cloud', 50000.00, 'pending', NULL, '2026-03-01 14:14:53'),
-(14, 15, 'foot', 'un resto moderne qui vise les joueur', 80000.00, 'pending', NULL, '2026-03-02 23:48:10');
+(1, 6, 'hekzrje', 'dezdez', 15.20, 'publie', NULL, '2026-02-11 21:04:33'),
+(7, 6, 'AAA', 'AAA', 200000.00, 'publie', NULL, '2026-02-25 06:18:37'),
+(8, 6, 'azazaz', 'ZZZZZ', 100000000.00, 'publie', NULL, '2026-02-25 06:24:24'),
+(9, 6, 'aa', 'aaaaa', 200000000000.00, 'publie', NULL, '2026-02-25 06:57:57'),
+(10, 6, 'aa', 'aaaaa', 200000000000.00, 'publie', NULL, '2026-02-25 06:57:57'),
+(11, 6, 'fatma', 'fatma', 400.00, 'publie', NULL, '2026-02-27 00:06:48'),
+(12, 12, 'Trading bot modern', 'c\'est un projet where we use more than 120 ai models as an agent brain trained on data market from 1950 until 2026', 150000.00, 'publie', NULL, '2026-03-01 13:30:26'),
+(25, 37, 'oui', 'dhqsikuhdiaqziudhaiqzuhdiuaqzhdiuh', 589.00, 'pending', 'transport', '2026-04-07 23:08:00');
 
 -- --------------------------------------------------------
 
@@ -6279,26 +6365,64 @@ CREATE TABLE `user` (
   `availability` text DEFAULT NULL,
   `cv_url` varchar(500) DEFAULT NULL,
   `totp_secret` varchar(255) DEFAULT NULL,
-  `face_token` varchar(255) DEFAULT NULL
+  `face_token` varchar(255) DEFAULT NULL,
+  `is_verified` tinyint(1) NOT NULL DEFAULT 0,
+  `face_enrolled_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`user_id`, `email`, `password_hash`, `user_type`, `created_at`, `is_active`, `full_name`, `phone`, `address`, `bio`, `avatar_url`, `company_name`, `sector`, `company_description`, `website`, `founding_date`, `business_type`, `delivery_zones`, `payment_methods`, `return_policy`, `investment_sector`, `max_budget`, `years_experience`, `represented_company`, `specialty`, `hourly_rate`, `availability`, `cv_url`, `totp_secret`, `face_token`) VALUES
-(6, 'TestAdmin@gmail.com', '$2a$12$V9CASbvSMt.auCGAmcEz/uVfWV4jN4NFqZM99n8dZy9x6ix9Aus02', 'admin', '2026-02-06 05:19:11', 1, 'jeremy', '23456789', NULL, NULL, 'com/bizhub/images/avatars/8ef86e74-d02d-4081-87dc-25d2040b8bf6.png', 'AstroWorld', 'Informatics', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(7, 'TestFormateur@gmail.com', '$2a$12$Vvk/.eHr9tPmH6AtYG10neYwxbh9MmyvN8/0f7QTvZ5.BQar3LX0q', 'formateur', '2026-02-06 05:26:11', 1, 'BlueWall', '12345678', NULL, NULL, 'com/bizhub/images/avatars/ca10dcf0-e18e-439a-8b6f-a813b23f65cf.jpeg', 'My dd', 'Baby Oil', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(8, 'TestStartup@gmail.com', '$2a$12$UKZh0JBfN.1RQ/g7RZbAVOKU9gBy.FwiRCFlzQJ.6BW2uF58gnB.a', 'startup', '2026-02-06 05:30:20', 1, 'skandrr', '12345678', NULL, NULL, 'com/bizhub/images/avatars/4038c4dc-e04d-495a-83f7-1fb29a921a3f.png', 'Dar Baba', 'Shanghai', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(9, 'Test1@gmail.com', '$2a$12$bvvRVl71HXL5T5y7J6/52.OUGvpT07JDV5U4Y7QPjSGS9awWBXHua', 'investisseur', '2026-02-07 19:21:13', 1, 'skandoura', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Java', 20.00, NULL, NULL, NULL, NULL),
-(10, 'test3@gmail.com', '$2a$12$1S7CUW.6wRB6rKRS53zsNO0s/Xdy7Qu0SZGCnJdfvqJs4208cMIqq', 'investisseur', '2026-02-07 19:22:33', 1, 'skannn', NULL, NULL, NULL, 'com/bizhub/images/avatars/23b44342-e8ce-4bc3-ae86-84ab7800c12d.png', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'FinTech', 50000.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(13, 'ziadijizel26@gmail.com', '$2a$12$xgekLmvAV9AU3NcFqBHAVeb7LqfN.t6J4IaAzqTck.Z.UUXjSrU6e', 'startup', '2026-03-01 14:13:30', 1, '123456', NULL, NULL, NULL, NULL, 'HP', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(15, 'startup@gmail.com', '$2a$12$evXjEssfWdq9FHtaV3NF1uZq03tlkZUs3QyQQ5ZBfR7LVZmfAwHUK', 'startup', '2026-03-02 23:33:39', 1, 'fatma', NULL, NULL, NULL, NULL, 'fatyy', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(16, 'investisseur@gmail..com', '$2a$12$Z/Nkf6fjOW2AuewOxre9neXiKKjc7ZfxmpucUBJnOH3wPJWt099N.', 'investisseur', '2026-03-02 23:34:35', 1, 'fatou', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'fatouu', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(28, 'selmiskander92@gmail.com', '$2a$12$WYNU7e13wWdf52q9XO1EZesylaXIct9ejhPIiCIf7SN8KF.q07dEW', 'startup', '2026-03-05 12:06:26', 1, 'skander', NULL, NULL, NULL, 'com/bizhub/images/avatars/58cf18a8-8102-48e5-8da2-1656b49afde2.png', 'test', 'test', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'LZOBQOKIN6BP5CKGKMVWDV3LILV74REJ', '0302e9f2ec14dd48cbfdc8f3f1e421a1'),
-(29, 'selmi.skan@gmail.com', '$2y$13$7MhujAJgyPs.yBNehKFxY.VcZBzLDGl8QOG8pohRi0wQVABY.3PhK', 'formateur', '2026-04-04 21:04:31', 0, 'bobo', NULL, NULL, NULL, '/assets/images/avatars/2AOqvyd4-69d1a85b286e9.jpg', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 24, NULL, 'yourmom', NULL, NULL, NULL, NULL, NULL),
-(33, 'skan.skan@gmail.com', '$2y$13$UelkrH/uXzdNmGgHoLHYLOMzar5YBtSXkYDFBBSrdIQ8JBC31lDLy', 'admin', '2026-04-05 00:21:18', 1, 'selmi', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(34, 's.s@gmail.com', '$2y$13$Znu843.FJSSqCMVrP5iG9u1PqP5GOMHH/gZBc0SW1FaJl0gpBKy6K', 'startup', '2026-04-05 00:31:05', 1, 'skandouri skan', '22788277', NULL, NULL, '/assets/images/avatars/cHNhbGN-removebg-preview-69d4d289ea6b6.png', 'bluered', 'blue', 'blueblue', NULL, NULL, 'trading', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `user` (`user_id`, `email`, `password_hash`, `user_type`, `created_at`, `is_active`, `full_name`, `phone`, `address`, `bio`, `avatar_url`, `company_name`, `sector`, `company_description`, `website`, `founding_date`, `business_type`, `delivery_zones`, `payment_methods`, `return_policy`, `investment_sector`, `max_budget`, `years_experience`, `represented_company`, `specialty`, `hourly_rate`, `availability`, `cv_url`, `totp_secret`, `face_token`, `is_verified`, `face_enrolled_at`) VALUES
+(6, 'TestAdmin@gmail.com', '$2a$12$V9CASbvSMt.auCGAmcEz/uVfWV4jN4NFqZM99n8dZy9x6ix9Aus02', 'admin', '2026-02-06 05:19:11', 1, 'jeremy', '23456789', NULL, NULL, 'com/bizhub/images/avatars/8ef86e74-d02d-4081-87dc-25d2040b8bf6.png', 'AstroWorld', 'Informatics', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
+(7, 'TestFormateur@gmail.com', '$2a$12$Vvk/.eHr9tPmH6AtYG10neYwxbh9MmyvN8/0f7QTvZ5.BQar3LX0q', 'formateur', '2026-02-06 05:26:11', 1, 'BlueWall', '12345678', NULL, NULL, '/assets/images/avatars/cHNhbGN-removebg-preview-69d8b659a323b.png', 'My dd', 'Baby Oil', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
+(8, 'TestStartup@gmail.com', '$2a$12$UKZh0JBfN.1RQ/g7RZbAVOKU9gBy.FwiRCFlzQJ.6BW2uF58gnB.a', 'startup', '2026-02-06 05:30:20', 1, 'skandrr', '12345678', NULL, NULL, 'com/bizhub/images/avatars/4038c4dc-e04d-495a-83f7-1fb29a921a3f.png', 'Dar Baba', 'Shanghai', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
+(9, 'Test1@gmail.com', '$2a$12$bvvRVl71HXL5T5y7J6/52.OUGvpT07JDV5U4Y7QPjSGS9awWBXHua', 'investisseur', '2026-02-07 19:21:13', 1, 'skandoura', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Java', 20.00, NULL, NULL, NULL, NULL, 0, NULL),
+(10, 'test3@gmail.com', '$2a$12$1S7CUW.6wRB6rKRS53zsNO0s/Xdy7Qu0SZGCnJdfvqJs4208cMIqq', 'investisseur', '2026-02-07 19:22:33', 1, 'skannn', NULL, NULL, NULL, 'com/bizhub/images/avatars/23b44342-e8ce-4bc3-ae86-84ab7800c12d.png', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'FinTech', 50000.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
+(11, 'invest@esprit.tn', '$2a$12$PDFeYX9W9cMccJZAV7CiRecN6Lqasp7sD8WeldmoWgtLieocCSZxG', 'investisseur', '2026-03-01 13:23:11', 1, '123456', '10203010', 'ariana', 'power in the money , money in the power', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'IT', 75000.00, 5, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
+(12, 'startup@esprit.tn', '$2a$12$atxx/OUWPo1j3rJYAUi/W.uQsX9vwET.H275rai4p4IQDU6YD./0q', 'startup', '2026-03-01 13:28:44', 1, '123456', NULL, NULL, NULL, NULL, 'esprit', 'Finance', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
+(13, 'ziadijizel26@gmail.com', '$2a$12$xgekLmvAV9AU3NcFqBHAVeb7LqfN.t6J4IaAzqTck.Z.UUXjSrU6e', 'startup', '2026-03-01 14:13:30', 1, '123456', NULL, NULL, NULL, NULL, 'HP', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
+(15, 'startup@gmail.com', '$2a$12$evXjEssfWdq9FHtaV3NF1uZq03tlkZUs3QyQQ5ZBfR7LVZmfAwHUK', 'startup', '2026-03-02 23:33:39', 1, 'fatma', NULL, NULL, NULL, NULL, 'fatyy', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
+(16, 'investisseur@gmail..com', '$2a$12$Z/Nkf6fjOW2AuewOxre9neXiKKjc7ZfxmpucUBJnOH3wPJWt099N.', 'investisseur', '2026-03-02 23:34:35', 1, 'fatou', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'fatouu', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
+(29, 'selmi.skan@gmail.com', '$2y$13$7MhujAJgyPs.yBNehKFxY.VcZBzLDGl8QOG8pohRi0wQVABY.3PhK', 'formateur', '2026-04-04 21:04:31', 0, 'bobo', NULL, NULL, NULL, '/assets/images/avatars/2AOqvyd4-69d1a85b286e9.jpg', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 24, NULL, 'yourmom', NULL, NULL, NULL, NULL, NULL, 0, NULL),
+(34, 'boughoula.fatma@esprit.tn', '$2y$13$cRTrjwUsXD4xByq4cq0bzurHtcsqRjOPeoS4AwPO/FsPQ7/svzLwC', 'investisseur', '2026-04-06 16:38:03', 1, 'boughoula fatma ezahra', '+21629523310', 'araian', 'faty', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
+(36, 'fatma2@gmail.com', '$2y$13$JWtohAldIaph8E0wIW4N3u5hp4O6Zr3QqGSUkOW.t0Qric43DXbaG', 'investisseur', '2026-04-06 16:40:25', 1, 'boughoula fatma ezahra', '+21629523310', 'araian', 'faty', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
+(37, 'fatma3@gmail.com', '$2y$13$kTRwwnAb3LaEW14DnfOGTOMu.SDttqFzZWDIQ5m/JXE9.rTRtxYpW', 'startup', '2026-04-06 23:46:10', 1, 'iram trabelsi', '+21629523310', 'ariana', 'fatyy', '/assets/images/avatars/638357820-930737542806290-4707335109899648181-n-69d520210d5ea.png', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
+(38, 'boutique@bizhub.tn', '$2y$13$demo.hash.not.real.login', 'fournisseur', '2026-04-07 22:02:23', 1, 'BizHub Store', '22333444', NULL, NULL, NULL, 'BizHub Commerce', 'Informatique', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
+(39, 'ffet.gre@gmail.com', '$2y$13$Mpc6TcJJDiaOZOcdkl6bm.iAixjqlEt668S825/XOarkzA0aQcliC', 'admin', '2026-04-08 10:27:29', 1, 'selmi skan', '33596478', NULL, '874', '/assets/images/avatars/cHNhbGN-removebg-preview-69d62dd8b8e30.png', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
+(58, 'selmiskander0.8@gmail.com', '$2y$13$3OHrajXRrhIeUvq7T.rFXea5qGtqhH9uS5ro8rLWOgJLAz.SB754m', 'startup', '2026-04-11 13:45:41', 1, 'selmi skan', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'd0716882b774c523ec0e782ee5708046', 0, '2026-04-11 14:17:50'),
+(59, 'selmiskander92@gmail.com', '$2y$13$d/egnlpge2YIv.CAjnOhxe3tXsTam/ZZiFwOv0VWAtJzmmytwToEy', 'startup', '2026-04-11 14:33:58', 1, 'selmi skan', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
+(60, 'selmiskan64@gmail.com', '$2y$13$zhK0q83PRl8SV4FIitRdoOl6TgEr8Guz4hQeduFwapwn1zJ3wEUQe', 'startup', '2026-04-11 19:57:28', 1, 'selmi skan64', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'a48dfd60686172b8ec4e9c3854d13de5', 0, '2026-04-11 21:06:23');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_auth_state`
+--
+
+CREATE TABLE `user_auth_state` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `is_verified` tinyint(1) NOT NULL DEFAULT 1,
+  `verification_token` varchar(128) DEFAULT NULL,
+  `verification_token_expires_at` datetime DEFAULT NULL,
+  `password_reset_token` varchar(128) DEFAULT NULL,
+  `password_reset_token_expires_at` datetime DEFAULT NULL,
+  `mfa_enabled` tinyint(1) NOT NULL DEFAULT 0,
+  `mfa_enrollment_id` varchar(255) DEFAULT NULL,
+  `oauth_provider` varchar(255) DEFAULT NULL,
+  `oauth_provider_id` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `user_auth_state`
+--
+
+INSERT INTO `user_auth_state` (`id`, `user_id`, `is_verified`, `verification_token`, `verification_token_expires_at`, `password_reset_token`, `password_reset_token_expires_at`, `mfa_enabled`, `mfa_enrollment_id`, `oauth_provider`, `oauth_provider_id`) VALUES
+(18, 58, 1, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL),
+(19, 59, 1, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL),
+(20, 60, 1, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -6418,7 +6542,15 @@ ALTER TABLE `fraud_analysis`
 ALTER TABLE `investment`
   ADD PRIMARY KEY (`investment_id`),
   ADD KEY `idx_investment_project` (`project_id`),
-  ADD KEY `idx_investment_investor` (`investor_id`);
+  ADD KEY `idx_investment_investor` (`investor_id`),
+  ADD KEY `idx_investment_date` (`investment_date`);
+
+--
+-- Indexes for table `messenger_messages`
+--
+ALTER TABLE `messenger_messages`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_75EA56E0FB7336F0E3BD61CE16BA31DBBF396750` (`queue_name`,`available_at`,`delivered_at`,`id`);
 
 --
 -- Indexes for table `negotiation`
@@ -6483,11 +6615,10 @@ ALTER TABLE `post`
 --
 ALTER TABLE `product_service`
   ADD PRIMARY KEY (`product_id`),
-  ADD KEY `idx_product_fournisseur` (`fournisseur_id`),
+  ADD KEY `idx_product_fournisseur` (`seller_id`),
   ADD KEY `idx_product_category` (`category`),
   ADD KEY `idx_product_price` (`price`),
-  ADD KEY `idx_product_available` (`is_available`),
-  ADD KEY `idx_product_stock` (`stock_quantity`);
+  ADD KEY `idx_product_stock` (`stock`);
 
 --
 -- Indexes for table `produit_service`
@@ -6542,6 +6673,16 @@ ALTER TABLE `user`
   ADD KEY `idx_user_sector` (`sector`);
 
 --
+-- Indexes for table `user_auth_state`
+--
+ALTER TABLE `user_auth_state`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uniq_user_auth_state_user` (`user_id`),
+  ADD UNIQUE KEY `uniq_user_auth_state_oauth_identity` (`oauth_provider`,`oauth_provider_id`),
+  ADD KEY `idx_user_auth_state_verification_token` (`verification_token`),
+  ADD KEY `idx_user_auth_state_password_reset_token` (`password_reset_token`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -6561,7 +6702,7 @@ ALTER TABLE `application`
 -- AUTO_INCREMENT for table `avis`
 --
 ALTER TABLE `avis`
-  MODIFY `avis_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `avis_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `avis_produit`
@@ -6579,13 +6720,13 @@ ALTER TABLE `chatbot_conversation`
 -- AUTO_INCREMENT for table `commande`
 --
 ALTER TABLE `commande`
-  MODIFY `id_commande` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=81;
+  MODIFY `id_commande` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=89;
 
 --
 -- AUTO_INCREMENT for table `commande_ligne`
 --
 ALTER TABLE `commande_ligne`
-  MODIFY `id_ligne` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id_ligne` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `commentaire`
@@ -6621,7 +6762,13 @@ ALTER TABLE `fraud_analysis`
 -- AUTO_INCREMENT for table `investment`
 --
 ALTER TABLE `investment`
-  MODIFY `investment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `investment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+
+--
+-- AUTO_INCREMENT for table `messenger_messages`
+--
+ALTER TABLE `messenger_messages`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `negotiation`
@@ -6639,19 +6786,19 @@ ALTER TABLE `negotiation_message`
 -- AUTO_INCREMENT for table `order`
 --
 ALTER TABLE `order`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `panier`
 --
 ALTER TABLE `panier`
-  MODIFY `id_panier` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id_panier` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT for table `participation`
 --
 ALTER TABLE `participation`
-  MODIFY `id_candidature` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id_candidature` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `payment`
@@ -6669,19 +6816,19 @@ ALTER TABLE `post`
 -- AUTO_INCREMENT for table `product_service`
 --
 ALTER TABLE `product_service`
-  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `produit_service`
 --
 ALTER TABLE `produit_service`
-  MODIFY `id_produit` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id_produit` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `project`
 --
 ALTER TABLE `project`
-  MODIFY `project_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `project_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `reaction`
@@ -6705,7 +6852,13 @@ ALTER TABLE `training_request`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
+
+--
+-- AUTO_INCREMENT for table `user_auth_state`
+--
+ALTER TABLE `user_auth_state`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- Constraints for dumped tables
@@ -6777,7 +6930,7 @@ ALTER TABLE `order`
 -- Constraints for table `product_service`
 --
 ALTER TABLE `product_service`
-  ADD CONSTRAINT `product_service_ibfk_1` FOREIGN KEY (`fournisseur_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `product_service_ibfk_1` FOREIGN KEY (`seller_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `project`
@@ -6791,6 +6944,12 @@ ALTER TABLE `project`
 ALTER TABLE `training_request`
   ADD CONSTRAINT `training_request_ibfk_1` FOREIGN KEY (`startup_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `training_request_ibfk_2` FOREIGN KEY (`formation_id`) REFERENCES `formation` (`formation_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `user_auth_state`
+--
+ALTER TABLE `user_auth_state`
+  ADD CONSTRAINT `FK_user_auth_state_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

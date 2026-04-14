@@ -181,6 +181,24 @@
             font-size: 1.1rem;
         }
 
+        .error-summary {
+            align-items: flex-start;
+        }
+
+        .error-summary strong {
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .error-list {
+            margin: 0;
+            padding-left: 18px;
+        }
+
+        .error-list li + li {
+            margin-top: 4px;
+        }
+
         .success-box {
             padding: 14px 16px;
             background: rgba(40, 167, 69, 0.08);
@@ -417,6 +435,35 @@
                 </div>
             {% endfor %}
 
+            {% set formErrors = [] %}
+            {% for error in form.vars.errors %}
+                {% set formErrors = formErrors|merge([error.message]) %}
+            {% endfor %}
+            {% for child in form %}
+                {% for error in child.vars.errors %}
+                    {% set formErrors = formErrors|merge([error.message]) %}
+                {% endfor %}
+                {% for grandChild in child %}
+                    {% for error in grandChild.vars.errors %}
+                        {% set formErrors = formErrors|merge([error.message]) %}
+                    {% endfor %}
+                {% endfor %}
+            {% endfor %}
+
+            {% if form.vars.submitted and formErrors|length > 0 %}
+                <div class="error-box error-summary" style="margin-bottom: 1.5rem;">
+                    <i class="fa fa-exclamation-circle"></i>
+                    <div>
+                        <strong>Impossible de creer le compte. Corrigez les champs suivants :</strong>
+                        <ul class="error-list">
+                            {% for message in formErrors %}
+                                <li>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}
+
             {{ form_start(form, {'attr': {'class': 'auth-form', 'novalidate': 'novalidate'}}) }}
 
                 <div class="form-group">
@@ -552,12 +599,22 @@
                 <div class="form-row">
                     <div class="form-group">
                         {{ form_label(form.phone, 'Telephone (optionnel)') }}
-                        {{ form_widget(form.phone, {'attr': {'placeholder': '+33 6 12 34 56 78'}}) }}
+                        {{ form_widget(form.phone, {'attr': {'placeholder': '+216 12 345 678 ou 12345678'}}) }}
+                        {% if form.phone.vars.errors|length %}
+                            <div class="error-text">
+                                {% for error in form.phone.vars.errors %}{{ error.message }}{% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
 
                     <div class="form-group">
                         {{ form_label(form.address, 'Adresse (optionnel)') }}
                         {{ form_widget(form.address, {'attr': {'placeholder': 'Votre adresse'}}) }}
+                        {% if form.address.vars.errors|length %}
+                            <div class="error-text">
+                                {% for error in form.address.vars.errors %}{{ error.message }}{% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
 
