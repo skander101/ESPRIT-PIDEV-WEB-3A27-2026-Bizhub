@@ -1,0 +1,54 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Modifier formation{% endblock %}
+{% block breadcrumb %}E-Learning / Formations / Modifier{% endblock %}
+
+{% block extra_stylesheets %}
+  <style>
+    .formation-form-page .heading {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+      flex-wrap: wrap;
+    }
+    .formation-form-page .heading p {
+      color: var(--pg-muted2);
+      margin: 0;
+      font-size: .92rem;
+    }
+    .formation-form-page .dash-panel {
+      padding: 1.5rem;
+      border: 1px solid var(--pg-border);
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(20,24,38,.86), rgba(12,16,30,.92));
+      box-shadow: 0 18px 45px rgba(0,0,0,.24);
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="formation-form-page" style="padding:2rem;max-width:950px;">
+  <div class="heading">
+    <div>
+      <h2 style="font-size:1.5rem;color:var(--pg-text);margin:0;">Modifier : {{ formation.title }}</h2>
+      <p>Ajustez les dates, le lieu et les règles de capacité.</p>
+    </div>
+    <a href="{{ path('app_admin_formation_index') }}" class="btn btn-outline-secondary">Retour à la liste</a>
+  </div>
+  {% for label, messages in app.flashes %}
+    {% for message in messages %}
+      <div class="alert alert-{{ label == 'error' ? 'danger' : label }} mb-3" role="alert">{{ message }}</div>
+    {% endfor %}
+  {% endfor %}
+  <div class="dash-panel">
+    {% include 'back/elearning/formation/_form.html.twig' %}
+  </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+  {{ parent() }}
+  <script src="{{ asset('js/elearning-forms-validation.js') }}"></script>
+{% endblock %}

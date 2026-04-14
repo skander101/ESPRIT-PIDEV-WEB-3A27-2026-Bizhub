@@ -1,0 +1,74 @@
+# yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+# See also https://symfony.com/doc/current/service_container/import.html
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+    app.auth.mail_from_email: 'bizbot64@gmail.com'
+    app.auth.mail_from_name: 'BizHub'
+    stripe.secret_key: '%env(STRIPE_SECRET_KEY)%'
+    stripe.webhook_secret: '%env(STRIPE_WEBHOOK_SECRET)%'
+    twilio.account_sid: '%env(TWILIO_ACCOUNT_SID)%'
+    twilio.auth_token: '%env(TWILIO_AUTH_TOKEN)%'
+    twilio.whatsapp_from: '%env(TWILIO_WHATSAPP_FROM)%'
+    groq.api_key: '%env(GROQ_API_KEY)%'
+    groq.model: '%env(GROQ_MODEL)%'
+    app.google_client_id: '%env(trim:GOOGLE_CLIENT_ID)%'
+    app.google_client_secret: '%env(trim:GOOGLE_CLIENT_SECRET)%'
+    app.auth0_domain: '%env(trim:AUTH0_DOMAIN)%'
+    app.auth0_client_id: '%env(trim:AUTH0_CLIENT_ID)%'
+    app.auth0_client_secret: '%env(trim:AUTH0_CLIENT_SECRET)%'
+    face.api_key: '%env(FACE_API_KEY)%'
+    face.api_secret: '%env(FACE_API_SECRET)%'
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/'
+
+    App\Service\Auth\AuthMailerService:
+        arguments:
+            $fromEmail: '%app.auth.mail_from_email%'
+            $fromName: '%app.auth.mail_from_name%'
+
+    App\Service\Auth\GoogleOAuthService:
+        arguments:
+            $googleClientId: '%app.google_client_id%'
+            $googleClientSecret: '%app.google_client_secret%'
+
+    App\Service\FacePlusPlus\FaceRecognitionService:
+        arguments:
+            $faceApiKey: '%face.api_key%'
+            $faceApiSecret: '%face.api_secret%'
+
+    App\EventListener\MfaEnforcementListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.request }
+
+    App\Service\Marketplace\StripeService:
+        arguments:
+            $stripeSecretKey: '%stripe.secret_key%'
+            $stripeWebhookSecret: '%stripe.webhook_secret%'
+
+    App\Service\Marketplace\TwilioService:
+        arguments:
+            $twilioAccountSid: '%twilio.account_sid%'
+            $twilioAuthToken: '%twilio.auth_token%'
+            $twilioWhatsappFrom: '%twilio.whatsapp_from%'
+
+    App\Service\Marketplace\GrokService:
+        arguments:
+            $apiKey: '%groq.api_key%'
+            $model: '%groq.model%'
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
