@@ -1,0 +1,41 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Modifier participation{% endblock %}
+{% block breadcrumb %}Participation / Modifier{% endblock %}
+
+{% block content %}
+<div style="padding:2rem;max-width:800px;">
+  <a href="{{ path('app_admin_formation_participants', { formation_id: formation.formation_id }) }}" class="text-decoration-none text-muted small">← Participants</a>
+  <h2 style="font-size:1.5rem;color:var(--pg-text);margin:1rem 0;">Modifier la participation</h2>
+  <p class="text-muted">{{ participation.user ? participation.user.fullName : '' }} — {{ formation.title }}</p>
+
+  {% for label, messages in app.flashes %}
+    {% for message in messages %}
+      <div class="alert alert-{{ label == 'error' ? 'danger' : label }} mb-3" role="alert">{{ message }}</div>
+    {% endfor %}
+  {% endfor %}
+
+  <div class="dash-panel" style="padding:1.5rem;">
+    {{ form_start(form, { attr: { novalidate: 'novalidate', class: 'elearning-validated-form', 'data-validate-mode': form_js_mode|default('participation-edit') } }) }}
+      {{ form_row(form.user) }}
+      {{ form_row(form.formation) }}
+      {{ form_row(form.date_affectation) }}
+      {{ form_row(form.remarques) }}
+      {{ form_row(form.payment_status) }}
+      {{ form_row(form.payment_provider) }}
+      {{ form_row(form.payment_ref) }}
+      {{ form_row(form.amount) }}
+      {{ form_row(form.paid_at) }}
+      <div class="mt-4 d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        <a href="{{ path('app_admin_formation_participants', { formation_id: formation.formation_id }) }}" class="btn btn-outline-secondary">Annuler</a>
+      </div>
+    {{ form_end(form) }}
+  </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+  {{ parent() }}
+  <script src="{{ asset('js/elearning-forms-validation.js') }}"></script>
+{% endblock %}

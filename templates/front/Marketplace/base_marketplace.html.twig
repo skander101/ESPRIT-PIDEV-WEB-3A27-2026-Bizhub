@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+  <title>{% block title %}Marketplace{% endblock %} — BizHub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #ffbe33; --primary-dark: #e0a820;
+      --dark: #222831;    --dark2: #1a1f27;
+      --white: #ffffff;   --light-bg: #f8f8f8;
+      --muted: #666666;   --border: #ebebeb;
+      --success: #22c55e; --danger: #ef4444; --info: #3b82f6;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Lora', serif; background: var(--white); color: var(--dark); overflow-x: hidden; }
+
+    /* ── NAV ── */
+    .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 72px; display: flex; align-items: center; padding: 0 5%; background: rgba(34,40,49,0.97); backdrop-filter: blur(10px); box-shadow: 0 2px 20px rgba(0,0,0,0.18); justify-content: space-between; transition: height 0.3s; }
+    .navbar.scrolled { height: 60px; }
+    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-brand img { height: 36px; }
+    .brand-name { font-size: 1.4rem; font-weight: 700; font-family: 'Josefin Sans', sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: var(--white); }
+    .brand-name span { color: var(--primary); }
+    .nav-links { display: flex; align-items: center; gap: 1.8rem; list-style: none; }
+    .nav-links a { font-size: 0.82rem; font-weight: 600; font-family: 'Josefin Sans', sans-serif; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.75); text-decoration: none; transition: color 0.2s; position: relative; padding-bottom: 4px; }
+    .nav-links a::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background: var(--primary); border-radius: 2px; transition: width 0.25s ease; }
+    .nav-links a:hover, .nav-links a.active { color: var(--white); }
+    .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+    .nav-links .btn-nav { background: var(--primary); color: var(--dark) !important; padding: 9px 22px; border-radius: 6px; font-weight: 700; }
+    .nav-links .btn-nav::after { display: none; }
+    .nav-links .btn-nav:hover { background: var(--primary-dark); }
+    .badge-cart { background: var(--danger); color: #fff; font-size: 0.6rem; border-radius: 50%; padding: 2px 5px; vertical-align: super; margin-left: 2px; }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 8px; }
+    .hamburger span { width: 24px; height: 2px; background: var(--white); display: block; border-radius: 2px; }
+    .mobile-nav { display: none; position: fixed; inset: 0; background: var(--dark2); z-index: 999; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem; }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav a { font-size: 1.4rem; font-weight: 700; font-family: 'Josefin Sans', sans-serif; color: var(--white); text-decoration: none; }
+    .mobile-nav a:hover { color: var(--primary); }
+    .mobile-close { position: absolute; top: 20px; right: 5%; background: none; border: none; color: var(--white); font-size: 1.5rem; cursor: pointer; }
+
+    /* ── PAGE HERO ── */
+    .page-hero { height: 240px; position: relative; display: flex; align-items: center; padding-top: 72px; overflow: hidden; }
+    .page-hero-bg { position: absolute; inset: 0; background: url('/images/hero-bg.png') center/cover no-repeat; opacity: 0.35; }
+    .page-hero-overlay { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(26,31,39,0.95) 0%, rgba(34,40,49,0.75) 100%); }
+    .page-hero-content { position: relative; z-index: 2; padding: 0 5%; }
+    .page-hero-eyebrow { font-family: 'Josefin Sans', sans-serif; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--primary); display: flex; align-items: center; gap: 10px; margin-bottom: 0.7rem; }
+    .page-hero-eyebrow::before { content: ''; width: 24px; height: 1px; background: var(--primary); }
+    .page-hero h1 { font-family: 'Lora', serif; font-size: clamp(1.8rem,3.5vw,2.8rem); font-weight: 700; font-style: italic; color: var(--white); line-height: 1.15; }
+    .page-hero h1 span { color: var(--primary); }
+    .breadcrumb-bar { position: relative; z-index: 2; padding: 0 5%; margin-top: 0.6rem; display: flex; gap: 0.5rem; align-items: center; font-family: 'Josefin Sans', sans-serif; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.4); }
+    .breadcrumb-bar a { color: var(--primary); text-decoration: none; }
+    .breadcrumb-bar a:hover { text-decoration: underline; }
+
+    /* ── SECTION ── */
+    .section { padding: 70px 5%; }
+    .section-alt { background: var(--light-bg); }
+
+    /* ── TOAST NOTIFICATIONS ── */
+    #toast-container { position: fixed; top: 88px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+    .toast { pointer-events: all; min-width: 320px; max-width: 400px; background: #fff; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.08); overflow: hidden; display: flex; flex-direction: column; transform: translateX(120%); opacity: 0; transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.35s ease; }
+    .toast.show { transform: translateX(0); opacity: 1; }
+    .toast.hide { transform: translateX(120%); opacity: 0; transition: transform 0.3s ease, opacity 0.3s ease; }
+    .toast-body { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px 12px; }
+    .toast-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1rem; margin-top: 1px; }
+    .toast-text { flex: 1; }
+    .toast-title { font-family: 'Josefin Sans', sans-serif; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 3px; }
+    .toast-msg { font-size: 0.84rem; line-height: 1.4; color: #444; }
+    .toast-close { background: none; border: none; cursor: pointer; color: #aaa; font-size: 0.9rem; padding: 4px; margin-left: 4px; flex-shrink: 0; transition: color 0.2s; }
+    .toast-close:hover { color: #333; }
+    .toast-bar { height: 3px; width: 100%; transform-origin: left; animation: toastBar linear forwards; }
+    @keyframes toastBar { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+    /* types */
+    .toast-success .toast-icon { background: rgba(34,197,94,0.12); color: #16a34a; }
+    .toast-success .toast-title { color: #166534; }
+    .toast-success .toast-bar { background: #22c55e; }
+    .toast-danger .toast-icon  { background: rgba(239,68,68,0.12);  color: #dc2626; }
+    .toast-danger .toast-title  { color: #991b1b; }
+    .toast-danger .toast-bar  { background: #ef4444; }
+    .toast-warning .toast-icon { background: rgba(255,190,51,0.15); color: #b45309; }
+    .toast-warning .toast-title { color: #92400e; }
+    .toast-warning .toast-bar { background: #fbbf24; }
+    .toast-info .toast-icon    { background: rgba(59,130,246,0.12); color: #2563eb; }
+    .toast-info .toast-title    { color: #1d4ed8; }
+    .toast-info .toast-bar    { background: #3b82f6; }
+
+    /* ── BUTTONS ── */
+    .btn-yellow { background: var(--primary); color: var(--dark); padding: 12px 28px; border-radius: 8px; font-family: 'Josefin Sans', sans-serif; font-weight: 700; font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; border: none; cursor: pointer; transition: background 0.2s, transform 0.15s; }
+    .btn-yellow:hover { background: var(--primary-dark); transform: translateY(-2px); }
+    .btn-outline { background: transparent; color: var(--dark); border: 1.5px solid var(--border); padding: 11px 26px; border-radius: 8px; font-family: 'Josefin Sans', sans-serif; font-weight: 700; font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s; }
+    .btn-outline:hover { border-color: var(--dark); background: var(--dark); color: var(--white); }
+    .btn-danger { background: var(--danger); color: #fff; padding: 11px 24px; border-radius: 8px; font-family: 'Josefin Sans', sans-serif; font-weight: 700; font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; transition: background 0.2s; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-success { background: var(--success); color: #fff; padding: 11px 24px; border-radius: 8px; font-family: 'Josefin Sans', sans-serif; font-weight: 700; font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; transition: background 0.2s; }
+    .btn-success:hover { background: #16a34a; }
+    .btn-sm { padding: 7px 16px; font-size: 0.75rem; }
+    .btn-ghost { background: transparent; border: 1.5px solid var(--border); color: var(--muted); padding: 9px 18px; border-radius: 8px; font-family: 'Josefin Sans', sans-serif; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-ghost:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* ── TAGS / BADGES ── */
+    .tag { display: inline-block; background: rgba(255,190,51,0.12); color: var(--primary-dark); font-family: 'Josefin Sans', sans-serif; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 10px; border-radius: 100px; }
+    .tag-success { background: rgba(34,197,94,0.12); color: #15803d; }
+    .tag-danger  { background: rgba(239,68,68,0.12); color: #b91c1c; }
+    .tag-info    { background: rgba(59,130,246,0.12); color: #1d4ed8; }
+    .tag-muted   { background: var(--light-bg); color: var(--muted); border: 1px solid var(--border); }
+
+    /* ── CARDS ── */
+    .biz-card { background: var(--white); border-radius: 14px; border: 1.5px solid var(--border); overflow: hidden; transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s; }
+    .biz-card:hover { transform: translateY(-5px); box-shadow: 0 16px 42px rgba(0,0,0,0.1); border-color: rgba(255,190,51,0.35); }
+    .biz-card-body { padding: 24px; }
+    .biz-card-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+
+    /* ── TABLE ── */
+    .biz-table { width: 100%; border-collapse: collapse; }
+    .biz-table th { font-family: 'Josefin Sans', sans-serif; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); padding: 14px 16px; text-align: left; border-bottom: 2px solid var(--border); }
+    .biz-table td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 0.88rem; color: var(--dark); vertical-align: middle; }
+    .biz-table tr:last-child td { border-bottom: none; }
+    .biz-table tr:hover td { background: var(--light-bg); }
+
+    /* ── FORM ── */
+    .biz-form-group { margin-bottom: 1.2rem; }
+    .biz-label { display: block; font-family: 'Josefin Sans', sans-serif; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dark); margin-bottom: 6px; }
+    .biz-input, .biz-select, .biz-textarea { width: 100%; background: var(--white); border: 1.5px solid var(--border); border-radius: 8px; padding: 12px 16px; font-family: 'Lora', serif; font-size: 0.88rem; color: var(--dark); outline: none; transition: border-color 0.2s; appearance: none; }
+    .biz-input:focus, .biz-select:focus, .biz-textarea:focus { border-color: var(--primary); }
+    .biz-textarea { resize: vertical; min-height: 100px; }
+    .biz-input-group { display: flex; }
+    .biz-input-group .biz-input { border-radius: 8px 0 0 8px; }
+    .biz-input-group-text { background: var(--light-bg); border: 1.5px solid var(--border); border-left: none; border-radius: 0 8px 8px 0; padding: 0 16px; font-family: 'Josefin Sans', sans-serif; font-size: 0.8rem; color: var(--muted); display: flex; align-items: center; white-space: nowrap; }
+    .biz-error { font-size: 0.78rem; color: var(--danger); margin-top: 4px; display: block; }
+
+    /* ── STATUT PILL ── */
+    .statut-pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 100px; font-family: 'Josefin Sans', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+    .statut-attente            { background: rgba(255,190,51,0.15);  color: #92400e; }
+    .statut-confirmee          { background: rgba(34,197,94,0.12);   color: #166534; }
+    .statut-annulee            { background: rgba(239,68,68,0.12);   color: #991b1b; }
+    .statut-livree             { background: rgba(59,130,246,0.12);  color: #1e40af; }
+    .statut-en_cours_paiement  { background: rgba(99,102,241,0.12);  color: #3730a3; }
+    .statut-payee              { background: rgba(16,185,129,0.12);  color: #065f46; }
+    .statut-en_preparation     { background: rgba(245,158,11,0.12);  color: #78350f; }
+    /* Bouton payer */
+    .btn-pay { background:#6366f1; color:#fff; padding:11px 24px; border-radius:8px; font-family:'Josefin Sans',sans-serif; font-weight:700; font-size:0.82rem; letter-spacing:0.08em; text-transform:uppercase; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:8px; text-decoration:none; transition:background 0.2s; }
+    .btn-pay:hover { background:#4f46e5; }
+    .btn-prepare { background:#f59e0b; color:#422006; padding:11px 24px; border-radius:8px; font-family:'Josefin Sans',sans-serif; font-weight:700; font-size:0.82rem; letter-spacing:0.08em; text-transform:uppercase; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:8px; transition:background 0.2s; }
+    .btn-prepare:hover { background:#d97706; }
+
+    /* ── FOOTER ── */
+    footer { background: var(--dark2); color: var(--white); padding: 50px 5% 24px; }
+    .footer-bottom { display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: rgba(255,255,255,0.25); flex-wrap: wrap; gap: 0.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.07); }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; font-family: 'Josefin Sans', sans-serif; letter-spacing: 0.1em; text-transform: uppercase; color: var(--white); text-decoration: none; }
+    .footer-brand span { color: var(--primary); }
+
+    /* ── CUSTOM MODAL ── */
+    #biz-modal-overlay { position:fixed; inset:0; z-index:10000; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0); backdrop-filter:blur(0px); transition:background 0.25s, backdrop-filter 0.25s; pointer-events:none; }
+    #biz-modal-overlay.open { background:rgba(0,0,0,0.55); backdrop-filter:blur(4px); pointer-events:all; }
+    #biz-modal { background:#fff; border-radius:18px; width:min(420px, 90vw); padding:0; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,0.22); transform:scale(0.85) translateY(20px); opacity:0; transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.25s ease; }
+    #biz-modal-overlay.open #biz-modal { transform:scale(1) translateY(0); opacity:1; }
+    #biz-modal-header { padding:22px 24px 16px; display:flex; align-items:center; gap:14px; }
+    #biz-modal-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0; }
+    #biz-modal-title { font-family:'Josefin Sans',sans-serif; font-weight:700; font-size:1rem; letter-spacing:0.04em; }
+    #biz-modal-body { padding:0 24px 22px; font-size:0.9rem; line-height:1.6; color:#555; }
+    #biz-modal-footer { padding:14px 20px; background:#f8f8f8; border-top:1px solid #ebebeb; display:flex; gap:10px; justify-content:flex-end; }
+    .biz-modal-btn { padding:10px 22px; border-radius:8px; font-family:'Josefin Sans',sans-serif; font-weight:700; font-size:0.78rem; letter-spacing:0.08em; text-transform:uppercase; border:none; cursor:pointer; transition:all 0.2s; display:inline-flex; align-items:center; gap:6px; }
+    .biz-modal-cancel { background:#f1f1f1; color:#555; }
+    .biz-modal-cancel:hover { background:#e0e0e0; }
+    .biz-modal-ok { color:#fff; }
+    /* types */
+    .modal-danger  #biz-modal-header { background:rgba(239,68,68,0.06); }
+    .modal-danger  #biz-modal-icon   { background:rgba(239,68,68,0.12); color:#dc2626; }
+    .modal-danger  #biz-modal-title  { color:#991b1b; }
+    .modal-danger  .biz-modal-ok     { background:#ef4444; }
+    .modal-danger  .biz-modal-ok:hover { background:#dc2626; }
+    .modal-warning #biz-modal-header { background:rgba(255,190,51,0.07); }
+    .modal-warning #biz-modal-icon   { background:rgba(255,190,51,0.15); color:#b45309; }
+    .modal-warning #biz-modal-title  { color:#92400e; }
+    .modal-warning .biz-modal-ok     { background:#fbbf24; color:#422006; }
+    .modal-warning .biz-modal-ok:hover { background:#f59e0b; }
+    .modal-success #biz-modal-header { background:rgba(34,197,94,0.06); }
+    .modal-success #biz-modal-icon   { background:rgba(34,197,94,0.12); color:#16a34a; }
+    .modal-success #biz-modal-title  { color:#166534; }
+    .modal-success .biz-modal-ok     { background:#22c55e; }
+    .modal-success .biz-modal-ok:hover { background:#16a34a; }
+    .modal-info    #biz-modal-header { background:rgba(59,130,246,0.06); }
+    .modal-info    #biz-modal-icon   { background:rgba(59,130,246,0.12); color:#2563eb; }
+    .modal-info    #biz-modal-title  { color:#1d4ed8; }
+    .modal-info    .biz-modal-ok     { background:#3b82f6; }
+    .modal-info    .biz-modal-ok:hover { background:#2563eb; }
+
+    /* ── ANIM ── */
+    .fade-up { opacity: 0; transform: translateY(24px); transition: opacity 0.55s ease, transform 0.55s ease; }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+    .fade-up.d1 { transition-delay: 0.1s; } .fade-up.d2 { transition-delay: 0.2s; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) { .nav-links { display: none; } .hamburger { display: flex; } }
+
+    /* ══════════════════════════════════════════════
+       CART DRAWER (offcanvas)
+    ══════════════════════════════════════════════ */
+    #cart-overlay {
+      position: fixed; inset: 0; z-index: 1100;
+      background: rgba(0,0,0,0);
+      backdrop-filter: blur(0px);
+      pointer-events: none;
+      transition: background 0.3s, backdrop-filter 0.3s;
+    }
+    #cart-overlay.open {
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(3px);
+      pointer-events: all;
+    }
+
+    #cart-drawer {
+      position: fixed; top: 0; right: 0; bottom: 0;
+      width: min(400px, 92vw);
+      z-index: 1101;
+      background: #fff;
+      display: flex; flex-direction: column;
+      box-shadow: -8px 0 40px rgba(0,0,0,0.18);
+      transform: translateX(100%);
+      transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+    }
+    #cart-drawer.open { transform: translateX(0); }
+
+    /* Header drawer */
+    .cart-drawer-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 20px 16px;
+      border-bottom: 1.5px solid #ebebeb;
+      flex-shrink: 0;
+    }
+    .cart-drawer-title {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 0.85rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: #1e293b;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .cart-drawer-title .cnt {
+      background: #ffbe33; color: #1e293b;
+      font-size: 0.65rem; font-weight: 900;
+      border-radius: 100px; padding: 2px 8px;
+    }
+    .cart-drawer-close {
+      background: none; border: none; cursor: pointer;
+      width: 34px; height: 34px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #64748b; font-size: 1rem;
+      transition: background 0.2s, color 0.2s;
+    }
+    .cart-drawer-close:hover { background: #f1f5f9; color: #1e293b; }
+
+    /* Loading spinner */
+    .cart-drawer-loading {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 12px;
+      color: #94a3b8; font-size: 0.82rem;
+      font-family: 'Josefin Sans', sans-serif;
+    }
+    .cart-drawer-loading .spin {
+      width: 32px; height: 32px; border: 3px solid #e2e8f0;
+      border-top-color: #ffbe33; border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Body: flex column, clips overflow — items scroll, footer stays pinned */
+    #cart-drawer-body {
+      flex: 1; overflow: hidden; display: flex; flex-direction: column; min-height: 0;
+    }
+
+    /* ── Items — seule zone scrollable ── */
+    .cart-sb-items {
+      flex: 1; overflow-y: auto; padding: 12px 16px; min-height: 0;
+      /* Scrollbar fine */
+      scrollbar-width: thin;
+      scrollbar-color: #e2e8f0 transparent;
+    }
+    .cart-sb-items::-webkit-scrollbar { width: 4px; }
+    .cart-sb-items::-webkit-scrollbar-track { background: transparent; }
+    .cart-sb-items::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
+    .cart-sb-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 14px 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .cart-sb-item:last-child { border-bottom: none; }
+    .cart-sb-item-icon {
+      width: 42px; height: 42px; border-radius: 10px;
+      background: rgba(255,190,51,0.1);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .cart-sb-item-info { flex: 1; min-width: 0; }
+    .cart-sb-item-name {
+      font-family: 'Josefin Sans', sans-serif; font-size: 0.82rem; font-weight: 700;
+      color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      margin-bottom: 2px;
+    }
+    .cart-sb-item-price { font-size: 0.75rem; color: #94a3b8; margin-bottom: 6px; }
+    .cart-sb-qty-form { display: inline-block; }
+    .cart-sb-qty-row { display: flex; align-items: center; gap: 4px; }
+    .cart-sb-qty-btn {
+      width: 24px; height: 24px; border: 1.5px solid #e2e8f0;
+      background: #f8fafc; border-radius: 6px; cursor: pointer;
+      font-size: 0.9rem; font-weight: 700; color: #475569;
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.2s, background 0.2s;
+      padding: 0;
+    }
+    .cart-sb-qty-btn:hover { border-color: #ffbe33; background: rgba(255,190,51,0.08); }
+    .cart-sb-qty-input {
+      width: 40px; height: 24px; border: 1.5px solid #e2e8f0; border-radius: 6px;
+      text-align: center; font-size: 0.78rem; font-weight: 700;
+      background: #fff; color: #1e293b; outline: none;
+      font-family: 'Josefin Sans', sans-serif;
+    }
+    .cart-sb-qty-input:focus { border-color: #ffbe33; }
+    .cart-sb-item-total {
+      font-family: 'Josefin Sans', sans-serif; font-size: 0.82rem; font-weight: 800;
+      color: #1e293b; text-align: right; flex-shrink: 0;
+      min-width: 52px;
+    }
+    .cart-sb-remove {
+      background: none; border: none; cursor: pointer;
+      width: 28px; height: 28px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      color: #cbd5e1; font-size: 0.75rem;
+      transition: color 0.2s, background 0.2s;
+      flex-shrink: 0;
+    }
+    .cart-sb-remove:hover { color: #ef4444; background: rgba(239,68,68,0.07); }
+
+    /* ── Footer ── */
+    .cart-sb-footer {
+      padding: 16px; border-top: 1.5px solid #ebebeb; flex-shrink: 0;
+      background: #f8fafc;
+    }
+    .cart-sb-totaux { display: flex; flex-direction: column; gap: 6px; }
+    .cart-sb-total-row {
+      display: flex; justify-content: space-between;
+      font-size: 0.82rem; color: #475569;
+    }
+    .cart-sb-grand {
+      font-family: 'Josefin Sans', sans-serif; font-weight: 800;
+      color: #1e293b; font-size: 0.9rem;
+      border-top: 1.5px solid #e2e8f0; padding-top: 8px; margin-top: 4px;
+    }
+    .cart-sb-checkout {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 12px;
+      background: linear-gradient(135deg,#ffbe33,#e0a820);
+      color: #1e293b; border: none; border-radius: 10px; cursor: pointer;
+      font-family: 'Josefin Sans', sans-serif; font-weight: 800;
+      font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.08em;
+      text-decoration: none; transition: opacity 0.2s;
+    }
+    .cart-sb-checkout:hover { opacity: 0.88; }
+    .cart-sb-continue {
+      flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 10px 12px; background: #fff; border: 1.5px solid #e2e8f0;
+      border-radius: 8px; font-family: 'Josefin Sans', sans-serif;
+      font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: #475569; text-decoration: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .cart-sb-continue:hover { border-color: #94a3b8; color: #1e293b; }
+    .cart-sb-clear {
+      flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 10px 12px; background: #fff; border: 1.5px solid #fecaca;
+      border-radius: 8px; font-family: 'Josefin Sans', sans-serif;
+      font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: #ef4444; cursor: pointer;
+      transition: background 0.2s; width: 100%;
+    }
+    .cart-sb-clear:hover { background: rgba(239,68,68,0.06); }
+
+    /* Empty state — inside the scrollable items zone */
+    .cart-sb-empty {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 60px 20px; text-align: center;
+    }
+
+    /* Cart toggle button in navbar */
+    .cart-toggle-btn {
+      position: relative; background: none; border: none; cursor: pointer;
+      padding: 6px 10px; border-radius: 8px; color: rgba(255,255,255,0.75);
+      font-size: 1.1rem; transition: color 0.2s, background 0.2s;
+      display: flex; align-items: center;
+    }
+    .cart-toggle-btn:hover { color: #fff; background: rgba(255,255,255,0.08); }
+    .cart-toggle-btn .badge-cart {
+      position: absolute; top: 0px; right: 0px;
+      background: #ef4444; color: #fff;
+      font-size: 0.55rem; font-weight: 900;
+      border-radius: 50%; min-width: 16px; height: 16px;
+      display: none; align-items: center; justify-content: center;
+      padding: 0 3px; border: 2px solid rgba(34,40,49,0.97);
+    }
+    .cart-toggle-btn .badge-cart.visible { display: flex; }
+  </style>
+  {% block stylesheets %}{% endblock %}
+</head>
+<body>
+
+{# Custom confirm modal #}
+<div id="biz-modal-overlay">
+  <div id="biz-modal">
+    <div id="biz-modal-header">
+      <div id="biz-modal-icon"><i id="biz-modal-icon-i" class="fa fa-question-circle"></i></div>
+      <div id="biz-modal-title">Confirmation</div>
+    </div>
+    <div id="biz-modal-body"></div>
+    <div id="biz-modal-footer">
+      <button class="biz-modal-btn biz-modal-cancel" id="biz-modal-cancel"><i class="fa fa-times"></i> Annuler</button>
+      <button class="biz-modal-btn biz-modal-ok" id="biz-modal-ok"><i class="fa fa-check"></i> Confirmer</button>
+    </div>
+  </div>
+</div>
+
+{# Mobile nav #}
+<div class="mobile-nav" id="mobileNav">
+  <button class="mobile-close" id="mobileClose"><i class="fa fa-times"></i></button>
+  <a href="{{ path('app_front_index') }}"><i class="fa fa-home"></i> Home</a>
+  <a href="{{ path('produit_index') }}" class="{{ app.request.attributes.get('_route') starts with 'produit' ? 'active' : '' }}"><i class="fa fa-store"></i> Marketplace</a>
+  {% if app.user %}
+    {% if app.user.userType == 'startup' %}
+      <a href="#" onclick="document.getElementById('mobileNav').classList.remove('open'); openCartDrawer(); return false;"><i class="fa fa-shopping-cart"></i> Panier <span class="badge-cart" id="cartBadgeMobile" style="display:none;"></span></a>
+      <a href="{{ path('commande_index') }}" class="{{ app.request.attributes.get('_route') starts with 'commande' and app.request.attributes.get('_route') != 'commande_investisseur_recues' ? 'active' : '' }}"><i class="fa fa-file-invoice"></i> Mes Commandes</a>
+      <a href="{{ path('tracking_index') }}" class="{{ app.request.attributes.get('_route') starts with 'tracking' ? 'active' : '' }}"><i class="fa fa-radar"></i> Suivi</a>
+    {% elseif app.user.userType == 'investisseur' %}
+      <a href="{{ path('produit_mes') }}" class="{{ app.request.attributes.get('_route') == 'produit_mes' ? 'active' : '' }}"><i class="fa fa-store"></i> Mes Produits</a>
+      <a href="{{ path('commande_investisseur_recues') }}" class="{{ app.request.attributes.get('_route') == 'commande_investisseur_recues' ? 'active' : '' }}"><i class="fa fa-inbox"></i> Commandes reçues</a>
+    {% endif %}
+    <a href="{{ path('app_logout') }}" style="color:var(--primary);"><i class="fa fa-sign-out-alt"></i> Déconnexion</a>
+  {% endif %}
+</div>
+
+{# Navbar #}
+<nav class="navbar" id="mainNav">
+  <a href="{{ path('app_front_index') }}" class="nav-brand">
+    <span class="brand-name">Biz<span>Hub</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="{{ path('app_front_index') }}"><i class="fa fa-home"></i> Home</a></li>
+    <li><a href="{{ path('produit_index') }}" class="{{ app.request.attributes.get('_route') starts with 'produit' ? 'active' : '' }}"><i class="fa fa-store"></i> Marketplace</a></li>
+    {% if app.user %}
+      {% if app.user.userType == 'startup' %}
+        <li>
+          <button class="cart-toggle-btn" id="cartToggle" onclick="openCartDrawer()" aria-label="Ouvrir le panier">
+            <i class="fa fa-shopping-cart"></i>
+            <span class="badge-cart" id="cartBadge"></span>
+          </button>
+        </li>
+        <li><a href="{{ path('commande_index') }}" class="{{ app.request.attributes.get('_route') starts with 'commande' and app.request.attributes.get('_route') != 'commande_investisseur_recues' ? 'active' : '' }}"><i class="fa fa-file-invoice"></i> Mes Commandes</a></li>
+        <li><a href="{{ path('tracking_index') }}" class="{{ app.request.attributes.get('_route') starts with 'tracking' ? 'active' : '' }}"><i class="fa fa-radar"></i> Suivi</a></li>
+      {% elseif app.user.userType == 'investisseur' %}
+        <li><a href="{{ path('produit_mes') }}" class="btn-nav {{ app.request.attributes.get('_route') == 'produit_mes' ? 'active' : '' }}"><i class="fa fa-store"></i> Mes Produits</a></li>
+        <li><a href="{{ path('commande_investisseur_recues') }}" class="{{ app.request.attributes.get('_route') == 'commande_investisseur_recues' ? 'active' : '' }}"><i class="fa fa-inbox"></i> Commandes reçues</a></li>
+      {% endif %}
+      <li>
+        <a href="{{ path('app_logout') }}" class="btn-nav" style="display:inline-flex; align-items:center; gap:6px; font-size:0.78rem;">
+          <i class="fa fa-sign-out-alt"></i> Déconnexion
+        </a>
+      </li>
+    {% endif %}
+  </ul>
+  <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+</nav>
+
+{# Toast container #}
+<div id="toast-container"></div>
+
+{# ══ CART DRAWER ══════════════════════════════════════════════════════ #}
+{% if app.user and app.user.userType == 'startup' %}
+<div id="cart-overlay" onclick="closeCartDrawer()"></div>
+<div id="cart-drawer" role="dialog" aria-label="Panier" aria-modal="true">
+  <div class="cart-drawer-head">
+    <div class="cart-drawer-title">
+      <i class="fa fa-shopping-cart" style="color:#ffbe33;"></i>
+      Mon Panier
+      <span class="cnt" id="cartDrawerCount">0</span>
+    </div>
+    <button class="cart-drawer-close" onclick="closeCartDrawer()" aria-label="Fermer">
+      <i class="fa fa-times"></i>
+    </button>
+  </div>
+  <div id="cart-drawer-body">
+    <div class="cart-drawer-loading">
+      <div class="spin"></div>
+      Chargement…
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{# Flash data for JS #}
+{% set _flashes = app.flashes %}
+{% if _flashes|length > 0 %}
+<script>
+window.__flashMessages = [
+  {% for type, messages in _flashes %}
+    {% for msg in messages %}
+      { type: {{ type|json_encode|raw }}, msg: {{ msg|json_encode|raw }} },
+    {% endfor %}
+  {% endfor %}
+];
+</script>
+{% else %}
+<script>window.__flashMessages = [];</script>
+{% endif %}
+
+{# Page hero #}
+{% block page_hero %}
+<div class="page-hero" style="{{ block('page_hero') is defined ? '' : '' }}">
+  <div class="page-hero-bg"></div>
+  <div class="page-hero-overlay"></div>
+  <div class="page-hero-content">
+    <div class="page-hero-eyebrow">{% block hero_eyebrow %}Marketplace{% endblock %}</div>
+    <h1>{% block hero_title %}<span>BizHub</span> Marketplace{% endblock %}</h1>
+  </div>
+  <div class="breadcrumb-bar">
+    <a href="{{ path('app_front_index') }}">Home</a> <i class="fa fa-chevron-right" style="font-size:.55rem"></i>
+    <a href="{{ path('produit_index') }}">Marketplace</a>
+    {% block breadcrumb_extra %}{% endblock %}
+  </div>
+</div>
+{% endblock %}
+
+{# Main content #}
+<main>
+  {% block body %}{% endblock %}
+</main>
+
+{# Footer #}
+<footer>
+  <div class="footer-bottom">
+    <a href="{{ path('app_front_index') }}" class="footer-brand">Biz<span>Hub</span></a>
+    <span>© {{ "now"|date("Y") }} BizHub Platform. Tous droits réservés.</span>
+  </div>
+</footer>
+
+<script>
+  // Hamburger menu
+  document.getElementById('hamburger').addEventListener('click', () => document.getElementById('mobileNav').classList.add('open'));
+  document.getElementById('mobileClose').addEventListener('click', () => document.getElementById('mobileNav').classList.remove('open'));
+  window.addEventListener('scroll', () => document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 50));
+
+  /* ══ CART DRAWER ══════════════════════════════════════════════════ */
+  var _cartLoaded   = false;
+  var _cartOpen     = false;
+
+  function openCartDrawer() {
+    var overlay = document.getElementById('cart-overlay');
+    var drawer  = document.getElementById('cart-drawer');
+    if (!overlay || !drawer) return;
+    overlay.classList.add('open');
+    drawer.classList.add('open');
+    _cartOpen = true;
+    document.body.style.overflow = 'hidden';
+    loadCartDrawer();
+  }
+
+  function closeCartDrawer() {
+    var overlay = document.getElementById('cart-overlay');
+    var drawer  = document.getElementById('cart-drawer');
+    if (!overlay || !drawer) return;
+    overlay.classList.remove('open');
+    drawer.classList.remove('open');
+    _cartOpen = false;
+    document.body.style.overflow = '';
+  }
+
+  // Expose globally so _sidebar.html.twig can call it
+  window.closeCartDrawer = closeCartDrawer;
+  window.openCartDrawer  = openCartDrawer;
+
+  function loadCartDrawer(forceReload) {
+    var body = document.getElementById('cart-drawer-body');
+    if (!body) return;
+    body.innerHTML = '<div class="cart-drawer-loading"><div class="spin"></div>Chargement…</div>';
+    _cartLoaded = false;
+
+    fetch('{{ path("panier_sidebar") }}', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+      .then(function(r) {
+        if (r.status === 204) { body.innerHTML = ''; return null; }
+        return r.text();
+      })
+      .then(function(html) {
+        if (!html) return;
+        body.innerHTML = html;
+        _cartLoaded = true;
+        // Intercept forms inside drawer so they reload drawer after submit
+        body.querySelectorAll('form[data-drawer-form]').forEach(function(form) {
+          form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            fetch(form.action, {
+              method: form.method || 'POST',
+              body: new FormData(form),
+              headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            }).then(function() {
+              updateCartBadge();
+              if (_cartOpen) loadCartDrawer(true);
+            });
+          });
+        });
+      })
+      .catch(function() {
+        body.innerHTML = '<div style="padding:20px;text-align:center;color:#ef4444;font-size:0.82rem;">Erreur de chargement.</div>';
+      });
+  }
+
+  // +/- qty buttons in drawer
+  function sbQty(btn, delta) {
+    var input = btn.parentElement.querySelector('input[type="number"]');
+    var val   = parseInt(input.value, 10) || 1;
+    var min   = parseInt(input.min, 10)   || 1;
+    var max   = parseInt(input.max, 10)   || 999;
+    input.value = Math.min(max, Math.max(min, val + delta));
+    input.dispatchEvent(new Event('change'));
+  }
+  window.sbQty = sbQty;
+
+  // Escape key closes drawer
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && _cartOpen) closeCartDrawer();
+  });
+
+  // ── Cart badge update ──────────────────────────────────────────────
+  function updateCartBadge() {
+    fetch('{{ path("panier_badge") }}')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var badge       = document.getElementById('cartBadge');
+        var badgeMobile = document.getElementById('cartBadgeMobile');
+        var cnt         = document.getElementById('cartDrawerCount');
+        if (data.count > 0) {
+          if (badge)       { badge.textContent = data.count; badge.classList.add('visible'); }
+          if (badgeMobile) { badgeMobile.textContent = data.count; badgeMobile.style.display = 'inline-block'; }
+          if (cnt)           cnt.textContent = data.count;
+        } else {
+          if (badge)       badge.classList.remove('visible');
+          if (badgeMobile) badgeMobile.style.display = 'none';
+          if (cnt)         cnt.textContent = '0';
+        }
+      });
+  }
+
+  updateCartBadge();
+
+  // Re-run badge after panier_add form submits
+  document.querySelectorAll('form[action*="panier_add"]').forEach(function(form) {
+    form.addEventListener('submit', function() { setTimeout(updateCartBadge, 600); });
+  });
+  var _addObserver = new MutationObserver(function() {
+    document.querySelectorAll('form[action*="panier_add"]').forEach(function(form) {
+      if (!form.dataset.observed) {
+        form.dataset.observed = 'true';
+        form.addEventListener('submit', function() { setTimeout(updateCartBadge, 600); });
+      }
+    });
+  });
+  _addObserver.observe(document.body, { childList: true, subtree: true });
+
+  const obs = new IntersectionObserver(entries => { entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); }}); }, {threshold:0.1});
+  document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+</script>
+<script>
+/* ══════════════════ CUSTOM MODAL ══════════════════ */
+(function() {
+  var overlay  = document.getElementById('biz-modal-overlay');
+  var modal    = document.getElementById('biz-modal');
+  var titleEl  = document.getElementById('biz-modal-title');
+  var bodyEl   = document.getElementById('biz-modal-body');
+  var iconEl   = document.getElementById('biz-modal-icon-i');
+  var okBtn    = document.getElementById('biz-modal-ok');
+  var cancelBtn= document.getElementById('biz-modal-cancel');
+  var pendingForm = null;
+
+  var CONFIGS = {
+    danger:  { icon:'fa-trash-alt',        title:'Supprimer',   ok:'Supprimer',   okIcon:'fa-trash' },
+    warning: { icon:'fa-exclamation-triangle', title:'Annuler',  ok:'Oui, annuler', okIcon:'fa-times' },
+    success: { icon:'fa-check-circle',     title:'Confirmer',   ok:'Confirmer',   okIcon:'fa-check' },
+    info:    { icon:'fa-redo',             title:'Reorder',     ok:'Recréer',     okIcon:'fa-redo'  },
+    deliver: { icon:'fa-truck',            title:'Livraison',   ok:'Marquer livré', okIcon:'fa-truck'},
+  };
+
+  function openModal(type, message, form) {
+    var cfg = CONFIGS[type] || CONFIGS.success;
+    var modalType = type === 'deliver' ? 'success' : type;
+
+    // Reset classes
+    modal.className = '';
+    modal.classList.add('modal-' + modalType);
+
+    iconEl.className  = 'fa ' + cfg.icon;
+    titleEl.textContent = cfg.title;
+    bodyEl.textContent  = message;
+    okBtn.innerHTML = '<i class="fa ' + cfg.okIcon + '"></i> ' + cfg.ok;
+    pendingForm = form;
+    overlay.classList.add('open');
+  }
+
+  function closeModal() { overlay.classList.remove('open'); pendingForm = null; }
+
+  okBtn.addEventListener('click', function() {
+    if (pendingForm) { pendingForm.removeAttribute('data-confirm'); pendingForm.submit(); }
+    closeModal();
+  });
+  cancelBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
+
+  // Intercept all forms with data-confirm
+  document.addEventListener('submit', function(e) {
+    var form = e.target;
+    if (!form.hasAttribute('data-confirm')) return;
+    e.preventDefault();
+    var type = form.getAttribute('data-confirm-type') || 'warning';
+    var msg  = form.getAttribute('data-confirm');
+    openModal(type, msg, form);
+  }, true);
+
+  window.bizConfirm = openModal;
+})();
+</script>
+
+<script>
+(function() {
+  var ICONS = {
+    success: 'fa-check-circle',
+    danger:  'fa-times-circle',
+    warning: 'fa-exclamation-triangle',
+    error:   'fa-times-circle',
+    info:    'fa-info-circle'
+  };
+  var TITLES = {
+    success: 'Succès',
+    danger:  'Erreur',
+    warning: 'Attention',
+    error:   'Erreur',
+    info:    'Info'
+  };
+  var DURATION = 4500;
+
+  function showToast(type, message) {
+    var t = type === 'error' ? 'danger' : type;
+    var container = document.getElementById('toast-container');
+    var toast = document.createElement('div');
+    toast.className = 'toast toast-' + t;
+
+    toast.innerHTML =
+      '<div class="toast-body">' +
+        '<div class="toast-icon"><i class="fa ' + (ICONS[type] || 'fa-bell') + '"></i></div>' +
+        '<div class="toast-text">' +
+          '<div class="toast-title">' + (TITLES[type] || 'Notification') + '</div>' +
+          '<div class="toast-msg">' + message + '</div>' +
+        '</div>' +
+        '<button class="toast-close" onclick="closeToast(this.parentElement.parentElement)"><i class="fa fa-times"></i></button>' +
+      '</div>' +
+      '<div class="toast-bar" style="animation-duration:' + DURATION + 'ms;"></div>';
+
+    container.appendChild(toast);
+    // trigger reflow then show
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() { toast.classList.add('show'); });
+    });
+
+    var timer = setTimeout(function() { closeToast(toast); }, DURATION);
+    toast._timer = timer;
+    toast.addEventListener('mouseenter', function() { clearTimeout(toast._timer); toast.querySelector('.toast-bar').style.animationPlayState = 'paused'; });
+    toast.addEventListener('mouseleave', function() {
+      toast.querySelector('.toast-bar').style.animationPlayState = 'running';
+      toast._timer = setTimeout(function() { closeToast(toast); }, 1200);
+    });
+  }
+
+  window.closeToast = function(toast) {
+    clearTimeout(toast._timer);
+    toast.classList.remove('show');
+    toast.classList.add('hide');
+    setTimeout(function() { if (toast.parentElement) toast.parentElement.removeChild(toast); }, 350);
+  };
+
+  // Show queued flash messages
+  document.addEventListener('DOMContentLoaded', function() {
+    if (window.__flashMessages) {
+      window.__flashMessages.forEach(function(f, i) {
+        setTimeout(function() { showToast(f.type, f.msg); }, i * 150);
+      });
+    }
+  });
+
+  // Expose globally for dynamic use
+  window.showToast = showToast;
+})();
+</script>
+{% block javascripts %}{% endblock %}
+</body>
+</html>

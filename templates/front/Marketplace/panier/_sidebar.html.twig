@@ -1,0 +1,100 @@
+{% if details|length > 0 %}
+
+  {# ── Liste des articles ── #}
+  <div class="cart-sb-items">
+    {% for detail in details %}
+      <div class="cart-sb-item">
+        {# Icône produit #}
+        <div class="cart-sb-item-icon">
+          <i class="fa fa-box" style="color:var(--primary); font-size:1rem;"></i>
+        </div>
+
+        {# Infos #}
+        <div class="cart-sb-item-info">
+          <div class="cart-sb-item-name">{{ detail.produit ? detail.produit.nom : 'Produit supprimé' }}</div>
+          <div class="cart-sb-item-price">{{ detail.prix_unit }} TND / unité</div>
+
+          {# Quantité éditable #}
+          <form method="POST" action="{{ path('panier_update', {id: detail.item.idPanier}) }}"
+                class="cart-sb-qty-form" data-drawer-form>
+            <input type="hidden" name="_token" value="{{ csrf_token('update_panier_' ~ detail.item.idPanier) }}">
+            <div class="cart-sb-qty-row">
+              <button type="button" class="cart-sb-qty-btn" onclick="sbQty(this,-1)">−</button>
+              <input type="number" name="quantite" value="{{ detail.item.quantite }}" min="1"
+                     max="{{ detail.produit ? detail.produit.quantite : 99 }}"
+                     class="cart-sb-qty-input"
+                     onchange="this.form.requestSubmit()">
+              <button type="button" class="cart-sb-qty-btn" onclick="sbQty(this,1)">+</button>
+            </div>
+          </form>
+        </div>
+
+        {# Total ligne #}
+        <div class="cart-sb-item-total">
+          {{ detail.total_ht|number_format(3, '.', ' ') }}<br>
+          <span style="font-size:0.65rem; color:#94a3b8; font-weight:400;">TND</span>
+        </div>
+
+        {# Supprimer #}
+        <form method="POST" action="{{ path('panier_remove', {id: detail.item.idPanier}) }}"
+              data-drawer-form>
+          <input type="hidden" name="_token" value="{{ csrf_token('remove_panier_' ~ detail.item.idPanier) }}">
+          <button type="submit" class="cart-sb-remove" title="Retirer">
+            <i class="fa fa-times"></i>
+          </button>
+        </form>
+      </div>
+    {% endfor %}
+  </div>
+
+  {# ── Résumé & actions ── #}
+  <div class="cart-sb-footer">
+    <div class="cart-sb-totaux">
+      <div class="cart-sb-total-row">
+        <span>Sous-total HT</span>
+        <span>{{ total_ht|number_format(3, '.', ' ') }} TND</span>
+      </div>
+      <div class="cart-sb-total-row">
+        <span style="color:#94a3b8;">TVA (19%)</span>
+        <span style="color:#94a3b8;">{{ tva|number_format(3, '.', ' ') }} TND</span>
+      </div>
+      <div class="cart-sb-total-row cart-sb-grand">
+        <span>Total TTC</span>
+        <span style="color:#ffbe33; font-size:1.15rem;">{{ ttc|number_format(3, '.', ' ') }} <small style="font-size:0.72rem; color:#94a3b8;">TND</small></span>
+      </div>
+    </div>
+
+    <form method="POST" action="{{ path('commande_passer') }}" style="margin-top:1rem;">
+      <input type="hidden" name="_token" value="{{ csrf_token('passer_commande') }}">
+      <button type="submit" class="cart-sb-checkout" onclick="if(window.closeCartDrawer) closeCartDrawer()">
+        <i class="fa fa-check-circle"></i> Passer commande
+      </button>
+    </form>
+
+    <div style="display:flex; gap:0.5rem; margin-top:0.6rem;">
+      <a href="{{ path('produit_index') }}" class="cart-sb-continue" onclick="closeCartDrawer()">
+        <i class="fa fa-store"></i> Continuer
+      </a>
+      <form method="POST" action="{{ path('panier_vider') }}" style="flex:1;" data-drawer-form>
+        <input type="hidden" name="_token" value="{{ csrf_token('vider_panier') }}">
+        <button type="submit" class="cart-sb-clear">
+          <i class="fa fa-trash"></i> Vider
+        </button>
+      </form>
+    </div>
+  </div>
+
+{% else %}
+
+  <div class="cart-sb-items">
+    <div class="cart-sb-empty">
+      <i class="fa fa-shopping-cart" style="font-size:2.5rem; color:#ffbe33; margin-bottom:1rem; display:block;"></i>
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:0.9rem; font-weight:700; color:#1e293b; margin-bottom:0.4rem;">Panier vide</div>
+      <div style="font-size:0.82rem; color:#94a3b8; margin-bottom:1.5rem;">Explorez le catalogue et ajoutez des produits.</div>
+      <a href="{{ path('produit_index') }}" class="cart-sb-checkout" onclick="closeCartDrawer()">
+        <i class="fa fa-store"></i> Voir le catalogue
+      </a>
+    </div>
+  </div>
+
+{% endif %}
