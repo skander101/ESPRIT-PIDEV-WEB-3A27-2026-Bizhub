@@ -75,14 +75,8 @@ class FrontInvestissementController extends AbstractController
             return $this->redirectToRoute('app_front_projet_index');
         }
 
-        // 3. Seuls les projets publiés / en cours acceptent des investissements.
-        // Support des anciens statuts (publie, en_cours) pendant la transition.
-        $statutsOuverts = [
-            Project::STATUS_PUBLIE,
-            Project::STATUS_EN_COURS,
-            'publie',
-            'en_cours',
-        ];
+        // 3. Seuls les projets publiés ou en cours acceptent des investissements
+        $statutsOuverts = [Project::STATUS_PUBLIE, Project::STATUS_EN_COURS];
         if (!in_array($projet->getStatus(), $statutsOuverts)) {
             $this->addFlash('error', 'Ce projet n\'accepte pas d\'investissements pour l\'instant.');
             return $this->redirectToRoute('app_front_projet_show', ['id' => $id]);

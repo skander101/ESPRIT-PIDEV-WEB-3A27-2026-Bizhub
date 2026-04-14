@@ -97,10 +97,11 @@
                                 <div class="inv-projet-title">{{ inv.project.title }}</div>
                             </a>
                             <span class="badge badge-{{ inv.project.status }}">
-                                {% if inv.project.status == 'brouillon' or inv.project.status == 'pending' %}En attente
-                                {% elseif inv.project.status == 'publie' or inv.project.status == 'en_cours' or inv.project.status == 'in_progress' %}En cours
-                                {% elseif inv.project.status == 'finance' or inv.project.status == 'funded' %}Financé
-                                {% elseif inv.project.status == 'ferme' or inv.project.status == 'completed' %}Terminé
+                                {% if inv.project.status == 'brouillon' %}Brouillon
+                                {% elseif inv.project.status == 'publie' %}Publié
+                                {% elseif inv.project.status == 'en_cours' %}En cours
+                                {% elseif inv.project.status == 'finance' %}Financé
+                                {% elseif inv.project.status == 'ferme' %}Fermé
                                 {% else %}{{ inv.project.status }}{% endif %}
                             </span>
                         {% else %}
