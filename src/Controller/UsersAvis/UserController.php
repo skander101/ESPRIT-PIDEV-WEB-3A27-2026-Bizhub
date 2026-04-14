@@ -89,16 +89,37 @@ class UserController extends AbstractController
                 $form->get('email')->addError(new FormError('This email is already used.'));
 
                 return $this->render('signup.html.twig', ['form' => $form]);
+            } catch (\Throwable $e) {
+                $this->logger->error('Registration persistence failed.', [
+                    'flow' => 'register',
+                    'email' => (string) $user->getEmail(),
+                    'error' => $e->getMessage(),
+                    'exception_class' => $e::class,
+                ]);
+                $form->addError(new FormError('Account creation failed due to a temporary server issue. Please try again.'));
+
+                return $this->render('signup.html.twig', ['form' => $form]);
             }
 
             $verificationUrl = $this->generateUrl('app_verify_email', ['token' => $verificationToken], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
-            $this->logger->info('Dispatching verification email after registration.', [
-                'flow' => 'email_verification_register',
-                'recipient' => (string) $user->getEmail(),
-            ]);
-            $this->authMailerService->sendEmailVerification($user, $verificationUrl, 15);
+            try {
+                $this->logger->info('Dispatching verification email after registration.', [
+                    'flow' => 'email_verification_register',
+                    'recipient' => (string) $user->getEmail(),
+                ]);
+                $this->authMailerService->sendEmailVerification($user, $verificationUrl, 15);
+                $this->addFlash('success', 'Account created successfully! Please verify your email to activate your account.');
+            } catch (\Throwable $e) {
+                $this->logger->error('Verification email failed after registration.', [
+                    'flow' => 'email_verification_register',
+                    'recipient' => (string) $user->getEmail(),
+                    'error' => $e->getMessage(),
+                    'exception_class' => $e::class,
+                ]);
 
-            $this->addFlash('success', 'Account created successfully! Please verify your email to activate your account.');
+                $this->addFlash('success', 'Account created successfully.');
+                $this->addFlash('error', 'We could not send the verification email right now. You can resend it from this page.');
+            }
 
             return $this->render('auth/register_success.html.twig', [
                 'email' => $user->getEmail(),

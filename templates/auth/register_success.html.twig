@@ -194,6 +194,10 @@
                 <div class="flash-box flash-success">{{ message }}</div>
             {% endfor %}
 
+            {% for message in app.flashes('error') %}
+                <div class="flash-box flash-error">{{ message }}</div>
+            {% endfor %}
+
             <div class="success-icon">
                 <i class="fa-solid fa-envelope-circle-check"></i>
             </div>

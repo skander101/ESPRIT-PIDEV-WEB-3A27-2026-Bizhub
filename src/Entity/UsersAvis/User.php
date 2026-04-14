@@ -62,7 +62,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     private ?string $full_name = null;
 
     #[ORM\Column(type: 'string', nullable: true)]
-    #[Assert\Regex(pattern: '/^\d{8}$/', message: 'Phone number must contain exactly 8 digits (Tunisian format).')]
+    #[Assert\Regex(
+        pattern: '/^(?:\d{8}|\+?[1-9][\d\s\-]{6,20}\d)$/',
+        message: 'Phone number must be 8 local digits or an international format (e.g. +216 12 345 678).',
+        normalizer: 'trim'
+    )]
     private ?string $phone = null;
 
     #[ORM\Column(type: 'string', nullable: true)]
@@ -196,7 +200,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     public function setFull_name(string $full_name): self { $this->full_name = $full_name; return $this; }
 
     public function getPhone(): ?string { return $this->phone; }
-    public function setPhone(?string $phone): self { $this->phone = $phone; return $this; }
+    public function setPhone(?string $phone): self
+    {
+        $phone = $phone !== null ? trim($phone) : null;
+        $this->phone = $phone === '' ? null : $phone;
+
+        return $this;
+    }
 
     public function getAddress(): ?string { return $this->address; }
     public function setAddress(?string $address): self { $this->address = $address; return $this; }
