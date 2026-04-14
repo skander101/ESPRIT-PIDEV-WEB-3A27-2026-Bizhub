@@ -85,7 +85,9 @@ class CommandeController extends AbstractController
             : $toutes;
 
         $nbAttente   = count(array_filter($toutes, fn($c) => $c->getEffectiveStatut() === Commande::STATUT_ATTENTE));
-        $nbConfirmee = count(array_filter($toutes, fn($c) => in_array($c->getEffectiveStatut(), [Commande::STATUT_CONFIRMEE, Commande::STATUT_EN_COURS_PAIEMENT], true)));
+        $nbConfirmee = count(array_filter($toutes, fn($c) => $c->getEffectiveStatut() === Commande::STATUT_CONFIRMEE));
+        $nbEnCours   = count(array_filter($toutes, fn($c) => $c->getEffectiveStatut() === Commande::STATUT_EN_COURS_PAIEMENT));
+        $nbPayeeChart = count(array_filter($toutes, fn($c) => in_array($c->getEffectiveStatut(), [Commande::STATUT_PAYEE, Commande::STATUT_EN_PREPARATION], true)));
         $nbAnnulee   = count(array_filter($toutes, fn($c) => $c->getEffectiveStatut() === Commande::STATUT_ANNULEE));
         $nbLivree    = count(array_filter($toutes, fn($c) => $c->getEffectiveStatut() === Commande::STATUT_LIVREE));
 
@@ -108,14 +110,15 @@ class CommandeController extends AbstractController
             'stats'         => [
                 'total'      => count($toutes),
                 'en_attente' => $nbAttente,
-                'confirmees' => $nbConfirmee,
+                'confirmees' => $nbConfirmee + $nbEnCours,
                 'annulees'   => $nbAnnulee,
                 'livrees'    => $nbLivree,
                 'payees'     => count(array_filter($toutes, fn($c) => $c->isEstPayee())),
             ],
             'chart_data'    => [
                 $nbAttente,
-                $nbConfirmee,
+                $nbConfirmee + $nbEnCours,
+                $nbPayeeChart,
                 $nbAnnulee,
                 $nbLivree,
             ],

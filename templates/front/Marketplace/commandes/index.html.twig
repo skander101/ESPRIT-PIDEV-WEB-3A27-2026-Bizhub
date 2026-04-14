@@ -54,11 +54,13 @@
         <div style="display:flex; flex-direction:column; gap:10px;">
           {% set pct_attente   = stats.total > 0 ? ((stats.en_attente  / stats.total) * 100)|round(1) : 0 %}
           {% set pct_confirmee = stats.total > 0 ? ((stats.confirmees  / stats.total) * 100)|round(1) : 0 %}
+          {% set pct_payee     = stats.total > 0 ? ((stats.payees      / stats.total) * 100)|round(1) : 0 %}
           {% set pct_annulee   = stats.total > 0 ? ((stats.annulees    / stats.total) * 100)|round(1) : 0 %}
           {% set pct_livree    = stats.total > 0 ? ((stats.livrees     / stats.total) * 100)|round(1) : 0 %}
           {% for item in [
             {label: 'En attente',  count: stats.en_attente, pct: pct_attente,   color: '#ffc107'},
             {label: 'Confirmée',   count: stats.confirmees, pct: pct_confirmee, color: '#28a745'},
+            {label: 'Payée',       count: stats.payees,     pct: pct_payee,     color: '#10b981'},
             {label: 'Annulée',     count: stats.annulees,   pct: pct_annulee,   color: '#dc3545'},
             {label: 'Livrée',      count: stats.livrees,    pct: pct_livree,    color: '#0d6efd'}
           ] %}
@@ -239,10 +241,10 @@
   new Chart(ctx, {
     type: 'doughnut',
     data: {
-      labels: ['En attente', 'Confirmée', 'Annulée', 'Livrée'],
+      labels: ['En attente', 'Confirmée', 'Payée', 'Annulée', 'Livrée'],
       datasets: [{
         data: {{ chart_data|json_encode|raw }},
-        backgroundColor: ['#ffc107', '#28a745', '#dc3545', '#0d6efd'],
+        backgroundColor: ['#ffc107', '#28a745', '#10b981', '#dc3545', '#0d6efd'],
         borderColor: '#fff',
         borderWidth: 3,
         hoverOffset: 8
