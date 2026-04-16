@@ -6,6 +6,7 @@ use App\Entity\Marketplace\Commande;
 use App\Entity\Marketplace\CommandeLigne;
 use App\Entity\Marketplace\CommandeStatusHistory;
 use App\Event\CommandeConfirmeeEvent;
+use App\Repository\Marketplace\AutoConfirmNotificationRepository;
 use App\Repository\Marketplace\CommandeRepository;
 use App\Repository\Marketplace\PanierRepository;
 use App\Repository\Marketplace\ProduitServiceRepository;
@@ -143,6 +144,7 @@ class CommandeController extends AbstractController
         EntityManagerInterface $em,
         OrderScoringService $scoringService,
         UserRepository $userRepo,
+        EventDispatcherInterface $dispatcher,
     ): Response {
         if ($r = $this->requireStartup()) return $r;
 
@@ -206,7 +208,12 @@ class CommandeController extends AbstractController
 
             if ($decision === 'auto_confirm') {
                 $commande->setStatut(Commande::STATUT_CONFIRMEE);
-                $this->addFlash('success', '✅ Commande #' . $commande->getIdCommande() . ' auto-confirmée (score : ' . $score . '/100).');
+                $em->flush();
+                $dispatcher->dispatch(
+                    new CommandeConfirmeeEvent($commande, null),
+                    CommandeConfirmeeEvent::NAME
+                );
+                $this->addFlash('success', '✅ Commande #' . $commande->getIdCommande() . ' auto-confirmée (score : ' . $score . '/100). Notification WhatsApp envoyée.');
             } elseif ($decision === 'auto_reject') {
                 $commande->setStatut(Commande::STATUT_ANNULEE);
                 $this->addFlash('warning', '⚠️ Commande #' . $commande->getIdCommande() . ' rejetée automatiquement (score trop faible : ' . $score . '/100).');
@@ -276,7 +283,7 @@ class CommandeController extends AbstractController
     // ════════════════════════════════════════════════════════════════════
 
     #[Route('/investisseur/recues', name: 'investisseur_recues', methods: ['GET'])]
-    public function recues(CommandeRepository $repo, ProduitServiceRepository $produitRepo, Request $request): Response
+    public function recues(CommandeRepository $repo, ProduitServiceRepository $produitRepo, Request $request, AutoConfirmNotificationRepository $notifRepo): Response
     {
         if ($r = $this->requireInvestisseur()) return $r;
 
@@ -319,12 +326,15 @@ class CommandeController extends AbstractController
             $chartValues[] = $qty;
         }
 
+        $notifications = $notifRepo->findUnreadByInvestisseur($this->getUserId());
+
         return $this->render('front/Marketplace/commandes/investisseur.html.twig', [
             'commandes'      => $commandes,
             'produits_map'   => $produitsMap,
             'statut_filtre'  => $statut,
             'chart_labels'   => $chartLabels,
             'chart_values'   => $chartValues,
+            'notifications'  => $notifications,
             'kpi'            => [
                 'ca_total'     => number_format($caTotal, 3, '.', ' '),
                 'ca_confirmee' => number_format($caConfirmee, 3, '.', ' '),
@@ -344,6 +354,21 @@ class CommandeController extends AbstractController
     // ════════════════════════════════════════════════════════════════════
     //  GENERIC PARAMETERIZED ROUTES (must come after specific routes)
     // ════════════════════════════════════════════════════════════════════
+
+    #[Route('/notifications/mark-read', name: 'notifications_mark_read', methods: ['POST'])]
+    public function markNotificationsRead(
+        AutoConfirmNotificationRepository $notifRepo,
+        EntityManagerInterface $em,
+    ): \Symfony\Component\HttpFoundation\JsonResponse {
+        if ($r = $this->requireInvestisseur()) {
+            return $this->json(['ok' => false], 403);
+        }
+        foreach ($notifRepo->findUnreadByInvestisseur($this->getUserId()) as $n) {
+            $n->setIsRead(true);
+        }
+        $em->flush();
+        return $this->json(['ok' => true]);
+    }
 
     #[Route('/{id}', name: 'show', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function show(

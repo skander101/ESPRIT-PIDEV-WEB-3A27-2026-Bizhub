@@ -2,8 +2,10 @@
 
 namespace App\EventListener;
 
+use App\Entity\Marketplace\AutoConfirmNotification;
 use App\Entity\Marketplace\CommandeStatusHistory;
 use App\Event\CommandeConfirmeeEvent;
+use App\Repository\Marketplace\ProduitServiceRepository;
 use App\Repository\UsersAvis\UserRepository;
 use App\Service\Marketplace\TwilioService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,6 +19,7 @@ class CommandeConfirmeeListener
         private readonly TwilioService $twilioService,
         private readonly EntityManagerInterface $em,
         private readonly UserRepository $userRepository,
+        private readonly ProduitServiceRepository $produitRepo,
         private readonly LoggerInterface $logger,
     ) {}
 
@@ -25,12 +28,16 @@ class CommandeConfirmeeListener
         $commande = $event->getCommande();
 
         // 1. Enregistrer l'entrée dans l'historique des statuts
+        $note = $event->getInvestisseurId()
+            ? 'Confirmée par l\'investisseur'
+            : 'Confirmée automatiquement par le moteur de scoring';
+
         $history = (new CommandeStatusHistory())
             ->setCommande($commande)
-            ->setStatutPrecedent(null) // était 'en_attente' avant confirmation
+            ->setStatutPrecedent(null)
             ->setStatutNouveau($commande->getStatut())
             ->setChangedByUserId($event->getInvestisseurId())
-            ->setNote('Confirmée par l\'investisseur');
+            ->setNote($note);
 
         $this->em->persist($history);
         $this->em->flush();
@@ -48,8 +55,36 @@ class CommandeConfirmeeListener
             ? $this->userRepository->find($event->getInvestisseurId())
             : null;
 
-        if ($investisseur) {
-            $this->twilioService->sendConfirmationSms($commande, $startup, $investisseur);
+        // 3. Notifier la startup de la confirmation
+        $this->twilioService->sendConfirmationSms($commande, $startup, $investisseur);
+
+        // 4. En cas de confirmation automatique, créer une notification toast + WhatsApp investisseur
+        if ($event->getInvestisseurId() === null) {
+            $investisseursNotifies = [];
+            foreach ($commande->getLignes() as $ligne) {
+                $produit = $this->produitRepo->find($ligne->getIdProduit());
+                if (!$produit) continue;
+
+                $ownerId = $produit->getOwnerUserId();
+                if ($ownerId === null || isset($investisseursNotifies[$ownerId])) continue;
+
+                $owner = $this->userRepository->find($ownerId);
+                if (!$owner) continue;
+
+                // Notification toast en base (affichée côté investisseur à la prochaine visite)
+                $notif = (new AutoConfirmNotification())
+                    ->setInvestisseurId($ownerId)
+                    ->setCommandeId($commande->getIdCommande())
+                    ->setStartupName($startup->getFullName() ?? $startup->getEmail())
+                    ->setMontantTtc($commande->getTotalTtc())
+                    ->setScoreAuto($commande->getScoreAuto() ?? 0);
+                $this->em->persist($notif);
+
+                // WhatsApp investisseur
+                $this->twilioService->sendAutoConfirmInvestisseurNotification($commande, $owner, $startup);
+                $investisseursNotifies[$ownerId] = true;
+            }
+            $this->em->flush();
         }
     }
 }

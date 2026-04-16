@@ -41,6 +41,24 @@ class Project
         'Autre'           => 'autre',
     ];
 
+    const MARCHES = [
+        'Local (Tunisie)'      => 'local',
+        'Régional (Maghreb)'   => 'regional',
+        'Afrique'              => 'afrique',
+        'Europe'               => 'europe',
+        'International'        => 'international',
+    ];
+
+    const BUSINESS_MODELS = [
+        'SaaS / Abonnement'    => 'saas',
+        'Marketplace'          => 'marketplace',
+        'E-commerce'           => 'ecommerce',
+        'Freemium'             => 'freemium',
+        'Licence'              => 'licence',
+        'Service à la demande' => 'on_demand',
+        'Autre'                => 'autre',
+    ];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
@@ -70,7 +88,7 @@ class Project
     )]
     private ?string $description = null;
 
-    #[ORM\Column(type: 'decimal', nullable: false)]
+    #[ORM\Column(type: 'decimal', precision: 15, scale: 2, nullable: false)]
     #[Assert\NotBlank(message: 'Le budget est obligatoire.')]
     #[Assert\Positive(message: 'Le budget doit être positif.')]
     private ?float $required_budget = null;
@@ -93,6 +111,26 @@ class Project
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $created_at = null;
+
+    // ── Champs enrichis (optionnels, pour l'IA et le coach) ─────────────────
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $problem_description = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $solution_description = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $target_audience = null;
+
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    private ?string $market_scope = null;
+
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    private ?string $business_model = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $competitive_advantage = null;
 
     #[ORM\OneToMany(targetEntity: AiAnalysis::class, mappedBy: 'project')]
     private Collection $aiAnalysis;
@@ -137,6 +175,24 @@ class Project
     public function getCreatedAt(): ?\DateTimeInterface { return $this->created_at; }
     public function setCreated_at(?\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
     public function setCreatedAt(?\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
+
+    public function getProblemDescription(): ?string { return $this->problem_description; }
+    public function setProblemDescription(?string $v): self { $this->problem_description = $v; return $this; }
+
+    public function getSolutionDescription(): ?string { return $this->solution_description; }
+    public function setSolutionDescription(?string $v): self { $this->solution_description = $v; return $this; }
+
+    public function getTargetAudience(): ?string { return $this->target_audience; }
+    public function setTargetAudience(?string $v): self { $this->target_audience = $v; return $this; }
+
+    public function getMarketScope(): ?string { return $this->market_scope; }
+    public function setMarketScope(?string $v): self { $this->market_scope = $v; return $this; }
+
+    public function getBusinessModel(): ?string { return $this->business_model; }
+    public function setBusinessModel(?string $v): self { $this->business_model = $v; return $this; }
+
+    public function getCompetitiveAdvantage(): ?string { return $this->competitive_advantage; }
+    public function setCompetitiveAdvantage(?string $v): self { $this->competitive_advantage = $v; return $this; }
 
     public function getAiAnalysis(): Collection
     {

@@ -4,12 +4,11 @@ namespace App\Controller\Admin\Marketplace;
 
 use App\Entity\Marketplace\Commande;
 use App\Entity\Marketplace\ProduitService;
-use App\Form\Marketplace\CommandeType;
-use App\Form\Marketplace\ProduitType;
 use App\Repository\Marketplace\CommandeRepository;
 use App\Repository\Marketplace\PanierRepository;
 use App\Repository\Marketplace\ProduitServiceRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\UsersAvis\UserRepository;
+use App\Service\Marketplace\StatisticsService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,8 +26,15 @@ class AdminMarketplaceController extends AbstractController
         ProduitServiceRepository $produitRepo,
         CommandeRepository $commandeRepo,
         PanierRepository $panierRepo,
+        StatisticsService $statisticsService,
     ): Response {
         $toutesCommandes = $commandeRepo->findAll();
+
+        // Revenue chart data (last 6 months)
+        $monthlyRevenue  = $statisticsService->getMonthlyRevenue(6);
+        $revenueLabels   = array_column($monthlyRevenue, 'mois');
+        $revenueData     = array_column($monthlyRevenue, 'total');
+
         return $this->render('back/marketplace/dashboard.html.twig', [
             'stats' => [
                 'total_produits'  => count($produitRepo->findAll()),
@@ -38,8 +44,12 @@ class AdminMarketplaceController extends AbstractController
                 'confirmees'      => count(array_filter($toutesCommandes, fn($c) => $c->getStatut() === Commande::STATUT_CONFIRMEE)),
                 'paniers_actifs'  => count($panierRepo->findAll()),
             ],
-            'statuts'           => $commandeRepo->countByStatut(),
-            'derniers_produits' => $produitRepo->findAll(),
+            'statuts'              => $commandeRepo->countByStatut(),
+            'derniers_produits'    => $produitRepo->findAll(),
+            'top_commandes'        => $statisticsService->getTopOrdersByAmount(5),
+            'top_produits'         => $statisticsService->getTopProductsByFrequency(5),
+            'revenue_labels'       => $revenueLabels,
+            'revenue_data'         => $revenueData,
         ]);
     }
 
@@ -58,72 +68,14 @@ class AdminMarketplaceController extends AbstractController
         ]);
     }
 
-    #[Route('/produits/new', name: 'produits_new', methods: ['GET', 'POST'])]
-    public function produitsNew(Request $request, EntityManagerInterface $em): Response
-    {
-        $produit = new ProduitService();
-        $form    = $this->createForm(ProduitType::class, $produit);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em->persist($produit);
-            $em->flush();
-            $this->addFlash('success', '✅ Produit «' . $produit->getNom() . '» ajouté.');
-            return $this->redirectToRoute('admin_marketplace_produits_index');
-        }
-        return $this->render('back/marketplace/produits/form.html.twig', [
-            'form'  => $form->createView(),
-            'titre' => 'Nouveau produit',
-            'mode'  => 'create',
-        ]);
-    }
-
     #[Route('/produits/{id}/show', name: 'produits_show', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function produitsShow(ProduitService $produit): Response
     {
         return $this->render('back/marketplace/produits/show.html.twig', ['produit' => $produit]);
     }
 
-    #[Route('/produits/{id}/edit', name: 'produits_edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
-    public function produitsEdit(ProduitService $produit, Request $request, EntityManagerInterface $em): Response
-    {
-        $form = $this->createForm(ProduitType::class, $produit);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em->flush();
-            $this->addFlash('success', '✏️ «' . $produit->getNom() . '» modifié.');
-            return $this->redirectToRoute('admin_marketplace_produits_index');
-        }
-        return $this->render('back/marketplace/produits/form.html.twig', [
-            'form'    => $form->createView(),
-            'titre'   => 'Modifier — ' . $produit->getNom(),
-            'produit' => $produit,
-            'mode'    => 'edit',
-        ]);
-    }
-
-    #[Route('/produits/{id}/delete', name: 'produits_delete', methods: ['POST'], requirements: ['id' => '\d+'])]
-    public function produitsDelete(ProduitService $produit, Request $request, EntityManagerInterface $em): Response
-    {
-        if ($this->isCsrfTokenValid('delete_produit_' . $produit->getIdProduit(), $request->request->get('_token'))) {
-            $nom = $produit->getNom();
-            $em->remove($produit);
-            $em->flush();
-            $this->addFlash('success', '🗑️ «' . $nom . '» supprimé.');
-        }
-        return $this->redirectToRoute('admin_marketplace_produits_index');
-    }
-
-    #[Route('/produits/{id}/toggle', name: 'produits_toggle', methods: ['POST'], requirements: ['id' => '\d+'])]
-    public function produitsToggle(ProduitService $produit, EntityManagerInterface $em): Response
-    {
-        $produit->setDisponible(!$produit->isDisponible());
-        $em->flush();
-        $this->addFlash('success', '«' . $produit->getNom() . '» → ' . ($produit->isDisponible() ? 'disponible' : 'indisponible'));
-        return $this->redirectToRoute('admin_marketplace_produits_index');
-    }
-
     // ════════════════════════════════════════════════════════════════════
-    //  COMMANDES
+    //  COMMANDES (lecture seule)
     // ════════════════════════════════════════════════════════════════════
 
     #[Route('/commandes', name: 'commandes_index', methods: ['GET'])]
@@ -143,47 +95,6 @@ class AdminMarketplaceController extends AbstractController
         return $this->render('back/marketplace/commandes/show.html.twig', ['commande' => $commande]);
     }
 
-    #[Route('/commandes/{id}/edit', name: 'commandes_edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
-    public function commandesEdit(Commande $commande, Request $request, EntityManagerInterface $em): Response
-    {
-        $form = $this->createForm(CommandeType::class, $commande, ['is_admin' => true]);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em->flush();
-            $this->addFlash('success', 'Commande #' . $commande->getIdCommande() . ' mise à jour.');
-            return $this->redirectToRoute('admin_marketplace_commandes_index');
-        }
-        return $this->render('back/marketplace/commandes/form.html.twig', [
-            'form'     => $form->createView(),
-            'commande' => $commande,
-        ]);
-    }
-
-    #[Route('/commandes/{id}/statut/{statut}', name: 'commandes_statut', methods: ['POST'], requirements: ['id' => '\d+'])]
-    public function commandesStatut(Commande $commande, string $statut, Request $request, EntityManagerInterface $em): Response
-    {
-        $allowed = [Commande::STATUT_ATTENTE, Commande::STATUT_CONFIRMEE, Commande::STATUT_ANNULEE, Commande::STATUT_LIVREE];
-        if ($this->isCsrfTokenValid('statut_' . $commande->getIdCommande(), $request->request->get('_token'))
-            && in_array($statut, $allowed, true)) {
-            $commande->setStatut($statut);
-            $em->flush();
-            $this->addFlash('success', 'Statut → «' . $statut . '»');
-        }
-        return $this->redirectToRoute('admin_marketplace_commandes_show', ['id' => $commande->getIdCommande()]);
-    }
-
-    #[Route('/commandes/{id}/delete', name: 'commandes_delete', methods: ['POST'], requirements: ['id' => '\d+'])]
-    public function commandesDelete(Commande $commande, Request $request, EntityManagerInterface $em): Response
-    {
-        if ($this->isCsrfTokenValid('delete_commande_' . $commande->getIdCommande(), $request->request->get('_token'))) {
-            $id = $commande->getIdCommande();
-            $em->remove($commande);
-            $em->flush();
-            $this->addFlash('success', '🗑️ Commande #' . $id . ' supprimée.');
-        }
-        return $this->redirectToRoute('admin_marketplace_commandes_index');
-    }
-
     // ════════════════════════════════════════════════════════════════════
     //  PANIERS (lecture seule)
     // ════════════════════════════════════════════════════════════════════
@@ -192,5 +103,50 @@ class AdminMarketplaceController extends AbstractController
     public function paniersIndex(PanierRepository $repo): Response
     {
         return $this->render('back/marketplace/paniers/index.html.twig', ['paniers' => $repo->findAll()]);
+    }
+
+    // ════════════════════════════════════════════════════════════════════
+    //  CLIENTS
+    // ════════════════════════════════════════════════════════════════════
+
+    #[Route('/clients', name: 'clients_index', methods: ['GET'])]
+    public function clientsIndex(
+        UserRepository     $userRepo,
+        CommandeRepository $commandeRepo,
+        Request            $request,
+    ): Response {
+        $search   = trim((string) $request->query->get('q', ''));
+        $typeFilter = $request->query->get('type', '');
+
+        // Récupérer tous les utilisateurs (filtrés si recherche)
+        $users = $search
+            ? $userRepo->findBySearchAndSort($search)
+            : $userRepo->findAll();
+
+        // Filtrer par type si demandé
+        if ($typeFilter !== '') {
+            $users = array_filter($users, fn($u) => $u->getUserType() === $typeFilter);
+        }
+
+        // Nombre de commandes par client (indexed by idClient)
+        $allCommandes     = $commandeRepo->findAll();
+        $commandesParClient = [];
+        foreach ($allCommandes as $cmd) {
+            $id = $cmd->getIdClient();
+            $commandesParClient[$id] = ($commandesParClient[$id] ?? 0) + 1;
+        }
+
+        // KPIs
+        $distribution = $userRepo->getRoleDistribution();
+
+        return $this->render('back/marketplace/clients/index.html.twig', [
+            'users'                => array_values($users),
+            'commandes_par_client' => $commandesParClient,
+            'distribution'         => $distribution,
+            'search'               => $search,
+            'type_filter'          => $typeFilter,
+            'types'                => ['startup', 'fournisseur', 'formateur', 'investisseur'],
+            'total'                => count($users),
+        ]);
     }
 }

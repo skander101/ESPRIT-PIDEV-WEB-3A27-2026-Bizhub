@@ -53,7 +53,7 @@ class Deal
     #[Assert\Positive(message: 'ID vendeur invalide.')]
     private ?int $seller_id = null;
 
-    #[ORM\Column(type: 'decimal', nullable: false)]
+    #[ORM\Column(type: 'decimal', precision: 15, scale: 2, nullable: false)]
     #[Assert\NotNull(message: 'Le montant est obligatoire.')]
     #[Assert\Positive(message: 'Le montant doit être positif.')]
     private ?float $amount = null;
@@ -84,6 +84,12 @@ class Deal
 
     #[ORM\Column(type: 'boolean', nullable: true)]
     private ?bool $email_sent = null;
+
+    #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    private ?string $signature_token = null;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $signature_token_expires_at = null;
 
     #[ORM\Column(type: 'string', nullable: true)]
     #[Assert\NotBlank(message: 'Le statut est obligatoire.')]
@@ -139,6 +145,12 @@ class Deal
 
     public function isEmail_sent(): ?bool { return $this->email_sent; }
     public function setEmail_sent(?bool $email_sent): self { $this->email_sent = $email_sent; return $this; }
+
+    public function getSignature_token(): ?string { return $this->signature_token; }
+    public function setSignature_token(?string $token): self { $this->signature_token = $token; return $this; }
+
+    public function getSignature_token_expires_at(): ?\DateTimeInterface { return $this->signature_token_expires_at; }
+    public function setSignature_token_expires_at(?\DateTimeInterface $dt): self { $this->signature_token_expires_at = $dt; return $this; }
 
     public function getStatus(): ?string { return $this->status; }
     public function setStatus(?string $status): self { $this->status = $status; return $this; }

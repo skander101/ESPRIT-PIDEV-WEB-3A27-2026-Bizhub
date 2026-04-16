@@ -44,12 +44,12 @@ class TwilioService
      * Renommé sendConfirmationSms → sendConfirmationWhatsApp mais l'ancien nom est gardé
      * en alias pour ne pas casser CommandeConfirmeeListener.
      */
-    public function sendConfirmationSms(Commande $commande, User $startup, User $investisseur): void
+    public function sendConfirmationSms(Commande $commande, User $startup, ?User $investisseur): void
     {
         $this->sendConfirmationWhatsApp($commande, $startup, $investisseur);
     }
 
-    public function sendConfirmationWhatsApp(Commande $commande, User $startup, User $investisseur): void
+    public function sendConfirmationWhatsApp(Commande $commande, User $startup, ?User $investisseur): void
     {
         $phone = $startup->getPhone();
 
@@ -103,6 +103,86 @@ class TwilioService
     }
 
     // ════════════════════════════════════════════════════════════════════
+    //  NOTIFICATION WHATSAPP — AUTO-CONFIRMATION → INVESTISSEUR
+    // ════════════════════════════════════════════════════════════════════
+
+    public function sendAutoConfirmInvestisseurNotification(Commande $commande, User $investisseur, User $startup): void
+    {
+        $phone = $investisseur->getPhone();
+
+        if (empty($phone)) {
+            $this->logger->warning('WhatsApp investisseur non envoyé : numéro absent', [
+                'investisseur_id' => $investisseur->getUserId(),
+                'commande_id'     => $commande->getIdCommande(),
+            ]);
+            return;
+        }
+
+        $phoneNormalized = $this->normalizePhone($phone);
+        $from = 'whatsapp:' . $this->twilioWhatsappFrom;
+        $to   = 'whatsapp:' . $phoneNormalized;
+
+        $investisseurName = $investisseur->getFullName() ?? $investisseur->getEmail();
+        $startupName      = $startup->getFullName() ?? $startup->getEmail();
+        $montantHt        = number_format((float) $commande->getTotalHt(),  3, '.', ' ');
+        $montantTva       = number_format((float) $commande->getTotalTva(), 3, '.', ' ');
+        $montantTtc       = number_format((float) $commande->getTotalTtc(), 3, '.', ' ');
+        $dateStr          = $commande->getDateCommande()?->format('d/m/Y à H:i') ?? date('d/m/Y');
+
+        $body = implode("\n", [
+            '━━━━━━━━━━━━━━━━━━━━━━',
+            '       *BIZHUB*',
+            '  Plateforme B2B Tunisie',
+            '━━━━━━━━━━━━━━━━━━━━━━',
+            '',
+            'Bonjour *' . $investisseurName . '*,',
+            '',
+            'Une nouvelle commande vient d\'être *confirmée automatiquement* sur votre espace BizHub.',
+            '',
+            '─────────────────────',
+            '*DÉTAILS DE LA COMMANDE*',
+            '─────────────────────',
+            '🔖 Référence    : *#' . $commande->getIdCommande() . '*',
+            '📅 Date         : ' . $dateStr,
+            '🏢 Client       : ' . $startupName,
+            '',
+            '💵 Montant HT   : ' . $montantHt . ' TND',
+            '📊 TVA (19%)    : ' . $montantTva . ' TND',
+            '💰 *Total TTC   : ' . $montantTtc . ' TND*',
+            '─────────────────────',
+            '',
+            'ℹ️ Cette commande a été validée automatiquement par notre moteur d\'analyse de fiabilité client.',
+            '',
+            'Merci de prendre en charge cette commande dans les meilleurs délais.',
+            '',
+            '👉 Consulter : ' . $commande->getIdCommande(),
+            '',
+            '_BizHub — Votre partenaire B2B de confiance_',
+            '━━━━━━━━━━━━━━━━━━━━━━',
+        ]);
+
+        $this->logger->info('Tentative envoi WhatsApp investisseur (auto-confirm)', [
+            'from' => $from, 'to' => $to, 'commande_id' => $commande->getIdCommande(),
+        ]);
+
+        try {
+            $message = $this->client->messages->create($to, ['from' => $from, 'body' => $body]);
+            $this->logger->info('WhatsApp investisseur envoyé', [
+                'commande_id' => $commande->getIdCommande(),
+                'message_sid' => $message->sid,
+                'status'      => $message->status,
+            ]);
+        } catch (TwilioException $e) {
+            $this->logger->error('Échec WhatsApp investisseur', [
+                'commande_id' => $commande->getIdCommande(),
+                'to'          => $to,
+                'error_code'  => $e->getCode(),
+                'error'       => $e->getMessage(),
+            ]);
+        }
+    }
+
+    // ════════════════════════════════════════════════════════════════════
     //  PRIVATE HELPERS
     // ════════════════════════════════════════════════════════════════════
 
@@ -110,19 +190,12 @@ class TwilioService
      * Construit le message WhatsApp (message libre, fenêtre 24h ou sandbox).
      * En production avec template approuvé, utiliser ContentSid + ContentVariables.
      */
-    private function buildWhatsAppMessage(Commande $commande, User $investisseur): string
+    private function buildWhatsAppMessage(Commande $commande, ?User $investisseur): string
     {
-        $investisseurName = $investisseur->getFullName() ?? $investisseur->getEmail();
-        $montant          = number_format((float) $commande->getTotalTtc(), 3, '.', ' ');
-
         return implode("\n", [
-            '🎉 *BizHub — Commande confirmée !*',
+            '✅ *Votre commande #' . $commande->getIdCommande() . ' est confirmée !*',
             '',
-            '📦 Commande n° *#' . $commande->getIdCommande() . '*',
-            '✅ Confirmée par : ' . $investisseurName,
-            '💰 Montant TTC   : *' . $montant . ' TND*',
-            '',
-            'Connectez-vous sur BizHub pour procéder au paiement et suivre votre commande.',
+            'Vous pouvez maintenant procéder au paiement sur BizHub.',
             '👉 http://localhost/ESPRIT-PIDEV-WEB-3A27-2026-Bizhub-main/marketplace/commandes/' . $commande->getIdCommande(),
         ]);
     }

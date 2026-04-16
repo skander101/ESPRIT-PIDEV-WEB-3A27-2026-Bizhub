@@ -97,6 +97,85 @@ class CommandeRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * Top N commandes par montant total TTC décroissant.
+     * Exclut les commandes annulées et celles sans montant.
+     *
+     * @return array<int, array{idCommande: int, idClient: int, statut: string, dateCommande: \DateTimeInterface, totalTtc: string}>
+     */
+    public function findTopByAmount(int $limit = 5): array
+    {
+        return $this->createQueryBuilder('c')
+            ->select(
+                'c.idCommande',
+                'c.idClient',
+                'c.statut',
+                'c.dateCommande',
+                'c.totalTtc',
+                'c.totalHt',
+                'c.totalTva'
+            )
+            ->where('c.statut != :annulee')
+            ->andWhere('c.totalTtc IS NOT NULL')
+            ->setParameter('annulee', Commande::STATUT_ANNULEE)
+            ->orderBy('c.totalTtc', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Chiffre d'affaires mensuel sur les N derniers mois.
+     *
+     * @return array<int, array{mois: string, total: string, nb: int}>
+     */
+    public function findMonthlyRevenue(int $months = 6): array
+    {
+        $since = new \DateTime("-{$months} months");
+
+        $rows = $this->createQueryBuilder('c')
+            ->select('c.dateCommande', 'c.totalTtc')
+            ->where('c.estPayee = true')
+            ->andWhere('c.dateCommande >= :since')
+            ->setParameter('since', $since)
+            ->orderBy('c.dateCommande', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
+
+        $grouped = [];
+        foreach ($rows as $row) {
+            $date = $row['dateCommande'];
+            $mois = $date instanceof \DateTimeInterface
+                ? $date->format('Y-m')
+                : substr((string) $date, 0, 7);
+            $grouped[$mois] ??= ['mois' => $mois, 'total' => 0.0, 'nb' => 0];
+            $grouped[$mois]['total'] += (float) ($row['totalTtc'] ?? 0);
+            $grouped[$mois]['nb']++;
+        }
+
+        ksort($grouped);
+        return array_values($grouped);
+    }
+
+    /**
+     * Répartition des commandes par statut avec leur montant cumulé.
+     *
+     * @return array<int, array{statut: string, nb: int, totalTtc: string}>
+     */
+    public function findStatsByStatut(): array
+    {
+        return $this->createQueryBuilder('c')
+            ->select(
+                'c.statut',
+                'COUNT(c.idCommande) AS nb',
+                'SUM(c.totalTtc) AS totalTtc'
+            )
+            ->groupBy('c.statut')
+            ->orderBy('nb', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function save(Commande $entity, bool $flush = true): void
     {
         $this->getEntityManager()->persist($entity);

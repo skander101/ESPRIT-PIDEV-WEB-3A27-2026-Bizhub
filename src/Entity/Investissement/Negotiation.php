@@ -54,11 +54,11 @@ class Negotiation
     )]
     private ?string $status = null;
 
-    #[ORM\Column(type: 'decimal', nullable: true)]
+    #[ORM\Column(type: 'decimal', precision: 15, scale: 2, nullable: true)]
     #[Assert\Positive(message: 'Le montant proposé doit être positif.')]
     private ?float $proposed_amount = null;
 
-    #[ORM\Column(type: 'decimal', nullable: true)]
+    #[ORM\Column(type: 'decimal', precision: 15, scale: 2, nullable: true)]
     #[Assert\Positive(message: 'Le montant final doit être positif.')]
     private ?float $final_amount = null;
 

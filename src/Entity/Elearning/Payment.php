@@ -42,7 +42,7 @@ class Payment
         return $this;
     }
 
-    #[ORM\Column(type: 'decimal', nullable: false)]
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: false)]
     private ?float $amount = null;
 
     public function getAmount(): ?float

@@ -6,6 +6,7 @@ use App\Entity\Marketplace\Panier;
 use App\Entity\Marketplace\ProduitService;
 use App\Repository\Marketplace\PanierRepository;
 use App\Repository\Marketplace\ProduitServiceRepository;
+use App\Service\Marketplace\RecommendationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -63,14 +64,27 @@ class PanierController extends AbstractController
     // ════════════════════════════════════════════════════════════════════
 
     #[Route('', name: 'index', methods: ['GET'])]
-    public function index(PanierRepository $panierRepo, ProduitServiceRepository $produitRepo): Response
-    {
+    public function index(
+        PanierRepository      $panierRepo,
+        ProduitServiceRepository $produitRepo,
+        RecommendationService $recommandation,
+    ): Response {
         if ($r = $this->requireLogin()) return $r;
 
-        $items  = $panierRepo->findByClient($this->getUserId());
+        $userId = $this->getUserId();
+        $items  = $panierRepo->findByClient($userId);
         $totaux = $this->calculerTotaux($items, $produitRepo);
 
-        return $this->render('front/Marketplace/panier/index.html.twig', $totaux);
+        $suggestions = $recommandation->getCartSuggestions(
+            $totaux['details'],
+            $userId,
+            4
+        );
+
+        return $this->render('front/Marketplace/panier/index.html.twig', array_merge(
+            $totaux,
+            ['suggestions' => $suggestions]
+        ));
     }
 
     // ════════════════════════════════════════════════════════════════════
@@ -188,15 +202,28 @@ class PanierController extends AbstractController
     // ════════════════════════════════════════════════════════════════════
 
     #[Route('/sidebar', name: 'sidebar', methods: ['GET'])]
-    public function sidebar(PanierRepository $panierRepo, ProduitServiceRepository $produitRepo): Response
-    {
+    public function sidebar(
+        PanierRepository         $panierRepo,
+        ProduitServiceRepository $produitRepo,
+        RecommendationService    $recommandation,
+    ): Response {
         if (!$this->getUser()) {
             return new Response('', Response::HTTP_NO_CONTENT);
         }
-        $items  = $panierRepo->findByClient($this->getUserId());
+        $userId = $this->getUserId();
+        $items  = $panierRepo->findByClient($userId);
         $totaux = $this->calculerTotaux($items, $produitRepo);
 
-        return $this->render('front/Marketplace/panier/_sidebar.html.twig', $totaux);
+        $suggestions = $recommandation->getCartSuggestions(
+            $totaux['details'],
+            $userId,
+            3
+        );
+
+        return $this->render('front/Marketplace/panier/_sidebar.html.twig', array_merge(
+            $totaux,
+            ['suggestions' => $suggestions]
+        ));
     }
 
     // ════════════════════════════════════════════════════════════════════

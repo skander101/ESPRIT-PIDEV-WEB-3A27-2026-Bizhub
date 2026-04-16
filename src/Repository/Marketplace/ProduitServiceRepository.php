@@ -69,6 +69,72 @@ class ProduitServiceRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * Produits de la même catégorie, en excluant un produit donné.
+     * Utilisé pour les recommandations "Produits similaires".
+     */
+    public function findByCategorieSauf(string $categorie, int $excludeId, int $limit = 4): array
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.categorie = :cat')
+            ->andWhere('p.idProduit != :exclude')
+            ->andWhere('p.disponible = true')
+            ->setParameter('cat', $categorie)
+            ->setParameter('exclude', $excludeId)
+            ->orderBy('p.nom', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Produits disponibles en excluant une liste d'IDs (fallback popularité).
+     *
+     * @param int[] $excludeIds
+     */
+    public function findDisponiblesExcluant(array $excludeIds, int $limit = 4): array
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->where('p.disponible = true')
+            ->orderBy('p.nom', 'ASC')
+            ->setMaxResults($limit);
+
+        if (!empty($excludeIds)) {
+            $qb->andWhere('p.idProduit NOT IN (:ids)')
+               ->setParameter('ids', $excludeIds);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Produits disponibles appartenant à au moins une des catégories données,
+     * en excluant une liste d'IDs (suggestions panier cross-category).
+     *
+     * @param string[] $categories
+     * @param int[]    $excludeIds
+     */
+    public function findByCategoriesExcluant(array $categories, array $excludeIds, int $limit = 4): array
+    {
+        if (empty($categories)) {
+            return $this->findDisponiblesExcluant($excludeIds, $limit);
+        }
+
+        $qb = $this->createQueryBuilder('p')
+            ->where('p.categorie IN (:cats)')
+            ->andWhere('p.disponible = true')
+            ->setParameter('cats', $categories)
+            ->orderBy('p.nom', 'ASC')
+            ->setMaxResults($limit);
+
+        if (!empty($excludeIds)) {
+            $qb->andWhere('p.idProduit NOT IN (:ids)')
+               ->setParameter('ids', $excludeIds);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
     public function save(ProduitService $entity, bool $flush = true): void
     {
         $this->getEntityManager()->persist($entity);

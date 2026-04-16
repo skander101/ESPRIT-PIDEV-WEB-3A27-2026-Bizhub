@@ -139,7 +139,7 @@ class Post
         return $this;
     }
 
-    #[ORM\Column(type: 'decimal', nullable: true)]
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 7, nullable: true)]
     private ?float $location_lat = null;
 
     public function getLocation_lat(): ?float
@@ -153,7 +153,7 @@ class Post
         return $this;
     }
 
-    #[ORM\Column(type: 'decimal', nullable: true)]
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 7, nullable: true)]
     private ?float $location_lon = null;
 
     public function getLocation_lon(): ?float
