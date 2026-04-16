@@ -117,7 +117,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[Assert\Length(max: 255, maxMessage: 'Investment sector must not exceed 255 characters')]
     private ?string $investment_sector = null;
 
-    #[ORM\Column(type: 'decimal', nullable: true)]
+    #[ORM\Column(type: 'decimal', precision: 15, scale: 2, nullable: true)]
     #[Assert\PositiveOrZero(message: 'Maximum budget must be a positive number.')]
     #[Assert\LessThanOrEqual(value: 1000000000, message: 'Maximum budget is too high.')]
     private ?float $max_budget = null;
@@ -134,7 +134,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[Assert\Length(max: 255, maxMessage: 'Specialty must not exceed 255 characters')]
     private ?string $specialty = null;
 
-    #[ORM\Column(type: 'decimal', nullable: true)]
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
     #[Assert\PositiveOrZero(message: 'Hourly rate must be a positive number.')]
     #[Assert\LessThanOrEqual(value: 10000, message: 'Hourly rate is too high.')]
     private ?float $hourly_rate = null;

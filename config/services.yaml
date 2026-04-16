@@ -9,6 +9,7 @@
 parameters:
     app.auth.mail_from_email: 'bizbot64@gmail.com'
     app.auth.mail_from_name: 'BizHub'
+    stripe.public_key: '%env(STRIPE_PUBLIC_KEY)%'
     stripe.secret_key: '%env(STRIPE_SECRET_KEY)%'
     stripe.webhook_secret: '%env(STRIPE_WEBHOOK_SECRET)%'
     twilio.account_sid: '%env(TWILIO_ACCOUNT_SID)%'
@@ -16,6 +17,7 @@ parameters:
     twilio.whatsapp_from: '%env(TWILIO_WHATSAPP_FROM)%'
     groq.api_key: '%env(GROQ_API_KEY)%'
     groq.model: '%env(GROQ_MODEL)%'
+    gnews.api_key: '%env(default::GNEWS_API_KEY)%'
     app.google_client_id: '%env(trim:GOOGLE_CLIENT_ID)%'
     app.google_client_secret: '%env(trim:GOOGLE_CLIENT_SECRET)%'
     app.auth0_domain: '%env(trim:AUTH0_DOMAIN)%'
@@ -59,6 +61,11 @@ services:
             $stripeSecretKey: '%stripe.secret_key%'
             $stripeWebhookSecret: '%stripe.webhook_secret%'
 
+    App\Controller\Investissement\DealController:
+        arguments:
+            $stripePublicKey: '%stripe.public_key%'
+            $stripeSecretKey: '%stripe.secret_key%'
+
     App\Service\Marketplace\TwilioService:
         arguments:
             $twilioAccountSid: '%twilio.account_sid%'
@@ -69,6 +76,42 @@ services:
         arguments:
             $apiKey: '%groq.api_key%'
             $model: '%groq.model%'
+
+    # ── Services Investissement ──────────────────────────────────────────────
+
+    App\Service\Investissement\AiNegotiationService:
+        arguments:
+            $openaiApiKey: '%env(default::OPENAI_API_KEY)%'
+
+    App\Service\Investissement\DashboardInvestisseurService:
+        arguments:
+            $openaiApiKey: '%env(default::OPENAI_API_KEY)%'
+
+    App\Service\Investissement\PortfolioAnalysisService:
+        arguments:
+            $openaiApiKey: '%env(default::OPENAI_API_KEY)%'
+
+    App\Service\Investissement\ProjectAdvisorService:
+        arguments:
+            $openaiApiKey: '%env(default::OPENAI_API_KEY)%'
+
+    App\Service\Investissement\RoiSimulatorService:
+        arguments:
+            $openaiApiKey: '%env(default::OPENAI_API_KEY)%'
+
+    App\Service\Investissement\ContractPdfService:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+
+    App\Service\Investissement\YousignService:
+        arguments:
+            $apiKey:      '%env(default::YOUSIGN_API_KEY)%'
+            $baseUrl:     '%env(default::YOUSIGN_BASE_URL)%'
+            $projectDir:  '%kernel.project_dir%'
+
+    App\Service\NewsService:
+        arguments:
+            $gnewsApiKey: '%gnews.api_key%'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

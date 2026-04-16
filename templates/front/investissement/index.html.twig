@@ -57,9 +57,14 @@
             <h1><i class="fa fa-chart-pie" style="color:var(--primary);margin-right:0.5rem;"></i>Mes Investissements</h1>
             <p>{{ investissements|length }} investissement(s) au total</p>
         </div>
-        <a href="{{ path('app_front_projet_index') }}" class="btn-yellow" style="display:flex;align-items:center;gap:8px;">
-            <i class="fa fa-search"></i> Explorer les projets
-        </a>
+        <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+            <a href="{{ path('app_negociation_index') }}" style="display:flex;align-items:center;gap:8px;padding:10px 18px;background:rgba(99,102,241,0.1);color:#6366f1;border:1.5px solid rgba(99,102,241,0.25);border-radius:8px;font-family:'Josefin Sans',sans-serif;font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.06em;text-decoration:none;">
+                <i class="fa fa-handshake"></i> Mes Négociations
+            </a>
+            <a href="{{ path('app_front_projet_index') }}" class="btn-yellow" style="display:flex;align-items:center;gap:8px;">
+                <i class="fa fa-search"></i> Explorer les projets
+            </a>
+        </div>
     </div>
 </div>
 
@@ -97,11 +102,10 @@
                                 <div class="inv-projet-title">{{ inv.project.title }}</div>
                             </a>
                             <span class="badge badge-{{ inv.project.status }}">
-                                {% if inv.project.status == 'brouillon' %}Brouillon
-                                {% elseif inv.project.status == 'publie' %}Publié
-                                {% elseif inv.project.status == 'en_cours' %}En cours
-                                {% elseif inv.project.status == 'finance' %}Financé
-                                {% elseif inv.project.status == 'ferme' %}Fermé
+                                {% if inv.project.status == 'pending' %}En attente
+                                {% elseif inv.project.status == 'in_progress' %}En cours
+                                {% elseif inv.project.status == 'funded' %}Financé
+                                {% elseif inv.project.status == 'completed' %}Terminé
                                 {% else %}{{ inv.project.status }}{% endif %}
                             </span>
                         {% else %}

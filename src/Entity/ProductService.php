@@ -5,8 +5,8 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ProductServiceRepository;
 
-#[ORM\Entity(repositoryClass: ProductServiceRepository::class)]
-#[ORM\Table(name: 'product_service')]
+// Legacy stub — superseded by App\Entity\Marketplace\ProductService.
+// #[ORM\Entity] removed to prevent duplicate table mapping.
 class ProductService
 {
     #[ORM\Id]

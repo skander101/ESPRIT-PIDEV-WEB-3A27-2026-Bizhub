@@ -13,15 +13,15 @@ use App\Repository\Marketplace\CommandeRepository;
  * à une API ML externe sans modifier les consommateurs (CommandeController).
  *
  * Résultat :
- *   score >= SEUIL_AUTO_CONFIRM  → confirmation automatique
- *   score <= SEUIL_AUTO_REJECT   → rejet automatique
- *   entre les deux               → attente validation manuelle
+ *   score >= 50  → confirmation automatique
+ *   score <= 40  → rejet automatique
+ *   41–49        → attente validation manuelle
  */
 class OrderScoringService
 {
     // Seuils de décision (ajustables via .env si besoin d'externaliser)
-    private const SEUIL_AUTO_CONFIRM = 70;
-    private const SEUIL_AUTO_REJECT  = 20;
+    private const SEUIL_AUTO_CONFIRM = 50;
+    private const SEUIL_AUTO_REJECT  = 40;
 
     // Poids des critères (total = 100)
     private const POIDS_MONTANT      = 20;

@@ -5,6 +5,8 @@ namespace App\Controller\Marketplace;
 use App\Entity\Marketplace\ProduitService;
 use App\Form\Marketplace\ProduitType;
 use App\Repository\Marketplace\ProduitServiceRepository;
+use App\Service\Marketplace\RecommendationService;
+use App\Service\Marketplace\StatisticsService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -43,7 +45,7 @@ class ProduitController extends AbstractController
     // ════════════════════════════════════════════════════════════════════
 
     #[Route('', name: 'index', methods: ['GET'])]
-    public function index(ProduitServiceRepository $repo, Request $request): Response
+    public function index(ProduitServiceRepository $repo, Request $request, StatisticsService $statisticsService): Response
     {
         // Investors cannot browse the public catalog - redirect to their products
         $user = $this->getUser();
@@ -61,15 +63,16 @@ class ProduitController extends AbstractController
         };
 
         return $this->render('front/Marketplace/produits/index.html.twig', [
-            'produits'   => $produits,
-            'categories' => $repo->findAllCategories(),
-            'q'          => $q,
-            'cat_active' => $categorie,
+            'produits'     => $produits,
+            'categories'   => $repo->findAllCategories(),
+            'q'            => $q,
+            'cat_active'   => $categorie,
+            'top_produits' => $statisticsService->getTopProductsByFrequency(5),
         ]);
     }
 
     #[Route('/{id}', name: 'show', methods: ['GET'], requirements: ['id' => '\d+'])]
-    public function show(ProduitService $produit): Response
+    public function show(ProduitService $produit, RecommendationService $recommandation): Response
     {
         if (!$this->getUser()) {
             return $this->redirectToRoute('app_login');
@@ -79,7 +82,8 @@ class ProduitController extends AbstractController
             return $this->redirectToRoute('produit_mes');
         }
         return $this->render('front/Marketplace/produits/show.html.twig', [
-            'produit' => $produit,
+            'produit'   => $produit,
+            'similaires' => $recommandation->getSimilarProducts($produit, 4),
         ]);
     }
 

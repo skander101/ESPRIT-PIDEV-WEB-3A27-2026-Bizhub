@@ -35,14 +35,16 @@
 
       {# Marketplace Module #}
       <li class="nav-item nav-item-has-children">
-        <a href="#0" data-bs-toggle="collapse" data-bs-target="#ddmenu_marketplace">
+        <a href="{{ path('admin_marketplace_dashboard') }}" data-bs-toggle="collapse" data-bs-target="#ddmenu_marketplace">
           <span class="icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 1a1 1 0 0 0-1 1v1h16V2a1 1 0 0 0-1-1H3Z"/><path d="M3 5h14v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5Z"/></svg></span>
           <span class="text">Marketplace</span>
         </a>
         <ul id="ddmenu_marketplace" class="collapse dropdown-nav">
-          <li><a href="#">Products</a></li>
-          <li><a href="#">Cart</a></li>
-          <li><a href="#">Orders</a></li>
+          <li><a href="{{ path('admin_marketplace_dashboard') }}">📊 Dashboard Stats</a></li>
+          <li><a href="{{ path('admin_marketplace_produits_index') }}">📦 Products</a></li>
+          <li><a href="{{ path('admin_marketplace_paniers_index') }}">🛒 Cart</a></li>
+          <li><a href="{{ path('admin_marketplace_commandes_index') }}">🛍️ Orders</a></li>
+          <li><a href="{{ path('admin_marketplace_clients_index') }}">👤 Clients</a></li>
         </ul>
       </li>
 
