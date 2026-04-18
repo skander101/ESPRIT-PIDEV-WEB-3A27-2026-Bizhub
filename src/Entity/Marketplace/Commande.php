@@ -13,10 +13,13 @@ use App\Repository\Marketplace\CommandeRepository;
 #[ORM\HasLifecycleCallbacks]
 class Commande
 {
-    const STATUT_ATTENTE   = 'en_attente';
-    const STATUT_CONFIRMEE = 'confirmee';
-    const STATUT_ANNULEE   = 'annulee';
-    const STATUT_LIVREE    = 'livree';
+    const STATUT_ATTENTE          = 'en_attente';
+    const STATUT_CONFIRMEE        = 'confirmee';
+    const STATUT_EN_COURS_PAIEMENT = 'en_cours_paiement';
+    const STATUT_PAYEE            = 'payee';
+    const STATUT_EN_PREPARATION   = 'en_preparation';
+    const STATUT_ANNULEE          = 'annulee';
+    const STATUT_LIVREE           = 'livree';
 
     const PAYMENT_STATUSES = [
         'non initié' => 'non initié',
@@ -50,7 +53,15 @@ class Commande
     #[ORM\Column(name: 'statut', type: 'string', length: 50, nullable: false)]
     #[Assert\NotBlank(message: 'Le statut est obligatoire.')]
     #[Assert\Choice(
-        choices: [self::STATUT_ATTENTE, self::STATUT_CONFIRMEE, self::STATUT_ANNULEE, self::STATUT_LIVREE],
+        choices: [
+            self::STATUT_ATTENTE,
+            self::STATUT_CONFIRMEE,
+            self::STATUT_EN_COURS_PAIEMENT,
+            self::STATUT_PAYEE,
+            self::STATUT_EN_PREPARATION,
+            self::STATUT_ANNULEE,
+            self::STATUT_LIVREE,
+        ],
         message: 'Statut invalide.'
     )]
     private string $statut = self::STATUT_ATTENTE;
@@ -73,6 +84,15 @@ class Commande
 
     #[ORM\Column(name: 'paid_at', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $paidAt = null;
+
+    #[ORM\Column(name: 'stripe_session_id', type: 'string', length: 255, nullable: true)]
+    private ?string $stripeSessionId = null;
+
+    #[ORM\Column(name: 'stripe_payment_intent_id', type: 'string', length: 255, nullable: true)]
+    private ?string $stripePaymentIntentId = null;
+
+    #[ORM\Column(name: 'score_auto', type: 'integer', nullable: true)]
+    private ?int $scoreAuto = null;
 
     #[ORM\Column(name: 'total_ht', type: 'decimal', precision: 10, scale: 3, nullable: true)]
     private ?string $totalHt = null;
@@ -119,6 +139,20 @@ class Commande
     public function getStatut(): string { return $this->statut; }
     public function setStatut(string $v): self { $this->statut = $v; return $this; }
 
+    /**
+     * Statut cohérent tenant compte à la fois de estPayee et de statut.
+     * Évite les incohérences dues à des webhooks tardifs ou des edge-cases
+     * qui laissent estPayee=true mais statut != 'payee'.
+     */
+    public function getEffectiveStatut(): string
+    {
+        $paidStates = [self::STATUT_PAYEE, self::STATUT_EN_PREPARATION, self::STATUT_LIVREE];
+        if ($this->estPayee && !in_array($this->statut, $paidStates, true)) {
+            return self::STATUT_PAYEE; // self-heal: payment confirmed, force paid state
+        }
+        return $this->statut;
+    }
+
     public function getPaymentStatus(): ?string { return $this->paymentStatus; }
     public function setPaymentStatus(?string $v): self { $this->paymentStatus = $v; return $this; }
 
@@ -159,6 +193,15 @@ class Commande
         $this->lignes->removeElement($ligne);
         return $this;
     }
+
+    public function getStripeSessionId(): ?string { return $this->stripeSessionId; }
+    public function setStripeSessionId(?string $v): self { $this->stripeSessionId = $v; return $this; }
+
+    public function getStripePaymentIntentId(): ?string { return $this->stripePaymentIntentId; }
+    public function setStripePaymentIntentId(?string $v): self { $this->stripePaymentIntentId = $v; return $this; }
+
+    public function getScoreAuto(): ?int { return $this->scoreAuto; }
+    public function setScoreAuto(?int $v): self { $this->scoreAuto = $v; return $this; }
 
     public function __toString(): string { return 'Commande #' . $this->idCommande; }
 }

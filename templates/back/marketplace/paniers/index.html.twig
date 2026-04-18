@@ -1,44 +1,55 @@
 {% extends 'back/base.html.twig' %}
 
 {% block title %}Paniers - Admin{% endblock %}
-{% block breadcrumb %}Paniers Actifs{% endblock %}
+{% block breadcrumb %}Paniers Actifs (lecture seule){% endblock %}
 
 {% block content %}
 <div style="padding:2rem;">
-  <div style="margin-bottom:2rem;">
-    <h2 style="font-size:1.5rem;color:var(--pg-text);margin:0;">Paniers Actifs</h2>
+
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; flex-wrap:wrap; gap:.8rem;">
+    <div>
+      <h2 style="font-size:1.4rem;color:var(--pg-text);margin:0 0 .25rem 0;">Paniers Actifs</h2>
+      <p style="color:var(--pg-muted);margin:0;font-size:0.83rem;">Lecture seule — {{ paniers|length }} article(s) en cours</p>
+    </div>
+    <a href="{{ path('admin_marketplace_dashboard') }}" style="background:var(--pg-surface2);color:var(--pg-text);padding:8px 16px;border-radius:6px;text-decoration:none;font-size:0.82rem;font-weight:700;border:1px solid var(--pg-border);">
+      ← Retour Dashboard
+    </a>
   </div>
 
   <div class="dash-panel">
     {% if paniers|length > 0 %}
       <div style="overflow-x:auto;">
-        <table style="width:100%;color:var(--pg-text);">
+        <table style="width:100%;border-collapse:collapse;color:var(--pg-text);">
           <thead>
-            <tr style="border-bottom:1px solid var(--pg-border);background:var(--pg-surface2);">
-              <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);">Client</th>
-              <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);">Articles</th>
-              <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);">Total</th>
-              <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);">Date Création</th>
-              <th style="text-align:center;padding:1rem;font-weight:700;color:var(--pg-muted);">Actions</th>
+            <tr style="border-bottom:2px solid var(--pg-border);background:var(--pg-surface2);">
+              <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);font-size:.78rem;text-transform:uppercase;">ID</th>
+              <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);font-size:.78rem;text-transform:uppercase;">Client</th>
+              <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);font-size:.78rem;text-transform:uppercase;">Produit</th>
+              <th style="text-align:center;padding:1rem;font-weight:700;color:var(--pg-muted);font-size:.78rem;text-transform:uppercase;">Qté</th>
+              <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);font-size:.78rem;text-transform:uppercase;">Ajouté le</th>
             </tr>
           </thead>
           <tbody>
             {% for panier in paniers %}
-              <tr style="border-bottom:1px solid var(--pg-border);transition:background 0.2s;">
-                <td style="padding:1rem;font-weight:600;">
-                  {% if panier.client %}
-                    {{ panier.client.fullName|default('Client #' ~ panier.idClient) }}
-                  {% else %}
-                    Client #{{ panier.idClient }}
-                  {% endif %}
+              <tr style="border-bottom:1px solid var(--pg-border);transition:background .15s;">
+                <td style="padding:.9rem 1rem;">
+                  <span style="background:var(--pg-surface2);color:var(--pg-muted);padding:3px 8px;border-radius:4px;font-size:.78rem;font-weight:700;">#{{ panier.idPanier }}</span>
                 </td>
-                <td style="padding:1rem;text-align:center;">{{ panier.articles|length }}</td>
-                <td style="padding:1rem;font-weight:700;color:#fbbf24;">{{ (panier.articles|reduce(0, (sum, art) => sum + (art.produit.prix * art.quantite)))|number_format(3, '.', '') }} TND</td>
-                <td style="padding:1rem;color:var(--pg-muted);">{{ panier.createdAt|date('d/m/Y H:i')|default('-') }}</td>
-                <td style="padding:1rem;text-align:center;">
-                  <div style="display:flex;gap:0.5rem;justify-content:center;">
-                    <button type="button" onclick="showPanierDetails({{ panier.idPanier }})" style="background:#17a2b8;color:white;padding:0.4rem 0.8rem;border:none;border-radius:4px;font-size:0.85rem;font-weight:700;cursor:pointer;transition:background 0.2s;">Voir</button>
-                  </div>
+                <td style="padding:.9rem 1rem;font-weight:600;">
+                  <span style="background:#eff6ff;color:#1d4ed8;padding:4px 10px;border-radius:20px;font-size:.8rem;font-weight:700;">
+                    Client #{{ panier.idClient }}
+                  </span>
+                </td>
+                <td style="padding:.9rem 1rem;">
+                  <span style="font-size:.85rem;color:var(--pg-text);">Produit #{{ panier.idProduit }}</span>
+                </td>
+                <td style="padding:.9rem 1rem;text-align:center;">
+                  <span style="background:#f0fdf4;color:#15803d;padding:4px 12px;border-radius:20px;font-size:.82rem;font-weight:700;">
+                    {{ panier.quantite }}
+                  </span>
+                </td>
+                <td style="padding:.9rem 1rem;color:var(--pg-muted);font-size:.82rem;">
+                  {{ panier.dateAjout ? panier.dateAjout|date('d/m/Y H:i') : '-' }}
                 </td>
               </tr>
             {% endfor %}
@@ -46,36 +57,11 @@
         </table>
       </div>
     {% else %}
-      <p style="text-align:center;padding:2rem;color:var(--pg-muted);">Aucun panier actif.</p>
+      <div style="text-align:center;padding:3rem;color:var(--pg-muted);">
+        <div style="font-size:2rem;margin-bottom:.5rem;">🛒</div>
+        <p>Aucun article dans les paniers actifs.</p>
+      </div>
     {% endif %}
   </div>
 </div>
-
-<!-- Modal de détails du panier -->
-<div id="panierModal" style="display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;overflow:auto;background-color:rgba(0,0,0,0.6);">
-  <div style="background:var(--pg-surface);margin:5% auto;padding:2rem;border:1px solid var(--pg-border);width:80%;max-width:500px;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.5);">
-    <span onclick="closePanierModal()" style="color:#aaa;float:right;font-size:28px;font-weight:bold;cursor:pointer;line-height:20px;">×</span>
-    <h3 id="panierTitle" style="margin-top:0;color:var(--pg-text);">Détails du Panier</h3>
-    <div id="panierDetails" style="max-height:400px;overflow-y:auto;"></div>
-  </div>
-</div>
-
-<script>
-function showPanierDetails(panierId) {
-  document.getElementById('panierModal').style.display = 'block';
-  document.getElementById('panierTitle').textContent = 'Détails du Panier #' + panierId;
-  document.getElementById('panierDetails').innerHTML = '<p style="text-align:center;padding:1rem;color:var(--pg-muted);">Contenu du panier chargement...</p>';
-}
-
-function closePanierModal() {
-  document.getElementById('panierModal').style.display = 'none';
-}
-
-window.onclick = function(event) {
-  const modal = document.getElementById('panierModal');
-  if (event.target === modal) {
-    modal.style.display = 'none';
-  }
-}
-</script>
 {% endblock %}

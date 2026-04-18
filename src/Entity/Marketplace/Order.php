@@ -73,7 +73,7 @@ class Order
         return $this;
     }
 
-    #[ORM\Column(type: 'decimal', nullable: true)]
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 3, nullable: true)]
     private ?float $unit_price = null;
 
     public function getUnit_price(): ?float
@@ -87,7 +87,7 @@ class Order
         return $this;
     }
 
-    #[ORM\Column(type: 'decimal', nullable: true)]
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 3, nullable: true)]
     private ?float $total_price = null;
 
     public function getTotal_price(): ?float

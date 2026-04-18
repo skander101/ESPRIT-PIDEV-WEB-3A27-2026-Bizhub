@@ -30,8 +30,8 @@ class AvisProduit
         return $this;
     }
 
-    #[ORM\OneToOne(targetEntity: User::class, inversedBy: 'avisProduit')]
-    #[ORM\JoinColumn(name: 'buyer_id', referencedColumnName: 'user_id', unique: true)]
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'buyer_id', referencedColumnName: 'user_id')]
     private ?User $user = null;
 
     public function getUser(): ?User
@@ -45,8 +45,8 @@ class AvisProduit
         return $this;
     }
 
-    #[ORM\OneToOne(targetEntity: ProduitService::class, inversedBy: 'avisProduit')]
-    #[ORM\JoinColumn(name: 'product_id', referencedColumnName: 'product_id', unique: true)]
+    #[ORM\ManyToOne(targetEntity: ProduitService::class)]
+    #[ORM\JoinColumn(name: 'product_id', referencedColumnName: 'id_produit')]
     private ?ProduitService $productService = null;
 
     public function getProductService(): ?ProduitService

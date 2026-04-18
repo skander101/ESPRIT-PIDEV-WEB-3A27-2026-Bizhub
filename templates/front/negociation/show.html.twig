@@ -1,0 +1,360 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Négociation #{{ neg.negotiation_id }} — BizHub{% endblock %}
+
+{% block extra_styles %}
+.neg-header { background: linear-gradient(135deg, var(--dark) 0%, var(--dark2) 100%); padding: 50px 5% 30px; }
+.neg-header h1 { font-size: 1.6rem; color: var(--white); font-family: 'Josefin Sans', sans-serif; font-weight: 700; }
+.neg-header p { color: rgba(255,255,255,0.55); font-size: 0.9rem; margin-top: 0.3rem; }
+.neg-layout { max-width: 1100px; margin: 0 auto; padding: 30px 5%; display: grid; grid-template-columns: 1fr 340px; gap: 1.5rem; }
+@media (max-width: 860px) { .neg-layout { grid-template-columns: 1fr; } }
+
+/* Chat */
+.chat-panel { background: var(--white); border-radius: 14px; border: 1.5px solid var(--border); display: flex; flex-direction: column; min-height: 540px; }
+.chat-header { padding: 18px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.chat-header-title { font-family: 'Josefin Sans', sans-serif; font-weight: 700; font-size: 0.95rem; color: var(--dark); }
+.chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; max-height: 460px; }
+.msg-bubble { max-width: 78%; padding: 12px 16px; border-radius: 14px; font-size: 0.88rem; line-height: 1.5; }
+.msg-bubble.mine { background: var(--primary); color: var(--dark); align-self: flex-end; border-bottom-right-radius: 4px; }
+.msg-bubble.theirs { background: var(--light-bg); color: var(--dark); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid var(--border); }
+.msg-meta { font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; }
+.msg-meta.right { text-align: right; }
+.msg-contre-offre { background: rgba(255,190,51,0.1); border: 1px solid rgba(255,190,51,0.3); border-radius: 10px; padding: 10px 14px; font-size: 0.85rem; }
+.chat-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
+.chat-input-row { display: flex; gap: 0.5rem; }
+.chat-input-row textarea { flex: 1; border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 0.88rem; resize: none; height: 60px; font-family: inherit; color: var(--dark); background: var(--light-bg); }
+.chat-input-row textarea:focus { outline: none; border-color: var(--primary); background: var(--white); }
+.btn-send { background: var(--primary); color: var(--dark); border: none; border-radius: 8px; padding: 0 20px; font-weight: 700; font-family: 'Josefin Sans', sans-serif; font-size: 0.82rem; cursor: pointer; transition: opacity 0.2s; }
+.btn-send:hover { opacity: 0.85; }
+
+/* Sidebar panels */
+.sidebar-panel { display: flex; flex-direction: column; gap: 1rem; }
+.panel-card { background: var(--white); border-radius: 14px; border: 1.5px solid var(--border); padding: 20px; }
+.panel-title { font-family: 'Josefin Sans', sans-serif; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 1rem; }
+.info-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+.info-row:last-child { border-bottom: none; }
+.info-label { color: var(--text-muted); }
+.info-value { font-weight: 700; color: var(--dark); font-family: 'Josefin Sans', sans-serif; }
+.info-value.accent { color: var(--primary); }
+
+/* Status badge */
+.badge-status { font-size: 0.72rem; font-weight: 700; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.08em; font-family: 'Josefin Sans', sans-serif; display: inline-block; }
+.badge-open     { background: rgba(255,190,51,0.12); color: #d97706; border: 1px solid rgba(255,190,51,0.3); }
+.badge-accepted { background: rgba(6,214,160,0.12);  color: #06d6a0; border: 1px solid rgba(6,214,160,0.3); }
+.badge-rejected { background: rgba(239,68,68,0.08);  color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
+.badge-expired  { background: rgba(107,114,128,0.1); color: #9ca3af; border: 1px solid rgba(107,114,128,0.2); }
+
+/* Action buttons */
+.action-btn { width: 100%; padding: 11px; border-radius: 8px; font-weight: 700; font-family: 'Josefin Sans', sans-serif; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.06em; border: none; cursor: pointer; transition: all 0.2s; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 7px; }
+.btn-accept  { background: #06d6a0; color: var(--white); }
+.btn-accept:hover  { background: #05c090; }
+.btn-reject  { background: rgba(239,68,68,0.08); color: #ef4444; border: 1.5px solid rgba(239,68,68,0.25); }
+.btn-reject:hover  { background: rgba(239,68,68,0.18); }
+.btn-counter { background: var(--primary); color: var(--dark); }
+.btn-counter:hover { opacity: 0.85; }
+
+/* Contre-offre form */
+.contre-offre-form { margin-top: 0.8rem; padding: 14px; background: var(--light-bg); border-radius: 10px; border: 1px solid var(--border); display: none; }
+.contre-offre-form.visible { display: block; }
+.contre-offre-form input[type=number] { width: 100%; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 7px; font-size: 0.9rem; color: var(--dark); background: var(--white); }
+.contre-offre-form input:focus { outline: none; border-color: var(--primary); }
+
+/* Deal banner */
+.deal-banner { background: rgba(6,214,160,0.08); border: 1px solid rgba(6,214,160,0.3); border-radius: 10px; padding: 14px 18px; display: flex; align-items: center; gap: 12px; }
+.deal-banner i { font-size: 1.4rem; color: #06d6a0; }
+.deal-banner-text { flex: 1; font-size: 0.88rem; }
+.deal-banner-title { font-weight: 700; color: var(--dark); font-family: 'Josefin Sans', sans-serif; }
+.deal-banner-sub { color: var(--text-muted); font-size: 0.8rem; margin-top: 2px; }
+
+/* Flash */
+.flash-msg { padding: 12px 18px; border-radius: 8px; margin-bottom: 1rem; font-size: 0.88rem; font-weight: 600; }
+.flash-success { background: rgba(6,214,160,0.1); color: #06d6a0; border: 1px solid rgba(6,214,160,0.3); }
+.flash-error   { background: rgba(239,68,68,0.08); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
+.flash-warning { background: rgba(255,190,51,0.1); color: #d97706; border: 1px solid rgba(255,190,51,0.3); }
+.flash-info    { background: rgba(99,102,241,0.08); color: #6366f1; border: 1px solid rgba(99,102,241,0.25); }
+{% endblock %}
+
+{% block content %}
+
+{# ── Header ── #}
+<div class="neg-header">
+    <div style="max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;">
+        <div>
+            <h1><i class="fa fa-handshake" style="color:var(--primary);margin-right:0.5rem;"></i>
+                Négociation #{{ neg.negotiation_id }}
+                {% if neg.project %} — {{ neg.project.title }}{% endif %}
+            </h1>
+            <p>
+                {% if neg.status == 'open' %}<span class="badge-status badge-open">Ouverte</span>
+                {% elseif neg.status == 'accepted' %}<span class="badge-status badge-accepted">Acceptée</span>
+                {% elseif neg.status == 'rejected' %}<span class="badge-status badge-rejected">Rejetée</span>
+                {% elseif neg.status == 'expired' %}<span class="badge-status badge-expired">Expirée</span>
+                {% endif %}
+                <span style="margin-left:0.8rem;">Initiée le {{ neg.created_at ? neg.created_at|date('d/m/Y') : '—' }}</span>
+            </p>
+        </div>
+        <a href="{{ path('app_negociation_index') }}" style="color:rgba(255,255,255,0.6);font-size:0.85rem;text-decoration:none;">
+            <i class="fa fa-arrow-left"></i> Retour à la liste
+        </a>
+    </div>
+</div>
+
+<div class="neg-layout">
+
+    {# ── Chat principal ── #}
+    <div>
+
+        {# Flash messages #}
+        {% for type, msgs in app.flashes %}
+            {% for msg in msgs %}
+                <div class="flash-msg flash-{{ type }}">{{ msg }}</div>
+            {% endfor %}
+        {% endfor %}
+
+        {# Deal banner si deal existant #}
+        {% if deal %}
+        <div class="deal-banner" style="margin-bottom:1rem;">
+            <i class="fa fa-file-contract"></i>
+            <div class="deal-banner-text">
+                <div class="deal-banner-title">Deal créé</div>
+                <div class="deal-banner-sub">
+                    Montant : {{ deal.amount|number_format(0, ',', ' ') }} TND —
+                    Statut :
+                    {% if deal.status == 'pending_payment' %}En attente de paiement
+                    {% elseif deal.status == 'paid' %}Payé
+                    {% elseif deal.status == 'pending_signature' %}En attente de signature
+                    {% elseif deal.status == 'signed' %}Signé
+                    {% elseif deal.status == 'completed' %}Terminé
+                    {% else %}{{ deal.status }}{% endif %}
+                </div>
+            </div>
+            <a href="{{ path('app_deal_show', {'id': deal.deal_id}) }}" class="btn-yellow" style="white-space:nowrap;padding:8px 16px;font-size:0.8rem;">
+                <i class="fa fa-eye"></i> Voir le deal
+            </a>
+        </div>
+        {% endif %}
+
+        {# Chat panel #}
+        <div class="chat-panel">
+            <div class="chat-header">
+                <span class="chat-header-title"><i class="fa fa-comments" style="color:var(--primary);margin-right:6px;"></i>Messages</span>
+                <span style="font-size:0.78rem;color:var(--text-muted);">{{ messages|length }} message(s)</span>
+            </div>
+
+            <div class="chat-messages" id="chat-messages">
+                {% if messages|length == 0 %}
+                    <div style="text-align:center;color:var(--text-muted);padding:40px 0;font-size:0.9rem;">
+                        <i class="fa fa-comment-slash" style="font-size:2rem;opacity:0.3;display:block;margin-bottom:0.8rem;"></i>
+                        Aucun message pour l'instant. Commencez la conversation.
+                    </div>
+                {% endif %}
+
+                {% for msg in messages %}
+                    {% set isMine = msg.user and msg.user.user_id == app.user.user_id %}
+
+                    {% if msg.message_type == 'contre_offre' %}
+                        {# Contre-offre : bulle spéciale centrée #}
+                        <div style="text-align:center;">
+                            <div class="msg-contre-offre" style="display:inline-block;">
+                                <i class="fa fa-exchange-alt" style="color:var(--primary);margin-right:5px;"></i>
+                                <strong>Contre-offre</strong>
+                                {% if msg.proposed_amount %}
+                                    — {{ msg.proposed_amount|number_format(0, ',', ' ') }} TND
+                                {% endif %}
+                                <br>
+                                <small style="color:var(--text-muted);">
+                                    par {{ msg.user ? msg.user.fullName : 'Inconnu' }}
+                                    {% if msg.created_at %} · {{ msg.created_at|date('d/m H:i') }}{% endif %}
+                                </small>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div style="display:flex;flex-direction:column;align-items:{% if isMine %}flex-end{% else %}flex-start{% endif %};">
+                            {% if not isMine %}
+                                <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:3px;padding-left:4px;">
+                                    {{ msg.user ? msg.user.fullName : 'Inconnu' }}
+                                </div>
+                            {% endif %}
+                            <div class="msg-bubble {{ isMine ? 'mine' : 'theirs' }}">
+                                {{ msg.message }}
+                            </div>
+                            <div class="msg-meta {{ isMine ? 'right' : '' }}">
+                                {% if msg.message_type == 'initiation' %}
+                                    <span style="color:var(--primary);font-weight:700;">Initiation · </span>
+                                {% endif %}
+                                {{ msg.created_at ? msg.created_at|date('d/m/Y H:i') : '' }}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            {# Zone de saisie (uniquement si négociation ouverte) #}
+            {% if neg.status == 'open' %}
+            <div class="chat-footer">
+                <form method="post" action="{{ path('app_negociation_message', {'id': neg.negotiation_id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('neg_msg_' ~ neg.negotiation_id) }}">
+                    <div class="chat-input-row">
+                        <textarea name="message" placeholder="Votre message…" required></textarea>
+                        <button type="submit" class="btn-send"><i class="fa fa-paper-plane"></i></button>
+                    </div>
+                </form>
+            </div>
+            {% else %}
+            <div class="chat-footer" style="text-align:center;color:var(--text-muted);font-size:0.85rem;padding:14px;">
+                <i class="fa fa-lock" style="margin-right:5px;"></i>
+                Cette négociation est {{ neg.status == 'accepted' ? 'acceptée' : (neg.status == 'rejected' ? 'rejetée' : 'terminée') }} — messagerie désactivée.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {# ── Sidebar ── #}
+    <div class="sidebar-panel">
+
+        {# Infos de la négociation #}
+        <div class="panel-card">
+            <div class="panel-title"><i class="fa fa-info-circle"></i> Détails</div>
+            <div class="info-row">
+                <span class="info-label">Projet</span>
+                <span class="info-value">{{ neg.project ? neg.project.title|slice(0, 22) ~ (neg.project.title|length > 22 ? '…' : '') : '—' }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Investisseur</span>
+                <span class="info-value">{{ neg.investor ? neg.investor.fullName : '—' }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Startup</span>
+                <span class="info-value">{{ neg.startup ? neg.startup.fullName : '—' }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Montant proposé</span>
+                <span class="info-value accent">
+                    {{ neg.proposed_amount ? neg.proposed_amount|number_format(0, ',', ' ') ~ ' TND' : '—' }}
+                </span>
+            </div>
+            {% if neg.final_amount %}
+            <div class="info-row">
+                <span class="info-label">Montant final</span>
+                <span class="info-value" style="color:#06d6a0;">{{ neg.final_amount|number_format(0, ',', ' ') }} TND</span>
+            </div>
+            {% endif %}
+            <div class="info-row">
+                <span class="info-label">Budget requis</span>
+                <span class="info-value">{{ neg.project ? neg.project.requiredBudget|number_format(0, ',', ' ') ~ ' TND' : '—' }}</span>
+            </div>
+        </div>
+
+        {# Actions (si négociation ouverte) #}
+        {% if neg.status == 'open' %}
+        <div class="panel-card">
+            <div class="panel-title"><i class="fa fa-bolt"></i> Actions</div>
+
+            {# Startup : accepter / rejeter #}
+            {% if is_startup %}
+
+            <form method="post" action="{{ path('app_negociation_accepter', {'id': neg.negotiation_id}) }}"
+                  data-confirm="Accepter cette négociation créera un Deal de {{ neg.proposed_amount ? neg.proposed_amount|number_format(0,',',' ') : '0' }} TND. Continuer ?"
+                  data-confirm-title="Accepter la négociation ?">
+                <input type="hidden" name="_token" value="{{ csrf_token('neg_accepter_' ~ neg.negotiation_id) }}">
+                <button type="submit" class="action-btn btn-accept">
+                    <i class="fa fa-check"></i> Accepter
+                </button>
+            </form>
+
+            <form method="post" action="{{ path('app_negociation_rejeter', {'id': neg.negotiation_id}) }}"
+                  data-confirm="Rejeter définitivement cette négociation ?"
+                  data-confirm-title="Rejeter la négociation ?">
+                <input type="hidden" name="_token" value="{{ csrf_token('neg_rejeter_' ~ neg.negotiation_id) }}">
+                <button type="submit" class="action-btn btn-reject">
+                    <i class="fa fa-times"></i> Rejeter
+                </button>
+            </form>
+
+            {% endif %}
+
+            {# Investisseur : rejeter seulement #}
+            {% if is_investor %}
+
+            <form method="post" action="{{ path('app_negociation_rejeter', {'id': neg.negotiation_id}) }}"
+                  data-confirm="Abandonner cette négociation ?"
+                  data-confirm-title="Abandonner ?">
+                <input type="hidden" name="_token" value="{{ csrf_token('neg_rejeter_' ~ neg.negotiation_id) }}">
+                <button type="submit" class="action-btn btn-reject">
+                    <i class="fa fa-times"></i> Abandonner
+                </button>
+            </form>
+
+            {% endif %}
+
+            {# Contre-offre (les deux parties) #}
+            <button type="button" class="action-btn btn-counter" onclick="toggleContreOffre()">
+                <i class="fa fa-exchange-alt"></i> Contre-offre
+            </button>
+
+            <div class="contre-offre-form" id="contre-offre-form">
+                <form method="post" action="{{ path('app_negociation_contre_offre', {'id': neg.negotiation_id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('neg_contre_' ~ neg.negotiation_id) }}">
+                    <label style="font-size:0.8rem;font-weight:700;color:var(--dark);display:block;margin-bottom:6px;">
+                        Nouveau montant (TND)
+                    </label>
+                    <input type="number" name="montant" min="1" step="0.01"
+                           placeholder="Ex: 50000"
+                           value="{{ neg.proposed_amount ?? '' }}"
+                           style="margin-bottom:10px;">
+                    <button type="submit" class="btn-send" style="width:100%;padding:10px;border-radius:7px;">
+                        <i class="fa fa-paper-plane"></i> Envoyer
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        {# Lien vers le projet #}
+        {% if neg.project %}
+        <div class="panel-card" style="padding:14px 18px;">
+            <a href="{{ path('app_front_projet_show', {'id': neg.project.project_id}) }}"
+               style="display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--dark);">
+                <i class="fa fa-rocket" style="color:var(--primary);font-size:1.1rem;"></i>
+                <div>
+                    <div style="font-size:0.8rem;font-weight:700;font-family:'Josefin Sans',sans-serif;">Voir le projet</div>
+                    <div style="font-size:0.75rem;color:var(--text-muted);">{{ neg.project.title }}</div>
+                </div>
+                <i class="fa fa-chevron-right" style="margin-left:auto;color:var(--text-muted);font-size:0.75rem;"></i>
+            </a>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<script>
+function toggleContreOffre() {
+    const f = document.getElementById('contre-offre-form');
+    f.classList.toggle('visible');
+}
+
+// Auto-scroll chat to bottom
+const chatMessages = document.getElementById('chat-messages');
+if (chatMessages) {
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// Polling AJAX toutes les 30 secondes si négociation ouverte
+{% if neg.status == 'open' %}
+let lastCount = {{ messages|length }};
+setInterval(function() {
+    fetch('{{ path('api_negociation_messages', {'id': neg.negotiation_id}) }}')
+        .then(r => r.json())
+        .then(data => {
+            if (data.count > lastCount) {
+                // Rechargement simple pour afficher les nouveaux messages
+                window.location.reload();
+            }
+        })
+        .catch(() => {});
+}, 30000);
+{% endif %}
+</script>
+
+{% endblock %}

@@ -10,9 +10,9 @@
       <h2 style="font-size:1.5rem;color:var(--pg-text);margin:0 0 0.5rem 0;">{{ produit.nom }}</h2>
       <p style="color:var(--pg-muted);margin:0;font-size:0.9rem;">Détails du produit</p>
     </div>
-    <div style="display:flex;gap:0.5rem;">
-      <a href="{{ path('admin_marketplace_produits_edit', {id: produit.idProduit}) }}" style="background:#8b5cf6;color:white;padding:0.5rem 1rem;border-radius:4px;text-decoration:none;font-weight:700;transition:background 0.2s;">✏️ Modifier</a>
-      <a href="{{ path('admin_marketplace_produits_index') }}" style="background:var(--pg-surface2);color:var(--pg-text);padding:0.5rem 1rem;border-radius:4px;text-decoration:none;font-weight:700;transition:background 0.2s;border:1px solid var(--pg-border);">← Retour</a>
+    <div style="display:flex;gap:0.5rem;align-items:center;">
+      <span style="background:#f3f4f6;color:#6b7280;padding:0.5rem 1rem;border-radius:4px;font-size:0.82rem;font-weight:700;">🔒 Lecture seule</span>
+      <a href="{{ path('admin_marketplace_produits_index') }}" style="background:var(--pg-surface2);color:var(--pg-text);padding:0.5rem 1rem;border-radius:4px;text-decoration:none;font-weight:700;border:1px solid var(--pg-border);">← Retour</a>
     </div>
   </div>
 
@@ -81,23 +81,10 @@
     <div style="padding:1rem;border-bottom:1px solid var(--pg-border);">
       <p style="color:var(--pg-text);margin:0;font-size:1rem;font-weight:700;">Actions</p>
     </div>
-    <div style="padding:1rem;display:flex;gap:0.75rem;flex-wrap:wrap;">
-      {% if produit.disponible %}
-        <form method="POST" action="{{ path('admin_marketplace_produits_toggle', {id: produit.idProduit}) }}" style="display:inline;">
-          <input type="hidden" name="_token" value="{{ csrf_token('toggle_produit_' ~ produit.idProduit) }}">
-          <button type="submit" style="background:#fbbf24;color:#000;padding:0.5rem 1rem;border:none;border-radius:4px;font-weight:700;cursor:pointer;transition:background 0.2s;">⊘ Marquer Indisponible</button>
-        </form>
-      {% else %}
-        <form method="POST" action="{{ path('admin_marketplace_produits_toggle', {id: produit.idProduit}) }}" style="display:inline;">
-          <input type="hidden" name="_token" value="{{ csrf_token('toggle_produit_' ~ produit.idProduit) }}">
-          <button type="submit" style="background:#06d6a0;color:#000;padding:0.5rem 1rem;border:none;border-radius:4px;font-weight:700;cursor:pointer;transition:background 0.2s;">✓ Marquer Disponible</button>
-        </form>
-      {% endif %}
-
-      <form method="POST" action="{{ path('admin_marketplace_produits_delete', {id: produit.idProduit}) }}" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr?');">
-        <input type="hidden" name="_token" value="{{ csrf_token('delete_produit_' ~ produit.idProduit) }}">
-        <button type="submit" style="background:#dc3545;color:white;padding:0.5rem 1rem;border:none;border-radius:4px;font-weight:700;cursor:pointer;transition:background 0.2s;">🗑️ Supprimer</button>
-      </form>
+    <div style="padding:1rem;">
+      <span style="background:#f0fdf4;color:#15803d;padding:6px 14px;border-radius:20px;font-size:0.8rem;font-weight:700;">
+        🔒 Admin — consultation uniquement
+      </span>
     </div>
   </div>
 </div>
