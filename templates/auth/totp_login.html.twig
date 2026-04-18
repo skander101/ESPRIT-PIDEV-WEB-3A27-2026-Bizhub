@@ -1,0 +1,73 @@
+{% extends 'auth_base.html.twig' %}
+
+{% block title %}Connexion TOTP - BizHub{% endblock %}
+
+{% block auth_page_styles %}
+.totp-note {
+    margin: 0 0 14px;
+    border: 1px solid #d8e4ff;
+    background: #f4f8ff;
+    color: #35506b;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 15px;
+    line-height: 1.45;
+    text-align: center;
+}
+{% endblock %}
+
+{% block auth_content %}
+    {% for message in app.flashes('success') %}
+        <div style="margin-bottom:12px;padding:11px 12px;border:1px solid #b7e1c1;background:#e8f5e9;color:#2e7d32;border-radius:8px;font-size:14px;">{{ message }}</div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div style="margin-bottom:12px;padding:11px 12px;border:1px solid #f3c4c4;background:#ffebee;color:#b71c1c;border-radius:8px;font-size:14px;">{{ message }}</div>
+    {% endfor %}
+
+    <h1 class="auth-heading">Connexion avec TOTP</h1>
+    <p class="auth-subtext">Entrez votre email et le code a 6 chiffres de votre application d'authentification.</p>
+
+    <div class="totp-note">Astuce : assurez-vous que l'heure de votre telephone est synchronisee automatiquement.</div>
+
+    {{ form_start(form, {'attr': {'id': 'totpForm', 'novalidate': 'novalidate'}}) }}
+        <div class="field-group">
+            <label class="field-label" for="{{ form.email.vars.id }}">Adresse email</label>
+            {{ form_widget(form.email, {'attr': {'class': 'input-field', 'placeholder': 'you@example.com', 'autocomplete': 'email'}}) }}
+            {% if form.email.vars.errors|length %}
+                <div class="field-error">{% for error in form.email.vars.errors %}{{ error.message }}{% endfor %}</div>
+            {% endif %}
+        </div>
+
+        <div class="field-group">
+            <label class="field-label" for="{{ form.otp.vars.id }}">Code TOTP</label>
+            {{ form_widget(form.otp, {'attr': {'class': 'input-field', 'placeholder': '123456', 'autocomplete': 'one-time-code', 'inputmode': 'numeric'}}) }}
+            {% if form.otp.vars.errors|length %}
+                <div class="field-error">{% for error in form.otp.vars.errors %}{{ error.message }}{% endfor %}</div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn-primary">Se connecter avec TOTP</button>
+    {{ form_end(form) }}
+
+    <hr class="section-separator" />
+
+    <p class="muted-center">
+        <a class="link-brand" href="{{ path('app_login') }}">Retour aux options de connexion</a>
+    </p>
+{% endblock %}
+
+{% block auth_scripts %}
+<script>
+(function () {
+    const otpInput = document.getElementById('{{ form.otp.vars.id }}');
+    if (!otpInput) {
+        return;
+    }
+
+    otpInput.addEventListener('input', function () {
+        otpInput.value = otpInput.value.replace(/[^0-9]/g, '').slice(0, 6);
+    });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,172 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Participants — {{ formation.title }}{% endblock %}
+{% block breadcrumb %}E-Learning / {{ formation.title }} / Participants{% endblock %}
+
+{% block extra_stylesheets %}
+  <style>
+    .participants-page .dash-panel {
+      border: 1px solid var(--pg-border);
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(20,24,38,.86), rgba(12,16,30,.92));
+      box-shadow: 0 18px 45px rgba(0,0,0,.24);
+      overflow: hidden;
+    }
+    .participants-page .table {
+      --bs-table-bg: transparent;
+      --bs-table-striped-bg: rgba(255,255,255,.02);
+      --bs-table-hover-bg: rgba(91,110,245,.08);
+      --bs-table-color: var(--pg-text);
+      margin-bottom: 0;
+    }
+    .participants-page .table thead th {
+      color: #c8d0ff;
+      font-weight: 600;
+      border-bottom: 1px solid var(--pg-border2);
+      background: rgba(91,110,245,.1);
+      letter-spacing: .01em;
+    }
+    .participants-page .table td { border-color: var(--pg-border); }
+    .participants-page .tiny-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: .28rem .62rem;
+      border-radius: 999px;
+      font-size: .72rem;
+      font-weight: 700;
+      border: 1px solid transparent;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+    }
+    .participants-page .tag-pending { background: rgba(255,190,51,.15); color: #ffd27b; border-color: rgba(255,190,51,.32); }
+    .participants-page .tag-paid,
+    .participants-page .tag-accepted,
+    .participants-page .tag-completed { background: rgba(6,214,160,.15); color: #53e2c0; border-color: rgba(6,214,160,.32); }
+    .participants-page .tag-failed,
+    .participants-page .tag-rejected,
+    .participants-page .tag-refunded { background: rgba(255,99,132,.15); color: #ff9bb3; border-color: rgba(255,99,132,.32); }
+    .participants-page .section-title {
+      font-size: 1.12rem;
+      color: var(--pg-text);
+      padding: 1rem 1rem 0;
+      margin: 0;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="participants-page" style="padding:2rem;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;">
+    <div>
+      <a href="{{ path('app_admin_formation_index') }}" class="text-decoration-none text-muted small">← Formations</a>
+      <h2 style="font-size:1.5rem;color:var(--pg-text);margin:0.5rem 0 0;">Participants : {{ formation.title }}</h2>
+      <p class="text-muted mb-0" style="font-size:0.85rem;">Formateurs approuves: {{ approved_trainers_count }} / {{ formation.maxFormateurs }}</p>
+    </div>
+    <a href="{{ path('app_admin_participation_new', { formation_id: formation.formation_id }) }}" class="btn btn-primary">+ Ajouter une participation</a>
+  </div>
+
+  {% for label, messages in app.flashes %}
+    {% for message in messages %}
+      <div class="alert alert-{{ label == 'error' ? 'danger' : label }} mb-3" role="alert">{{ message }}</div>
+    {% endfor %}
+  {% endfor %}
+
+  <div class="dash-panel">
+    {% if participations|length > 0 %}
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Participant</th>
+              <th>Email</th>
+              <th>Date affectation</th>
+              <th>Montant</th>
+              <th>Statut</th>
+              <th class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in participations %}
+              <tr>
+                <td>{{ p.user ? p.user.fullName : '—' }}</td>
+                <td>{{ p.user ? p.user.email : '—' }}</td>
+                <td>{{ p.date_affectation ? p.date_affectation|date('d/m/Y H:i') : '—' }}</td>
+                <td>{{ p.amount }}</td>
+                {% set paymentStatus = (p.payment_status ?? 'pending')|lower %}
+                <td>
+                  <span class="tiny-tag
+                    {{ paymentStatus in ['paid'] ? 'tag-paid' : '' }}
+                    {{ paymentStatus in ['pending'] ? 'tag-pending' : '' }}
+                    {{ paymentStatus in ['failed', 'refunded'] ? 'tag-failed' : '' }}">
+                    {{ paymentStatus|upper }}
+                  </span>
+                </td>
+                <td class="text-center">
+                  <a href="{{ path('app_admin_participation_edit', { id_candidature: p.id_candidature }) }}" class="btn btn-sm btn-outline-primary">Modifier</a>
+                  <form method="post" action="{{ path('app_admin_participation_delete', { id_candidature: p.id_candidature }) }}" class="d-inline" onsubmit="return confirm('Supprimer cette participation ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete_participation_' ~ p.id_candidature) }}">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-muted text-center py-5 mb-0">Aucun participant pour cette formation.</p>
+    {% endif %}
+  </div>
+
+  <div class="dash-panel mt-4">
+    <h3 class="section-title">Demandes formateurs</h3>
+    {% if training_requests|length > 0 %}
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Formateur</th>
+              <th>Email</th>
+              <th>Statut</th>
+              <th>Demande le</th>
+              <th class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for tr in training_requests %}
+              <tr>
+                <td>{{ tr.user ? tr.user.fullName : '—' }}</td>
+                <td>{{ tr.user ? tr.user.email : '—' }}</td>
+                <td>
+                  {% set reqStatus = (tr.status ?? 'pending')|lower %}
+                  <span class="tiny-tag
+                    {{ reqStatus in ['accepted', 'completed'] ? 'tag-accepted' : '' }}
+                    {{ reqStatus in ['pending'] ? 'tag-pending' : '' }}
+                    {{ reqStatus in ['rejected'] ? 'tag-rejected' : '' }}">
+                    {{ reqStatus|upper }}
+                  </span>
+                </td>
+                <td>{{ tr.createdAt ? tr.createdAt|date('d/m/Y H:i') : '—' }}</td>
+                <td class="text-center">
+                  <div class="d-flex gap-1 justify-content-center">
+                    <form method="post" action="{{ path('app_admin_formation_request_approve', { formation_id: formation.formation_id, id: tr.id }) }}">
+                      <input type="hidden" name="_token" value="{{ csrf_token('approve_training_request_' ~ tr.id) }}">
+                      <button type="submit" class="btn btn-sm btn-outline-success" {% if tr.status == 'accepted' %}disabled{% endif %}>Accepter</button>
+                    </form>
+                    <form method="post" action="{{ path('app_admin_formation_request_reject', { formation_id: formation.formation_id, id: tr.id }) }}">
+                      <input type="hidden" name="_token" value="{{ csrf_token('reject_training_request_' ~ tr.id) }}">
+                      <button type="submit" class="btn btn-sm btn-outline-danger" {% if tr.status == 'rejected' %}disabled{% endif %}>Refuser</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-muted text-center py-4 mb-0">Aucune demande formateur pour cette formation.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

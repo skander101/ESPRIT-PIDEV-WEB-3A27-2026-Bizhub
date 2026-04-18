@@ -1,0 +1,58 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Write a Review - BizHub{% endblock %}
+
+{% block content %}
+<div style="max-width:800px;margin:0 auto;padding:40px 5%;">
+    <h2 style="font-size:1.8rem;color:var(--dark);margin-bottom:0.5rem;font-family:'Lora',serif;">Write a Review</h2>
+    <p style="color:var(--text-muted);margin-bottom:2rem;">Share your feedback and rate your experience</p>
+
+    <div class="biz-form">
+        {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+        <div class="form-group">
+            {{ form_label(form.formation) }}
+            {{ form_widget(form.formation) }}
+            {% if form.formation.vars.errors|length %}
+                <div style="color:#c33;font-size:0.85rem;margin-top:0.4rem;">
+                    {% for error in form.formation.vars.errors %}
+                        {{ error.message }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.rating) }}
+            {{ form_widget(form.rating) }}
+            {% if form.rating.vars.errors|length %}
+                <div style="color:#c33;font-size:0.85rem;margin-top:0.4rem;">
+                    {% for error in form.rating.vars.errors %}
+                        {{ error.message }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.comment) }}
+            {{ form_widget(form.comment) }}
+            <p style="font-size:0.8rem;color:var(--text-muted);margin-top:0.4rem;">Max 1000 characters</p>
+            {% if form.comment.vars.errors|length %}
+                <div style="color:#c33;font-size:0.85rem;margin-top:0.4rem;">
+                    {% for error in form.comment.vars.errors %}
+                        {{ error.message }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div style="display:flex;gap:1rem;margin-top:2rem;">
+            <button type="submit" class="form-submit" style="flex:1;">Publish Review</button>
+            <a href="{{ path('app_avis_list') }}" class="btn-outline-dark" style="flex:1;text-align:center;padding:15px 0;">Cancel</a>
+        </div>
+
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,374 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Formations — BizHub{% endblock %}
+
+{# Le bloc extra_styles est déjà à l'intérieur de <style> dans base.html.twig : ne pas ajouter de <style></style> ici. #}
+{% block extra_styles %}
+  .formations-page { min-height: 100vh; padding-top: 72px; background: linear-gradient(180deg, #eef0f5 0%, #f4f6fa 35%, #eef0f5 100%); }
+  .formations-hero {
+    background: linear-gradient(135deg, #151b26 0%, #1e2533 45%, #222831 100%);
+    color: #fff;
+    padding: 2.25rem 5% 2.75rem;
+    margin: 0 -5vw 0;
+    padding-left: 5vw;
+    padding-right: 5vw;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+  }
+  @media (min-width: 1200px) {
+    .formations-hero { margin: 0 calc(50% - 50vw); padding-left: max(5%, calc(50vw - 560px)); padding-right: max(5%, calc(50vw - 560px)); }
+  }
+  .formations-hero-inner { max-width: 1100px; margin: 0 auto; }
+  .formations-badge {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 0.35rem 0.75rem; border-radius: 999px;
+    background: rgba(255,190,51,0.15); color: #ffbe33; border: 1px solid rgba(255,190,51,0.35);
+    font-family: 'Josefin Sans', sans-serif;
+  }
+  .formations-hero h1 {
+    font-family: 'Josefin Sans', sans-serif; font-size: clamp(1.65rem, 4vw, 2.15rem);
+    font-weight: 700; margin: 1rem 0 0.5rem; line-height: 1.2;
+  }
+  .formations-hero h1 span { color: #ffbe33; }
+  .formations-hero p.sub { color: rgba(255,255,255,0.65); font-size: 0.95rem; max-width: 520px; margin: 0 0 1.5rem; line-height: 1.55; }
+  .formations-search-wrap {
+    max-width: 640px;
+    margin-top: 0.25rem;
+  }
+  .formations-search-form {
+    display: flex; gap: 0.65rem; flex-wrap: wrap; align-items: stretch;
+  }
+  .formations-search-input-wrap {
+    flex: 1; min-width: 220px; position: relative;
+  }
+  .formations-search-input-wrap i {
+    position: absolute; left: 1rem; top: 50%; transform: translateY(-50%);
+    color: rgba(255,255,255,0.45); font-size: 0.95rem; pointer-events: none;
+  }
+  .formations-search-input {
+    width: 100%; height: 48px; padding: 0 1rem 0 2.65rem; border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.08);
+    color: #fff; font-size: 0.92rem; outline: none; transition: border .2s, background .2s, box-shadow .2s;
+  }
+  .formations-search-input::placeholder { color: rgba(255,255,255,0.4); }
+  .formations-search-input:focus {
+    border-color: rgba(255,190,51,0.55); background: rgba(255,255,255,0.12);
+    box-shadow: 0 0 0 3px rgba(255,190,51,0.15);
+  }
+  .formations-search-btn {
+    height: 48px; padding: 0 1.35rem; border-radius: 12px; border: none; cursor: pointer;
+    font-weight: 700; font-size: 0.88rem; letter-spacing: 0.04em; text-transform: uppercase;
+    font-family: 'Josefin Sans', sans-serif;
+    background: #ffbe33; color: #1e2533; transition: transform .15s, box-shadow .2s;
+    box-shadow: 0 4px 14px rgba(255,190,51,0.35);
+  }
+  .formations-search-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,190,51,0.45); }
+  .formations-search-reset {
+    height: 48px; padding: 0 1rem; border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.2); background: transparent; color: rgba(255,255,255,0.85);
+    font-weight: 600; font-size: 0.85rem; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center;
+    transition: background .2s, border-color .2s;
+  }
+  .formations-search-reset:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.35); color: #fff; }
+  .formations-main { max-width: 1100px; margin: 0 auto; padding: 2rem 5% 4rem; }
+  .formations-meta-bar {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .formations-count {
+    font-size: 0.88rem; color: var(--text-muted, #6b7280); font-weight: 500;
+  }
+  .formations-count strong { color: var(--dark, #1e2533); }
+  .formations-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;
+  }
+  .formation-card {
+    background: #fff; border-radius: 16px; overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+    border: 1px solid rgba(0,0,0,0.05);
+    display: flex; flex-direction: column; height: 100%;
+    transition: transform .22s ease, box-shadow .22s ease;
+  }
+  .formation-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.1), 0 4px 12px rgba(255,190,51,0.08);
+  }
+  .formation-card-accent {
+    height: 4px; width: 100%;
+  }
+  .formation-card-accent--online { background: linear-gradient(90deg, #3b82f6, #8b5cf6); }
+  .formation-card-accent--present { background: linear-gradient(90deg, #ffbe33, #f59e0b); }
+  .formation-card-body { padding: 1.35rem 1.35rem 1rem; flex: 1; display: flex; flex-direction: column; }
+  .formation-tag {
+    font-size: 0.65rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+    color: #ffbe33; margin-bottom: 0.5rem; font-family: 'Josefin Sans', sans-serif;
+  }
+  .formation-tag.online { color: #3b82f6; }
+  .formation-title { font-size: 1.12rem; font-weight: 700; color: #1e2533; margin: 0 0 0.5rem; line-height: 1.35; }
+  .formation-desc {
+    font-size: 0.88rem; color: #6b7280; line-height: 1.55; margin: 0;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .formation-meta {
+    padding: 0 1.35rem 1.25rem; display: flex; flex-direction: column; gap: 0.65rem;
+  }
+  .formation-meta-row {
+    display: flex; align-items: flex-start; gap: 0.65rem; font-size: 0.82rem; color: #4b5563;
+  }
+  .formation-meta-icon {
+    width: 32px; height: 32px; border-radius: 10px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 0.85rem;
+  }
+  .formation-meta-icon.cal { background: rgba(255,190,51,0.14); color: #d97706; }
+  .formation-meta-icon.pin { background: rgba(59,130,246,0.12); color: #2563eb; }
+  .formation-meta-icon.coin { background: rgba(16,185,129,0.12); color: #059669; }
+  .formation-meta-icon.user { background: rgba(139,92,246,0.12); color: #7c3aed; }
+  .formation-meta-text { padding-top: 0.15rem; line-height: 1.4; word-break: break-word; }
+  .formation-actions { padding: 0 1.35rem 1.35rem; margin-top: auto; }
+  .formation-btn-participate {
+    width: 100%; height: 46px; border: none; border-radius: 12px; cursor: pointer;
+    font-weight: 700; font-size: 0.82rem; letter-spacing: 0.06em; text-transform: uppercase;
+    font-family: 'Josefin Sans', sans-serif;
+    background: #ffbe33; color: #1e2533; transition: transform .15s, box-shadow .2s;
+    box-shadow: 0 4px 14px rgba(255,190,51,0.3);
+  }
+  .formation-btn-participate:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(255,190,51,0.4); }
+  .formation-btn-inscrit {
+    width: 100%; height: 46px; border-radius: 12px; border: 1px solid rgba(16,185,129,0.35);
+    background: rgba(16,185,129,0.1); color: #059669; font-weight: 700; font-size: 0.82rem;
+    cursor: default;
+  }
+  .formation-panel { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #f0f2f5; }
+  .formation-panel .btn-submit-msg {
+    width: 100%; height: 44px; border-radius: 10px; border: none; background: #1e2533; color: #fff;
+    font-weight: 600; font-size: 0.85rem; cursor: pointer; margin-top: 0.5rem;
+  }
+  .formation-reviews {
+    margin-top: 0.9rem; padding-top: 0.9rem; border-top: 1px solid #f0f2f5;
+  }
+  .formation-review-form {
+    display: grid; gap: 0.55rem;
+  }
+  .formation-review-stars {
+    display: flex; gap: 0.55rem; align-items: center;
+  }
+  .formation-review-stars label {
+    font-size: 0.82rem; color: #4b5563; min-width: 2.2rem;
+  }
+  .formation-review-stars select,
+  .formation-review-form textarea {
+    width: 100%; border: 1px solid #e5e7eb; border-radius: 10px; background: #fff; color: #1f2937;
+    font-size: 0.82rem; padding: 0.55rem 0.7rem;
+  }
+  .formation-review-form textarea { min-height: 84px; resize: vertical; }
+  .formation-review-submit {
+    height: 40px; border: none; border-radius: 10px; background: #2563eb; color: #fff;
+    font-weight: 700; font-size: 0.78rem; letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer;
+  }
+  .formation-review-list { margin-top: 0.75rem; display: grid; gap: 0.65rem; }
+  .formation-review-item {
+    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 0.65rem 0.75rem;
+  }
+  .formation-review-head {
+    display: flex; justify-content: space-between; gap: 0.5rem; align-items: center; margin-bottom: 0.25rem;
+  }
+  .formation-review-author { font-size: 0.78rem; font-weight: 700; color: #1f2937; }
+  .formation-review-date { font-size: 0.72rem; color: #6b7280; }
+  .formation-review-rating { color: #f59e0b; font-size: 0.8rem; letter-spacing: 0.04em; }
+  .formation-review-comment { font-size: 0.8rem; color: #374151; line-height: 1.45; white-space: pre-wrap; }
+  .formation-review-empty { font-size: 0.78rem; color: #6b7280; }
+  .formations-empty {
+    text-align: center; padding: 3rem 1.5rem; background: #fff; border-radius: 16px;
+    border: 1px dashed #e5e7eb; color: #6b7280;
+  }
+  .formations-empty i { font-size: 2.5rem; color: #d1d5db; margin-bottom: 1rem; display: block; }
+{% endblock %}
+
+{% block content %}
+<div class="formations-page">
+  <header class="formations-hero">
+    <div class="formations-hero-inner">
+      <span class="formations-badge"><i class="fa fa-graduation-cap"></i> E-learning</span>
+      <h1>Bonjour, <span>{{ (app.user.fullName|default(app.user.email))|split(' ')|first }}</span> — Formations</h1>
+      <p class="sub">Explorez les sessions disponibles et inscrivez-vous en un clic. Recherchez par titre, lieu, formateur ou mot-clé.</p>
+
+      <div class="formations-search-wrap">
+        <form class="formations-search-form" method="get" action="{{ path('app_front_formations_index') }}" role="search">
+          <div class="formations-search-input-wrap">
+            <i class="fa fa-search"></i>
+            <input type="search" name="q" class="formations-search-input" placeholder="Rechercher une formation, un lieu, un formateur…" value="{{ search_query|default('')|e('html_attr') }}" autocomplete="off" aria-label="Recherche formations">
+          </div>
+          <button type="submit" class="formations-search-btn">Rechercher</button>
+          {% if search_query|default('')|trim != '' %}
+            <a href="{{ path('app_front_formations_index') }}" class="formations-search-reset">Effacer</a>
+          {% endif %}
+        </form>
+      </div>
+    </div>
+  </header>
+
+  <div class="formations-main">
+    {% for label, messages in app.flashes %}
+      {% for message in messages %}
+        <div class="alert alert-{{ label == 'error' ? 'danger' : (label == 'success' ? 'success' : (label == 'warning' ? 'warning' : 'info')) }} mb-3" role="alert" style="border-radius:12px;">{{ message }}</div>
+      {% endfor %}
+    {% endfor %}
+
+    <div class="formations-meta-bar">
+      <p class="formations-count">
+        {% set n = formations|length %}
+        <strong>{{ n }}</strong> formation{{ n > 1 ? 's' : '' }}{% if search_query|default('')|trim != '' %} pour « {{ search_query|e }} »{% endif %}
+      </p>
+    </div>
+
+    {% if formations|length > 0 %}
+      <div class="formations-grid">
+        {% for f in formations %}
+          <article class="formation-card">
+            <div class="formation-card-accent {{ f.enLigne ? 'formation-card-accent--online' : 'formation-card-accent--present' }}"></div>
+            <div class="formation-card-body">
+              <div class="formation-tag {{ f.enLigne ? 'online' : '' }}">{{ f.enLigne ? 'En ligne' : 'Présentiel' }}</div>
+              <h2 class="formation-title">{{ f.title }}</h2>
+              {% if f.description %}
+                <p class="formation-desc">{{ f.description }}</p>
+              {% endif %}
+            </div>
+            <div class="formation-meta">
+              <div class="formation-meta-row">
+                <span class="formation-meta-icon cal"><i class="fa-regular fa-calendar"></i></span>
+                <span class="formation-meta-text">{{ f.start_date|date('d/m/Y') }} <span style="color:#9ca3af;">→</span> {{ f.end_date|date('d/m/Y') }}</span>
+              </div>
+              <div class="formation-meta-row">
+                <span class="formation-meta-icon pin"><i class="fa-solid fa-location-dot"></i></span>
+                <span class="formation-meta-text" title="{{ f.lieu|e('html_attr') }}">{% set lieu = f.lieu %}{{ lieu|length > 48 ? lieu|slice(0,45) ~ '…' : lieu }}</span>
+              </div>
+              <div class="formation-meta-row">
+                <span class="formation-meta-icon coin"><i class="fa-solid fa-coins"></i></span>
+                <span class="formation-meta-text"><strong>{{ f.cost ?? '0.00' }}</strong> TND</span>
+              </div>
+              {% if f.user %}
+                <div class="formation-meta-row">
+                  <span class="formation-meta-icon user"><i class="fa-regular fa-user"></i></span>
+                  <span class="formation-meta-text">{{ f.user.fullName }}</span>
+                </div>
+              {% endif %}
+                <div class="formation-meta-row">
+                  <span class="formation-meta-icon user"><i class="fa-solid fa-user-check"></i></span>
+                  <span class="formation-meta-text">Formateurs acceptes: {{ approved_formateurs_by_formation[f.formation_id]|default(0) }} / {{ f.maxFormateurs }}</span>
+                </div>
+            </div>
+            <div class="formation-actions">
+                {% if is_formateur %}
+                  {% set req = trainer_requests[f.formation_id]|default(null) %}
+                  {% if req and req.status == 'accepted' %}
+                    <button type="button" class="formation-btn-inscrit" disabled>Demande acceptee</button>
+                  {% elseif req and req.status == 'pending' %}
+                    <button type="button" class="formation-btn-inscrit" disabled>Demande en attente</button>
+                  {% elseif approved_formateurs_by_formation[f.formation_id]|default(0) >= f.maxFormateurs %}
+                    <button type="button" class="formation-btn-inscrit" disabled>Quota formateurs atteint</button>
+                  {% else %}
+                    <form method="post" action="{{ path('app_front_formation_apply', { formation_id: f.formation_id }) }}">
+                      <input type="hidden" name="_token" value="{{ csrf_token('formation_apply_' ~ f.formation_id) }}">
+                      {% if search_query|default('')|trim != '' %}
+                        <input type="hidden" name="q" value="{{ search_query|e('html_attr') }}">
+                      {% endif %}
+                      <button type="submit" class="formation-btn-participate">Demander cette formation</button>
+                    </form>
+                  {% endif %}
+                {% else %}
+                  {% if already_participating[f.formation_id] %}
+                    <button type="button" class="formation-btn-inscrit" disabled>Déjà inscrit</button>
+                  {% else %}
+                    <button type="button" class="formation-btn-participate nb-toggle-participation" data-target="participation-panel-{{ f.formation_id }}">Participer</button>
+                    <div id="participation-panel-{{ f.formation_id }}" class="formation-panel" style="display:none;">
+                      {{ form_start(forms[f.formation_id], { action: path('app_front_formation_participate', { formation_id: f.formation_id }), attr: { novalidate: 'novalidate', class: 'elearning-validated-form', 'data-validate-mode': 'participation-front' } }) }}
+                        {% if search_query|default('')|trim != '' %}
+                          <input type="hidden" name="q" value="{{ search_query|e('html_attr') }}">
+                        {% endif %}
+                        {{ form_row(forms[f.formation_id].remarques) }}
+                        <button type="submit" class="btn-submit-msg">Envoyer la demande</button>
+                      {{ form_end(forms[f.formation_id]) }}
+                    </div>
+                  {% endif %}
+                {% endif %}
+
+              <div class="formation-reviews">
+                  {% if (not is_formateur) and already_participating[f.formation_id] %}
+                  {% set currentReview = user_reviews[f.formation_id]|default(null) %}
+                  <form method="post" action="{{ path('app_front_formation_review', { formation_id: f.formation_id }) }}" class="formation-review-form">
+                    <input type="hidden" name="_token" value="{{ csrf_token('formation_review_' ~ f.formation_id) }}">
+                    {% if search_query|default('')|trim != '' %}
+                      <input type="hidden" name="q" value="{{ search_query|e('html_attr') }}">
+                    {% endif %}
+                    <div class="formation-review-stars">
+                      <label for="review-rating-{{ f.formation_id }}">Note</label>
+                      <select id="review-rating-{{ f.formation_id }}" name="rating" required>
+                        <option value="">Choisir</option>
+                        {% for i in 1..5 %}
+                          <option value="{{ i }}" {% if currentReview and currentReview.rating == i %}selected{% endif %}>{{ i }} / 5</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <textarea name="comment" maxlength="1000" placeholder="Partagez votre retour sur cette formation...">{{ currentReview ? currentReview.comment : '' }}</textarea>
+                    <button type="submit" class="formation-review-submit">{{ currentReview ? 'Mettre a jour mon avis' : 'Publier mon avis' }}</button>
+                  </form>
+                {% endif %}
+
+                {% set reviews = reviews_by_formation[f.formation_id]|default([]) %}
+                {% if reviews is not empty %}
+                  <div class="formation-review-list">
+                    {% for r in reviews %}
+                      <article class="formation-review-item">
+                        <div class="formation-review-head">
+                          <span class="formation-review-author">{{ r.user.fullName|default(r.user.email) }}</span>
+                          <span class="formation-review-date">{{ r.createdAt ? r.createdAt|date('d/m/Y') : '' }}</span>
+                        </div>
+                        <div class="formation-review-rating">
+                          {% set stars = r.rating|default(0) %}
+                          {% for i in 1..5 %}
+                            {{ i <= stars ? '★' : '☆' }}
+                          {% endfor %}
+                        </div>
+                        {% if r.displayComment %}
+                          <p class="formation-review-comment">{{ r.displayComment }}</p>
+                        {% endif %}
+                      </article>
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  <p class="formation-review-empty">Aucun avis pour le moment.</p>
+                {% endif %}
+              </div>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="formations-empty">
+        <i class="fa fa-search"></i>
+        {% if search_query|default('')|trim != '' %}
+          <p style="margin:0;font-size:1rem;color:#4b5563;">Aucune formation ne correspond à votre recherche.</p>
+          <p style="margin:0.75rem 0 0;"><a href="{{ path('app_front_formations_index') }}" style="color:#ffbe33;font-weight:600;">Voir toutes les formations</a></p>
+        {% else %}
+          <p style="margin:0;">Aucune formation n’est disponible pour le moment.</p>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+  {{ parent() }}
+  <script>
+    document.querySelectorAll('.nb-toggle-participation').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = btn.getAttribute('data-target');
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.style.display = el.style.display === 'none' ? 'block' : 'none';
+      });
+    });
+  </script>
+  <script src="{{ asset('js/elearning-forms-validation.js') }}"></script>
+{% endblock %}

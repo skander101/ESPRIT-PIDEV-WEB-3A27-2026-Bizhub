@@ -1,0 +1,145 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Commande #{{ commande.idCommande }} - Admin{% endblock %}
+{% block breadcrumb %}Commande #{{ commande.idCommande }}{% endblock %}
+
+{% block content %}
+<div style="padding:2rem;">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2rem;">
+    <div>
+      <h2 style="font-size:1.5rem;color:var(--pg-text);margin:0 0 0.5rem 0;">#{{ commande.idCommande }}</h2>
+      <p style="color:var(--pg-muted);margin:0;font-size:0.9rem;">Détails de la commande</p>
+    </div>
+    <div style="display:flex;gap:0.5rem;">
+      <a href="{{ path('admin_marketplace_commandes_edit', {id: commande.idCommande}) }}" style="background:#8b5cf6;color:white;padding:0.5rem 1rem;border-radius:4px;text-decoration:none;font-weight:700;transition:background 0.2s;">✏️ Modifier</a>
+      <a href="{{ path('admin_marketplace_commandes_index') }}" style="background:var(--pg-surface2);color:var(--pg-text);padding:0.5rem 1rem;border-radius:4px;text-decoration:none;font-weight:700;transition:background 0.2s;border:1px solid var(--pg-border);">← Retour</a>
+    </div>
+  </div>
+
+  <!-- Info Grid -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));gap:1.5rem;margin-bottom:2rem;">
+    <div class="dash-panel">
+      <div style="padding:1rem;border-bottom:1px solid var(--pg-border);">
+        <p style="color:var(--pg-muted);margin:0;font-size:0.85rem;font-weight:700;text-transform:uppercase;">Client</p>
+      </div>
+      <div style="padding:1rem;">
+        <p style="color:var(--pg-text);margin:0;font-size:1rem;font-weight:600;">Client #{{ commande.idClient }}</p>
+      </div>
+    </div>
+
+    <div class="dash-panel">
+      <div style="padding:1rem;border-bottom:1px solid var(--pg-border);">
+        <p style="color:var(--pg-muted);margin:0;font-size:0.85rem;font-weight:700;text-transform:uppercase;">Date</p>
+      </div>
+      <div style="padding:1rem;">
+        <p style="color:var(--pg-text);margin:0;font-size:1rem;font-weight:600;">{{ commande.dateCommande|date('d/m/Y H:i') }}</p>
+      </div>
+    </div>
+
+    <div class="dash-panel">
+      <div style="padding:1rem;border-bottom:1px solid var(--pg-border);">
+        <p style="color:var(--pg-muted);margin:0;font-size:0.85rem;font-weight:700;text-transform:uppercase;">Statut</p>
+      </div>
+      <div style="padding:1rem;">
+        <span style="display:inline-block;background:rgba(91,110,245,0.15);color:#5b6ef5;padding:0.3rem 0.8rem;border-radius:4px;font-size:0.85rem;font-weight:700;text-transform:capitalize;">{{ commande.statut }}</span>
+      </div>
+    </div>
+
+    <div class="dash-panel">
+      <div style="padding:1rem;border-bottom:1px solid var(--pg-border);">
+        <p style="color:var(--pg-muted);margin:0;font-size:0.85rem;font-weight:700;text-transform:uppercase;">Paiement</p>
+      </div>
+      <div style="padding:1rem;">
+        <span style="display:inline-block;background:{{ commande.estPayee ? 'rgba(6,214,160,0.15)' : 'rgba(255,191,36,0.15)' }};color:{{ commande.estPayee ? '#06d6a0' : '#fbbf24' }};padding:0.3rem 0.8rem;border-radius:4px;font-size:0.85rem;font-weight:700;">
+          {{ commande.estPayee ? 'Payée' : 'En attente' }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Articles -->
+  <div class="dash-panel" style="margin-bottom:2rem;">
+    <div style="padding:1rem;border-bottom:1px solid var(--pg-border);">
+      <p style="color:var(--pg-text);margin:0;font-size:1rem;font-weight:700;">Articles Commandés</p>
+    </div>
+    {% if commande.lignes|length > 0 %}
+      <div style="overflow-x:auto;">
+        <table style="width:100%;color:var(--pg-text);">
+          <thead>
+            <tr style="border-bottom:1px solid var(--pg-border);background:var(--pg-surface2);">
+              <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);">Produit</th>
+              <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);">Quantité</th>
+              <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);">Prix HT</th>
+              <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ligne in commande.lignes %}
+              <tr style="border-bottom:1px solid var(--pg-border);">
+                <td style="padding:1rem;">
+                  {% if ligne.produit %}
+                    <div style="font-weight:600;">{{ ligne.produit.nom }}</div>
+                    <div style="font-size:0.85rem;color:var(--pg-muted);">{{ ligne.produit.categorie|default('N/A') }}</div>
+                  {% else %}
+                    <span style="color:#dc3545;">Produit supprimé</span>
+                  {% endif %}
+                </td>
+                <td style="padding:1rem;text-align:center;">{{ ligne.quantite }}</td>
+                <td style="padding:1rem;text-align:right;">{{ ligne.prixHtUnitaire }} TND</td>
+                <td style="padding:1rem;text-align:right;font-weight:700;color:#fbbf24;">{{ (ligne.prixHtUnitaire * ligne.quantite)|number_format(3, '.', '') }} TND</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div style="padding:1rem;">
+        <p style="color:var(--pg-muted);margin:0;">Aucun article dans cette commande.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Summary -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));gap:1.5rem;margin-bottom:2rem;">
+    <div class="dash-panel">
+      <div style="padding:1rem;border-bottom:1px solid var(--pg-border);">
+        <p style="color:var(--pg-muted);margin:0;font-size:0.85rem;font-weight:700;text-transform:uppercase;">Total HT</p>
+      </div>
+      <div style="padding:1rem;">
+        <p style="color:var(--pg-text);margin:0;font-size:1.5rem;font-weight:700;">{{ commande.totalHt }} TND</p>
+      </div>
+    </div>
+
+    <div class="dash-panel">
+      <div style="padding:1rem;border-bottom:1px solid var(--pg-border);">
+        <p style="color:var(--pg-muted);margin:0;font-size:0.85rem;font-weight:700;text-transform:uppercase;">TVA (19%)</p>
+      </div>
+      <div style="padding:1rem;">
+        <p style="color:var(--pg-text);margin:0;font-size:1.5rem;font-weight:700;">{{ commande.totalTva }} TND</p>
+      </div>
+    </div>
+
+    <div class="dash-panel" style="border-left:4px solid #fbbf24;">
+      <div style="padding:1rem;border-bottom:1px solid var(--pg-border);">
+        <p style="color:var(--pg-muted);margin:0;font-size:0.85rem;font-weight:700;text-transform:uppercase;">Total TTC</p>
+      </div>
+      <div style="padding:1rem;">
+        <p style="color:#fbbf24;margin:0;font-size:1.5rem;font-weight:700;">{{ commande.totalTtc }} TND</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="dash-panel">
+    <div style="padding:1rem;border-bottom:1px solid var(--pg-border);">
+      <p style="color:var(--pg-text);margin:0;font-size:1rem;font-weight:700;">Actions</p>
+    </div>
+    <div style="padding:1rem;display:flex;gap:0.75rem;flex-wrap:wrap;">
+      <form method="POST" action="{{ path('admin_marketplace_commandes_delete', {id: commande.idCommande}) }}" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr?');">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete_commande_' ~ commande.idCommande) }}">
+        <button type="submit" style="background:#dc3545;color:white;padding:0.5rem 1rem;border:none;border-radius:4px;font-weight:700;cursor:pointer;transition:background 0.2s;">🗑️ Supprimer</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

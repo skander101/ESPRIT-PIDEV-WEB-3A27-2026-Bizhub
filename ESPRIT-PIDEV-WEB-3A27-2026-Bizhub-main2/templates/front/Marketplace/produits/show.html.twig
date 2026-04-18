@@ -1,0 +1,119 @@
+{% extends 'front/Marketplace/base_marketplace.html.twig' %}
+
+{% block title %}{{ produit.nom }}{% endblock %}
+{% block hero_eyebrow %}Produit{% endblock %}
+{% block hero_title %}<span>{{ produit.nom }}</span>{% endblock %}
+{% block breadcrumb_extra %}
+  <i class="fa fa-chevron-right" style="font-size:.55rem"></i>
+  <a href="{{ path('produit_index') }}">Catalogue</a>
+  <i class="fa fa-chevron-right" style="font-size:.55rem"></i>
+  {{ produit.nom|slice(0,30) }}{% if produit.nom|length > 30 %}…{% endif %}
+{% endblock %}
+
+{% block body %}
+<div style="max-width:1100px; margin:0 auto; padding:60px 5%;">
+  <div style="display:grid; grid-template-columns:1fr 340px; gap:3rem; align-items:start;">
+
+    {# ── Infos produit ── #}
+    <div>
+      <a href="{{ path('produit_index') }}" class="btn-ghost btn-sm" style="margin-bottom:2rem">
+        <i class="fa fa-arrow-left"></i> Retour au catalogue
+      </a>
+
+      <div style="background:var(--light-bg); border-radius:16px; height:280px; display:flex; align-items:center; justify-content:center; margin-bottom:2rem; border:1.5px solid var(--border); overflow:hidden;">
+        {% if produit.imagePath %}
+          <img src="{{ asset('assets/images/productimages/' ~ produit.imagePath) }}" alt="{{ produit.nom }}" style="width:100%; height:100%; object-fit:cover; border-radius:16px;">
+        {% else %}
+          <i class="fa fa-cube" style="font-size:5rem; color:rgba(255,190,51,0.35);"></i>
+        {% endif %}
+      </div>
+
+      <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem; align-items:center;">
+        {% if produit.categorie %}<span class="tag">{{ produit.categorie }}</span>{% endif %}
+        <span style="display:inline-flex; align-items:center; gap:4px; padding:6px 12px; border-radius:6px; background:{{ produit.disponible ? 'rgba(34,197,94,0.12)' : 'rgba(220,53,69,0.12)' }}; color:{{ produit.disponible ? '#15803d' : '#b91c1c' }}; font-size:0.85rem; font-weight:700;">
+          <i class="fa fa-{{ produit.disponible ? 'check-circle' : 'times-circle' }}"></i>
+          {{ produit.disponible ? 'Disponible' : 'Indisponible' }}
+        </span>
+      </div>
+
+      <h1 style="font-family:'Lora',serif; font-size:clamp(1.5rem,3vw,2.2rem); font-weight:700; color:var(--dark); margin-bottom:1rem;">
+        {{ produit.nom }}
+      </h1>
+
+      {% if produit.description %}
+      <p style="font-size:0.92rem; color:var(--muted); line-height:1.8; margin-bottom:1.5rem;">
+        {{ produit.description }}
+      </p>
+      {% endif %}
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem;">
+        <div class="biz-card">
+          <div class="biz-card-body" style="text-align:center; padding:18px;">
+            <div style="font-family:'Josefin Sans',sans-serif; font-size:0.66rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); margin-bottom:4px;">Prix HT</div>
+            <div style="font-family:'Josefin Sans',sans-serif; font-size:1.8rem; font-weight:800; color:var(--dark);">
+              {{ produit.prix }} <span style="font-size:0.9rem; font-weight:500; color:var(--muted);">TND</span>
+            </div>
+          </div>
+        </div>
+        <div class="biz-card">
+          <div class="biz-card-body" style="text-align:center; padding:18px;">
+            <div style="font-family:'Josefin Sans',sans-serif; font-size:0.66rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); margin-bottom:4px;">Stock</div>
+            <div style="font-family:'Josefin Sans',sans-serif; font-size:1.8rem; font-weight:800; color:var(--dark);">
+              {{ produit.quantite }} <span style="font-size:0.9rem; font-weight:500; color:var(--muted);">unités</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# ── Panneau achat ── #}
+    <div style="position:sticky; top:90px;">
+      <div class="biz-card">
+        <div class="biz-card-body">
+          <h3 style="font-family:'Lora',serif; font-size:1.1rem; font-weight:700; margin-bottom:1.2rem; padding-bottom:0.8rem; border-bottom:1px solid var(--border);">
+            Commander
+          </h3>
+
+          {% if produit.disponible %}
+          {# Ajouter au panier #}
+          <form method="post" action="{{ path('panier_add', {id: produit.idProduit}) }}" style="margin-bottom:0.75rem;">
+            <input type="hidden" name="_token" value="{{ csrf_token('add_panier_' ~ produit.idProduit) }}">
+            <div class="biz-form-group">
+              <label class="biz-label">Quantité</label>
+              <input type="number" name="quantite" value="1" min="1" max="{{ produit.quantite }}" class="biz-input">
+            </div>
+            <input type="hidden" name="redirect" value="panier">
+            <button type="submit" class="btn-yellow" style="width:100%; justify-content:center;">
+              <i class="fa fa-cart-plus"></i> Ajouter au panier
+            </button>
+          </form>
+
+          {# Commander direct #}
+          <form method="post" action="{{ path('commande_directe', {produitId: produit.idProduit}) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('directe_' ~ produit.idProduit) }}">
+            <input type="hidden" name="quantite" value="1">
+            <button type="submit" class="btn-success" style="width:100%; justify-content:center;">
+              <i class="fa fa-bolt"></i> Commander directement
+            </button>
+          </form>
+
+          {% else %}
+          <div class="flash flash-warning">
+            <i class="fa fa-exclamation-triangle"></i> Ce produit n'est plus disponible.
+          </div>
+          {% endif %}
+
+          <hr style="border:none; border-top:1px solid var(--border); margin:1.2rem 0;">
+
+          <div style="font-size:0.78rem; color:var(--muted); display:flex; flex-direction:column; gap:6px;">
+            <div><i class="fa fa-shield-alt" style="color:var(--primary); width:16px;"></i> Transaction sécurisée</div>
+            <div><i class="fa fa-check-circle" style="color:var(--success); width:16px;"></i> Confirmation rapide</div>
+            <div><i class="fa fa-undo" style="color:var(--info); width:16px;"></i> Annulation possible avant confirmation</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inscription - BizHub</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --primary:      #ffbe33;
+            --primary-dark: #e0a820;
+            --dark:         #222831;
+            --dark2:        #1a1f27;
+            --white:        #ffffff;
+            --light-bg:     #f8f8f8;
+            --text-muted:   #666666;
+            --border:       #ebebeb;
+        }
+
+        body {
+            font-family: 'Lora', serif;
+            background: var(--dark2);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 20%, rgba(255,190,51,0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 80%, rgba(255,190,51,0.05) 0%, transparent 40%);
+            pointer-events: none;
+        }
+
+        .auth-wrapper {
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .auth-brand {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-brand a {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--white);
+            letter-spacing: 0.1em;
+            font-family: 'Josefin Sans', sans-serif;
+            text-transform: uppercase;
+            text-decoration: none;
+        }
+
+        .auth-brand a span {
+            color: var(--primary);
+        }
+
+        .auth-container {
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+            padding: 48px 40px;
+            border: 1px solid var(--border);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+            font-family: 'Lora', serif;
+        }
+
+        .auth-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--dark);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            font-family: 'Josefin Sans', sans-serif;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            background: var(--white);
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            padding: 14px 16px;
+            font-family: 'Lora', serif;
+            font-size: 0.95rem;
+            color: var(--dark);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255,190,51,0.15);
+        }
+
+        .form-group input::placeholder {
+            color: #aaa;
+        }
+
+        .form-group select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .error-text {
+            color: #c33;
+            font-size: 0.8rem;
+            margin-top: 4px;
+        }
+
+        .error-box {
+            padding: 14px 16px;
+            background: rgba(220, 53, 69, 0.08);
+            border: 1px solid rgba(220, 53, 69, 0.2);
+            border-radius: 8px;
+            color: #c33;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .error-box i {
+            font-size: 1.1rem;
+        }
+
+        .success-box {
+            padding: 14px 16px;
+            background: rgba(40, 167, 69, 0.08);
+            border: 1px solid rgba(40, 167, 69, 0.2);
+            border-radius: 8px;
+            color: #28a745;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .terms-text {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-top: 0.5rem;
+        }
+
+        .terms-text a {
+            color: var(--primary-dark);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .terms-text a:hover {
+            color: var(--primary);
+        }
+
+        .auth-submit {
+            width: 100%;
+            background: var(--primary);
+            color: var(--dark);
+            border: none;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Josefin Sans', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 0.8rem;
+        }
+
+        .auth-submit:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(255,190,51,0.4);
+        }
+
+        .auth-submit:active {
+            transform: translateY(0);
+        }
+
+        .auth-footer {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .auth-footer a {
+            color: var(--primary-dark);
+            text-decoration: none;
+            font-weight: 700;
+            transition: color 0.2s;
+        }
+
+        .auth-footer a:hover {
+            color: var(--primary);
+        }
+
+        .back-home {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .back-home a {
+            color: rgba(255,255,255,0.5);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .back-home a:hover {
+            color: var(--primary);
+        }
+
+        .user-type-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
+        }
+
+        .user-type-option {
+            position: relative;
+        }
+
+        .user-type-option input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .user-type-option label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            background: var(--light-bg);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        .user-type-option label i {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            transition: color 0.2s;
+        }
+
+        .user-type-option label span {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .user-type-option input:checked + label {
+            border-color: var(--primary);
+            background: rgba(255,190,51,0.1);
+        }
+
+        .user-type-option input:checked + label i {
+            color: var(--primary);
+        }
+
+        .user-type-option label:hover {
+            border-color: var(--primary-dark);
+        }
+
+        @media (max-width: 540px) {
+            .auth-container {
+                padding: 36px 24px;
+            }
+
+            .auth-title {
+                font-size: 1.5rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .user-type-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .user-type-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .role-field {
+            display: none;
+        }
+
+        .role-field.active {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .role-section {
+            background: rgba(255,190,51,0.05);
+            border: 1px solid rgba(255,190,51,0.15);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .role-section-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-wrapper">
+        <div class="auth-brand">
+            <a href="{{ path('app_index') }}">Biz<span>Hub</span></a>
+        </div>
+
+        <div class="auth-container">
+            <div class="auth-header">
+                <h1 class="auth-title">Creer un compte</h1>
+                <p class="auth-subtitle">Rejoignez la communaute BizHub</p>
+            </div>
+
+            {% for message in app.flashes('error') %}
+                <div class="error-box" style="margin-bottom: 1.5rem;">
+                    <i class="fa fa-exclamation-circle"></i>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('success') %}
+                <div class="success-box" style="margin-bottom: 1.5rem;">
+                    <i class="fa fa-check-circle"></i>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+
+            {{ form_start(form, {'attr': {'class': 'auth-form', 'novalidate': 'novalidate'}}) }}
+
+                {# Global form errors (catches transform errors from numeric fields, etc.) #}
+                {% set globalErrors = [] %}
+                {% for error in form.vars.errors %}
+                    {% set globalErrors = globalErrors|merge([error.message]) %}
+                {% endfor %}
+                {% for child in form %}
+                    {% for error in child.vars.errors %}
+                        {% set globalErrors = globalErrors|merge([error.message]) %}
+                    {% endfor %}
+                {% endfor %}
+                {% if globalErrors|length %}
+                    <div class="error-box" style="margin-bottom: 1rem; flex-direction: column; align-items: flex-start; gap: 6px;">
+                        <div style="display:flex; align-items:center; gap:8px; font-weight:600;">
+                            <i class="fa fa-exclamation-circle"></i> Veuillez corriger les erreurs suivantes :
+                        </div>
+                        <ul style="margin:4px 0 0 20px; padding:0;">
+                            {% for msg in globalErrors %}
+                                <li>{{ msg }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <div class="form-group">
+                    {{ form_label(form.full_name, 'Nom Complet') }}
+                    {{ form_widget(form.full_name, {'attr': {'placeholder': 'Votre nom complet'}}) }}
+                    {% if form.full_name.vars.errors|length %}
+                        <div class="error-text">
+                            {% for error in form.full_name.vars.errors %}{{ error.message }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(form.email, 'Adresse Email') }}
+                    {{ form_widget(form.email, {'attr': {'placeholder': 'vous@exemple.com'}}) }}
+                    {% if form.email.vars.errors|length %}
+                        <div class="error-text">
+                            {% for error in form.email.vars.errors %}{{ error.message }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(form.user_type, 'Je suis un(e)') }}
+                    {{ form_widget(form.user_type) }}
+                    {% if form.user_type.vars.errors|length %}
+                        <div class="error-text">
+                            {% for error in form.user_type.vars.errors %}{{ error.message }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Dynamic role-specific fields -->
+                <div class="role-section" id="roleSection" style="display:none;">
+                    <div class="role-section-title" id="roleSectionTitle">
+                        <i class="fa fa-briefcase"></i> Informations complementaires
+                    </div>
+
+                    <!-- STARTUP & FOURNISSEUR: Company Information -->
+                    <div class="role-field" data-role="startup,fournisseur">
+                        {{ form_widget(form.company_name, {'attr': {'placeholder': 'Nom de votre entreprise'}}) }}
+                    </div>
+                    <div class="role-field" data-role="startup,fournisseur">
+                        {{ form_widget(form.sector, {'attr': {'placeholder': 'Secteur d\'activite'}}) }}
+                    </div>
+                    <div class="role-field" data-role="startup,fournisseur">
+                        {{ form_widget(form.company_description, {'attr': {'placeholder': 'Description'}}) }}
+                    </div>
+
+                    <!-- STARTUP only -->
+                    <div class="role-field" data-role="startup">
+                        {{ form_widget(form.website, {'attr': {'placeholder': 'https://exemple.com'}}) }}
+                    </div>
+                    <div class="role-field" data-role="startup">
+                        {{ form_label(form.founding_date, 'Date de fondation') }}
+                        {{ form_widget(form.founding_date) }}
+                    </div>
+                    <div class="role-field" data-role="startup">
+                        {{ form_widget(form.business_type, {'attr': {'placeholder': 'Type d\'entreprise (B2B, B2C, etc.)'}}) }}
+                    </div>
+
+                    <!-- FOURNISSEUR only -->
+                    <div class="role-field" data-role="fournisseur">
+                        {{ form_widget(form.delivery_zones, {'attr': {'placeholder': 'Zones de livraison (separees par des virgules)'}}) }}
+                    </div>
+                    <div class="role-field" data-role="fournisseur">
+                        {{ form_widget(form.payment_methods, {'attr': {'placeholder': 'Moyens de paiement acceptes'}}) }}
+                    </div>
+                    <div class="role-field" data-role="fournisseur">
+                        {{ form_widget(form.return_policy, {'attr': {'placeholder': 'Politique de retour'}}) }}
+                    </div>
+
+                    <!-- FORMATEUR fields -->
+                    <div class="role-field" data-role="formateur">
+                        {{ form_widget(form.specialty, {'attr': {'placeholder': 'Votre specialite'}}) }}
+                    </div>
+                    <div class="role-field" data-role="formateur,investisseur">
+                        {{ form_label(form.years_experience, 'Annees d\'experience') }}
+                        {{ form_widget(form.years_experience) }}
+                    </div>
+                    <div class="role-field" data-role="formateur">
+                        {{ form_label(form.hourly_rate, 'Tarif horaire (€)') }}
+                        {{ form_widget(form.hourly_rate, {'attr': {'placeholder': 'Ex: 50.00'}}) }}
+                    </div>
+                    <div class="role-field" data-role="formateur">
+                        {{ form_widget(form.availability, {'attr': {'placeholder': 'Votre disponibilite'}}) }}
+                    </div>
+                    <div class="role-field" data-role="formateur">
+                        {{ form_widget(form.cv_url, {'attr': {'placeholder': 'Lien vers votre CV'}}) }}
+                    </div>
+
+                    <!-- INVESTISSEUR fields -->
+                    <div class="role-field" data-role="investisseur">
+                        {{ form_widget(form.represented_company, {'attr': {'placeholder': 'Entreprise representee'}}) }}
+                    </div>
+                    <div class="role-field" data-role="investisseur">
+                        {{ form_widget(form.investment_sector, {'attr': {'placeholder': 'Secteur d\'investissement'}}) }}
+                    </div>
+                    <div class="role-field" data-role="investisseur">
+                        {{ form_label(form.max_budget, 'Budget maximum (€)') }}
+                        {{ form_widget(form.max_budget, {'attr': {'placeholder': 'Ex: 100000.00'}}) }}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        {{ form_label(form.password.first, 'Mot de Passe') }}
+                        {{ form_widget(form.password.first, {'attr': {'placeholder': 'Min. 8 caracteres'}}) }}
+                        {% if form.password.first.vars.errors|length %}
+                            <div class="error-text">
+                                {% for error in form.password.first.vars.errors %}{{ error.message }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form_label(form.password.second, 'Confirmer') }}
+                        {{ form_widget(form.password.second, {'attr': {'placeholder': 'Confirmez le mot de passe'}}) }}
+                        {% if form.password.second.vars.errors|length %}
+                            <div class="error-text">
+                                {% for error in form.password.second.vars.errors %}{{ error.message }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if form.password.vars.errors|length %}
+                    <div class="error-text" style="margin-top:-0.2rem; margin-bottom:0.8rem;">
+                        {% for error in form.password.vars.errors %}{{ error.message }}{% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="form-row">
+                    <div class="form-group">
+                        {{ form_label(form.phone, 'Telephone (optionnel)') }}
+                        {{ form_widget(form.phone, {'attr': {'placeholder': '+33 6 12 34 56 78'}}) }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form_label(form.address, 'Adresse (optionnel)') }}
+                        {{ form_widget(form.address, {'attr': {'placeholder': 'Votre adresse'}}) }}
+                    </div>
+                </div>
+
+                <div class="terms-text">
+                    En creant un compte, vous acceptez nos <a href="#">conditions d'utilisation</a>
+                    et notre <a href="#">politique de confidentialite</a>.
+                </div>
+
+                <button type="submit" class="auth-submit">
+                    <span>Creer mon compte</span>
+                    <i class="fa fa-arrow-right"></i>
+                </button>
+
+            {{ form_end(form) }}
+
+            <div class="auth-footer">
+                Vous avez deja un compte ? <a href="{{ path('app_login') }}">Se connecter</a>
+            </div>
+        </div>
+
+        <div class="back-home">
+            <a href="{{ path('app_index') }}"><i class="fa fa-arrow-left"></i> Retour a l'accueil</a>
+        </div>
+    </div>
+
+    <script>
+        // Handle dynamic role-specific fields
+        const userTypeSelect = document.querySelector('[name="user_form[user_type]"]');
+        const roleSection = document.getElementById('roleSection');
+        const roleFields = document.querySelectorAll('.role-field');
+
+        function updateRoleFields() {
+            const selectedRole = userTypeSelect?.value;
+            if (!selectedRole) {
+                roleSection.style.display = 'none';
+                return;
+            }
+
+            roleSection.style.display = 'block';
+
+            roleFields.forEach(field => {
+                const roles = field.dataset.role.split(',');
+                if (roles.includes(selectedRole)) {
+                    field.classList.add('active');
+                    field.style.display = 'flex';
+                } else {
+                    field.classList.remove('active');
+                    field.style.display = 'none';
+                }
+            });
+        }
+
+        if (userTypeSelect) {
+            userTypeSelect.addEventListener('change', updateRoleFields);
+            updateRoleFields(); // Initial state
+        }
+    </script>
+

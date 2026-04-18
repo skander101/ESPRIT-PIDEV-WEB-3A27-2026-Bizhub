@@ -1,0 +1,82 @@
+{% extends 'front/Marketplace/base_marketplace.html.twig' %}
+
+{% block title %}Paiement confirmé — Commande #{{ commande.idCommande }}{% endblock %}
+{% block hero_eyebrow %}Paiement{% endblock %}
+{% block hero_title %}Paiement <span>reçu</span>{% endblock %}
+{% block breadcrumb_extra %}
+  <i class="fa fa-chevron-right" style="font-size:.55rem"></i> Confirmation paiement
+{% endblock %}
+
+{% block body %}
+<div style="max-width:580px; margin:0 auto; padding:60px 5%;">
+
+  {# Carte principale #}
+  <div style="background:var(--white); border-radius:18px; border:1.5px solid var(--border); overflow:hidden; box-shadow:0 8px 40px rgba(0,0,0,0.1); text-align:center;">
+
+    {# Header vert #}
+    <div style="background:linear-gradient(135deg, #10b981 0%, #059669 100%); padding:40px 32px 32px;">
+      <div style="width:72px; height:72px; background:rgba(255,255,255,0.2); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
+        <i class="fa fa-check" style="font-size:2rem; color:white;"></i>
+      </div>
+      <h2 style="font-family:'Lora',serif; font-size:1.6rem; font-weight:700; color:white; margin-bottom:6px; font-style:italic;">Merci pour votre paiement !</h2>
+      <p style="color:rgba(255,255,255,0.85); font-size:0.9rem; margin:0;">Votre transaction est en cours de validation.</p>
+    </div>
+
+    {# Corps #}
+    <div style="padding:32px;">
+
+      {# Info commande #}
+      <div style="background:var(--light-bg); border-radius:12px; padding:20px 24px; margin-bottom:24px; text-align:left;">
+        <div style="font-family:'Josefin Sans',sans-serif; font-size:0.65rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:14px;">Détails de la commande</div>
+
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:0.85rem; color:var(--muted);">Commande</span>
+            <span style="font-family:'Josefin Sans',sans-serif; font-weight:700; color:var(--dark);">#{{ commande.idCommande }}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:0.85rem; color:var(--muted);">Montant TTC</span>
+            <span style="font-family:'Josefin Sans',sans-serif; font-weight:800; color:var(--primary); font-size:1.1rem;">{{ commande.totalTtc }} TND</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:0.85rem; color:var(--muted);">Statut paiement</span>
+            <span style="display:inline-flex; align-items:center; gap:5px; padding:5px 12px; border-radius:6px; background:rgba(16,185,129,0.12); color:#065f46; font-family:'Josefin Sans',sans-serif; font-size:0.75rem; font-weight:700; text-transform:uppercase;">
+              <i class="fa fa-check-circle"></i>
+              {{ commande.estPayee ? 'Confirmé' : 'En traitement' }}
+            </span>
+          </div>
+          {% if commande.stripeSessionId %}
+          <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:10px; margin-top:4px;">
+            <span style="font-size:0.82rem; color:var(--muted);">Réf. Stripe</span>
+            <code style="font-size:0.72rem; background:var(--border); padding:3px 8px; border-radius:4px; color:var(--dark);">{{ commande.stripeSessionId|slice(0, 20) }}…</code>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      {# Message #}
+      <p style="color:var(--muted); font-size:0.88rem; line-height:1.6; margin-bottom:28px;">
+        Votre paiement est confirmé et l'investisseur a été notifié.
+        Vous pouvez suivre l'avancement de votre commande en temps réel.
+      </p>
+
+      {# Boutons #}
+      <div style="display:flex; flex-direction:column; gap:0.75rem;">
+        <a href="{{ path('tracking_show', {id: commande.idCommande}) }}"
+           style="background:var(--primary); color:var(--dark); padding:13px 24px; border-radius:10px; font-family:'Josefin Sans',sans-serif; font-weight:700; font-size:0.82rem; text-transform:uppercase; letter-spacing:0.08em; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:8px; transition:background 0.2s;"
+           onmouseover="this.style.background='var(--primary-dark)'" onmouseout="this.style.background='var(--primary)'">
+          <i class="fa fa-map-marker-alt"></i> Suivre ma commande
+        </a>
+        <a href="{{ path('commande_index') }}"
+           style="background:transparent; color:var(--dark); border:1.5px solid var(--border); padding:12px 24px; border-radius:10px; font-family:'Josefin Sans',sans-serif; font-weight:700; font-size:0.82rem; text-transform:uppercase; letter-spacing:0.08em; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:8px; transition:all 0.2s;"
+           onmouseover="this.style.borderColor='var(--dark)'; this.style.background='var(--dark)'; this.style.color='white'"
+           onmouseout="this.style.borderColor='var(--border)'; this.style.background='transparent'; this.style.color='var(--dark)'">
+          <i class="fa fa-list"></i> Mes commandes
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}

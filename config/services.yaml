@@ -1,0 +1,135 @@
+# yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+# See also https://symfony.com/doc/current/service_container/import.html
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+    app.auth.mail_from_email: 'bizbot64@gmail.com'
+    app.auth.mail_from_name: 'BizHub'
+    app.google_client_id: '%env(trim:GOOGLE_CLIENT_ID)%'
+    app.google_client_secret: '%env(trim:GOOGLE_CLIENT_SECRET)%'
+    app.auth0_domain: '%env(trim:AUTH0_DOMAIN)%'
+    app.auth0_client_id: '%env(trim:AUTH0_CLIENT_ID)%'
+    app.auth0_client_secret: '%env(trim:AUTH0_CLIENT_SECRET)%'
+    face.api_key: '%env(FACE_API_KEY)%'
+    face.api_secret: '%env(FACE_API_SECRET)%'
+    app.cloudflare_api_token: '%env(default::CLOUDFLARE_API_TOKEN)%'
+    app.cloudflare_acc_id: '%env(default::CLOUDFLARE_ACC_ID)%'
+    app.stripe_public_key: '%env(STRIPE_PUBLIC_KEY)%'
+    app.stripe_secret_key: '%env(STRIPE_SECRET_KEY)%'
+    app.stripe_webhook_secret: '%env(default::STRIPE_WEBHOOK_SECRET)%'
+    app.groq_api_key: '%env(default::GROQ_API_KEY)%'
+    app.groq_model: '%env(default::GROQ_MODEL)%'
+    app.openai_api_key: '%env(default::OPENAI_API_KEY)%'
+    app.twilio_account_sid: '%env(default::TWILIO_ACCOUNT_SID)%'
+    app.twilio_auth_token: '%env(default::TWILIO_AUTH_TOKEN)%'
+    app.twilio_whatsapp_from: '%env(default::TWILIO_WHATSAPP_FROM)%'
+    app.gnews_api_key: '%env(default::GNEWS_API_KEY)%'
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/'
+
+    App\Service\Auth\AuthMailerService:
+        arguments:
+            $fromEmail: '%app.auth.mail_from_email%'
+            $fromName: '%app.auth.mail_from_name%'
+
+    App\Service\Auth\GoogleOAuthService:
+        arguments:
+            $googleClientId: '%app.google_client_id%'
+            $googleClientSecret: '%app.google_client_secret%'
+
+    App\Service\FacePlusPlus\FaceRecognitionService:
+        arguments:
+            $faceApiKey: '%face.api_key%'
+            $faceApiSecret: '%face.api_secret%'
+
+    App\Service\AI\CloudflareAiService:
+        arguments:
+            $cloudflareApiToken: '%app.cloudflare_api_token%'
+            $cloudflareAccountId: '%app.cloudflare_acc_id%'
+
+    App\EventListener\MfaEnforcementListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.request }
+
+    App\Controller\Investissement\DealController:
+        arguments:
+            $stripePublicKey: '%app.stripe_public_key%'
+            $stripeSecretKey: '%app.stripe_secret_key%'
+
+    App\Service\Marketplace\GrokService:
+        arguments:
+            $apiKey: '%app.groq_api_key%'
+            $model: '%app.groq_model%'
+
+    App\Service\Marketplace\StripeService:
+        arguments:
+            $stripeSecretKey: '%app.stripe_secret_key%'
+            $stripeWebhookSecret: '%app.stripe_webhook_secret%'
+
+    App\Service\Investissement\AiNegotiationService:
+        arguments:
+            $openaiApiKey: '%app.openai_api_key%'
+
+    App\Service\Investissement\ContractPdfService:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+
+    App\Service\Investissement\DashboardInvestisseurService:
+        arguments:
+            $openaiApiKey: '%app.openai_api_key%'
+
+    App\Service\Investissement\PortfolioAnalysisService:
+        arguments:
+            $openaiApiKey: '%app.openai_api_key%'
+
+    App\Service\Investissement\ProjectAdvisorService:
+        arguments:
+            $openaiApiKey: '%app.openai_api_key%'
+
+    App\Service\Investissement\RoiSimulatorService:
+        arguments:
+            $openaiApiKey: '%app.openai_api_key%'
+
+    App\Service\AI\AiProjectService:
+        arguments:
+            $openaiApiKey: '%app.openai_api_key%'
+
+    App\Service\Investissement\YousignService:
+        arguments:
+            $apiKey: '%env(YOUSIGN_API_KEY)%'
+            $baseUrl: '%env(YOUSIGN_BASE_URL)%'
+            $projectDir: '%kernel.project_dir%'
+
+    App\Command\TwilioTestCommand:
+        arguments:
+            $twilioAccountSid: '%app.twilio_account_sid%'
+            $twilioAuthToken: '%app.twilio_auth_token%'
+            $twilioWhatsappFrom: '%app.twilio_whatsapp_from%'
+        tags:
+            - { name: console.command }
+
+    App\Service\Marketplace\TwilioService:
+        arguments:
+            $twilioAccountSid: '%app.twilio_account_sid%'
+            $twilioAuthToken: '%app.twilio_auth_token%'
+            $twilioWhatsappFrom: '%app.twilio_whatsapp_from%'
+
+    App\Service\NewsService:
+        arguments:
+            $gnewsApiKey: '%app.gnews_api_key%'
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones

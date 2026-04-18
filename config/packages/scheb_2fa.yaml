@@ -1,0 +1,10 @@
+# See the configuration reference at https://symfony.com/bundles/SchebTwoFactorBundle/6.x/configuration.html
+scheb_two_factor:
+    totp:
+        enabled: true
+        issuer: "%env(APP_NAME)%"
+        leeway: 1
+    persister: scheb_two_factor.persister.doctrine
+    security_tokens:
+        - Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken
+        - Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken

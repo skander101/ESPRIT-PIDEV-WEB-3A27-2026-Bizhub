@@ -1,0 +1,271 @@
+{#
+  _market_widget.html.twig
+  Expects: market = { crypto: [...], rates: {...}, updated_at: DateTimeImmutable, available: bool }
+  Variant: market_variant = 'investisseur' | 'startup'
+#}
+
+<style>
+/* ══ Market Widget ════════════════════════════════════════════════════════════ */
+.mkt-section {
+  background: linear-gradient(145deg, #0f1621 0%, #151d2b 55%, #1a2235 100%);
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.07);
+  padding: 28px 28px 24px;
+  margin-bottom: 1.8rem;
+  position: relative; overflow: hidden;
+}
+.mkt-section::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 50% 70% at 90% 30%, rgba(255,190,51,0.05) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+/* Header */
+.mkt-head {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 22px; flex-wrap: wrap; gap: 8px;
+}
+.mkt-title {
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.72rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.14em; color: #ffbe33;
+  display: flex; align-items: center; gap: 8px;
+}
+.mkt-title i { font-size: 0.9rem; }
+.mkt-live-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.25);
+  border-radius: 100px; padding: 3px 10px;
+  font-size: 0.64rem; font-weight: 700; color: #10b981;
+  font-family: 'Josefin Sans', sans-serif; text-transform: uppercase; letter-spacing: 0.08em;
+}
+.mkt-live-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: #10b981;
+  animation: mkt-pulse 2s infinite;
+}
+@keyframes mkt-pulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.4; transform: scale(0.7); }
+}
+.mkt-update {
+  font-size: 0.68rem; color: rgba(255,255,255,0.25);
+}
+
+/* ── Exchange rates row ───────────────────────────────────────────────────── */
+.mkt-rates {
+  display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;
+}
+.mkt-rate-pill {
+  flex: 1; min-width: 130px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 4px;
+  transition: border-color 0.2s, background 0.2s;
+}
+.mkt-rate-pill:hover {
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(255,190,51,0.2);
+}
+.mkt-rate-label {
+  font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.1em; color: rgba(255,255,255,0.35);
+  font-family: 'Josefin Sans', sans-serif;
+}
+.mkt-rate-pair {
+  font-size: 0.72rem; color: rgba(255,255,255,0.5); margin-bottom: 2px;
+}
+.mkt-rate-value {
+  font-family: 'Josefin Sans', sans-serif; font-size: 1.2rem;
+  font-weight: 700; color: #fff; line-height: 1;
+}
+.mkt-rate-flag {
+  font-size: 1rem; margin-right: 4px;
+}
+
+/* ── Divider ─────────────────────────────────────────────────────────────── */
+.mkt-divider {
+  height: 1px; background: rgba(255,255,255,0.06); margin: 0 0 20px;
+}
+
+/* ── Crypto grid ─────────────────────────────────────────────────────────── */
+.mkt-crypto-head {
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.65rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.3); margin-bottom: 12px;
+}
+.mkt-crypto-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+}
+.mkt-coin {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px; padding: 16px 14px;
+  display: flex; flex-direction: column; gap: 8px;
+  transition: transform 0.18s, border-color 0.18s, background 0.18s;
+  cursor: default;
+}
+.mkt-coin:hover {
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.14);
+}
+.mkt-coin-top {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.mkt-coin-ident {
+  display: flex; align-items: center; gap: 8px;
+}
+.mkt-coin-icon {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem; color: #fff; flex-shrink: 0;
+}
+.mkt-coin-symbol {
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.82rem;
+  font-weight: 700; color: #fff; line-height: 1;
+}
+.mkt-coin-name {
+  font-size: 0.65rem; color: rgba(255,255,255,0.35); margin-top: 2px;
+}
+.mkt-badge {
+  font-size: 0.65rem; font-weight: 700;
+  font-family: 'Josefin Sans', sans-serif;
+  border-radius: 100px; padding: 3px 8px;
+  display: inline-flex; align-items: center; gap: 3px;
+  letter-spacing: 0.04em;
+}
+.mkt-badge.up   { background: rgba(16,185,129,0.15); color: #10b981; }
+.mkt-badge.down { background: rgba(239,68,68,0.15);  color: #ef4444; }
+.mkt-badge.flat { background: rgba(156,163,175,0.15);color: #9ca3af; }
+
+.mkt-coin-price-usd {
+  font-family: 'Josefin Sans', sans-serif; font-size: 1.05rem;
+  font-weight: 700; color: #fff; line-height: 1;
+}
+.mkt-coin-price-eur {
+  font-size: 0.74rem; color: rgba(255,255,255,0.38); margin-top: 1px;
+}
+
+/* ── Unavailable fallback ────────────────────────────────────────────────── */
+.mkt-unavail {
+  text-align: center; padding: 24px;
+  color: rgba(255,255,255,0.3); font-size: 0.82rem;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .mkt-crypto-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .mkt-crypto-grid { grid-template-columns: 1fr 1fr; }
+  .mkt-section { padding: 20px 16px; }
+}
+</style>
+
+{# ══ Market Widget ════════════════════════════════════════════════════════════ #}
+<div class="mkt-section">
+
+  {# Header #}
+  <div class="mkt-head">
+    <div class="mkt-title">
+      <i class="fa fa-chart-line"></i>
+      Marché financier &amp; Crypto
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      {% if market.available %}
+        <span class="mkt-live-badge">
+          <span class="mkt-live-dot"></span> Live
+        </span>
+        <span class="mkt-update">
+          Mis à jour {{ market.updated_at|date('H:i') }}
+        </span>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if not market.available %}
+    {# ── Fallback ─────────────────────────────────────────────────────────── #}
+    <div class="mkt-unavail">
+      <i class="fa fa-wifi-slash"></i>
+      Données de marché temporairement indisponibles.
+    </div>
+  {% else %}
+
+    {# ── Exchange Rates ────────────────────────────────────────────────────── #}
+    {% if market.rates %}
+      <div class="mkt-rates">
+
+        <div class="mkt-rate-pill">
+          <div class="mkt-rate-label"><span class="mkt-rate-flag">🇪🇺</span> Euro</div>
+          <div class="mkt-rate-pair">EUR → USD</div>
+          <div class="mkt-rate-value">{{ market.rates.EUR_USD }}</div>
+        </div>
+
+        <div class="mkt-rate-pill">
+          <div class="mkt-rate-label"><span class="mkt-rate-flag">🇪🇺</span> Euro</div>
+          <div class="mkt-rate-pair">EUR → TND</div>
+          <div class="mkt-rate-value">{{ market.rates.EUR_TND }}</div>
+        </div>
+
+        <div class="mkt-rate-pill">
+          <div class="mkt-rate-label"><span class="mkt-rate-flag">🇺🇸</span> Dollar</div>
+          <div class="mkt-rate-pair">USD → TND</div>
+          <div class="mkt-rate-value">{{ market.rates.USD_TND }}</div>
+        </div>
+
+      </div>
+      <div class="mkt-divider"></div>
+    {% endif %}
+
+    {# ── Crypto Prices ─────────────────────────────────────────────────────── #}
+    {% if market.crypto %}
+      <div class="mkt-crypto-head">
+        <i class="fa fa-coins" style="color:#ffbe33;margin-right:5px;"></i>
+        Cryptomonnaies — prix en temps réel (USD / EUR)
+      </div>
+      <div class="mkt-crypto-grid">
+        {% for coin in market.crypto %}
+          {% set chg = coin.change_24h %}
+          {% if chg > 0 %}
+            {% set badge_class = 'up'   %}{% set badge_icon = '▲' %}
+          {% elseif chg < 0 %}
+            {% set badge_class = 'down' %}{% set badge_icon = '▼' %}
+          {% else %}
+            {% set badge_class = 'flat' %}{% set badge_icon = '—' %}
+          {% endif %}
+
+          <div class="mkt-coin">
+            <div class="mkt-coin-top">
+              <div class="mkt-coin-ident">
+                <div class="mkt-coin-icon" style="background:{{ coin.color }}22;border:1.5px solid {{ coin.color }}44;">
+                  <span style="color:{{ coin.color }};font-weight:700;font-size:0.65rem;font-family:'Josefin Sans',sans-serif;">
+                    {{ coin.symbol[0:1] }}
+                  </span>
+                </div>
+                <div>
+                  <div class="mkt-coin-symbol">{{ coin.symbol }}</div>
+                  <div class="mkt-coin-name">{{ coin.name }}</div>
+                </div>
+              </div>
+              <span class="mkt-badge {{ badge_class }}">
+                {{ badge_icon }} {{ chg|abs }}%
+              </span>
+            </div>
+
+            <div>
+              <div class="mkt-coin-price-usd">
+                ${{ coin.price_usd|number_format(coin.price_usd >= 100 ? 0 : 4, '.', ',') }}
+              </div>
+              <div class="mkt-coin-price-eur">
+                ≈ €{{ coin.price_eur|number_format(coin.price_eur >= 100 ? 0 : 4, '.', ',') }}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+  {% endif %}
+</div>

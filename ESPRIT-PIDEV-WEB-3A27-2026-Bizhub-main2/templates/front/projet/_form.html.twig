@@ -1,0 +1,320 @@
+{{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'biz-form proj-form'}}) }}
+
+{# ═══════════════════════════════════════════════════════
+   SECTION 1 — Informations de base
+═══════════════════════════════════════════════════════ #}
+<div class="proj-section">
+  <div class="proj-section-head">
+    <span class="proj-section-num">1</span>
+    <div>
+      <div class="proj-section-title"><i class="fa fa-folder-open"></i> Informations de base</div>
+      <div class="proj-section-sub">Nom, secteur, budget et statut du projet</div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    {{ form_label(form.title) }}
+    {{ form_widget(form.title, {'attr': {'placeholder': 'Ex : Application FinTech mobile', 'maxlength': 255}}) }}
+    {{ form_errors(form.title) }}
+    <div class="form-hint"><i class="fa fa-info-circle"></i> Entre 3 et 255 caractères — sera affiché publiquement</div>
+  </div>
+
+  <div class="form-row-3">
+    <div class="form-group">
+      {{ form_label(form.secteur) }}
+      {{ form_widget(form.secteur) }}
+      {{ form_errors(form.secteur) }}
+    </div>
+    <div class="form-group">
+      {{ form_label(form.required_budget) }}
+      {{ form_widget(form.required_budget, {'attr': {'placeholder': '50 000'}}) }}
+      {{ form_errors(form.required_budget) }}
+      <div class="form-hint"><i class="fa fa-coins"></i> Montant en TND</div>
+    </div>
+    <div class="form-group">
+      {{ form_label(form.status) }}
+      {{ form_widget(form.status) }}
+      {{ form_errors(form.status) }}
+      <div class="form-hint"><i class="fa fa-lightbulb"></i> Seuls <strong>En cours</strong> / <strong>Financé</strong> sont visibles aux investisseurs</div>
+    </div>
+  </div>
+</div>
+
+{# ═══════════════════════════════════════════════════════
+   SECTION 2 — Vision & Description
+═══════════════════════════════════════════════════════ #}
+<div class="proj-section">
+  <div class="proj-section-head">
+    <span class="proj-section-num">2</span>
+    <div>
+      <div class="proj-section-title"><i class="fa fa-lightbulb"></i> Vision & Description</div>
+      <div class="proj-section-sub">Contexte général, problème identifié et solution apportée</div>
+    </div>
+  </div>
+
+  {# Description générale + bouton IA #}
+  <div class="form-group">
+    {{ form_label(form.description) }}
+    {{ form_widget(form.description, {'attr': {
+        'placeholder': 'Vue d\'ensemble du projet, vision, contexte général…',
+        'rows': 5,
+        'id': 'projet_description',
+        'maxlength': 5000
+    }}) }}
+    {{ form_errors(form.description) }}
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;gap:8px;flex-wrap:wrap;">
+      <div class="form-hint" style="margin:0;"><i class="fa fa-info-circle"></i> Min. 20 caractères — max. 5 000</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div id="desc-counter" style="font-size:0.75rem;color:var(--text-muted);font-family:'Josefin Sans',sans-serif;white-space:nowrap;">
+          <span id="desc-count">0</span> / 5 000
+        </div>
+        <button type="button" id="aiImproveBtn"
+                style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;border:none;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;font-size:0.78rem;font-weight:700;font-family:'Josefin Sans',sans-serif;cursor:pointer;transition:all 0.2s;box-shadow:0 3px 10px rgba(124,58,237,0.35);white-space:nowrap;"
+                title="Reformuler la description avec l'IA">
+          <span id="aiBtnIdle"><i class="fa fa-magic"></i> Améliorer avec IA</span>
+          <span id="aiBtnSpin" style="display:none;"><i class="fa fa-spinner fa-spin"></i> En cours…</span>
+        </button>
+      </div>
+    </div>
+    <div id="aiImproveError" style="display:none;margin-top:8px;padding:9px 13px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);border-radius:8px;color:#dc2626;font-size:0.8rem;line-height:1.5;"></div>
+    <input type="hidden" id="aiImproveToken"     value="{{ csrf_token('ai_improve_projet') }}">
+    <input type="hidden" id="aiImproveProjectId" value="{{ form.vars.data.project_id ?? '' }}">
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      {{ form_label(form.problem_description) }}
+      <div class="field-badge optional-badge"><i class="fa fa-circle-dot"></i> Recommandé</div>
+      {{ form_widget(form.problem_description, {'attr': {
+          'placeholder': 'Quel problème réel ce projet résout-il ? Qui en souffre ?',
+          'rows': 4, 'maxlength': 2000
+      }}) }}
+      {{ form_errors(form.problem_description) }}
+      <div class="form-hint"><i class="fa fa-info-circle"></i> Très utile pour l'analyse IA — min. 20 car.</div>
+    </div>
+    <div class="form-group">
+      {{ form_label(form.solution_description) }}
+      <div class="field-badge optional-badge"><i class="fa fa-circle-dot"></i> Recommandé</div>
+      {{ form_widget(form.solution_description, {'attr': {
+          'placeholder': 'Comment fonctionne votre solution ? Quelle est votre valeur ajoutée ?',
+          'rows': 4, 'maxlength': 2000
+      }}) }}
+      {{ form_errors(form.solution_description) }}
+      <div class="form-hint"><i class="fa fa-info-circle"></i> Décrivez le produit / service concret</div>
+    </div>
+  </div>
+</div>
+
+{# ═══════════════════════════════════════════════════════
+   SECTION 3 — Marché & Positionnement
+═══════════════════════════════════════════════════════ #}
+<div class="proj-section">
+  <div class="proj-section-head">
+    <span class="proj-section-num">3</span>
+    <div>
+      <div class="proj-section-title"><i class="fa fa-globe"></i> Marché & Positionnement</div>
+      <div class="proj-section-sub">Public cible, périmètre géographique et différenciation</div>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      {{ form_label(form.target_audience) }}
+      {{ form_widget(form.target_audience, {'attr': {
+          'placeholder': 'Qui sont vos clients ? Âge, profil, secteur, comportement…',
+          'rows': 3, 'maxlength': 1000
+      }}) }}
+      {{ form_errors(form.target_audience) }}
+    </div>
+    <div class="form-group">
+      {{ form_label(form.market_scope) }}
+      {{ form_widget(form.market_scope) }}
+      {{ form_errors(form.market_scope) }}
+      <div class="form-hint"><i class="fa fa-map-marker-alt"></i> Zone géographique principale visée</div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    {{ form_label(form.competitive_advantage) }}
+    {{ form_widget(form.competitive_advantage, {'attr': {
+        'placeholder': 'Technologie propriétaire, réseau, coût, partenariats, IP… Pourquoi vous plutôt qu\'un concurrent ?',
+        'rows': 3, 'maxlength': 1500
+    }}) }}
+    {{ form_errors(form.competitive_advantage) }}
+    <div class="form-hint"><i class="fa fa-trophy"></i> Clé pour convaincre un investisseur</div>
+  </div>
+</div>
+
+{# ═══════════════════════════════════════════════════════
+   SECTION 4 — Modèle économique
+═══════════════════════════════════════════════════════ #}
+<div class="proj-section">
+  <div class="proj-section-head">
+    <span class="proj-section-num">4</span>
+    <div>
+      <div class="proj-section-title"><i class="fa fa-chart-line"></i> Modèle économique</div>
+      <div class="proj-section-sub">Comment le projet génère des revenus et comment le financement sera utilisé</div>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      {{ form_label(form.business_model) }}
+      {{ form_widget(form.business_model) }}
+      {{ form_errors(form.business_model) }}
+      <div class="form-hint"><i class="fa fa-tag"></i> Mode de monétisation principal</div>
+    </div>
+    <div class="form-group">
+      {{ form_label(form.financial_forecast) }}
+      {{ form_widget(form.financial_forecast, {'attr': {
+          'placeholder': 'CA cible à 12 mois, point d\'équilibre, nombre de clients visés…',
+          'rows': 3, 'maxlength': 1000
+      }}) }}
+      {{ form_errors(form.financial_forecast) }}
+    </div>
+  </div>
+
+  <div class="form-group">
+    {{ form_label(form.funding_usage) }}
+    {{ form_widget(form.funding_usage, {'attr': {
+        'placeholder': 'Ex : 40 % développement produit, 30 % marketing, 20 % recrutement, 10 % infrastructure…',
+        'rows': 3, 'maxlength': 1500
+    }}) }}
+    {{ form_errors(form.funding_usage) }}
+    <div class="form-hint"><i class="fa fa-coins"></i> Montre aux investisseurs que le budget est maîtrisé</div>
+  </div>
+</div>
+
+{# ═══════════════════════════════════════════════════════
+   SECTION 5 — Équipe & Stade
+═══════════════════════════════════════════════════════ #}
+<div class="proj-section">
+  <div class="proj-section-head">
+    <span class="proj-section-num">5</span>
+    <div>
+      <div class="proj-section-title"><i class="fa fa-users"></i> Équipe & Stade d'avancement</div>
+      <div class="proj-section-sub">Maturité du projet et profils impliqués</div>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      {{ form_label(form.project_stage) }}
+      {{ form_widget(form.project_stage) }}
+      {{ form_errors(form.project_stage) }}
+      <div class="form-hint"><i class="fa fa-road"></i> Niveau de maturité actuel</div>
+    </div>
+    <div class="form-group">
+      {{ form_label(form.team_description) }}
+      {{ form_widget(form.team_description, {'attr': {
+          'placeholder': 'Ex : 3 associés (dev, marketing, finance) + 1 conseiller senior',
+          'maxlength': 500
+      }}) }}
+      {{ form_errors(form.team_description) }}
+      <div class="form-hint"><i class="fa fa-user-check"></i> L'équipe est un facteur clé pour les investisseurs</div>
+    </div>
+  </div>
+</div>
+
+{# ── Actions ─────────────────────────────────────────── #}
+<div style="display:flex;gap:1rem;margin-top:2rem;padding-top:1.5rem;border-top:1.5px solid var(--border);">
+  <button type="submit" class="form-submit" style="flex:1;">
+    <i class="fa fa-{{ submitIcon|default('save') }}"></i>
+    {{ submitLabel|default('Enregistrer le projet') }}
+  </button>
+  <a href="{{ path('app_front_projet_index') }}" class="btn-ghost" style="padding:14px 24px;">
+    Annuler
+  </a>
+</div>
+
+{{ form_end(form) }}
+
+<script>
+(function () {
+  'use strict';
+
+  // ── Compteur description ──────────────────────────────
+  var textarea = document.getElementById('projet_description');
+  var counter  = document.getElementById('desc-count');
+  var wrap     = document.getElementById('desc-counter');
+
+  if (textarea && counter) {
+    function updateCounter() {
+      var len = textarea.value.length;
+      counter.textContent = len;
+      wrap.style.color = len < 20 ? '#ef4444' : (len > 4800 ? '#f59e0b' : 'var(--text-muted)');
+    }
+    textarea.addEventListener('input', updateCounter);
+    updateCounter();
+  }
+
+  // ── Améliorer avec IA ─────────────────────────────────
+  var aiBtn       = document.getElementById('aiImproveBtn');
+  var aiBtnIdle   = document.getElementById('aiBtnIdle');
+  var aiBtnSpin   = document.getElementById('aiBtnSpin');
+  var aiError     = document.getElementById('aiImproveError');
+  var aiToken     = document.getElementById('aiImproveToken');
+  var aiProjectId = document.getElementById('aiImproveProjectId');
+
+  if (!aiBtn || !textarea || !aiToken) return;
+
+  var AI_URL = '{{ path('app_front_projet_ai_improve') }}';
+
+  function setLoading(on) {
+    aiBtn.disabled          = on;
+    aiBtnIdle.style.display = on ? 'none'   : 'inline-flex';
+    aiBtnSpin.style.display = on ? 'inline' : 'none';
+    aiBtn.style.opacity     = on ? '0.65' : '1';
+    aiBtn.style.cursor      = on ? 'not-allowed' : 'pointer';
+  }
+
+  function showError(msg) {
+    aiError.innerHTML     = '<i class="fa fa-exclamation-triangle"></i> ' + msg;
+    aiError.style.display = 'block';
+  }
+
+  function hideError() { aiError.style.display = 'none'; }
+
+  aiBtn.addEventListener('click', function () {
+    var text = textarea.value.trim();
+    if (text.length < 10) {
+      showError('Saisissez au moins 10 caractères avant d\'améliorer avec l\'IA.');
+      return;
+    }
+    hideError();
+    setLoading(true);
+
+    var body = new FormData();
+    body.append('_token',      aiToken.value);
+    body.append('description', text);
+    if (aiProjectId && aiProjectId.value) {
+      body.append('project_id', aiProjectId.value);
+    }
+
+    fetch(AI_URL, { method: 'POST', body: body })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        setLoading(false);
+        if (data.error) { showError(data.error); return; }
+        if (data.improved) {
+          textarea.style.transition = 'opacity 0.2s';
+          textarea.style.opacity    = '0.3';
+          setTimeout(function () {
+            textarea.value         = data.improved;
+            textarea.style.opacity = '1';
+            if (counter) {
+              counter.textContent = data.improved.length;
+              wrap.style.color = data.improved.length < 20 ? '#ef4444'
+                : (data.improved.length > 4800 ? '#f59e0b' : 'var(--text-muted)');
+            }
+            textarea.focus();
+          }, 180);
+        }
+      })
+      .catch(function () {
+        setLoading(false);
+        showError('Erreur réseau. Vérifiez votre connexion et réessayez.');
+      });
+  });
+})();
+</script>

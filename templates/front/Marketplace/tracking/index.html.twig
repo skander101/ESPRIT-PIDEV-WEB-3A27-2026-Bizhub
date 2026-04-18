@@ -1,0 +1,204 @@
+{% extends 'front/Marketplace/base_marketplace.html.twig' %}
+
+{% block title %}Suivi de mes commandes{% endblock %}
+{% block hero_eyebrow %}Startup{% endblock %}
+{% block hero_title %}Suivi de <span>mes commandes</span>{% endblock %}
+{% block breadcrumb_extra %}
+  <i class="fa fa-chevron-right" style="font-size:.55rem"></i> Suivi commandes
+{% endblock %}
+
+{% block body %}
+<div style="max-width:1200px; margin:0 auto; padding:60px 5%;">
+
+  {# ── STATS ─────────────────────────────────────────────────────────── #}
+  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:1.2rem; margin-bottom:2.5rem;">
+
+    {% set kpi_items = [
+      {label: 'Total',          value: stats.total,                   color: 'var(--primary)', border: 'var(--primary)'},
+      {label: 'En attente',     value: stats['en_attente'] ?? 0,      color: '#ffc107',        border: '#ffc107'},
+      {label: 'Confirmées',     value: stats['confirmee'] ?? 0,       color: '#28a745',        border: '#28a745'},
+      {label: 'En préparation', value: stats['en_preparation'] ?? 0,  color: '#f59e0b',        border: '#f59e0b'},
+      {label: 'Livrées',        value: stats['livree'] ?? 0,          color: '#0d6efd',        border: '#0d6efd'},
+      {label: 'Annulées',       value: stats['annulee'] ?? 0,         color: '#dc3545',        border: '#dc3545'},
+    ] %}
+
+    {% for k in kpi_items %}
+    <div style="background:var(--white); padding:18px 16px; border-radius:12px; border-left:4px solid {{ k.border }}; box-shadow:0 2px 10px rgba(0,0,0,0.05); text-align:center;">
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:1.6rem; font-weight:800; color:{{ k.color }};">{{ k.value }}</div>
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:0.65rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin-top:4px;">{{ k.label }}</div>
+    </div>
+    {% endfor %}
+
+  </div>
+
+  {# ── FILTRES ───────────────────────────────────────────────────────── #}
+  <form method="get" style="display:flex; gap:0.6rem; margin-bottom:1.8rem; flex-wrap:wrap; align-items:center;">
+
+    <select name="statut" onchange="this.form.submit()"
+      style="background:var(--white); border:1.5px solid var(--border); border-radius:8px; padding:9px 14px; font-family:'Josefin Sans',sans-serif; font-size:0.78rem; color:var(--dark); font-weight:600; outline:none; cursor:pointer;">
+      <option value="">Tous les statuts</option>
+      {% for s in statuts_dispo %}
+        <option value="{{ s }}" {% if statut_filtre == s %}selected{% endif %}>
+          {{ s|replace({'_': ' '})|title }}
+        </option>
+      {% endfor %}
+    </select>
+
+    <input type="text" name="q" value="{{ search }}"
+      placeholder="Rechercher N° commande…"
+      style="background:var(--white); border:1.5px solid var(--border); border-radius:8px; padding:9px 14px; font-family:'Lora',serif; font-size:0.85rem; color:var(--dark); outline:none; min-width:200px;">
+
+    <button type="submit"
+      style="background:var(--primary); color:var(--dark); border:none; padding:9px 18px; border-radius:8px; font-family:'Josefin Sans',sans-serif; font-weight:700; font-size:0.78rem; text-transform:uppercase; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+      <i class="fa fa-search"></i> Filtrer
+    </button>
+
+    {% if statut_filtre or search %}
+    <a href="{{ path('tracking_index') }}"
+      style="background:var(--light-bg); color:var(--muted); border:1.5px solid var(--border); padding:9px 16px; border-radius:8px; font-family:'Josefin Sans',sans-serif; font-size:0.78rem; font-weight:700; text-decoration:none; text-transform:uppercase; display:inline-flex; align-items:center; gap:6px;">
+      <i class="fa fa-times"></i> Réinitialiser
+    </a>
+    {% endif %}
+
+  </form>
+
+  {# ── LISTE DES COMMANDES ───────────────────────────────────────────── #}
+  {% if commandes_enrichies is empty %}
+
+    <div style="text-align:center; padding:80px 20px; background:var(--light-bg); border-radius:16px; border:1.5px dashed var(--border);">
+      <i class="fa fa-search" style="font-size:3rem; color:rgba(255,190,51,0.3); margin-bottom:1.2rem; display:block;"></i>
+      <h3 style="font-family:'Lora',serif; font-size:1.2rem; font-weight:700; margin-bottom:0.5rem;">Aucune commande trouvée</h3>
+      <p style="color:var(--muted); margin-bottom:1.5rem;">Aucune commande ne correspond à vos critères de recherche.</p>
+      <a href="{{ path('tracking_index') }}" class="btn-yellow" style="justify-content:center;">
+        <i class="fa fa-list"></i> Voir toutes mes commandes
+      </a>
+    </div>
+
+  {% else %}
+
+    <div style="display:flex; flex-direction:column; gap:1rem;">
+
+      {% for item in commandes_enrichies %}
+        {% set cmd = item.commande %}
+
+        {# ── Couleurs selon workflow commande (payee et en_cours_paiement = confirmee) ── #}
+        {% set sl = cmd.effectiveStatut %}
+        {% set sl_display = sl in ['en_cours_paiement', 'payee'] ? 'confirmee' : sl %}
+
+        {% set s_bg =
+          sl_display == 'en_attente'      ? 'rgba(255,193,7,0.12)' :
+          (sl_display == 'confirmee'      ? 'rgba(34,197,94,0.12)' :
+          (sl_display == 'en_preparation' ? 'rgba(245,158,11,0.12)' :
+          (sl_display == 'livree'         ? 'rgba(13,110,253,0.12)' :
+          (sl_display == 'annulee'        ? 'rgba(220,53,69,0.12)' :
+          'rgba(150,150,150,0.12)'))))
+        %}
+        {% set s_color =
+          sl_display == 'en_attente'      ? '#92400e' :
+          (sl_display == 'confirmee'      ? '#15803d' :
+          (sl_display == 'en_preparation' ? '#78350f' :
+          (sl_display == 'livree'         ? '#084298' :
+          (sl_display == 'annulee'        ? '#991b1b' :
+          '#666666'))))
+        %}
+        {% set s_icon =
+          sl_display == 'en_attente'      ? 'clock' :
+          (sl_display == 'confirmee'      ? 'check-circle' :
+          (sl_display == 'en_preparation' ? 'box-open' :
+          (sl_display == 'livree'         ? 'truck' :
+          (sl_display == 'annulee'        ? 'ban' :
+          'circle-question'))))
+        %}
+        {% set s_label = sl_display|replace({'_': ' '})|title %}
+
+        <div style="background:var(--white); border-radius:14px; border:1.5px solid var(--border); box-shadow:0 2px 12px rgba(0,0,0,0.05); padding:20px 24px; display:flex; align-items:center; flex-wrap:wrap; gap:1rem; transition:box-shadow 0.2s, border-color 0.2s;"
+             onmouseover="this.style.boxShadow='0 6px 24px rgba(0,0,0,0.1)'; this.style.borderColor='rgba(255,190,51,0.4)'"
+             onmouseout="this.style.boxShadow='0 2px 12px rgba(0,0,0,0.05)'; this.style.borderColor='var(--border)'">
+
+          {# Numéro + infos #}
+          <div style="flex:1; min-width:200px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+              <div style="width:38px; height:38px; background:rgba(255,190,51,0.12); border-radius:10px; display:flex; align-items:center; justify-content:center;">
+                <i class="fa fa-file-invoice" style="color:var(--primary); font-size:1rem;"></i>
+              </div>
+              <div>
+                <div style="font-family:'Josefin Sans',sans-serif; font-weight:800; font-size:1rem; color:var(--dark);">
+                  Commande <span style="color:var(--primary);">#{{ cmd.idCommande }}</span>
+                </div>
+                <div style="font-size:0.8rem; color:var(--muted);">
+                  {{ cmd.dateCommande ? cmd.dateCommande|date('d/m/Y à H:i') : '-' }}
+                </div>
+              </div>
+            </div>
+            {% if item.produits_noms|length > 0 %}
+            <div style="font-size:0.82rem; color:var(--muted); margin-left:48px;">
+              <i class="fa fa-box" style="margin-right:4px;"></i>
+              {{ item.produits_noms|slice(0, 2)|join(', ') }}{% if item.produits_noms|length > 2 %} <em>+{{ item.produits_noms|length - 2 }} autre{{ item.produits_noms|length - 2 > 1 ? 's' : '' }}</em>{% endif %}
+            </div>
+            {% endif %}
+          </div>
+
+          {# Montant #}
+          <div style="text-align:center; min-width:100px;">
+            <div style="font-family:'Josefin Sans',sans-serif; font-size:0.65rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:4px;">Montant</div>
+            <div style="font-family:'Josefin Sans',sans-serif; font-size:1.1rem; font-weight:800; color:var(--dark);">
+              {{ cmd.totalTtc }} <span style="font-size:0.7rem; color:var(--muted);">TND</span>
+            </div>
+          </div>
+
+          {# Statut #}
+          <div style="min-width:140px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:5px;">
+            <span style="display:inline-flex; align-items:center; gap:5px; padding:7px 14px; border-radius:8px; background:{{ s_bg }}; color:{{ s_color }}; font-family:'Josefin Sans',sans-serif; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em;">
+              <i class="fa fa-{{ s_icon }}"></i>
+              {{ s_label }}
+            </span>
+            {% if cmd.estPayee %}
+            <span style="display:inline-flex; align-items:center; gap:3px; padding:3px 8px; border-radius:6px; background:rgba(16,185,129,0.1); color:#065f46; font-family:'Josefin Sans',sans-serif; font-size:0.62rem; font-weight:700; text-transform:uppercase;">
+              <i class="fa fa-coins"></i> Payée
+            </span>
+            {% endif %}
+          </div>
+
+          {# Actions #}
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+
+            {# Suivre #}
+            <a href="{{ path('tracking_show', {id: cmd.idCommande}) }}"
+               style="background:var(--primary); color:var(--dark); padding:8px 14px; border-radius:8px; font-family:'Josefin Sans',sans-serif; font-weight:700; font-size:0.72rem; text-transform:uppercase; text-decoration:none; display:inline-flex; align-items:center; gap:6px; transition:background 0.2s;"
+               onmouseover="this.style.background='var(--primary-dark)'" onmouseout="this.style.background='var(--primary)'">
+              <i class="fa fa-map-marker-alt"></i> Suivre
+            </a>
+
+            {# Payer si confirmée et non payée #}
+            {% if cmd.effectiveStatut == 'confirmee' and not cmd.estPayee %}
+            <form method="post" action="{{ path('payment_initier', {id: cmd.idCommande}) }}" style="display:inline;"
+                  data-confirm="Procéder au paiement de la commande #{{ cmd.idCommande }} ({{ cmd.totalTtc }} TND) ?"
+                  data-confirm-type="info">
+              <input type="hidden" name="_token" value="{{ csrf_token('payer_' ~ cmd.idCommande) }}">
+              <button type="submit"
+                style="background:#6366f1; color:white; border:none; padding:8px 14px; border-radius:8px; cursor:pointer; font-family:'Josefin Sans',sans-serif; font-weight:700; font-size:0.72rem; text-transform:uppercase; display:inline-flex; align-items:center; gap:6px; transition:background 0.2s;"
+                onmouseover="this.style.background='#4f46e5'" onmouseout="this.style.background='#6366f1'">
+                <i class="fa fa-credit-card"></i> Payer
+              </button>
+            </form>
+            {% endif %}
+
+            {# Paiement en cours #}
+            {% if cmd.effectiveStatut == 'en_cours_paiement' and cmd.paymentUrl %}
+            <a href="{{ cmd.paymentUrl }}"
+               style="background:#6366f1; color:white; padding:8px 14px; border-radius:8px; font-family:'Josefin Sans',sans-serif; font-weight:700; font-size:0.72rem; text-transform:uppercase; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+              <i class="fa fa-redo"></i> Reprendre
+            </a>
+            {% endif %}
+
+          </div>
+
+        </div>
+      {% endfor %}
+
+    </div>
+
+  {% endif %}
+
+</div>
+{% endblock %}

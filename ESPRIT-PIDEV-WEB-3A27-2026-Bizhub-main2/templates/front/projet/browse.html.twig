@@ -1,0 +1,334 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Explorer les Projets — BizHub{% endblock %}
+
+{% block extra_styles %}
+.page-header { background: linear-gradient(135deg, var(--dark) 0%, var(--dark2) 100%); padding: 60px 5% 40px; }
+.page-header h1 { font-size: 2rem; color: var(--white); font-family: 'Josefin Sans', sans-serif; font-weight: 700; }
+.page-header p { color: rgba(255,255,255,0.55); margin-top: 0.4rem; }
+.page-body { max-width: 1200px; margin: 0 auto; padding: 30px 5%; }
+
+/* Formulaire de recherche */
+.search-panel {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 26px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+}
+.search-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
+    gap: 0.8rem;
+    align-items: end;
+}
+.search-group label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    font-family: 'Josefin Sans', sans-serif;
+    margin-bottom: 5px;
+}
+.search-group input,
+.search-group select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: var(--dark);
+    background: var(--light-bg);
+    font-family: inherit;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+.search-group input:focus,
+.search-group select:focus { outline: none; border-color: var(--primary); }
+.btn-search {
+    padding: 10px 20px;
+    background: var(--primary);
+    color: var(--dark);
+    border: none;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    font-family: 'Josefin Sans', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+.btn-search:hover { background: var(--primary-dark); }
+.btn-reset {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    background: var(--light-bg);
+    color: var(--text-muted);
+    border: 1.5px solid var(--border);
+    border-radius: 7px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: 'Josefin Sans', sans-serif;
+    text-decoration: none;
+    margin-top: 0.6rem;
+}
+.btn-reset:hover { border-color: var(--primary); color: var(--dark); }
+
+/* Grille de projets */
+.results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; }
+.results-count { font-size: 0.82rem; color: var(--text-muted); font-family: 'Josefin Sans', sans-serif; }
+.projets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
+.projet-card {
+    background: var(--white); border-radius: 14px; border: 1.5px solid var(--border);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.06); overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column;
+}
+.projet-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.1); }
+.projet-card-top { padding: 22px 22px 14px; border-bottom: 1px solid var(--border); }
+.projet-card-title { font-size: 1.05rem; font-weight: 700; color: var(--dark); font-family: 'Josefin Sans', sans-serif; margin-bottom: 0.4rem; }
+.projet-card-desc { font-size: 0.84rem; color: var(--text-muted); line-height: 1.6; }
+.projet-card-body { padding: 18px 22px; flex: 1; }
+.card-footer { padding: 14px 22px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.startup-name { font-size: 0.8rem; color: var(--text-muted); }
+.startup-name strong { color: var(--dark); }
+.invest-link {
+    background: var(--primary); color: var(--dark); padding: 8px 16px; border-radius: 7px;
+    font-size: 0.78rem; font-weight: 700; font-family: 'Josefin Sans', sans-serif;
+    text-transform: uppercase; letter-spacing: 0.06em; text-decoration: none;
+    display: flex; align-items: center; gap: 5px; transition: background 0.2s;
+}
+.invest-link:hover { background: var(--primary-dark); }
+.invest-link.disabled { background: var(--light-bg); color: var(--text-muted); cursor: not-allowed; border: 1.5px solid var(--border); }
+.invest-link.bientot { background: rgba(91,110,245,0.1); color: #5b6ef5; border: 1.5px solid rgba(91,110,245,0.25); cursor: default; }
+
+/* Badges de statut */
+.status-badge { font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.08em; font-family: 'Josefin Sans', sans-serif; display: inline-block; margin-bottom: 0.8rem; }
+/* Badges définis dans base.html.twig via .badge-* */
+
+/* Badge secteur */
+.secteur-badge { font-size: 0.68rem; font-weight: 600; padding: 2px 8px; border-radius: 12px; background: rgba(255,190,51,0.1); color: #b8860b; border: 1px solid rgba(255,190,51,0.2); font-family: 'Josefin Sans', sans-serif; display: inline-block; margin-left: 6px; }
+
+.progress-bar-wrap { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin: 0.5rem 0 0.3rem; }
+.progress-bar-fill { height: 100%; background: var(--primary); border-radius: 3px; }
+.empty-state { text-align: center; padding: 60px 20px; }
+
+/* Badges négociation sur les cartes */
+.neg-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.68rem; font-weight: 700; padding: 3px 9px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.05em; font-family: 'Josefin Sans', sans-serif; white-space: nowrap; }
+.neg-badge-open     { background: rgba(91,110,245,0.1);  color: #5b6ef5;  border: 1px solid rgba(91,110,245,0.25); }
+.neg-badge-accepted { background: rgba(6,214,160,0.1);   color: #06d6a0;  border: 1px solid rgba(6,214,160,0.25); }
+.neg-badge-rejected { background: rgba(239,68,68,0.08);  color: #ef4444;  border: 1px solid rgba(239,68,68,0.2); }
+.neg-badge-deal     { background: rgba(255,190,51,0.12); color: #b8860b;  border: 1px solid rgba(255,190,51,0.3); }
+.btn-neg-card { display: inline-flex; align-items: center; gap: 5px; padding: 7px 13px; border-radius: 7px; font-size: 0.73rem; font-weight: 700; font-family: 'Josefin Sans', sans-serif; text-transform: uppercase; letter-spacing: 0.05em; text-decoration: none; transition: all 0.2s; background: rgba(91,110,245,0.08); color: #5b6ef5; border: 1.5px solid rgba(91,110,245,0.25); }
+.btn-neg-card:hover { background: rgba(91,110,245,0.18); }
+.btn-deal-card { background: rgba(6,214,160,0.08); color: #06d6a0; border: 1.5px solid rgba(6,214,160,0.25); }
+.btn-deal-card:hover { background: rgba(6,214,160,0.18); }
+
+@media (max-width: 900px) { .search-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px) { .search-grid { grid-template-columns: 1fr; } }
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div style="max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;">
+        <div>
+            <h1><i class="fa fa-search-dollar" style="color:var(--primary);margin-right:0.5rem;"></i>Explorer les Projets</h1>
+            <p>Trouvez votre prochaine opportunité d'investissement.</p>
+        </div>
+        <a href="{{ path('app_front_investissement_index') }}" class="btn-yellow" style="display:flex;align-items:center;gap:8px;">
+            <i class="fa fa-chart-pie"></i> Mes investissements
+        </a>
+    </div>
+</div>
+
+<div class="page-body">
+
+    {# ── Formulaire de recherche ── #}
+    <div class="search-panel">
+        <form method="get" action="{{ path('app_front_projet_index') }}">
+            <div class="search-grid">
+                <div class="search-group">
+                    <label for="q"><i class="fa fa-search"></i> Mot-clé</label>
+                    <input type="text" id="q" name="q" value="{{ filters.q }}" placeholder="Titre ou description…">
+                </div>
+                <div class="search-group">
+                    <label for="secteur"><i class="fa fa-tag"></i> Secteur</label>
+                    <select id="secteur" name="secteur">
+                        <option value="">Tous</option>
+                        {% for label, value in secteurs %}
+                            <option value="{{ value }}" {{ filters.secteur == value ? 'selected' : '' }}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="search-group">
+                    <label for="statut"><i class="fa fa-flag"></i> Statut</label>
+                    <select id="statut" name="statut">
+                        <option value="">Tous</option>
+                        {% for label, value in statuts %}
+                            <option value="{{ value }}" {{ filters.statut == value ? 'selected' : '' }}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="search-group">
+                    <label for="budget_min"><i class="fa fa-coins"></i> Budget min (TND)</label>
+                    <input type="number" id="budget_min" name="budget_min" value="{{ filters.budget_min }}" placeholder="0" min="0">
+                </div>
+                <div class="search-group">
+                    <label for="budget_max"><i class="fa fa-coins"></i> Budget max (TND)</label>
+                    <input type="number" id="budget_max" name="budget_max" value="{{ filters.budget_max }}" placeholder="illimité" min="0">
+                </div>
+                <div class="search-group">
+                    <label>&nbsp;</label>
+                    <button type="submit" class="btn-search">
+                        <i class="fa fa-search"></i> Filtrer
+                    </button>
+                </div>
+            </div>
+            {% set hasFilter = filters.q or filters.secteur or filters.statut or filters.budget_min or filters.budget_max %}
+            {% if hasFilter %}
+                <a href="{{ path('app_front_projet_index') }}" class="btn-reset">
+                    <i class="fa fa-times"></i> Réinitialiser les filtres
+                </a>
+            {% endif %}
+        </form>
+    </div>
+
+    {# ── Résultats ── #}
+    <div class="results-header">
+        <div class="results-count">
+            <strong>{{ projets|length }}</strong> projet(s) trouvé(s)
+        </div>
+    </div>
+
+    {% if projets|length > 0 %}
+        <div class="projets-grid">
+            {% for projet in projets %}
+                <div class="projet-card">
+                    <div class="projet-card-top">
+                        {# Statut + secteur #}
+                        <div style="margin-bottom:0.6rem;display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+                            <span class="badge badge-{{ projet.status }}">
+                                {% if projet.status == 'brouillon' %}Brouillon
+                                {% elseif projet.status == 'publie' %}Publié
+                                {% elseif projet.status == 'en_cours' %}En cours
+                                {% elseif projet.status == 'finance' %}Financé
+                                {% elseif projet.status == 'ferme' %}Fermé
+                                {% else %}{{ projet.status }}{% endif %}
+                            </span>
+                            {% if projet.secteur %}
+                                <span class="secteur-badge">{{ projet.secteur|capitalize }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="projet-card-title">{{ projet.title }}</div>
+                        {% if projet.description %}
+                            <div class="projet-card-desc">{{ projet.description|slice(0, 100) }}{% if projet.description|length > 100 %}…{% endif %}</div>
+                        {% endif %}
+                    </div>
+                    <div class="projet-card-body">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem;">
+                            <div>
+                                <div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;font-family:'Josefin Sans',sans-serif;">Objectif</div>
+                                <div style="font-size:1.05rem;font-weight:700;color:var(--dark);font-family:'Josefin Sans',sans-serif;">{{ projet.requiredBudget|number_format(0, ',', ' ') }} TND</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;font-family:'Josefin Sans',sans-serif;">Investisseurs</div>
+                                <div style="font-size:1.05rem;font-weight:700;color:var(--primary);font-family:'Josefin Sans',sans-serif;">{{ projet.investments|length }}</div>
+                            </div>
+                        </div>
+                        <div class="progress-bar-wrap">
+                            {% set invPct = projet.investments|length * 10 %}
+                            {% set invPct = invPct > 100 ? 100 : invPct %}
+                            <div class="progress-bar-fill" style="width:{{ projet.requiredBudget > 0 ? invPct : 0 }}%;"></div>
+                        </div>
+                    </div>
+                    {# ── Négociation/deal pour l'investisseur connecté ── #}
+                    {% if app.user and app.user.userType == 'investisseur' %}
+                        {% set myNeg  = browse_neg_map[projet.project_id]  ?? null %}
+                        {% set myDeal = browse_deal_map[projet.project_id] ?? null %}
+                        <div style="padding:8px 22px;border-top:1px dashed var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                            {% if myDeal %}
+                                {# CAS 3 : deal existant #}
+                                {% set dealLabels = {'pending_payment':'Paiement en attente','paid':'Payé','pending_signature':'À signer','signed':'Signé','completed':'Complété','cancelled':'Annulé'} %}
+                                <span class="neg-badge neg-badge-deal"><i class="fa fa-file-signature"></i> Deal : {{ dealLabels[myDeal.status] ?? myDeal.status }}</span>
+                                <a href="{{ path('app_deal_show', {'id': myDeal.deal_id}) }}" class="btn-neg-card btn-deal-card">
+                                    <i class="fa fa-arrow-right"></i> Suivre le deal
+                                </a>
+                            {% elseif myNeg %}
+                                {# CAS 2 : négociation existante #}
+                                {% if myNeg.status == 'open' %}
+                                    <span class="neg-badge neg-badge-open"><i class="fa fa-comments"></i> Négo. en cours</span>
+                                {% elseif myNeg.status == 'accepted' %}
+                                    <span class="neg-badge neg-badge-accepted"><i class="fa fa-check"></i> Négo. acceptée</span>
+                                {% elseif myNeg.status == 'rejected' %}
+                                    <span class="neg-badge neg-badge-rejected"><i class="fa fa-times"></i> Négo. refusée</span>
+                                {% endif %}
+                                <a href="{{ path('app_negociation_show', {'id': myNeg.negotiation_id}) }}" class="btn-neg-card">
+                                    <i class="fa fa-eye"></i> Voir la négociation
+                                </a>
+                            {% else %}
+                                {# CAS 1 : aucune négo, aucun deal → proposer de négocier #}
+                                <a href="{{ path('app_negociation_creer_par_projet', {'id': projet.project_id}) }}" class="btn-neg-card">
+                                    <i class="fa fa-handshake"></i> Négocier
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                    <div class="card-footer">
+                        <div class="startup-name">
+                            <i class="fa fa-user-circle" style="color:var(--primary);margin-right:4px;"></i>
+                            {% if projet.user %}<strong>{{ projet.user.fullName }}</strong>{% else %}Startup{% endif %}
+                        </div>
+                        <div style="display:flex;gap:0.5rem;align-items:center;">
+                            {# Bouton Voir — toujours visible #}
+                            <a href="{{ path('app_front_projet_show', {'id': projet.project_id}) }}"
+                               title="Voir le projet"
+                               style="background:var(--light-bg);color:var(--dark);padding:8px 12px;border-radius:7px;font-size:0.78rem;font-weight:700;font-family:'Josefin Sans',sans-serif;text-decoration:none;border:1.5px solid var(--border);display:inline-flex;align-items:center;gap:4px;transition:border-color 0.2s;"
+                               onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+                                <i class="fa fa-eye"></i> Voir
+                            </a>
+
+                            {# Bouton Investir — seulement si projet ouvert aux investissements #}
+                            {% if projet.status in ['publie', 'en_cours'] %}
+                                <a href="{{ path('app_front_investir', {'id': projet.project_id}) }}"
+                                   class="btn-yellow" style="padding:8px 16px;font-size:0.75rem;display:inline-flex;align-items:center;gap:5px;">
+                                    <i class="fa fa-hand-holding-usd"></i> Investir
+                                </a>
+
+                            {% elseif projet.status == 'finance' %}
+                                <span style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:7px;font-size:0.72rem;font-weight:700;font-family:'Josefin Sans',sans-serif;background:rgba(16,185,129,0.1);color:#10b981;border:1.5px solid rgba(16,185,129,0.25);cursor:default;">
+                                    <i class="fa fa-check-circle"></i> Financé
+                                </span>
+
+                            {% elseif projet.status == 'ferme' %}
+                                <span style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:7px;font-size:0.72rem;font-weight:700;font-family:'Josefin Sans',sans-serif;background:rgba(239,68,68,0.08);color:#ef4444;border:1.5px solid rgba(239,68,68,0.2);cursor:default;">
+                                    <i class="fa fa-lock"></i> Fermé
+                                </span>
+                            {% endif %}
+                            {# Pas d'autre cas — les brouillons sont exclus de la requête #}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state dash-panel">
+            <div style="font-size:3rem;color:var(--text-muted);opacity:0.35;margin-bottom:1.2rem;"><i class="fa fa-search"></i></div>
+            <h3 style="font-family:'Josefin Sans',sans-serif;font-size:1.1rem;margin-bottom:0.7rem;">Aucun projet trouvé</h3>
+            <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:1.5rem;">Essayez de modifier vos filtres.</p>
+            <a href="{{ path('app_front_projet_index') }}" class="btn-yellow">
+                <i class="fa fa-times" style="margin-right:6px;"></i>Voir tous les projets
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
