@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    @page { margin: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: DejaVu Sans, sans-serif;
+      background: #ffffff;
+      color: #1a1f2e;
+      font-size: 11pt;
+    }
+
+    /* ── Gold top bar ── */
+    .top-bar {
+      background: #ffbe33;
+      height: 8px;
+      width: 100%;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: #1a1f2e;
+      padding: 28px 48px 22px;
+      display: table;
+      width: 100%;
+    }
+    .header-left  { display: table-cell; vertical-align: middle; }
+    .header-right { display: table-cell; vertical-align: middle; text-align: right; width: 200px; }
+
+    .brand {
+      font-family: DejaVu Sans, sans-serif;
+      font-size: 22pt;
+      font-weight: 700;
+      color: #ffbe33;
+      letter-spacing: 0.03em;
+    }
+    .brand-tagline {
+      font-size: 7.5pt;
+      color: rgba(255,255,255,0.45);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+    .header-badge {
+      border: 1.5px solid rgba(255,190,51,0.4);
+      border-radius: 6px;
+      padding: 7px 14px;
+      text-align: center;
+    }
+    .header-badge div:first-child {
+      font-size: 7pt;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .header-badge div:last-child {
+      font-size: 9pt;
+      font-weight: 700;
+      color: #ffbe33;
+      margin-top: 3px;
+    }
+
+    /* ── Page body ── */
+    .page-body { padding: 36px 48px 20px; }
+
+    /* ── Certificate title block ── */
+    .cert-title-block { text-align: center; margin-bottom: 30px; }
+    .cert-seal {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: #ffbe33;
+      margin: 0 auto 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cert-seal-inner {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: #ffbe33;
+      border: 3px solid #1a1f2e;
+      margin: 0 auto 14px;
+      text-align: center;
+      line-height: 58px;
+      font-size: 24pt;
+    }
+    .cert-main-title {
+      font-size: 20pt;
+      font-weight: 700;
+      color: #1a1f2e;
+      letter-spacing: 0.02em;
+      margin-bottom: 4px;
+    }
+    .cert-subtitle {
+      font-size: 9pt;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .cert-title-divider {
+      width: 60px;
+      height: 3px;
+      background: #ffbe33;
+      margin: 12px auto 0;
+      border-radius: 2px;
+    }
+
+    /* ── Proof banner ── */
+    .proof-banner {
+      background: rgba(16,185,129,0.08);
+      border: 1.5px solid rgba(16,185,129,0.35);
+      border-radius: 10px;
+      padding: 14px 22px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .proof-banner-title {
+      font-size: 10.5pt;
+      font-weight: 700;
+      color: #065f46;
+    }
+    .proof-banner-sub {
+      font-size: 8.5pt;
+      color: #6b7280;
+      margin-top: 3px;
+    }
+
+    /* ── Section cards ── */
+    .section-grid {
+      display: table;
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 10px 0;
+      margin-bottom: 18px;
+    }
+    .section-cell { display: table-cell; vertical-align: top; width: 50%; }
+
+    .info-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .info-card-header {
+      background: #f8f9fa;
+      padding: 9px 16px;
+      font-size: 7.5pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #6b7280;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .info-card-header .accent { color: #ffbe33; margin-right: 5px; }
+    .info-card-body { padding: 12px 16px; }
+
+    .info-row {
+      display: table;
+      width: 100%;
+      padding: 5px 0;
+      border-bottom: 1px solid #f3f4f6;
+      font-size: 9pt;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { display: table-cell; color: #9ca3af; width: 46%; vertical-align: top; }
+    .info-value { display: table-cell; font-weight: 700; color: #1a1f2e; vertical-align: top; }
+    .info-value.highlight { color: #ffbe33; }
+    .info-value.green { color: #059669; }
+
+    /* ── Full-width card ── */
+    .full-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+    .full-card-header {
+      background: #f8f9fa;
+      padding: 9px 18px;
+      font-size: 7.5pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #6b7280;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .full-card-body {
+      padding: 14px 18px;
+    }
+    .ref-box {
+      text-align: center;
+      padding: 10px;
+    }
+    .ref-number {
+      font-size: 18pt;
+      font-weight: 700;
+      color: #1a1f2e;
+      letter-spacing: 0.08em;
+    }
+    .ref-sub {
+      font-size: 8pt;
+      color: #9ca3af;
+      margin-top: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* ── Status badge ── */
+    .status-badge {
+      display: inline-block;
+      background: rgba(16,185,129,0.12);
+      color: #065f46;
+      border: 1px solid rgba(16,185,129,0.35);
+      border-radius: 6px;
+      padding: 4px 12px;
+      font-size: 9pt;
+      font-weight: 700;
+    }
+
+    /* ── Legal note ── */
+    .legal-box {
+      background: #f8f9fa;
+      border: 1px solid #e5e7eb;
+      border-left: 3px solid #ffbe33;
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px;
+      font-size: 8pt;
+      color: #6b7280;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .legal-box strong { color: #1a1f2e; }
+
+    /* ── Footer ── */
+    .footer {
+      border-top: 1px solid #e5e7eb;
+      padding: 14px 48px;
+      display: table;
+      width: 100%;
+      background: #f8f9fa;
+    }
+    .footer-left  { display: table-cell; vertical-align: middle; font-size: 7.5pt; color: #9ca3af; }
+    .footer-right { display: table-cell; vertical-align: middle; text-align: right; width: 40%; font-size: 7.5pt; color: #9ca3af; }
+    .footer-brand { font-weight: 700; color: #ffbe33; }
+
+    /* ── Bottom gold bar ── */
+    .bottom-bar {
+      background: #1a1f2e;
+      height: 5px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-bar"></div>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-left">
+    <div class="brand">BizHub</div>
+    <div class="brand-tagline">Plateforme d'investissement &amp; startup</div>
+  </div>
+  <div class="header-right">
+    <div class="header-badge">
+      <div>Numéro de certificat</div>
+      <div>CERT-{{ deal.deal_id }}-{{ date|date('Ymd') }}</div>
+    </div>
+  </div>
+</div>
+
+<!-- Body -->
+<div class="page-body">
+
+  <!-- Certificate title -->
+  <div class="cert-title-block">
+    <div class="cert-seal-inner">&#10003;</div>
+    <div class="cert-main-title">Certificat de Signature</div>
+    <div class="cert-subtitle">Preuve de signature électronique</div>
+    <div class="cert-title-divider"></div>
+  </div>
+
+  <!-- Proof banner -->
+  <div class="proof-banner">
+    <div class="proof-banner-title">
+      &#10003; &nbsp;Le présent document atteste que le contrat d'investissement a été signé électroniquement
+    </div>
+    <div class="proof-banner-sub">
+      Signature enregistrée le {{ signed_at|date('d/m/Y à H:i') }} — Plateforme BizHub
+    </div>
+  </div>
+
+  <!-- Deal reference (full width) -->
+  <div class="full-card">
+    <div class="full-card-header">&#9632; &nbsp;Référence du deal</div>
+    <div class="full-card-body">
+      <div class="ref-box">
+        <div class="ref-number">DEAL-{{ deal.deal_id }}</div>
+        <div class="ref-sub">Identifiant unique de la transaction BizHub</div>
+      </div>
+      <div style="display:table;width:100%;margin-top:8px;">
+        <div style="display:table-cell;text-align:center;padding:0 10px;border-right:1px solid #e5e7eb;">
+          <div style="font-size:8pt;color:#9ca3af;margin-bottom:2px;">Montant</div>
+          <div style="font-size:13pt;font-weight:700;color:#ffbe33;">{{ deal.amount|number_format(0, ',', ' ') }} TND</div>
+        </div>
+        <div style="display:table-cell;text-align:center;padding:0 10px;border-right:1px solid #e5e7eb;">
+          <div style="font-size:8pt;color:#9ca3af;margin-bottom:2px;">Statut final</div>
+          <span class="status-badge">&#10003; {{ status_label }}</span>
+        </div>
+        <div style="display:table-cell;text-align:center;padding:0 10px;">
+          <div style="font-size:8pt;color:#9ca3af;margin-bottom:2px;">Date de création</div>
+          <div style="font-size:9pt;font-weight:700;color:#1a1f2e;">{{ deal.created_at ? deal.created_at|date('d/m/Y') : '—' }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Parties grid -->
+  <div class="section-grid">
+    <!-- Signataire (investisseur) -->
+    <div class="section-cell">
+      <div class="info-card">
+        <div class="info-card-header"><span class="accent">&#9632;</span> Signataire — Investisseur</div>
+        <div class="info-card-body">
+          <div class="info-row">
+            <div class="info-label">Nom complet</div>
+            <div class="info-value">{{ buyer.fullName ?? '—' }}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Email</div>
+            <div class="info-value" style="font-size:8.5pt;">{{ buyer.email ?? '—' }}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Rôle</div>
+            <div class="info-value">Investisseur</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Date signature</div>
+            <div class="info-value green">{{ signed_at|date('d/m/Y H:i') }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Startup (vendeur) -->
+    <div class="section-cell">
+      <div class="info-card">
+        <div class="info-card-header"><span class="accent">&#9632;</span> Startup — Bénéficiaire</div>
+        <div class="info-card-body">
+          <div class="info-row">
+            <div class="info-label">Nom complet</div>
+            <div class="info-value">{{ seller.fullName ?? '—' }}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Email</div>
+            <div class="info-value" style="font-size:8.5pt;">{{ seller.email ?? '—' }}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Rôle</div>
+            <div class="info-value">Startup / Porteur de projet</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Plateforme</div>
+            <div class="info-value">BizHub</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Signature method -->
+  <div class="full-card">
+    <div class="full-card-header">&#9632; &nbsp;Méthode de signature</div>
+    <div class="full-card-body">
+      <div style="display:table;width:100%;">
+        <div style="display:table-cell;vertical-align:top;width:50%;padding-right:14px;">
+          <div class="info-row">
+            <div class="info-label">Méthode</div>
+            <div class="info-value">
+              {% if deal.yousign_signature_request_id %}
+                Signature électronique (Yousign v3)
+              {% else %}
+                Signature électronique (lien sécurisé)
+              {% endif %}
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Niveau</div>
+            <div class="info-value">Signature électronique avancée</div>
+          </div>
+        </div>
+        <div style="display:table-cell;vertical-align:top;width:50%;padding-left:14px;border-left:1px solid #e5e7eb;">
+          {% if deal.yousign_signature_request_id %}
+          <div class="info-row">
+            <div class="info-label">ID Yousign</div>
+            <div class="info-value" style="font-size:7.5pt;word-break:break-all;">{{ deal.yousign_signature_request_id }}</div>
+          </div>
+          {% endif %}
+          <div class="info-row">
+            <div class="info-label">Statut Yousign</div>
+            <div class="info-value green">
+              {{ deal.yousign_status == 'done' ? '&#10003; Complété' : (deal.yousign_status ?? 'Signé') }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Legal note -->
+  <div class="legal-box">
+    <strong>Valeur juridique :</strong> Ce certificat constitue la preuve de la conclusion d'un accord d'investissement entre
+    les parties susmentionnées sur la plateforme BizHub. Le contrat original signé fait foi entre les parties.
+    Ce document a été généré automatiquement le <strong>{{ date|date('d/m/Y à H:i') }}</strong> par la plateforme BizHub.
+    Toute falsification de ce document est passible de poursuites pénales conformément à la législation en vigueur.
+  </div>
+
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <div class="footer-left">
+    <span class="footer-brand">BizHub</span> — Plateforme d'investissement &amp; startup<br>
+    Émis le {{ date|date('d/m/Y à H:i') }} &mdash; Certificat n° CERT-{{ deal.deal_id }}-{{ date|date('Ymd') }}
+  </div>
+  <div class="footer-right">
+    Ce document est généré automatiquement.<br>
+    Authentique et non modifiable.
+  </div>
+</div>
+
+<div class="bottom-bar"></div>
+
+</body>
+</html>

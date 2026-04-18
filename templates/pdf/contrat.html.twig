@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "DejaVu Sans", Arial, sans-serif;
+    font-size: 12px;
+    color: #1a1a2e;
+    padding: 40px;
+    line-height: 1.5;
+  }
+
+  /* ── Header ── */
+  .header {
+    text-align: center;
+    border-bottom: 3px solid #ffbe33;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+  }
+  .header-logo {
+    font-size: 20px;
+    font-weight: bold;
+    color: #1a1a2e;
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+  }
+  .header-logo span { color: #ffbe33; }
+  .header h1 {
+    font-size: 18px;
+    color: #1a1a2e;
+    margin: 10px 0 6px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .header-ref {
+    font-size: 10px;
+    color: #888;
+    margin-bottom: 8px;
+  }
+  .badge {
+    display: inline-block;
+    background: #ffbe33;
+    color: #1a1a2e;
+    font-weight: bold;
+    font-size: 9px;
+    padding: 3px 12px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* ── Section ── */
+  .section { margin-bottom: 22px; }
+  .section-title {
+    font-size: 9px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #ffbe33;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 5px;
+    margin-bottom: 12px;
+  }
+
+  /* ── Parties ── */
+  .parties-table { width: 100%; border-collapse: collapse; }
+  .party-cell {
+    width: 50%;
+    vertical-align: top;
+    padding: 14px 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+  }
+  .party-cell:first-child { margin-right: 10px; }
+  .party-role {
+    font-size: 9px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #ffbe33;
+    margin-bottom: 6px;
+  }
+  .party-name { font-size: 13px; font-weight: bold; color: #1a1a2e; margin-bottom: 3px; }
+  .party-email { font-size: 10px; color: #6b7280; }
+
+  /* ── Montant ── */
+  .amount-box {
+    border: 2px solid #ffbe33;
+    border-radius: 10px;
+    padding: 18px;
+    text-align: center;
+    background: #fffbeb;
+    margin: 4px 0 16px;
+  }
+  .amount-big { font-size: 28px; font-weight: bold; color: #1a1a2e; }
+  .amount-sub { font-size: 10px; color: #6b7280; margin-top: 4px; }
+
+  /* ── Détails deal ── */
+  .details-table { width: 100%; border-collapse: collapse; }
+  .details-table tr { border-bottom: 1px solid #f3f4f6; }
+  .details-table tr:last-child { border-bottom: none; }
+  .details-table td { padding: 7px 4px; font-size: 11px; }
+  .dt-label { color: #6b7280; font-weight: bold; width: 40%; }
+  .dt-value { color: #1a1a2e; }
+
+  /* ── Clauses ── */
+  .clauses {
+    background: #fafafa;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px;
+    font-size: 10.5px;
+    line-height: 1.8;
+  }
+  .clause { margin-bottom: 10px; }
+  .clause-num { font-weight: bold; color: #ffbe33; margin-right: 4px; }
+
+  /* ── Signatures ── */
+  .signatures-table { width: 100%; border-collapse: collapse; margin-top: 40px; }
+  .sig-cell {
+    width: 50%;
+    vertical-align: top;
+    text-align: center;
+    padding: 0 20px;
+  }
+  .sig-line {
+    border-top: 1px solid #9ca3af;
+    padding-top: 10px;
+    margin-top: 50px;
+    font-size: 10px;
+    color: #6b7280;
+  }
+  .sig-name { font-weight: bold; color: #1a1a2e; font-size: 11px; margin-top: 4px; }
+  .sig-date { font-size: 9px; color: #9ca3af; margin-top: 2px; }
+
+  /* ── Footer ── */
+  .footer {
+    text-align: center;
+    font-size: 8.5px;
+    color: #9ca3af;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 12px;
+    margin-top: 36px;
+  }
+
+  /* ── Status badge ── */
+  .status-paid {
+    display: inline-block;
+    background: rgba(16,185,129,0.12);
+    color: #065f46;
+    font-size: 9px;
+    font-weight: bold;
+    padding: 3px 10px;
+    border-radius: 10px;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+{# ── En-tête ── #}
+<div class="header">
+  <div class="header-logo">Biz<span>Hub</span></div>
+  <h1>Contrat d'Investissement</h1>
+  <div class="header-ref">
+    Référence : <strong>DEAL-{{ deal.deal_id }}</strong>
+    &nbsp;|&nbsp; Date : <strong>{{ date|date('d/m/Y') }}</strong>
+    &nbsp;|&nbsp; NEG-{{ negotiation.negotiation_id }}
+  </div>
+  <span class="badge">Document officiel — BizHub Plateforme d'investissement</span>
+</div>
+
+{# ── Projet concerné ── #}
+<div class="section">
+  <div class="section-title">Projet concerné</div>
+  <table class="details-table">
+    <tr>
+      <td class="dt-label">Titre du projet</td>
+      <td class="dt-value">
+        {% if project %}{{ project.title }}{% else %}Projet #{{ deal.project_id }}{% endif %}
+      </td>
+    </tr>
+    {% if project and project.description %}
+    <tr>
+      <td class="dt-label">Description</td>
+      <td class="dt-value" style="font-size:10px;color:#6b7280;">
+        {{ project.description|slice(0, 200) }}{% if project.description|length > 200 %}…{% endif %}
+      </td>
+    </tr>
+    {% endif %}
+    {% if project and project.secteur %}
+    <tr>
+      <td class="dt-label">Secteur</td>
+      <td class="dt-value">{{ project.secteur }}</td>
+    </tr>
+    {% endif %}
+    <tr>
+      <td class="dt-label">Réf. négociation</td>
+      <td class="dt-value">NEG-{{ negotiation.negotiation_id }}</td>
+    </tr>
+    <tr>
+      <td class="dt-label">Statut paiement</td>
+      <td class="dt-value"><span class="status-paid">✓ Paiement confirmé</span></td>
+    </tr>
+  </table>
+</div>
+
+{# ── Parties contractantes ── #}
+<div class="section">
+  <div class="section-title">Parties contractantes</div>
+  <table class="parties-table">
+    <tr>
+      <td class="party-cell" style="margin-right:10px;">
+        <div class="party-role">Investisseur (Acheteur)</div>
+        <div class="party-name">{{ buyer.fullName ?? 'Investisseur' }}</div>
+        <div class="party-email">{{ buyer.email ?? '' }}</div>
+      </td>
+      <td style="width:20px;"></td>
+      <td class="party-cell">
+        <div class="party-role">Startup (Vendeur / Porteur de projet)</div>
+        <div class="party-name">{{ seller.fullName ?? 'Startup' }}</div>
+        <div class="party-email">{{ seller.email ?? '' }}</div>
+      </td>
+    </tr>
+  </table>
+</div>
+
+{# ── Montant ── #}
+<div class="section">
+  <div class="section-title">Montant de l'investissement</div>
+  <div class="amount-box">
+    <div class="amount-big">{{ deal.amount|number_format(2, ',', ' ') }} TND</div>
+    <div class="amount-sub">
+      Montant convenu après négociation et validé par les deux parties.
+      {% if negotiation.proposed_amount and negotiation.proposed_amount != deal.amount %}
+        (Montant initial proposé : {{ negotiation.proposed_amount|number_format(0, ',', ' ') }} TND)
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{# ── Clauses et conditions ── #}
+<div class="section">
+  <div class="section-title">Clauses et conditions générales</div>
+  <div class="clauses">
+    <div class="clause">
+      <span class="clause-num">Art. 1 — Objet :</span>
+      Le présent contrat formalise l'accord d'investissement conclu entre les parties à l'issue de la
+      négociation <strong>NEG-{{ negotiation.negotiation_id }}</strong> sur la plateforme BizHub.
+    </div>
+    <div class="clause">
+      <span class="clause-num">Art. 2 — Montant :</span>
+      L'investisseur <strong>{{ buyer.fullName ?? 'l\'investisseur' }}</strong> s'engage à verser la somme de
+      <strong>{{ deal.amount|number_format(2, ',', ' ') }} TND</strong>
+      en faveur du projet <strong>{% if project %}{{ project.title }}{% else %}#{{ deal.project_id }}{% endif %}</strong>
+      porté par <strong>{{ seller.fullName ?? 'la startup' }}</strong>.
+    </div>
+    <div class="clause">
+      <span class="clause-num">Art. 3 — Paiement :</span>
+      Le paiement a été effectué et validé via la plateforme de paiement sécurisée
+      <strong>Stripe</strong>{% if deal.stripe_payment_intent_id %} (réf. {{ deal.stripe_payment_intent_id }}){% endif %}.
+    </div>
+    <div class="clause">
+      <span class="clause-num">Art. 4 — Confidentialité :</span>
+      Les parties s'engagent à garder confidentielles toutes les informations échangées dans le cadre
+      de cette négociation et du présent accord.
+    </div>
+    <div class="clause">
+      <span class="clause-num">Art. 5 — Droit applicable :</span>
+      Le présent contrat est soumis au droit tunisien. Tout litige sera soumis à la compétence
+      exclusive des tribunaux de Tunis.
+    </div>
+    <div class="clause">
+      <span class="clause-num">Art. 6 — Validité :</span>
+      Ce contrat prend effet à la date de signature électronique par l'investisseur et est archivé
+      sur la plateforme BizHub. Il constitue la preuve de l'accord entre les parties.
+    </div>
+  </div>
+</div>
+
+{# ── Blocs de signature ── #}
+<table class="signatures-table">
+  <tr>
+    <td class="sig-cell">
+      <div class="sig-line">
+        <div>Signature de l'investisseur</div>
+        <div class="sig-name">{{ buyer.fullName ?? 'Investisseur' }}</div>
+        <div class="sig-date">{{ buyer.email ?? '' }}</div>
+        <div class="sig-date" style="margin-top:6px;">Date : {{ date|date('d/m/Y') }}</div>
+      </div>
+    </td>
+    <td class="sig-cell">
+      <div class="sig-line">
+        <div>Signature de la startup</div>
+        <div class="sig-name">{{ seller.fullName ?? 'Startup' }}</div>
+        <div class="sig-date">{{ seller.email ?? '' }}</div>
+        <div class="sig-date" style="margin-top:6px;">Date : {{ date|date('d/m/Y') }}</div>
+      </div>
+    </td>
+  </tr>
+</table>
+
+{# ── Pied de page ── #}
+<div class="footer">
+  Document généré automatiquement par BizHub le {{ date|date('d/m/Y à H:i') }}.
+  Ce contrat a valeur juridique entre les parties signataires.
+  &nbsp;|&nbsp; DEAL-{{ deal.deal_id }} &nbsp;|&nbsp; NEG-{{ negotiation.negotiation_id }}
+</div>
+
+</body>
+</html>
