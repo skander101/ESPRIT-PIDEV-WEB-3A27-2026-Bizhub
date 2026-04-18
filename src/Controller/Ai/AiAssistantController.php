@@ -3,15 +3,9 @@
 namespace App\Controller\Ai;
 
 use App\Model\Ai\ChatMessageInput;
-<<<<<<< HEAD
 use App\Service\AI\AiDatabaseAssistantService;
 use App\Service\AI\AiNavigationBotService;
 use App\Service\AI\CloudflareAiService;
-=======
-use App\Service\Ai\AiDatabaseAssistantService;
-use App\Service\Ai\AiNavigationBotService;
-use App\Service\Ai\CloudflareAiService;
->>>>>>> 519f5a51f3bf7c581ad4c50416902763a63db3e9
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
