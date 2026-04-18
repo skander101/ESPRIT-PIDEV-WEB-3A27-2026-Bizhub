@@ -1,0 +1,67 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Commandes - Admin{% endblock %}
+{% block breadcrumb %}Commandes{% endblock %}
+
+{% block content %}
+<div style="padding:2rem;">
+  <div style="margin-bottom:2rem;">
+    <h2 style="font-size:1.5rem;color:var(--pg-text);margin:0;">Gestion des Commandes</h2>
+  </div>
+
+  {% if statuts_dispo %}
+    <div style="display:flex;gap:0.5rem;margin-bottom:1.5rem;flex-wrap:wrap;">
+      <a href="{{ path('admin_marketplace_commandes_index') }}" style="padding:0.5rem 1rem;border:1px solid var(--pg-border);background:var(--pg-surface2);border-radius:4px;text-decoration:none;color:var(--pg-text);font-size:0.85rem;{% if not statut_filtre %}background:#5b6ef5;border-color:#5b6ef5;{% endif %}transition:all 0.2s;">Tous</a>
+      {% for statut in statuts_dispo %}
+        <a href="{{ path('admin_marketplace_commandes_index', {statut: statut}) }}" style="padding:0.5rem 1rem;border:1px solid var(--pg-border);background:var(--pg-surface2);border-radius:4px;text-decoration:none;color:var(--pg-text);font-size:0.85rem;{% if statut == statut_filtre %}background:#5b6ef5;border-color:#5b6ef5;{% endif %}transition:all 0.2s;">{{ statut|capitalize }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="dash-panel">
+    {% if commandes|length > 0 %}
+      <div style="overflow-x:auto;">
+        <table style="width:100%;color:var(--pg-text);">
+          <thead>
+            <tr style="border-bottom:1px solid var(--pg-border);background:var(--pg-surface2);">
+              <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);">N°</th>
+              <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);">Client</th>
+              <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);">Date</th>
+              <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);">Total</th>
+              <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);">Statut</th>
+              <th style="text-align:center;padding:1rem;font-weight:700;color:var(--pg-muted);">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for commande in commandes %}
+              <tr style="border-bottom:1px solid var(--pg-border);transition:background 0.2s;">
+                <td style="padding:1rem;font-weight:600;">#{{ commande.idCommande }}</td>
+                <td style="padding:1rem;color:var(--pg-muted);">Client #{{ commande.idClient }}</td>
+                <td style="padding:1rem;">{{ commande.dateCommande|date('d/m/Y H:i') }}</td>
+                <td style="padding:1rem;font-weight:700;color:#fbbf24;">{{ commande.totalTtc }} TND</td>
+                <td style="padding:1rem;">
+                  <span style="display:inline-block;background:rgba(91,110,245,0.15);color:#5b6ef5;padding:0.3rem 0.8rem;border-radius:4px;font-size:0.85rem;font-weight:700;text-transform:capitalize;">
+                    {{ commande.statut }}
+                  </span>
+                </td>
+                <td style="padding:1rem;text-align:center;">
+                  <div style="display:flex;gap:0.5rem;justify-content:center;">
+                    <a href="{{ path('admin_marketplace_commandes_show', {id: commande.idCommande}) }}" style="background:#17a2b8;color:white;padding:0.4rem 0.8rem;border-radius:4px;text-decoration:none;font-size:0.85rem;font-weight:700;transition:background 0.2s;">Voir</a>
+                    <a href="{{ path('admin_marketplace_commandes_edit', {id: commande.idCommande}) }}" style="background:#007bff;color:white;padding:0.4rem 0.8rem;border-radius:4px;text-decoration:none;font-size:0.85rem;font-weight:700;transition:background 0.2s;">Éditer</a>
+                    <form method="POST" action="{{ path('admin_marketplace_commandes_delete', {id: commande.idCommande}) }}" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr?');">
+                      <input type="hidden" name="_token" value="{{ csrf_token('delete_commande_' ~ commande.idCommande) }}">
+                      <button type="submit" style="background:#dc3545;color:white;padding:0.4rem 0.8rem;border:none;border-radius:4px;font-size:0.85rem;font-weight:700;cursor:pointer;transition:background 0.2s;">Supp.</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p style="text-align:center;padding:2rem;color:var(--pg-muted);">Aucune commande trouvée.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

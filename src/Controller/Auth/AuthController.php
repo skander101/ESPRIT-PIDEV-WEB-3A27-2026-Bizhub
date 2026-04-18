@@ -20,7 +20,6 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
-use Symfony\Component\Security\Http\Authenticator\FormLoginAuthenticator;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use BaconQrCode\Writer;
@@ -287,7 +286,6 @@ class AuthController extends AbstractController
     public function googleCallback(
         Request $request,
         UserAuthenticatorInterface $userAuthenticator,
-        FormLoginAuthenticator $formLoginAuthenticator,
     ): Response {
         $state = (string) $request->query->get('state', '');
         $savedState = (string) $request->getSession()->get('google_oauth_state', '');

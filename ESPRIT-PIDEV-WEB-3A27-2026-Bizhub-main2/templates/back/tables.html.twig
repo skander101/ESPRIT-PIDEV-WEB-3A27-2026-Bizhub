@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="shortcut icon" href="{{ asset('assets/back/images/favicon.svg') }}" type="image/x-icon" />
+  <title>Tables | BizHub</title>
+  <link rel="stylesheet" href="{{ asset('assets/back/css/bootstrap.min.css') }}" />
+  <link rel="stylesheet" href="{{ asset('assets/back/css/lineicons.css') }}" />
+  <link rel="stylesheet" href="{{ asset('assets/back/css/materialdesignicons.min.css') }}" />
+  <link rel="stylesheet" href="{{ asset('assets/back/css/main.css') }}" />
+  <link rel="stylesheet" href="{{ asset('assets/back/css/custom.css') }}" />
+  <link rel="stylesheet" href="{{ asset('assets/back/css/dark-mode.css') }}" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* ═══════════════════════════════════════
+       GLOBAL TOKENS
+    ═══════════════════════════════════════ */
+    :root {
+      --nb-bg:      #0f1117;
+      --nb-surface: #1a1d27;
+      --nb-border:  #2a2d3a;
+      --nb-accent:  #5b6ef5;
+      --nb-accent2: #8b5cf6;
+      --nb-accent3: #06d6a0;
+      --nb-text:    #e2e8f0;
+      --nb-muted:   #64748b;
+      --nb-hover:   #242736;
+
+      --pg-bg:      #080b12;
+      --pg-surface: #0e1220;
+      --pg-surface2:#141826;
+      --pg-border:  rgba(255,255,255,0.07);
+      --pg-border2: rgba(255,255,255,0.12);
+      --pg-text:    #f0f2ff;
+      --pg-muted:   #6b7280;
+      --pg-muted2:  #9ca3af;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body.dark-mode {
+      background: var(--pg-bg) !important;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    /* ── Preloader ── */
+    #preloader {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--pg-bg);
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity .5s ease;
+    }
+    #preloader.hidden { opacity: 0; pointer-events: none; }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 2px solid rgba(255,255,255,.08);
+      border-top-color: var(--nb-accent);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ═══════════════════════════════════════
+       NEW NAVBAR
+    ═══════════════════════════════════════ */
+    .plain-navbar {
+      width: 100%;
+      background: var(--nb-bg);
+      border-bottom: 1px solid var(--nb-border);
+      display: flex;
+      align-items: center;
+      height: 64px;
+      padding: 0 1.5rem;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1100;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .plain-navbar::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, var(--nb-accent), var(--nb-accent2), transparent);
+      opacity: .5;
+    }
+
+    /* Left */
+    .nb-left { display: flex; align-items: center; gap: 14px; flex: 0 0 auto; }
+    .nb-logo {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--nb-accent), var(--nb-accent2));
+      display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
+    }
+    .nb-site-title {
+      font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700;
+      color: var(--nb-text); letter-spacing: -.3px;
+    }
+    .nb-site-title span { color: var(--nb-accent); font-weight: 400; }
+
+    .nb-breadcrumb {
+      display: flex; align-items: center; gap: 7px;
+      margin-left: 18px; padding-left: 18px;
+      border-left: 1px solid var(--nb-border);
+    }
+    .nb-breadcrumb a {
+      font-size: 13px; color: var(--nb-muted); text-decoration: none; transition: color .2s;
+    }
+    .nb-breadcrumb a:hover { color: var(--nb-text); }
+    .nb-breadcrumb .sep { color: var(--nb-border); }
+    .nb-breadcrumb .current { font-size: 13px; color: var(--nb-text); font-weight: 500; }
+
+    /* Center */
+    .nb-center { flex: 1; display: flex; justify-content: center; }
+    .nb-search { position: relative; width: 280px; }
+    .nb-search svg {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      opacity: .4; pointer-events: none;
+    }
+    .nb-search input {
+      width: 100%; height: 38px;
+      background: var(--nb-surface); border: 1px solid var(--nb-border);
+      border-radius: 9px; color: var(--nb-text);
+      font-size: 13px; font-family: 'DM Sans', sans-serif;
+      padding: 0 12px 0 36px; outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .nb-search input::placeholder { color: var(--nb-muted); }
+    .nb-search input:focus {
+      border-color: var(--nb-accent);
+      box-shadow: 0 0 0 3px rgba(91,110,245,.12);
+    }
+
+    /* Right */
+    .nb-right { display: flex; align-items: center; gap: 6px; flex: 0 0 auto; }
+
+    .nb-icon-btn {
+      width: 38px; height: 38px; border-radius: 9px;
+      background: var(--nb-surface); border: 1px solid var(--nb-border);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background .2s, border-color .2s; position: relative;
+    }
+    .nb-icon-btn:hover { background: var(--nb-hover); border-color: #3a3d50; }
+    .nb-icon-btn svg { opacity: .7; transition: opacity .2s; }
+    .nb-icon-btn:hover svg { opacity: 1; }
+    .nb-badge {
+      position: absolute; top: 6px; right: 6px;
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #ef4444; border: 1.5px solid var(--nb-bg);
+    }
+    .nb-badge.blue { background: var(--nb-accent); }
+
+    .nb-quick-actions {
+      display: flex; align-items: center; gap: 3px;
+      background: var(--nb-surface); border: 1px solid var(--nb-border);
+      border-radius: 9px; padding: 3px;
+    }
+    .nb-qa-btn {
+      padding: 5px 11px; border-radius: 6px; font-size: 12px; font-weight: 500;
+      color: var(--nb-muted); cursor: pointer; transition: all .2s; white-space: nowrap;
+      border: none; background: transparent; font-family: 'DM Sans', sans-serif;
+    }
+    .nb-qa-btn:hover { color: var(--nb-text); background: var(--nb-hover); }
+    .nb-qa-btn.active { color: #fff; background: var(--nb-accent); }
+
+    .nb-divider { width: 1px; height: 22px; background: var(--nb-border); margin: 0 4px; }
+
+    .nb-toggle-wrap {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--nb-surface); border: 1px solid var(--nb-border);
+      border-radius: 9px; padding: 5px 11px; cursor: pointer; transition: border-color .2s;
+    }
+    .nb-toggle-wrap:hover { border-color: #3a3d50; }
+    .nb-toggle-label { font-size: 12px; color: var(--nb-muted); font-weight: 500; }
+    .nb-toggle {
+      width: 30px; height: 16px; background: #2a2d3a; border-radius: 20px;
+      position: relative; transition: background .3s;
+    }
+    .nb-toggle.on { background: var(--nb-accent); }
+    .nb-toggle-knob {
+      width: 12px; height: 12px; background: #fff; border-radius: 50%;
+      position: absolute; top: 2px; left: 2px; transition: transform .3s;
+    }
+    .nb-toggle.on .nb-toggle-knob { transform: translateX(14px); }
+
+    .nb-user-pill {
+      display: flex; align-items: center; gap: 9px;
+      background: var(--nb-surface); border: 1px solid var(--nb-border);
+      border-radius: 9px; padding: 4px 10px 4px 6px;
+      cursor: pointer; transition: border-color .2s, background .2s; position: relative;
+    }
+    .nb-user-pill:hover { border-color: #3a3d50; background: var(--nb-hover); }
+    .nb-avatar {
+      width: 28px; height: 28px; border-radius: 7px;
+      background: linear-gradient(135deg, var(--nb-accent), var(--nb-accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 600; color: #fff; flex-shrink: 0;
+    }
+    .nb-user-info { display: flex; flex-direction: column; line-height: 1.2; }
+    .nb-user-name { font-size: 13px; font-weight: 500; color: var(--nb-text); }
+    .nb-user-role { font-size: 11px; color: var(--nb-muted); }
+    .nb-chevron { opacity: .4; transition: opacity .2s, transform .3s; }
+    .nb-user-pill:hover .nb-chevron { opacity: .8; }
+    .nb-user-pill.open .nb-chevron { transform: rotate(180deg); }
+
+    .nb-dropdown {
+      position: absolute; top: calc(100% + 8px); right: 0;
+      background: var(--nb-surface); border: 1px solid var(--nb-border);
+      border-radius: 11px; width: 185px; overflow: hidden;
+      opacity: 0; transform: translateY(-6px); pointer-events: none;
+      transition: opacity .2s, transform .2s; z-index: 999;
+      box-shadow: 0 10px 30px rgba(0,0,0,.5);
+    }
+    .nb-dropdown.open { opacity: 1; transform: translateY(0); pointer-events: all; }
+    .nb-dd-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 14px; font-size: 13px; color: var(--nb-muted);
+      cursor: pointer; transition: background .15s, color .15s;
+    }
+    .nb-dd-item:hover { background: var(--nb-hover); color: var(--nb-text); }
+    .nb-dd-item.danger:hover { color: #ef4444; }
+    .nb-dd-sep { height: 1px; background: var(--nb-border); margin: 2px 0; }
+
+    /* ═══════════════════════════════════════
+       LAYOUT
+    ═══════════════════════════════════════ */
+    .page-wrapper {
+      display: flex;
+      padding-top: 64px; /* navbar height */
+      min-height: 100vh;
+    }
+
+    /* Keep existing sidebar, just adjust top */
+    .sidebar-nav-wrapper {
+      position: fixed !important;
+      top: 64px !important;
+      height: calc(100vh - 64px) !important;
+    }
+
+    .main-wrapper {
+      margin-left: 260px; /* sidebar width */
+      flex: 1;
+      min-height: calc(100vh - 64px);
+      background: var(--pg-bg);
+      padding: 0;
+    }
+
+    /* ═══════════════════════════════════════
+       TABLE PAGE STYLES
+    ═══════════════════════════════════════ */
+
+    /* Hero header */
+    .table-page-hero {
+      padding: 2.5rem 2rem 1.5rem;
+      border-bottom: 1px solid var(--pg-border2);
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .table-hero-badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(91,110,245,.1); border: 1px solid rgba(91,110,245,.2);
+      border-radius: 6px; padding: 3px 12px;
+      font-size: 11px; font-weight: 500; color: #a5b4fc;
+      letter-spacing: .5px; text-transform: uppercase; margin-bottom: .75rem;
+    }
+    .table-page-hero h1 {
+      font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800;
+      color: var(--pg-text); letter-spacing: -.4px; margin-bottom: .4rem; margin-top: 0;
+    }
+    .table-page-hero > div > p {
+      font-size: 14px; color: var(--pg-muted2); font-weight: 300; margin: 0;
+    }
+    .hero-actions { display: flex; gap: 10px; align-items: center; margin-top: .25rem; }
+
+    .btn-outline-nb {
+      height: 40px; padding: 0 18px;
+      background: var(--pg-surface); border: 1px solid var(--pg-border2);
+      border-radius: 9px; color: var(--pg-muted2);
+      font-size: 13px; font-weight: 500; font-family: 'DM Sans', sans-serif;
+      cursor: pointer; transition: all .2s; display: flex; align-items: center; gap: 7px;
+    }
+    .btn-outline-nb:hover { border-color: rgba(255,255,255,.22); color: var(--pg-text); }
+
+    .btn-accent-nb {
+      height: 40px; padding: 0 18px;
+      background: linear-gradient(135deg, var(--nb-accent), var(--nb-accent2));
+      border: none; border-radius: 9px; color: #fff;
+      font-size: 13px; font-weight: 600; font-family: 'Syne', sans-serif;
+      cursor: pointer; transition: all .2s; display: flex; align-items: center; gap: 7px;
+      box-shadow: 0 3px 14px rgba(91,110,245,.3);
+    }
+    .btn-accent-nb:hover { opacity: .9; transform: translateY(-1px); }
+
+    /* Content area */
+    .table-content { padding: 2rem; }
+
+    /* Stat cards row */
+    .stat-row {
+      display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: var(--pg-surface); border: 1px solid var(--pg-border2);
+      border-radius: 12px; padding: 1.1rem 1.25rem;
+      position: relative; overflow: hidden;
+    }
+    .stat-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--nb-accent), var(--nb-accent2));
+      opacity: 0; transition: opacity .3s;
+    }
+    .stat-card:hover::before { opacity: 1; }
+    .stat-card-label { font-size: 12px; color: var(--pg-muted); font-weight: 500; margin-bottom: 8px; letter-spacing: .3px; }
+    .stat-card-val {
+      font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--pg-text); margin-bottom: 4px;
+    }
+    .stat-card-sub { font-size: 12px; color: var(--nb-accent3); }
+
+    /* Table card */
+    .tbl-card {
+      background: var(--pg-surface); border: 1px solid var(--pg-border2);
+      border-radius: 14px; overflow: hidden; margin-bottom: 2rem;
+    }
+    .tbl-card-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--pg-border2);
+      flex-wrap: wrap; gap: 12px;
+    }
+    .tbl-card-title {
+      font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+      color: var(--pg-text); margin: 0;
+    }
+    .tbl-card-sub { font-size: 13px; color: var(--pg-muted); margin: 2px 0 0; }
+    .tbl-tools { display: flex; gap: 10px; align-items: center; }
+
+    .tbl-search {
+      position: relative;
+    }
+    .tbl-search svg {
+      position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+      opacity: .4; pointer-events: none;
+    }
+    .tbl-search input {
+      height: 36px; width: 210px;
+      background: var(--pg-bg); border: 1px solid var(--pg-border2);
+      border-radius: 8px; color: var(--pg-text);
+      font-size: 13px; font-family: 'DM Sans', sans-serif;
+      padding: 0 12px 0 32px; outline: none; transition: border-color .2s;
+    }
+    .tbl-search input::placeholder { color: var(--pg-muted); }
+    .tbl-search input:focus { border-color: var(--nb-accent); }
+
+    .tbl-filter-btn {
+      height: 36px; padding: 0 14px;
+      background: var(--pg-bg); border: 1px solid var(--pg-border2);
+      border-radius: 8px; color: var(--pg-muted2);
+      font-size: 13px; font-family: 'DM Sans', sans-serif;
+      cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all .2s;
+    }
+    .tbl-filter-btn:hover { border-color: rgba(255,255,255,.2); color: var(--pg-text); }
+
+    /* Tables */
+    .tbl-wrap { overflow-x: auto; }
+
+    .nb-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 13.5px;
+    }
+    .nb-table thead tr {
+      border-bottom: 1px solid var(--pg-border2);
+    }
+    .nb-table thead th {
+      padding: 12px 16px;
+      font-size: 11px; font-weight: 600; color: var(--pg-muted);
+      text-transform: uppercase; letter-spacing: .7px;
+      text-align: left; white-space: nowrap;
+      background: var(--pg-bg);
+    }
+    .nb-table tbody tr {
+      border-bottom: 1px solid var(--pg-border);
+      transition: background .15s;
+    }
+    .nb-table tbody tr:last-child { border-bottom: none; }
+    .nb-table tbody tr:hover { background: rgba(255,255,255,.03); }
+    .nb-table tbody td {
+      padding: 13px 16px;
+      color: var(--pg-muted2); vertical-align: middle;
+    }
+    .nb-table tbody td:first-child { color: var(--pg-text); font-weight: 500; }
+
+    /* Status badges */
+    .nb-badge-status {
+      display: inline-block; padding: 3px 11px;
+      border-radius: 100px; font-size: 11px; font-weight: 600;
+      letter-spacing: .3px;
+    }
+    .nb-badge-status.active  { background: rgba(6,214,160,.12); color: #06d6a0; }
+    .nb-badge-status.pending { background: rgba(91,110,245,.12); color: #818cf8; }
+    .nb-badge-status.done    { background: rgba(99,214,6,.12);   color: #84cc16; }
+    .nb-badge-status.close   { background: rgba(239,68,68,.12);  color: #f87171; }
+    .nb-badge-status.info    { background: rgba(14,165,233,.12); color: #38bdf8; }
+
+    /* Action btn */
+    .tbl-action-btn {
+      width: 30px; height: 30px; border-radius: 7px;
+      background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.15);
+      color: #f87171; cursor: pointer; transition: all .2s;
+      display: flex; align-items: center; justify-content: center; font-size: 14px;
+    }
+    .tbl-action-btn:hover { background: rgba(239,68,68,.15); border-color: rgba(239,68,68,.3); }
+
+    /* User cell */
+    .tbl-user { display: flex; align-items: center; gap: 10px; }
+    .tbl-avatar {
+      width: 32px; height: 32px; border-radius: 8px; overflow: hidden; flex-shrink: 0;
+    }
+    .tbl-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .tbl-avatar-initials {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--nb-accent), var(--nb-accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 600; color: #fff; flex-shrink: 0;
+    }
+    .tbl-email { color: var(--pg-muted) !important; font-weight: 400 !important; }
+
+    /* Checkbox */
+    .nb-check {
+      width: 15px; height: 15px; accent-color: var(--nb-accent); cursor: pointer;
+    }
+
+    /* Grid of 2 tables */
+    .tbl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+
+    /* Footer */
+    .nb-footer {
+      padding: 1.25rem 2rem;
+      border-top: 1px solid var(--pg-border2);
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 12px; color: var(--pg-muted);
+    }
+    .nb-footer a { color: var(--pg-muted); text-decoration: none; transition: color .2s; margin-left: 16px; }
+    .nb-footer a:hover { color: var(--pg-text); }
+
+    /* Pagination */
+    .tbl-pagination {
+      display: flex; align-items: center; justify-content: flex-end; gap: 6px;
+      padding: 12px 1.5rem; border-top: 1px solid var(--pg-border);
+    }
+    .pg-btn {
+      width: 30px; height: 30px; border-radius: 7px;
+      background: transparent; border: 1px solid var(--pg-border2);
+      color: var(--pg-muted2); font-size: 12px; cursor: pointer; transition: all .2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .pg-btn:hover { border-color: var(--nb-accent); color: var(--nb-accent); }
+    .pg-btn.active { background: var(--nb-accent); border-color: var(--nb-accent); color: #fff; font-weight: 600; }
+
+    @media (max-width: 1100px) { .stat-row { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 768px) {
+      .main-wrapper { margin-left: 0; }
+      .tbl-grid { grid-template-columns: 1fr; }
+      .stat-row { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body class="dark-mode">
+
+  <div id="preloader"><div class="spinner"></div></div>
+
+  <!-- ════════════ NEW NAVBAR ════════════ -->
+  <nav class="plain-navbar" id="plainNavbar">
+    <div class="nb-left">
+      <div class="nb-logo">🔷</div>
+      <div class="nb-site-title"><span style="color:#ffbe33 !important;">Biz</span><span style="color:#ffffff !important;">Hub</span></div>
+      <div class="nb-breadcrumb">
+        <a href="index.html">Accueil</a>
+        <span class="sep">/</span>
+        <span class="current">Tables</span>
+      </div>
+    </div>
+
+    <div class="nb-center">
+      <div class="nb-search">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" placeholder="Rechercher…" />
+      </div>
+    </div>
+
+    <div class="nb-right">
+      <div class="nb-quick-actions">
+        <button class="nb-qa-btn active" onclick="nbSetActive(this)">Vue d'ensemble</button>
+        <button class="nb-qa-btn" onclick="nbSetActive(this)">Rapports</button>
+        <button class="nb-qa-btn" onclick="nbSetActive(this)">Logs</button>
+      </div>
+      <div class="nb-divider"></div>
+      <div class="nb-toggle-wrap" onclick="nbToggleDark()" title="Mode sombre/clair">
+        <span class="nb-toggle-label" id="nbToggleLabel">Sombre</span>
+        <div class="nb-toggle on" id="nbToggle"><div class="nb-toggle-knob"></div></div>
+      </div>
+      <div class="nb-icon-btn" title="Notifications">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+        <div class="nb-badge"></div>
+      </div>
+      <div class="nb-icon-btn" title="Messages">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+        <div class="nb-badge blue"></div>
+      </div>
+      <div class="nb-divider"></div>
+      <div class="nb-user-pill" id="nbUserPill" onclick="nbToggleDropdown()">
+        <div class="nb-avatar">AJ</div>
+        <div class="nb-user-info">
+          <span class="nb-user-name">Adam Joe</span>
+          <span class="nb-user-role">Admin</span>
+        </div>
+        <svg class="nb-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+        <div class="nb-dropdown" id="nbDropdown">
+          <div class="nb-dd-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Profil
+          </div>
+          <div class="nb-dd-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+            Paramètres
+          </div>
+          <div class="nb-dd-sep"></div>
+          <div class="nb-dd-item danger">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Se déconnecter
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <!-- ════════════ END NAVBAR ════════════ -->
+
+  <!-- ════════════ SIDEBAR (original preserved) ════════════ -->
+  <aside class="sidebar-nav-wrapper">
+    <div class="navbar-logo">
+      <a href="index.html"><img src="{{ asset('assets/back/images/logo_dark.png') }}" alt="logo" /></a>
+    </div>
+    <nav class="sidebar-nav">
+      <ul>
+        <li class="nav-item nav-item-has-children">
+          <a href="#0" class="collapsed" data-bs-toggle="collapse" data-bs-target="#ddmenu_1" aria-controls="ddmenu_1" aria-expanded="false">
+            <span class="icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M8.74999 18.3333C12.2376 18.3333 15.1364 15.8128 15.7244 12.4941C15.8448 11.8143 15.2737 11.25 14.5833 11.25H9.99999C9.30966 11.25 8.74999 10.6903 8.74999 10V5.41666C8.74999 4.7263 8.18563 4.15512 7.50586 4.27556C4.18711 4.86357 1.66666 7.76243 1.66666 11.25C1.66666 15.162 4.83797 18.3333 8.74999 18.3333Z"/><path d="M17.0833 10C17.7737 10 18.3432 9.43708 18.2408 8.75433C17.7005 5.14918 14.8508 2.29947 11.2457 1.75912C10.5629 1.6568 10 2.2263 10 2.91665V9.16666C10 9.62691 10.3731 10 10.8333 10H17.0833Z"/></svg></span>
+            <span class="text">Dashboard</span>
+          </a>
+          <ul id="ddmenu_1" class="collapse dropdown-nav"><li><a href="index.html">eCommerce</a></li></ul>
+        </li>
+        <li class="nav-item nav-item-has-children">
+          <a href="#0" class="collapsed" data-bs-toggle="collapse" data-bs-target="#ddmenu_3" aria-controls="ddmenu_3" aria-expanded="false">
+            <span class="icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M14.9211 10.1294C15.1652 9.88534 15.1652 9.48967 14.9211 9.24559L10.7544 5.0789C10.5103 4.83482 10.1147 4.83482 9.87057 5.0789C9.62649 5.32297 9.62649 5.71871 9.87057 5.96278L12.9702 9.06251H1.97916C1.63398 9.06251 1.35416 9.34234 1.35416 9.68751C1.35416 10.0327 1.63398 10.3125 1.97916 10.3125H12.9702L9.87057 13.4123C9.62649 13.6563 9.62649 14.052 9.87057 14.2961C10.1147 14.5402 10.5103 14.5402 10.7544 14.2961L14.9211 10.1294Z"/><path d="M11.6383 15.18L15.805 11.0133C16.5373 10.2811 16.5373 9.09391 15.805 8.36166L11.6383 4.195C11.2722 3.82888 10.7923 3.64582 10.3125 3.64582V3.02082C10.3125 2.10035 11.0587 1.35416 11.9792 1.35416H16.9792C17.8997 1.35416 18.6458 2.10035 18.6458 3.02082V16.3542C18.6458 17.2747 17.8997 18.0208 16.9792 18.0208H11.9792C11.0587 18.0208 10.3125 17.2747 10.3125 16.3542V15.7292C10.7923 15.7292 11.2722 15.5461 11.6383 15.18Z"/></svg></span>
+            <span class="text">Auth</span>
+          </a>
+          <ul id="ddmenu_3" class="collapse dropdown-nav">
+            <li><a href="signin.html">Se connecter</a></li>
+            <li><a href="signup.html">S'inscrire</a></li>
+          </ul>
+        </li>
+        <li class="nav-item active">
+          <a href="tables.html">
+            <span class="icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M1.66666 4.16667C1.66666 3.24619 2.41285 2.5 3.33332 2.5H16.6667C17.5872 2.5 18.3333 3.24619 18.3333 4.16667V9.16667C18.3333 10.0872 17.5872 10.8333 16.6667 10.8333H3.33332C2.41285 10.8333 1.66666 10.0872 1.66666 9.16667V4.16667Z"/><path d="M1.875 13.75C1.875 13.4048 2.15483 13.125 2.5 13.125H17.5C17.8452 13.125 18.125 13.4048 18.125 13.75C18.125 14.0952 17.8452 14.375 17.5 14.375H2.5C2.15483 14.375 1.875 14.0952 1.875 13.75Z"/><path d="M2.5 16.875C2.15483 16.875 1.875 17.1548 1.875 17.5C1.875 17.8452 2.15483 18.125 2.5 18.125H17.5C17.8452 18.125 18.125 17.8452 18.125 17.5C18.125 17.1548 17.8452 16.875 17.5 16.875H2.5Z"/></svg></span>
+            <span class="text">Tables</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+  <div class="overlay"></div>
+
+  <!-- ════════════ MAIN ════════════ -->
+  <div class="page-wrapper">
+    <main class="main-wrapper">
+
+      <!-- Hero -->
+      <div class="table-page-hero">
+        <div>
+          <div class="table-hero-badge">
+            <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#a5b4fc"/></svg>
+            Gestion des données
+          </div>
+          <h1>Tableau des utilisateurs</h1>
+          <p>Consultez, filtrez et gérez vos données dans une interface propre et professionnelle.</p>
+        </div>
+        <div class="hero-actions">
+          <button class="btn-outline-nb">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Exporter
+          </button>
+          <button class="btn-accent-nb">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Ajouter
+          </button>
+        </div>
+      </div>
+
+      <div class="table-content">
+
+        <!-- Stat cards -->
+        <div class="stat-row">
+          <div class="stat-card">
+            <div class="stat-card-label">Total contacts</div>
+            <div class="stat-card-val">1 284</div>
+            <div class="stat-card-sub">↑ +12% ce mois</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">Actifs</div>
+            <div class="stat-card-val">847</div>
+            <div class="stat-card-sub">↑ +5% ce mois</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">En attente</div>
+            <div class="stat-card-val">312</div>
+            <div class="stat-card-sub">↓ -3% ce mois</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">Clôturés</div>
+            <div class="stat-card-val">125</div>
+            <div class="stat-card-sub">— stable</div>
+          </div>
+        </div>
+
+        <!-- Main contacts table -->
+        <div class="tbl-card">
+          <div class="tbl-card-head">
+            <div>
+              <p class="tbl-card-title">Liste des contacts</p>
+              <p class="tbl-card-sub">Toutes les données disponibles, design revu et optimisé.</p>
+            </div>
+            <div class="tbl-tools">
+              <div class="tbl-search">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="text" placeholder="Rechercher un contact…" id="searchContacts" oninput="filterTable(this.value)" />
+              </div>
+              <button class="tbl-filter-btn">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                Filtrer
+              </button>
+            </div>
+          </div>
+
+          <div class="tbl-wrap">
+            <table class="nb-table" id="contactTable">
+              <thead>
+                <tr>
+                  <th style="width:44px"><input type="checkbox" class="nb-check" onclick="toggleAll(this)"/></th>
+                  <th>Utilisateur</th>
+                  <th>Email</th>
+                  <th>Projet</th>
+                  <th>Statut</th>
+                  <th style="width:60px">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><input type="checkbox" class="nb-check row-check"/></td>
+                  <td><div class="tbl-user"><div class="tbl-avatar"><img src="{{ asset('assets/back/images/lead/lead-1.png') }}" alt=""/></div>Jacob Jones</div></td>
+                  <td class="tbl-email">jacob@example.com</td>
+                  <td>Vue Dashboard</td>
+                  <td><span class="nb-badge-status active">Actif</span></td>
+                  <td><button class="tbl-action-btn"><i class="lni lni-trash-can"></i></button></td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" class="nb-check row-check"/></td>
+                  <td><div class="tbl-user"><div class="tbl-avatar"><img src="{{ asset('assets/back/images/lead/lead-2.png') }}" alt=""/></div>D. Jonathon</div></td>
+                  <td class="tbl-email">jonathon@example.com</td>
+                  <td>React Dashboard</td>
+                  <td><span class="nb-badge-status active">Actif</span></td>
+                  <td><button class="tbl-action-btn"><i class="lni lni-trash-can"></i></button></td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" class="nb-check row-check"/></td>
+                  <td><div class="tbl-user"><div class="tbl-avatar"><img src="{{ asset('assets/back/images/lead/lead-3.png') }}" alt=""/></div>John Doe</div></td>
+                  <td class="tbl-email">johndoe@example.com</td>
+                  <td>Bootstrap Template</td>
+                  <td><span class="nb-badge-status done">Terminé</span></td>
+                  <td><button class="tbl-action-btn"><i class="lni lni-trash-can"></i></button></td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" class="nb-check row-check"/></td>
+                  <td><div class="tbl-user"><div class="tbl-avatar"><img src="{{ asset('assets/back/images/lead/lead-4.png') }}" alt=""/></div>Rayhan Jamil</div></td>
+                  <td class="tbl-email">rayhan@example.com</td>
+                  <td>Css Grid Template</td>
+                  <td><span class="nb-badge-status pending">En attente</span></td>
+                  <td><button class="tbl-action-btn"><i class="lni lni-trash-can"></i></button></td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" class="nb-check row-check"/></td>
+                  <td><div class="tbl-user"><div class="tbl-avatar"><img src="{{ asset('assets/back/images/lead/lead-5.png') }}" alt=""/></div>Esther Howard</div></td>
+                  <td class="tbl-email">esther@example.com</td>
+                  <td>Admin Dashboard Design</td>
+                  <td><span class="nb-badge-status close">Clôturé</span></td>
+                  <td><button class="tbl-action-btn"><i class="lni lni-trash-can"></i></button></td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" class="nb-check row-check"/></td>
+                  <td><div class="tbl-user"><div class="tbl-avatar"><img src="{{ asset('assets/back/images/lead/lead-6.png') }}" alt=""/></div>Anee Doe</div></td>
+                  <td class="tbl-email">anee@example.com</td>
+                  <td>Space Template Update</td>
+                  <td><span class="nb-badge-status active">Actif</span></td>
+                  <td><button class="tbl-action-btn"><i class="lni lni-trash-can"></i></button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="tbl-pagination">
+            <button class="pg-btn active">1</button>
+            <button class="pg-btn">2</button>
+            <button class="pg-btn">3</button>
+            <button class="pg-btn">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Two smaller tables -->
+        <div class="tbl-grid">
+          <!-- Striped table -->
+          <div class="tbl-card">
+            <div class="tbl-card-head">
+              <div>
+                <p class="tbl-card-title">Comptes bancaires</p>
+                <p class="tbl-card-sub">Tableau rayé, padding léger.</p>
+              </div>
+            </div>
+            <div class="tbl-wrap">
+              <table class="nb-table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>N° de compte</th>
+                    <th>Solde</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><input type="checkbox" class="nb-check"/></td><td>AC336 508 2157</td><td>$523</td><td><button class="tbl-action-btn"><i class="lni lni-trash-can"></i></button></td></tr>
+                  <tr><td><input type="checkbox" class="nb-check"/></td><td>AC336 756 0987</td><td>$123</td><td><button class="tbl-action-btn"><i class="lni lni-trash-can"></i></button></td></tr>
+                  <tr><td><input type="checkbox" class="nb-check"/></td><td>AC336 098 8765</td><td>$223</td><td><button class="tbl-action-btn"><i class="lni lni-trash-can"></i></button></td></tr>
+                  <tr><td><input type="checkbox" class="nb-check"/></td><td>AC336 897 3242</td><td>$323</td><td><button class="tbl-action-btn"><i class="lni lni-trash-can"></i></button></td></tr>
+                  <tr><td><input type="checkbox" class="nb-check"/></td><td>AC336 654 0987</td><td>$423</td><td><button class="tbl-action-btn"><i class="lni lni-trash-can"></i></button></td></tr>
+                  <tr><td><input type="checkbox" class="nb-check"/></td><td>AC336 234 9804</td><td>$523</td><td><button class="tbl-action-btn"><i class="lni lni-trash-can"></i></button></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- User names table -->
+          <div class="tbl-card">
+            <div class="tbl-card-head">
+              <div>
+                <p class="tbl-card-title">Annuaire utilisateurs</p>
+                <p class="tbl-card-sub">En-tête neutre, séparations horizontales.</p>
+              </div>
+            </div>
+            <div class="tbl-wrap">
+              <table class="nb-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Prénom</th>
+                    <th>Nom</th>
+                    <th>Identifiant</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>1</td><td>Albert</td><td>Miles</td><td style="color:#818cf8">@albert_miles</td></tr>
+                  <tr><td>2</td><td>John</td><td>Doe</td><td style="color:#818cf8">@john_doe</td></tr>
+                  <tr><td>3</td><td>David</td><td>Smith</td><td style="color:#818cf8">@davidsmith</td></tr>
+                  <tr><td>4</td><td>Jameel</td><td>Kareem</td><td style="color:#818cf8">@jkreem</td></tr>
+                  <tr><td>5</td><td>Esther</td><td>Howard</td><td style="color:#818cf8">@estherh</td></tr>
+                  <tr><td>6</td><td>Anna</td><td>Lee</td><td style="color:#818cf8">@anna_lee</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end table-content -->
+
+      <!-- Footer -->
+      <footer class="nb-footer">
+        <span>© 2025 BizHub — Conçu avec soin.</span>
+        <div>
+          <a href="#">Conditions d'utilisation</a>
+          <a href="#">Confidentialité</a>
+        </div>
+      </footer>
+
+    </main>
+  </div>
+
+  <script src="{{ asset('assets/back/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ asset('assets/back/js/main.js') }}"></script>
+  <script>
+    /* Preloader */
+    window.addEventListener('load', () => {
+      setTimeout(() => document.getElementById('preloader').classList.add('hidden'), 400);
+    });
+
+    /* Navbar: quick actions */
+    function nbSetActive(el) {
+      el.closest('.nb-quick-actions').querySelectorAll('.nb-qa-btn').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    /* Dark / Light toggle */
+    let nbDark = true;
+    function nbToggleDark() {
+      nbDark = !nbDark;
+      document.getElementById('nbToggle').classList.toggle('on', nbDark);
+      document.getElementById('nbToggleLabel').textContent = nbDark ? 'Sombre' : 'Clair';
+    }
+
+    /* Dropdown */
+    let nbDdOpen = false;
+    function nbToggleDropdown() {
+      nbDdOpen = !nbDdOpen;
+      document.getElementById('nbDropdown').classList.toggle('open', nbDdOpen);
+      document.getElementById('nbUserPill').classList.toggle('open', nbDdOpen);
+    }
+    document.addEventListener('click', function(e) {
+      const pill = document.getElementById('nbUserPill');
+      if (pill && !pill.contains(e.target)) {
+        nbDdOpen = false;
+        document.getElementById('nbDropdown').classList.remove('open');
+        pill.classList.remove('open');
+      }
+    });
+
+    /* Table search filter */
+    function filterTable(query) {
+      const rows = document.querySelectorAll('#contactTable tbody tr');
+      const q = query.toLowerCase();
+      rows.forEach(row => {
+        row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+      });
+    }
+
+    /* Select all checkboxes */
+    function toggleAll(master) {
+      document.querySelectorAll('.row-check').forEach(cb => cb.checked = master.checked);
+    }
+
+    /* Pagination */
+    document.querySelectorAll('.pg-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.pg-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

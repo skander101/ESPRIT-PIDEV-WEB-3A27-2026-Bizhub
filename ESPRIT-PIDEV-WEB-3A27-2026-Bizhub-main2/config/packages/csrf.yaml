@@ -1,0 +1,4 @@
+# CSRF protection Symfony 6.4
+framework:
+    csrf_protection:
+        enabled: true
