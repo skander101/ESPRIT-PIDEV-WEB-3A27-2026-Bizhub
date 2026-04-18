@@ -1,0 +1,1347 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Dashboard Investisseur — BizHub{% endblock %}
+
+{% block extra_styles %}
+/* ═══════════════════ LAYOUT ═══════════════════ */
+.d-body { max-width: 1240px; margin: 0 auto; padding: 36px 5% 60px; background: transparent; }
+
+/* ═══════════════════ HEADER BANNER ═══════════════════ */
+.d-hero {
+  background: linear-gradient(135deg, #151b26 0%, #1e2533 55%, #242e42 100%);
+  padding: 52px 5% 44px; position: relative; overflow: hidden;
+}
+.d-hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(255,190,51,0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+.d-hero-inner { max-width: 1240px; margin: 0 auto; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1.5rem; position: relative; }
+.d-hero-role {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(255,190,51,0.12); border: 1px solid rgba(255,190,51,0.25);
+  color: #ffbe33; border-radius: 100px; padding: 5px 16px;
+  font-size: 0.68rem; font-weight: 700; font-family: 'Josefin Sans', sans-serif;
+  text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.9rem; width: fit-content;
+}
+.d-hero h1 {
+  font-family: 'Josefin Sans', sans-serif; font-size: 2rem; font-weight: 700;
+  color: #fff; line-height: 1.2; margin-bottom: 0.4rem;
+}
+.d-hero h1 span { color: #ffbe33; }
+.d-hero p { color: rgba(255,255,255,0.45); font-size: 0.88rem; }
+.d-hero-quick {
+  display: flex; gap: 2rem; flex-wrap: wrap;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px; padding: 16px 24px; backdrop-filter: blur(4px);
+}
+.d-hero-qs { }
+.d-hero-qs-v { font-family: 'Josefin Sans', sans-serif; font-size: 1.5rem; font-weight: 700; color: #ffbe33; line-height: 1; }
+.d-hero-qs-l { font-size: 0.68rem; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 3px; }
+
+/* ═══════════════════ KPI CARDS ═══════════════════ */
+.kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; margin-bottom: 1.8rem; }
+.kpi {
+  background: #fff; border-radius: 16px; padding: 22px 22px 20px;
+  border: 1px solid #eef0f5;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 8px 28px rgba(0,0,0,0.04);
+  display: flex; gap: 16px; align-items: flex-start;
+  position: relative; overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.kpi:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.09); }
+.kpi::before {
+  content: ''; position: absolute; top: 0; left: 0;
+  width: 4px; height: 100%; border-radius: 16px 0 0 16px;
+}
+.kpi.gold::before   { background: linear-gradient(180deg, #ffbe33, #e0a820); }
+.kpi.blue::before   { background: linear-gradient(180deg, #3b82f6, #1d4ed8); }
+.kpi.green::before  { background: linear-gradient(180deg, #10b981, #059669); }
+.kpi.purple::before { background: linear-gradient(180deg, #8b5cf6, #7c3aed); }
+.kpi-icon {
+  width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 1.15rem;
+}
+.kpi.gold   .kpi-icon { background: rgba(255,190,51,0.12); color: #d97706; }
+.kpi.blue   .kpi-icon { background: rgba(59,130,246,0.1);  color: #2563eb; }
+.kpi.green  .kpi-icon { background: rgba(16,185,129,0.1);  color: #059669; }
+.kpi.purple .kpi-icon { background: rgba(139,92,246,0.1);  color: #7c3aed; }
+.kpi-body { flex: 1; min-width: 0; }
+.kpi-val  { font-family: 'Josefin Sans', sans-serif; font-size: 1.75rem; font-weight: 700; color: #1e2533; line-height: 1; }
+.kpi-lbl  { font-size: 0.74rem; color: #6b7280; margin-top: 5px; font-weight: 500; }
+.kpi-sub  { font-size: 0.7rem; color: #9ca3af; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f0f2f5; }
+.kpi-sub i { color: #ffbe33; margin-right: 3px; }
+
+/* ═══════════════════ PANELS ═══════════════════ */
+.d-grid-main  { display: grid; grid-template-columns: 1fr 320px; gap: 1.4rem; margin-bottom: 1.4rem; }
+.d-grid-2     { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; margin-bottom: 1.4rem; }
+.panel {
+  background: #fff; border-radius: 16px; padding: 26px;
+  border: 1px solid #eef0f5;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 24px rgba(0,0,0,0.04);
+  margin-bottom: 1.4rem;
+}
+.panel:last-child { margin-bottom: 0; }
+.panel-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1.2rem; padding-bottom: 0.9rem;
+  border-bottom: 1.5px solid #f0f2f5;
+}
+.panel-title {
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.78rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em; color: #1e2533;
+  display: flex; align-items: center; gap: 8px;
+}
+.panel-title i { color: #ffbe33; font-size: 0.9rem; }
+.panel-link {
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.7rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: #ffbe33; text-decoration: none; display: flex; align-items: center; gap: 4px;
+  transition: gap 0.2s;
+}
+.panel-link:hover { gap: 7px; color: #d97706; }
+
+/* ═══════════════════ TABLE ═══════════════════ */
+.d-table { width: 100%; border-collapse: collapse; }
+.d-table th {
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.67rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em; color: #9ca3af;
+  padding: 0 12px 10px 0; border-bottom: 1.5px solid #f0f2f5; text-align: left;
+}
+.d-table td { padding: 11px 12px 11px 0; border-bottom: 1px solid #f5f6f8; vertical-align: middle; font-size: 0.84rem; color: #1e2533; }
+.d-table tr:last-child td { border-bottom: none; }
+.d-table tbody tr { transition: background 0.15s; }
+.d-table tbody tr:hover td { background: #fafbfc; }
+.d-table .t-amount { font-family: 'Josefin Sans', sans-serif; font-weight: 700; color: #ffbe33; text-align: right; }
+.d-table .t-muted  { color: #9ca3af; font-size: 0.77rem; }
+.d-table .t-name   { font-weight: 600; color: #1e2533; text-decoration: none; }
+.d-table .t-name:hover { color: #ffbe33; }
+
+/* ═══════════════════ STATUT BADGES ═══════════════════ */
+.sb {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.65rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.07em; padding: 3px 9px;
+  border-radius: 100px; border: 1px solid;
+}
+.sb::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+.sb-en_attente     { background: #fef9ec; color: #d97706; border-color: #fde68a; }
+.sb-en_negociation { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+.sb-accepte        { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
+.sb-refuse         { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+.sb-contrat_genere { background: #f5f3ff; color: #7c3aed; border-color: #ddd6fe; }
+.sb-signe          { background: #ecfdf5; color: #065f46; border-color: #6ee7b7; }
+.sb-termine        { background: #f9fafb; color: #6b7280; border-color: #e5e7eb; }
+
+/* ═══════════════════ STATUT BREAKDOWN ═══════════════════ */
+.stat-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 9px 0; border-bottom: 1px solid #f5f6f8; gap: 1rem;
+}
+.stat-row:last-child { border-bottom: none; }
+.stat-bar-wrap { flex: 1; height: 5px; background: #f0f2f5; border-radius: 3px; overflow: hidden; margin: 0 10px; }
+.stat-bar-fill { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
+.stat-count { font-family: 'Josefin Sans', sans-serif; font-weight: 700; font-size: 0.9rem; color: #1e2533; min-width: 24px; text-align: right; }
+
+/* ═══════════════════ ROI BADGE ═══════════════════ */
+.roi-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 9px; border-radius: 10px;
+  font-size: 0.72rem; font-weight: 700; font-family: 'Josefin Sans', sans-serif;
+}
+.roi-high   { background: rgba(16,185,129,0.1); color: #059669; }
+.roi-mid    { background: rgba(255,190,51,0.12); color: #d97706; }
+.roi-low    { background: rgba(239,68,68,0.1);  color: #ef4444; }
+
+/* ═══════════════════ PROJET MINI CARD ═══════════════════ */
+.proj-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+.proj-card {
+  border: 1.5px solid #eef0f5; border-radius: 12px; padding: 16px 18px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.proj-card:hover { border-color: #ffbe33; box-shadow: 0 4px 18px rgba(255,190,51,0.08); }
+.proj-card-title { font-family: 'Josefin Sans', sans-serif; font-size: 0.92rem; font-weight: 700; color: #1e2533; text-decoration: none; display: block; margin-bottom: 4px; }
+.proj-card-title:hover { color: #ffbe33; }
+.proj-card-meta { font-size: 0.77rem; color: #9ca3af; margin-bottom: 12px; }
+.proj-prog-bar { height: 5px; background: #f0f2f5; border-radius: 3px; overflow: hidden; margin-bottom: 8px; }
+.proj-prog-fill { height: 100%; background: linear-gradient(90deg, #ffbe33, #d97706); border-radius: 3px; }
+.proj-card-footer { display: flex; justify-content: space-between; align-items: center; }
+.proj-investors { font-size: 0.73rem; color: #9ca3af; }
+.btn-inv {
+  background: #ffbe33; color: #1e2533; padding: 6px 14px; border-radius: 7px;
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.7rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em; text-decoration: none;
+  display: inline-flex; align-items: center; gap: 5px; transition: background 0.2s;
+}
+.btn-inv:hover { background: #e0a820; }
+
+/* ═══════════════════ ALERTS ═══════════════════ */
+.alert-item {
+  display: flex; gap: 12px; padding: 12px 14px; border-radius: 10px;
+  margin-bottom: 0.6rem; font-size: 0.84rem; line-height: 1.5;
+}
+.alert-item:last-child { margin-bottom: 0; }
+.alert-info    { background: rgba(59,130,246,0.06);  border: 1px solid rgba(59,130,246,0.18); }
+.alert-success { background: rgba(16,185,129,0.07);  border: 1px solid rgba(16,185,129,0.2); }
+.alert-warning { background: rgba(255,190,51,0.08);  border: 1px solid rgba(255,190,51,0.25); }
+.alert-danger  { background: rgba(239,68,68,0.07);   border: 1px solid rgba(239,68,68,0.18); }
+.alert-icon { font-size: 1rem; margin-top: 1px; flex-shrink: 0; }
+.alert-info    .alert-icon { color: #2563eb; }
+.alert-success .alert-icon { color: #059669; }
+.alert-warning .alert-icon { color: #d97706; }
+.alert-danger  .alert-icon { color: #ef4444; }
+.alert-title { font-weight: 700; font-size: 0.82rem; font-family: 'Josefin Sans', sans-serif; margin-bottom: 2px; color: #1e2533; }
+
+/* ═══════════════════ AI RECOMMENDATIONS ═══════════════════ */
+.ai-reco-card {
+  background: linear-gradient(135deg, rgba(124,58,237,0.05) 0%, rgba(79,70,229,0.05) 100%);
+  border: 1.5px solid rgba(124,58,237,0.18);
+  border-radius: 16px; padding: 24px;
+}
+.ai-reco-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1rem; gap: 10px;
+}
+.ai-reco-title {
+  font-size: 0.78rem; font-weight: 700; color: #7c3aed;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  font-family: 'Josefin Sans', sans-serif;
+  display: flex; align-items: center; gap: 7px;
+}
+.ai-reco-items { list-style: none; padding: 0; margin: 0; }
+.ai-reco-item {
+  display: flex; gap: 10px; padding: 10px 0;
+  border-bottom: 1px solid rgba(124,58,237,0.1);
+  font-size: 0.84rem; color: #374151; line-height: 1.55;
+}
+.ai-reco-item:last-child { border-bottom: none; padding-bottom: 0; }
+.ai-reco-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: #7c3aed;
+  flex-shrink: 0; margin-top: 7px;
+}
+.ai-reco-source {
+  font-size: 0.7rem; color: #9ca3af; text-align: right;
+  margin-top: 10px; font-style: italic;
+}
+.btn-ai-load {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 8px; border: none;
+  background: linear-gradient(135deg, #7c3aed, #4f46e5); color: #fff;
+  font-size: 0.72rem; font-weight: 700; font-family: 'Josefin Sans', sans-serif;
+  cursor: pointer; transition: all 0.2s;
+  box-shadow: 0 3px 10px rgba(124,58,237,0.3); white-space: nowrap;
+}
+.btn-ai-load:hover { opacity: 0.88; }
+.btn-ai-load:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* ═══════════════════ CHART ═══════════════════ */
+.chart-wrap { position: relative; height: 220px; }
+
+/* ═══════════════════ SECTOR BARS ═══════════════════ */
+.sector-bar-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; font-size: 0.8rem; }
+.sector-bg { flex: 1; height: 6px; background: #f0f2f5; border-radius: 3px; overflow: hidden; margin: 0 10px; }
+.sector-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #ffbe33, #d97706); }
+
+/* ═══════════════════ EMPTY STATE ═══════════════════ */
+.d-empty { text-align: center; padding: 32px 20px; }
+.d-empty-icon { font-size: 2.2rem; color: #d1d5db; margin-bottom: 0.8rem; }
+.d-empty p { color: #9ca3af; font-size: 0.85rem; }
+
+/* ═══════════════════ PORTFOLIO ANALYSIS ═══════════════════ */
+.pa-trigger {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; flex-wrap: wrap;
+  background: linear-gradient(135deg, rgba(79,70,229,0.05) 0%, rgba(124,58,237,0.06) 100%);
+  border: 1.5px dashed rgba(124,58,237,0.3);
+  border-radius: 16px; padding: 22px 28px; margin-bottom: 1.4rem;
+}
+.pa-trigger-txt h3 {
+  font-family: 'Josefin Sans', sans-serif; font-size: 1rem; font-weight: 700;
+  color: #1e2533; margin-bottom: 4px;
+}
+.pa-trigger-txt p { font-size: 0.82rem; color: #6b7280; margin: 0; }
+.btn-analyse {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, #7c3aed, #4f46e5); color: #fff;
+  border: none; border-radius: 10px; padding: 10px 22px; cursor: pointer;
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.78rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  box-shadow: 0 4px 14px rgba(124,58,237,0.35); transition: all 0.2s;
+  white-space: nowrap;
+}
+.btn-analyse:hover { opacity: 0.88; transform: translateY(-1px); }
+.btn-analyse:active { transform: translateY(0); }
+
+/* Score ring */
+.pa-score-ring { position: relative; width: 130px; height: 130px; flex-shrink: 0; }
+.pa-score-ring svg { transform: rotate(-90deg); }
+.pa-score-ring-track { fill: none; stroke: #f0f2f5; stroke-width: 10; }
+.pa-score-ring-fill  { fill: none; stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset 1s ease; }
+.pa-score-center {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.pa-score-val {
+  font-family: 'Josefin Sans', sans-serif; font-size: 2rem; font-weight: 700;
+  color: #1e2533; line-height: 1;
+}
+.pa-score-max { font-size: 0.7rem; color: #9ca3af; }
+
+/* Analysis header card */
+.pa-header { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; margin-bottom: 1.4rem; }
+.pa-header-info { flex: 1; min-width: 200px; }
+.pa-header-info h3 {
+  font-family: 'Josefin Sans', sans-serif; font-size: 1.1rem; font-weight: 700;
+  color: #1e2533; margin-bottom: 6px;
+}
+.pa-status-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 14px; border-radius: 100px;
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.72rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px;
+}
+.pa-health { font-size: 0.85rem; color: #374151; line-height: 1.65; }
+.pa-trend {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 0.75rem; font-weight: 600; margin-top: 8px;
+  padding: 3px 10px; border-radius: 6px; background: #f9fafb;
+}
+.pa-trend-up   { color: #059669; }
+.pa-trend-mid  { color: #d97706; }
+.pa-trend-down { color: #dc2626; }
+
+/* Lists (risks / strengths) */
+.pa-list { list-style: none; padding: 0; margin: 0; }
+.pa-list li {
+  display: flex; gap: 10px; padding: 9px 0;
+  border-bottom: 1px solid #f5f6f8; font-size: 0.84rem; color: #374151; line-height: 1.5;
+}
+.pa-list li:last-child { border-bottom: none; }
+.pa-list-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+.pa-list-dot-red    { background: #ef4444; }
+.pa-list-dot-green  { background: #10b981; }
+.pa-list-dot-purple { background: #7c3aed; }
+
+/* Prediction cards */
+.pa-pred-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.4rem; }
+.pa-pred-card {
+  border: 1.5px solid #eef0f5; border-radius: 14px; padding: 18px 20px;
+  text-align: center; background: #fff; position: relative; overflow: hidden;
+}
+.pa-pred-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+}
+.pa-pred-card.court::before  { background: linear-gradient(90deg, #3b82f6, #2563eb); }
+.pa-pred-card.moyen::before  { background: linear-gradient(90deg, #ffbe33, #d97706); }
+.pa-pred-card.long::before   { background: linear-gradient(90deg, #10b981, #059669); }
+.pa-pred-label {
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.68rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em; color: #9ca3af; margin-bottom: 8px;
+}
+.pa-pred-years { font-size: 0.75rem; color: #d1d5db; margin-bottom: 12px; }
+.pa-pred-value {
+  font-family: 'Josefin Sans', sans-serif; font-size: 1.5rem; font-weight: 700;
+  color: #1e2533; line-height: 1;
+}
+.pa-pred-currency { font-size: 0.75rem; color: #9ca3af; margin-bottom: 4px; }
+.pa-pred-gain { font-size: 0.8rem; margin-top: 6px; }
+.pa-pred-gain-positive { color: #059669; font-weight: 600; }
+.pa-pred-growth {
+  display: inline-flex; align-items: center; gap: 4px;
+  margin-top: 8px; padding: 2px 10px; border-radius: 100px; font-size: 0.72rem; font-weight: 700;
+  font-family: 'Josefin Sans', sans-serif;
+}
+.pa-pred-growth-positive { background: rgba(16,185,129,0.1); color: #059669; }
+
+/* Projection chart */
+.pa-chart-wrap { position: relative; height: 230px; }
+
+/* Reco items */
+.pa-reco-item {
+  display: flex; gap: 12px; padding: 10px 14px; border-radius: 10px;
+  margin-bottom: 0.5rem; font-size: 0.84rem; line-height: 1.55;
+  background: rgba(124,58,237,0.04); border: 1px solid rgba(124,58,237,0.1);
+  color: #374151;
+}
+.pa-reco-item:last-child { margin-bottom: 0; }
+.pa-reco-num {
+  width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg,#7c3aed,#4f46e5);
+  color: #fff; font-size: 0.65rem; font-weight: 700; font-family: 'Josefin Sans', sans-serif;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+}
+.pa-analyzed-at { font-size: 0.72rem; color: #9ca3af; text-align: right; margin-top: 0.8rem; font-style: italic; }
+@media (max-width: 700px) { .pa-pred-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px) { .pa-pred-grid { grid-template-columns: 1fr; } .pa-header { flex-direction: column; } }
+
+/* ═══════════════════ MATCHING CARDS ═══════════════════ */
+.match-card {
+  display: flex; align-items: center; gap: 20px;
+  padding: 18px 20px; border-radius: 14px;
+  border: 1.5px solid #eef0f5; background: #fff;
+  margin-bottom: 0.85rem; transition: border-color 0.2s, box-shadow 0.2s;
+}
+.match-card:last-child { margin-bottom: 0; }
+.match-card:hover { border-color: rgba(255,190,51,0.5); box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+.match-score-ring { position: relative; width: 58px; height: 58px; flex-shrink: 0; }
+.match-score-ring svg { transform: rotate(-90deg); }
+.match-ring-track { fill: none; stroke: #f0f2f5; stroke-width: 6; }
+.match-ring-fill  { fill: none; stroke-width: 6; stroke-linecap: round; }
+.match-score-center {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.9rem; font-weight: 700; color: #1e2533;
+}
+.match-body { flex: 1; min-width: 0; }
+.match-title-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+.match-project-name {
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.92rem; font-weight: 700;
+  color: #1e2533; text-decoration: none; white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis; max-width: 280px; display: block;
+}
+.match-project-name:hover { color: #ffbe33; }
+.match-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.63rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 3px 10px; border-radius: 100px; border: 1px solid; white-space: nowrap;
+}
+.match-high { background: rgba(5,150,105,0.08);  color: #059669; border-color: rgba(5,150,105,0.25); }
+.match-mid  { background: rgba(217,119,6,0.08);  color: #d97706; border-color: rgba(217,119,6,0.25); }
+.match-low  { background: rgba(107,114,128,0.08); color: #6b7280; border-color: rgba(107,114,128,0.2); }
+.match-reason { font-size: 0.81rem; color: #6b7280; line-height: 1.55; margin-bottom: 8px; }
+.match-meta { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.match-sector-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 0.71rem; color: #9ca3af; font-weight: 500;
+}
+.match-prog-wrap { flex: 1; min-width: 80px; max-width: 140px; }
+.match-prog-bar { height: 4px; background: #f0f2f5; border-radius: 2px; overflow: hidden; }
+.match-prog-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, #ffbe33, #d97706); }
+.match-prog-label { font-size: 0.68rem; color: #9ca3af; margin-top: 3px; }
+.match-action { flex-shrink: 0; }
+.btn-match-see {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 7px 16px; border-radius: 8px;
+  background: #f9fafb; border: 1.5px solid #e5e7eb; color: #374151;
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.7rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em; text-decoration: none;
+  transition: all 0.2s; white-space: nowrap;
+}
+.btn-match-see:hover { background: #ffbe33; border-color: #ffbe33; color: #1e2533; }
+.match-empty { text-align: center; padding: 28px 20px; }
+.match-empty-icon { font-size: 1.8rem; color: #d1d5db; margin-bottom: 0.6rem; }
+.match-empty p { font-size: 0.84rem; color: #9ca3af; }
+
+/* ═══════════════════ RESPONSIVE ═══════════════════ */
+@media (max-width: 1024px) { .d-grid-main { grid-template-columns: 1fr; } .kpi-row { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 900px)  { .d-grid-2 { grid-template-columns: 1fr; } }
+@media (max-width: 480px)  { .kpi-row { grid-template-columns: 1fr; } }
+{% endblock %}
+
+{% block content %}
+
+{# ══════════════════════════════════════════════════
+   HERO BANNER
+══════════════════════════════════════════════════ #}
+<div class="d-hero">
+  <div class="d-hero-inner">
+    <div>
+      <div class="d-hero-role"><i class="fa fa-user-tie"></i> Investisseur</div>
+      <h1>Bonjour, <span>{{ app.user.fullName }}</span> 👋</h1>
+      <p>Tableau de bord de votre portefeuille · {{ 'now'|date('d/m/Y') }}</p>
+    </div>
+    <div class="d-hero-quick">
+      <div class="d-hero-qs">
+        <div class="d-hero-qs-v">{{ portfolio.total_investi|number_format(0, ',', ' ') }}</div>
+        <div class="d-hero-qs-l">TND investis</div>
+      </div>
+      <div class="d-hero-qs">
+        <div class="d-hero-qs-v">{{ portfolio.roi_global }} %</div>
+        <div class="d-hero-qs-l">ROI estimé</div>
+      </div>
+      <div class="d-hero-qs">
+        <div class="d-hero-qs-v">{{ portfolio.nb_investissements }}</div>
+        <div class="d-hero-qs-l">Investissements</div>
+      </div>
+      <div class="d-hero-qs">
+        <div class="d-hero-qs-v">{{ portfolio.projets_actifs }}</div>
+        <div class="d-hero-qs-l">Projets actifs</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="d-body">
+
+  {# ══════════════════════════════════════════════════
+     4 KPI CARDS
+  ══════════════════════════════════════════════════ #}
+  <div class="kpi-row">
+
+    <div class="kpi gold">
+      <div class="kpi-icon"><i class="fa fa-coins"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-val">{{ portfolio.total_investi|number_format(0, ',', ' ') }}</div>
+        <div class="kpi-lbl">TND investis au total</div>
+        <div class="kpi-sub"><i class="fa fa-info-circle"></i> {{ portfolio.nb_investissements }} investissement(s) réalisé(s)</div>
+      </div>
+    </div>
+
+    <div class="kpi green">
+      <div class="kpi-icon"><i class="fa fa-chart-line"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-val">+{{ portfolio.gains_estimes|number_format(0, ',', ' ') }}</div>
+        <div class="kpi-lbl">Gains estimés (TND)</div>
+        <div class="kpi-sub"><i class="fa fa-info-circle"></i> Scénario réaliste sur 5 ans</div>
+      </div>
+    </div>
+
+    <div class="kpi blue">
+      <div class="kpi-icon"><i class="fa fa-percentage"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-val">{{ portfolio.roi_global }} %</div>
+        <div class="kpi-lbl">ROI global estimé</div>
+        <div class="kpi-sub">
+          <i class="fa fa-circle" style="color:{{ portfolio.roi_global >= 40 ? '#059669' : (portfolio.roi_global >= 20 ? '#d97706' : '#dc2626') }};"></i>
+          {% if portfolio.roi_global >= 40 %}Excellent{% elseif portfolio.roi_global >= 20 %}Correct{% elseif portfolio.roi_global > 0 %}À améliorer{% else %}Aucune donnée{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="kpi purple">
+      <div class="kpi-icon"><i class="fa fa-layer-group"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-val">{{ portfolio.projets_actifs }}</div>
+        <div class="kpi-lbl">Projets actifs</div>
+        <div class="kpi-sub"><i class="fa fa-info-circle"></i> {{ portfolio.nb_negs_ouvertes }} négociation(s) · {{ portfolio.nb_deals }} deal(s)</div>
+      </div>
+    </div>
+
+  </div>
+
+  {# ══════════════════════════════════════════════════
+     ANALYSE GLOBALE DU PORTEFEUILLE
+  ══════════════════════════════════════════════════ #}
+
+  {% if analysis is null %}
+
+    {# Trigger card — invite the user to run the analysis #}
+    <div class="pa-trigger">
+      <div class="pa-trigger-txt">
+        <h3><i class="fa fa-brain" style="color:#7c3aed;margin-right:6px;"></i>Analyse globale du portefeuille</h3>
+        <p>Obtenez un score de santé, des prédictions sur 5 ans et des recommandations stratégiques personnalisées générées par IA.</p>
+      </div>
+      <form method="POST" action="{{ path('app_front_dashboard_investisseur_analyser') }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('portfolio_analyse') }}">
+        <button type="submit" class="btn-analyse">
+          <i class="fa fa-chart-line"></i> Lancer l'analyse
+        </button>
+      </form>
+    </div>
+
+  {% else %}
+
+    {# ── Full analysis panel ─────────────────────────────────────────────── #}
+    {% set circumference = 339.292 %}
+    {% set scoreOffset   = circumference * (1 - analysis.score / 100) %}
+    {% set ringColor     = analysis.status_color %}
+
+    <div class="panel" style="margin-bottom:1.4rem;">
+      <div class="panel-head">
+        <div class="panel-title"><i class="fa fa-chart-pie"></i>Analyse globale du portefeuille</div>
+        <form method="POST" action="{{ path('app_front_dashboard_investisseur_analyser') }}" style="margin:0;">
+          <input type="hidden" name="_token" value="{{ csrf_token('portfolio_analyse') }}">
+          <button type="submit" class="btn-ai-load" style="font-size:0.7rem;">
+            <i class="fa fa-sync-alt"></i> Relancer
+          </button>
+        </form>
+      </div>
+
+      {# — Score ring + health overview — #}
+      <div class="pa-header">
+        <div class="pa-score-ring">
+          <svg width="130" height="130" viewBox="0 0 130 130">
+            <circle class="pa-score-ring-track" cx="65" cy="65" r="54"/>
+            <circle class="pa-score-ring-fill"
+              cx="65" cy="65" r="54"
+              stroke="{{ ringColor }}"
+              stroke-dasharray="{{ circumference }}"
+              stroke-dashoffset="{{ scoreOffset|round(2) }}"/>
+          </svg>
+          <div class="pa-score-center">
+            <span class="pa-score-val">{{ analysis.score }}</span>
+            <span class="pa-score-max">/100</span>
+          </div>
+        </div>
+
+        <div class="pa-header-info">
+          <div class="pa-status-badge" style="background:{{ ringColor }}22;color:{{ ringColor }};border:1px solid {{ ringColor }}44;">
+            <i class="fa fa-{{ analysis.score >= 70 ? 'check-circle' : (analysis.score >= 40 ? 'exclamation-circle' : 'times-circle') }}"></i>
+            {{ analysis.status_label }}
+          </div>
+          <h3>Score de santé du portefeuille</h3>
+          <p class="pa-health">{{ analysis.analysis.sante }}</p>
+          <div class="pa-trend pa-trend-{{ analysis.trend == 'croissance' ? 'up' : (analysis.trend == 'stable' ? 'mid' : 'down') }}">
+            <i class="fa fa-{{ analysis.trend == 'croissance' ? 'arrow-up' : (analysis.trend == 'stable' ? 'minus' : 'arrow-down') }}"></i>
+            {{ analysis.trend_label }} · ROI estimé {{ analysis.roi_estimated }} %
+          </div>
+          {% if analysis.analysis.source == 'openai' %}
+            <div style="margin-top:8px;font-size:0.7rem;color:#9ca3af;font-style:italic;">
+              <i class="fa fa-robot" style="margin-right:3px;color:#7c3aed;"></i>Analyse générée par GPT-4o mini
+            </div>
+          {% endif %}
+          <div class="pa-analyzed-at" style="text-align:left;">
+            Analysé le {{ analysis.analyzed_at|date('d/m/Y à H:i') }}
+          </div>
+        </div>
+      </div>
+
+      {# — Risks & Strengths — #}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-bottom:1.4rem;">
+
+        <div>
+          <div class="panel-title" style="margin-bottom:0.8rem;"><i class="fa fa-exclamation-triangle" style="color:#ef4444;"></i>Risques identifiés</div>
+          <ul class="pa-list">
+            {% for r in analysis.analysis.risques %}
+              <li>
+                <span class="pa-list-dot pa-list-dot-red"></span>
+                <span>{{ r }}</span>
+              </li>
+            {% else %}
+              <li><span class="pa-list-dot pa-list-dot-red"></span><span style="color:#9ca3af;">Aucun risque majeur détecté.</span></li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <div>
+          <div class="panel-title" style="margin-bottom:0.8rem;"><i class="fa fa-star" style="color:#10b981;"></i>Points forts</div>
+          <ul class="pa-list">
+            {% for f in analysis.analysis.forces %}
+              <li>
+                <span class="pa-list-dot pa-list-dot-green"></span>
+                <span>{{ f }}</span>
+              </li>
+            {% else %}
+              <li><span class="pa-list-dot pa-list-dot-green"></span><span style="color:#9ca3af;">Continuez à investir pour renforcer votre portefeuille.</span></li>
+            {% endfor %}
+          </ul>
+        </div>
+
+      </div>
+
+    </div>
+
+    {# — Prediction cards — #}
+    {% set ct = analysis.predictions.court_terme %}
+    {% set mt = analysis.predictions.moyen_terme %}
+    {% set lt = analysis.predictions.long_terme  %}
+
+    <div class="pa-pred-grid">
+
+      <div class="pa-pred-card court">
+        <div class="pa-pred-label"><i class="fa fa-clock" style="color:#3b82f6;margin-right:4px;"></i>Court terme</div>
+        <div class="pa-pred-years">{{ ct.annees }} an</div>
+        <div class="pa-pred-currency">Valeur estimée (TND)</div>
+        <div class="pa-pred-value">{{ ct.valeur_totale|number_format(0, ',', ' ') }}</div>
+        <div class="pa-pred-gain">
+          <span class="pa-pred-gain-positive">+{{ ct.gain_estime|number_format(0, ',', ' ') }} TND</span>
+        </div>
+        <div class="pa-pred-growth pa-pred-growth-positive">
+          <i class="fa fa-arrow-up"></i> +{{ ct.croissance_pct }} %
+        </div>
+      </div>
+
+      <div class="pa-pred-card moyen">
+        <div class="pa-pred-label"><i class="fa fa-calendar-alt" style="color:#d97706;margin-right:4px;"></i>Moyen terme</div>
+        <div class="pa-pred-years">{{ mt.annees }} ans</div>
+        <div class="pa-pred-currency">Valeur estimée (TND)</div>
+        <div class="pa-pred-value">{{ mt.valeur_totale|number_format(0, ',', ' ') }}</div>
+        <div class="pa-pred-gain">
+          <span class="pa-pred-gain-positive">+{{ mt.gain_estime|number_format(0, ',', ' ') }} TND</span>
+        </div>
+        <div class="pa-pred-growth pa-pred-growth-positive">
+          <i class="fa fa-arrow-up"></i> +{{ mt.croissance_pct }} %
+        </div>
+      </div>
+
+      <div class="pa-pred-card long">
+        <div class="pa-pred-label"><i class="fa fa-flag-checkered" style="color:#10b981;margin-right:4px;"></i>Long terme</div>
+        <div class="pa-pred-years">{{ lt.annees }} ans</div>
+        <div class="pa-pred-currency">Valeur estimée (TND)</div>
+        <div class="pa-pred-value">{{ lt.valeur_totale|number_format(0, ',', ' ') }}</div>
+        <div class="pa-pred-gain">
+          <span class="pa-pred-gain-positive">+{{ lt.gain_estime|number_format(0, ',', ' ') }} TND</span>
+        </div>
+        <div class="pa-pred-growth pa-pred-growth-positive">
+          <i class="fa fa-arrow-up"></i> +{{ lt.croissance_pct }} %
+        </div>
+      </div>
+
+    </div>
+
+    {# — Projection chart + Recommendations — #}
+    <div style="display:grid;grid-template-columns:1fr 360px;gap:1.4rem;margin-bottom:1.4rem;">
+
+      {# Projection Chart #}
+      <div class="panel" style="margin-bottom:0;">
+        <div class="panel-head">
+          <div class="panel-title"><i class="fa fa-chart-line"></i>Projection sur 5 ans (3 scénarios)</div>
+        </div>
+        <div class="pa-chart-wrap">
+          <canvas id="portfolioProjectionChart"
+            data-labels='{{ analysis.chart.labels|json_encode|raw }}'
+            data-pessi='{{ analysis.chart.pessimiste|json_encode|raw }}'
+            data-real='{{ analysis.chart.realiste|json_encode|raw }}'
+            data-opti='{{ analysis.chart.optimiste|json_encode|raw }}'
+          ></canvas>
+        </div>
+        <div style="display:flex;gap:1rem;margin-top:10px;font-size:0.72rem;justify-content:center;">
+          <span style="display:flex;align-items:center;gap:4px;color:#ef4444;"><span style="width:16px;height:3px;background:#ef4444;border-radius:2px;display:inline-block;"></span>Pessimiste</span>
+          <span style="display:flex;align-items:center;gap:4px;color:#3b82f6;"><span style="width:16px;height:3px;background:#3b82f6;border-radius:2px;display:inline-block;"></span>Réaliste</span>
+          <span style="display:flex;align-items:center;gap:4px;color:#10b981;"><span style="width:16px;height:3px;background:#10b981;border-radius:2px;display:inline-block;"></span>Optimiste</span>
+        </div>
+      </div>
+
+      {# Strategic Recommendations #}
+      <div class="panel" style="margin-bottom:0;">
+        <div class="panel-head">
+          <div class="panel-title"><i class="fa fa-lightbulb" style="color:#7c3aed;"></i>Recommandations stratégiques</div>
+        </div>
+        {% if analysis.analysis.recommandations|length > 0 %}
+          {% for i, reco in analysis.analysis.recommandations %}
+            <div class="pa-reco-item">
+              <span class="pa-reco-num">{{ i + 1 }}</span>
+              <span>{{ reco }}</span>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="d-empty" style="padding:1rem 0;">
+            <p>Aucune recommandation disponible.</p>
+          </div>
+        {% endif %}
+      </div>
+
+    </div>
+
+  {% endif %}
+
+  {# ══════════════════════════════════════════════════
+     LIGNE : Évolution + Alertes & IA
+  ══════════════════════════════════════════════════ #}
+  <div class="d-grid-main">
+
+    {# Évolution du portefeuille — Chart.js #}
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title"><i class="fa fa-chart-bar"></i>Évolution du portefeuille (6 mois)</div>
+      </div>
+      {% if portfolio.total_investi > 0 %}
+        <div class="chart-wrap">
+          <canvas id="portfolioEvolutionChart"></canvas>
+        </div>
+      {% else %}
+        <div class="d-empty">
+          <div class="d-empty-icon"><i class="fa fa-chart-bar"></i></div>
+          <p>Aucune donnée d'investissement pour l'instant.</p>
+        </div>
+      {% endif %}
+    </div>
+
+    {# Alertes + Recommandations IA (colonne droite) #}
+    <div>
+
+      {# Alertes intelligentes #}
+      <div class="panel" style="margin-bottom:1.4rem;">
+        <div class="panel-head">
+          <div class="panel-title"><i class="fa fa-bell"></i>Alertes intelligentes</div>
+          {% if portfolio.alerts|length > 0 %}
+            <span style="background:rgba(255,190,51,0.15);color:#d97706;border:1px solid rgba(255,190,51,0.3);border-radius:100px;padding:2px 9px;font-size:0.68rem;font-weight:700;font-family:'Josefin Sans',sans-serif;">{{ portfolio.alerts|length }}</span>
+          {% endif %}
+        </div>
+        {% if portfolio.alerts|length > 0 %}
+          {% for alert in portfolio.alerts %}
+            <div class="alert-item alert-{{ alert.type }}">
+              <span class="alert-icon"><i class="fa {{ alert.icon }}"></i></span>
+              <div>
+                <div class="alert-title">{{ alert.title }}</div>
+                <div style="font-size:0.79rem;color:#6b7280;">{{ alert.message }}</div>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="d-empty" style="padding:1rem 0;">
+            <div class="d-empty-icon" style="font-size:1.5rem;"><i class="fa fa-check-circle" style="color:#10b981;"></i></div>
+            <p>Tout va bien, aucune alerte.</p>
+          </div>
+        {% endif %}
+      </div>
+
+      {# Recommandations IA #}
+      <div class="ai-reco-card">
+        <div class="ai-reco-header">
+          <div class="ai-reco-title"><i class="fa fa-magic"></i> Recommandations IA</div>
+          <button type="button" id="aiRecoBtn" class="btn-ai-load">
+            <span id="aiRecoBtnIdle"><i class="fa fa-brain"></i> Analyser</span>
+            <span id="aiRecoBtnSpin" style="display:none;"><i class="fa fa-spinner fa-spin"></i></span>
+          </button>
+        </div>
+        <ul class="ai-reco-items" id="aiRecoList">
+          {% for reco in portfolio.recommendations %}
+            <li class="ai-reco-item">
+              <span class="ai-reco-dot"></span>
+              <span>{{ reco }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+        <div id="aiRecoError" style="display:none;margin-top:8px;padding:8px 12px;background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.2);border-radius:8px;color:#ef4444;font-size:0.8rem;"></div>
+        <div class="ai-reco-source" id="aiRecoSource">Basé sur votre profil · Conseils locaux</div>
+        <input type="hidden" id="aiRecoToken" value="{{ csrf_token('dashboard_ai_reco') }}">
+      </div>
+
+    </div>
+  </div>
+
+  {# ══════════════════════════════════════════════════
+     LIGNE : Investissements avec ROI + Répartition statuts
+  ══════════════════════════════════════════════════ #}
+  <div class="d-grid-main">
+
+    {# Mes investissements avec ROI estimé #}
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title"><i class="fa fa-briefcase"></i>Mes investissements & ROI estimé</div>
+        <a href="{{ path('app_front_investissement_index') }}" class="panel-link">Voir tout <i class="fa fa-arrow-right"></i></a>
+      </div>
+      {% if portfolio.investments|length > 0 %}
+        <table class="d-table">
+          <thead>
+            <tr>
+              <th>Projet</th>
+              <th>Montant</th>
+              <th>ROI est.</th>
+              <th>Statut</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for item in portfolio.investments|slice(0, 8) %}
+            {% set inv     = item.investment %}
+            {% set project = item.project %}
+            {% set neg     = item.neg %}
+            {% set deal    = item.deal %}
+            {% set roi     = item.roi_estim %}
+            <tr>
+              <td>
+                {% if project %}
+                  <a href="{{ path('app_front_projet_show', {'id': project.project_id}) }}" class="t-name">
+                    {{ project.title|slice(0,26) }}{% if project.title|length > 26 %}…{% endif %}
+                  </a>
+                  <div class="t-muted" style="margin-top:2px;">{{ item.sector_label }}</div>
+                {% else %}
+                  <span class="t-muted">Projet supprimé</span>
+                {% endif %}
+              </td>
+              <td class="t-amount">{{ inv.amount|number_format(0, ',', ' ') }} TND</td>
+              <td>
+                <span class="roi-badge {{ roi >= 40 ? 'roi-high' : (roi >= 20 ? 'roi-mid' : 'roi-low') }}">
+                  <i class="fa fa-{{ roi >= 20 ? 'arrow-up' : 'arrow-down' }}"></i>
+                  {{ roi }} %
+                </span>
+              </td>
+              <td>
+                {% if deal %}
+                  <span class="sb" style="background:#ecfdf5;color:#065f46;border-color:#6ee7b7;">Deal</span>
+                {% elseif neg and neg.status == 'open' %}
+                  <span class="sb sb-en_negociation">Négo.</span>
+                {% elseif neg and neg.status == 'accepted' %}
+                  <span class="sb sb-accepte">Accordé</span>
+                {% elseif project and project.status in ['en_cours', 'publie', 'in_progress'] %}
+                  <span class="sb sb-accepte">Actif</span>
+                {% else %}
+                  <span class="sb sb-en_attente">Attente</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if deal %}
+                  <a href="{{ path('app_deal_show', {'id': deal.deal_id}) }}" class="panel-link">Deal <i class="fa fa-arrow-right"></i></a>
+                {% elseif neg %}
+                  <a href="{{ path('app_negociation_show', {'id': neg.negotiation_id}) }}" class="panel-link">Négo. <i class="fa fa-arrow-right"></i></a>
+                {% elseif project %}
+                  <a href="{{ path('app_front_projet_show', {'id': project.project_id}) }}" class="panel-link">Voir <i class="fa fa-arrow-right"></i></a>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div class="d-empty">
+          <div class="d-empty-icon"><i class="fa fa-briefcase"></i></div>
+          <p>Aucun investissement pour l'instant.</p>
+          <a href="{{ path('app_front_projet_index') }}" class="btn-inv" style="margin-top:1rem;">
+            <i class="fa fa-search"></i> Explorer les projets
+          </a>
+        </div>
+      {% endif %}
+    </div>
+
+    {# Répartition sectorielle + statuts #}
+    <div>
+
+      {# Secteurs #}
+      {% if portfolio.sectors|length > 0 %}
+      <div class="panel" style="margin-bottom:1.4rem;">
+        <div class="panel-head">
+          <div class="panel-title"><i class="fa fa-chart-pie"></i>Répartition sectorielle</div>
+        </div>
+        {% for sector, data in portfolio.sectors %}
+          {% set pct = portfolio.total_investi > 0 ? (data.amount / portfolio.total_investi * 100)|round(1) : 0 %}
+          <div class="sector-bar-row">
+            <span style="min-width:90px;font-size:0.79rem;color:#374151;font-weight:500;">{{ data.label }}</span>
+            <div class="sector-bg">
+              <div class="sector-fill" style="width:{{ pct }}%;"></div>
+            </div>
+            <span style="font-size:0.75rem;color:#9ca3af;min-width:40px;text-align:right;">{{ pct }}%</span>
+          </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {# Répartition par statut d'investissement #}
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title"><i class="fa fa-chart-bar"></i>Statuts d'investissement</div>
+        </div>
+        {% if par_statut|length > 0 %}
+          {% set total_inv = 0 %}
+          {% for c in par_statut %}{% set total_inv = total_inv + c %}{% endfor %}
+          {% set statut_labels = {
+            'en_attente':     {'label': 'En attente',   'color': '#d97706'},
+            'en_negociation': {'label': 'Négociation',  'color': '#2563eb'},
+            'accepte':        {'label': 'Accepté',      'color': '#059669'},
+            'refuse':         {'label': 'Refusé',       'color': '#dc2626'},
+            'contrat_genere': {'label': 'Contrat',      'color': '#7c3aed'},
+            'signe':          {'label': 'Signé',        'color': '#065f46'},
+            'termine':        {'label': 'Terminé',      'color': '#6b7280'}
+          } %}
+          {% for statut, count in par_statut %}
+            {% set info = statut_labels[statut] ?? {'label': statut, 'color': '#9ca3af'} %}
+            {% set pct = total_inv > 0 ? ((count / total_inv) * 100)|round(0) : 0 %}
+            <div class="stat-row">
+              <span class="sb sb-{{ statut }}" style="min-width:90px;">{{ info.label }}</span>
+              <div class="stat-bar-wrap">
+                <div class="stat-bar-fill" style="width:{{ pct }}%;background:{{ info.color }};"></div>
+              </div>
+              <span class="stat-count">{{ count }}</span>
+            </div>
+          {% endfor %}
+          <div style="margin-top:0.8rem;font-size:0.72rem;color:#9ca3af;text-align:right;">
+            {{ total_inv }} investissement(s) au total
+          </div>
+        {% else %}
+          <div class="d-empty" style="padding:1rem 0;">
+            <div class="d-empty-icon" style="font-size:1.3rem;"><i class="fa fa-chart-bar"></i></div>
+            <p>Aucune donnée disponible.</p>
+          </div>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+
+  {# ══════════════════════════════════════════════════
+     PROJETS RECOMMANDÉS (MATCHING)
+  ══════════════════════════════════════════════════ #}
+  <div class="panel" style="margin-bottom:1.4rem;">
+    <div class="panel-head">
+      <div class="panel-title">
+        <i class="fa fa-magic" style="color:#ffbe33;"></i>Projets recommandés pour vous
+      </div>
+      <span style="background:rgba(255,190,51,0.12);color:#d97706;border:1px solid rgba(255,190,51,0.28);border-radius:100px;padding:2px 10px;font-size:0.68rem;font-weight:700;font-family:'Josefin Sans',sans-serif;">
+        Score de compatibilité
+      </span>
+    </div>
+
+    {% if matches|length > 0 %}
+
+      {% for item in matches %}
+        {# Score ring calculation: circumference 2π×26 ≈ 163.36 #}
+        {% set rc = 163.36 %}
+        {% set rOffset = rc * (1 - item.score / 100) %}
+        {% set rColor = item.badge_class == 'match-high' ? '#059669' : (item.badge_class == 'match-mid' ? '#d97706' : '#9ca3af') %}
+
+        <div class="match-card">
+
+          {# Score ring #}
+          <div class="match-score-ring">
+            <svg width="58" height="58" viewBox="0 0 58 58">
+              <circle class="match-ring-track" cx="29" cy="29" r="26"/>
+              <circle class="match-ring-fill"
+                cx="29" cy="29" r="26"
+                stroke="{{ rColor }}"
+                stroke-dasharray="{{ rc }}"
+                stroke-dashoffset="{{ rOffset|round(2) }}"/>
+            </svg>
+            <div class="match-score-center">{{ item.score }}</div>
+          </div>
+
+          {# Body #}
+          <div class="match-body">
+            <div class="match-title-row">
+              <a href="{{ path('app_front_projet_show', {'id': item.project.project_id}) }}" class="match-project-name">
+                {{ item.project.title }}
+              </a>
+              <span class="match-badge {{ item.badge_class }}">
+                <i class="fa fa-{{ item.badge_class == 'match-high' ? 'check-circle' : (item.badge_class == 'match-mid' ? 'dot-circle' : 'minus-circle') }}"></i>
+                {{ item.badge }}
+              </span>
+            </div>
+
+            <p class="match-reason">{{ item.reason }}</p>
+
+            <div class="match-meta">
+              {% if item.project.secteur %}
+                <span class="match-sector-tag">
+                  <i class="fa fa-tag" style="color:#ffbe33;"></i>
+                  {{ item.project.secteur|capitalize }}
+                </span>
+              {% endif %}
+              <span class="match-sector-tag">
+                <i class="fa fa-users"></i> {{ item.nb_investors }} invest.
+              </span>
+              <div class="match-prog-wrap">
+                <div class="match-prog-bar">
+                  <div class="match-prog-fill" style="width:{{ item.funded_pct }}%;"></div>
+                </div>
+                <div class="match-prog-label">{{ item.funded_pct }}% financé</div>
+              </div>
+            </div>
+          </div>
+
+          {# Action #}
+          <div class="match-action">
+            <a href="{{ path('app_front_projet_show', {'id': item.project.project_id}) }}" class="btn-match-see">
+              Voir <i class="fa fa-arrow-right"></i>
+            </a>
+          </div>
+
+        </div>
+      {% endfor %}
+
+      <div style="text-align:right;margin-top:0.6rem;">
+        <a href="{{ path('app_front_projet_index') }}" class="panel-link" style="font-size:0.72rem;">
+          Explorer tous les projets <i class="fa fa-arrow-right"></i>
+        </a>
+      </div>
+
+    {% else %}
+      <div class="match-empty">
+        <div class="match-empty-icon"><i class="fa fa-search"></i></div>
+        <p>Aucun projet disponible correspondant à votre profil pour l'instant.</p>
+        <a href="{{ path('app_front_projet_index') }}" class="btn-inv" style="margin-top:0.8rem;">
+          <i class="fa fa-compass"></i> Explorer les projets
+        </a>
+      </div>
+    {% endif %}
+  </div>
+
+  {# ══════════════════════════════════════════════════
+     OPPORTUNITÉS D'INVESTISSEMENT
+  ══════════════════════════════════════════════════ #}
+  <div class="panel">
+    <div class="panel-head">
+      <div class="panel-title"><i class="fa fa-rocket"></i>Opportunités d'investissement</div>
+      <a href="{{ path('app_front_projet_index') }}" class="panel-link">Explorer tout <i class="fa fa-arrow-right"></i></a>
+    </div>
+    {% if projets_en_cours|length > 0 %}
+      <div class="proj-cards">
+        {% for projet in projets_en_cours %}
+          {% set investi = 0 %}
+          {% for inv in projet.investments %}{% set investi = investi + inv.amount %}{% endfor %}
+          {% set rawPct = projet.requiredBudget > 0 ? (investi / projet.requiredBudget * 100)|round(1) : 0 %}
+          {% set pct = rawPct > 100 ? 100 : rawPct %}
+          <div class="proj-card">
+            <a href="{{ path('app_front_projet_show', {'id': projet.project_id}) }}" class="proj-card-title">
+              {{ projet.title }}
+            </a>
+            <div class="proj-card-meta">
+              {% if projet.secteur %}<i class="fa fa-tag" style="color:#ffbe33;margin-right:3px;"></i>{{ projet.secteur|capitalize }} &nbsp;·&nbsp; {% endif %}
+              <i class="fa fa-coins" style="color:#ffbe33;margin-right:3px;"></i>{{ projet.requiredBudget|number_format(0,',',' ') }} TND
+            </div>
+            <div class="proj-prog-bar">
+              <div class="proj-prog-fill" style="width:{{ pct }}%;"></div>
+            </div>
+            <div class="proj-card-footer">
+              <span class="proj-investors">
+                <i class="fa fa-users" style="color:#9ca3af;margin-right:3px;"></i>{{ projet.investments|length }} investisseur(s)
+                &nbsp;·&nbsp; {{ pct }}%
+              </span>
+              <a href="{{ path('app_front_investir', {'id': projet.project_id}) }}" class="btn-inv">
+                <i class="fa fa-hand-holding-usd"></i> Investir
+              </a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="d-empty">
+        <div class="d-empty-icon"><i class="fa fa-folder-open"></i></div>
+        <p>Aucun projet ouvert à l'investissement pour l'instant.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  {# ══════════════════════════════════════════════════
+     MARCHÉ FINANCIER & CRYPTO
+  ══════════════════════════════════════════════════ #}
+  {% include 'front/dashboard/_market_widget.html.twig' %}
+
+  {# ══════════════════════════════════════════════════
+     ACTUALITÉS MONDIALES
+  ══════════════════════════════════════════════════ #}
+  {% include 'front/dashboard/_news_widget.html.twig' with {
+      'news': news,
+      'news_category': news_category|default('business')
+  } %}
+
+  {# ══════════════════════════════════════════════════
+     GRAPHIQUE SECTEURS (tous projets plateforme)
+  ══════════════════════════════════════════════════ #}
+  {% include 'front/dashboard/_secteur_chart.html.twig' %}
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    // ── Portfolio evolution chart ─────────────────────────────────────────
+    var chartEl = document.getElementById('portfolioEvolutionChart');
+    if (chartEl) {
+        var labels = {{ portfolio.chart_labels|json_encode|raw }};
+        var data   = {{ portfolio.chart_data|json_encode|raw }};
+        var cumul  = {{ portfolio.chart_cumul|json_encode|raw }};
+
+        new Chart(chartEl, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        type: 'bar',
+                        label: 'Investi ce mois (TND)',
+                        data: data,
+                        backgroundColor: 'rgba(255,190,51,0.35)',
+                        borderColor: '#ffbe33',
+                        borderWidth: 1.5,
+                        borderRadius: 6,
+                        order: 2,
+                    },
+                    {
+                        type: 'line',
+                        label: 'Cumul investi (TND)',
+                        data: cumul,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16,185,129,0.08)',
+                        borderWidth: 2.5,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#10b981',
+                        fill: true,
+                        tension: 0.4,
+                        order: 1,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#6b7280',
+                            font: { family: "'Josefin Sans', sans-serif", size: 11 }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                return ' ' + ctx.dataset.label + ' : ' + ctx.parsed.y.toLocaleString('fr-FR') + ' TND';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#9ca3af', font: { family: "'Josefin Sans', sans-serif", size: 10 } }
+                    },
+                    y: {
+                        grid: { color: 'rgba(0,0,0,0.04)' },
+                        ticks: {
+                            color: '#9ca3af',
+                            font: { family: "'Josefin Sans', sans-serif", size: 10 },
+                            callback: function(v) { return v.toLocaleString('fr-FR'); }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // ── Portfolio projection chart (3 scenarios) ─────────────────────────
+    var projEl = document.getElementById('portfolioProjectionChart');
+    if (projEl) {
+        var pLabels = JSON.parse(projEl.dataset.labels || '[]');
+        var pPessi  = JSON.parse(projEl.dataset.pessi  || '[]');
+        var pReal   = JSON.parse(projEl.dataset.real   || '[]');
+        var pOpti   = JSON.parse(projEl.dataset.opti   || '[]');
+
+        new Chart(projEl, {
+            type: 'line',
+            data: {
+                labels: pLabels,
+                datasets: [
+                    {
+                        label: 'Pessimiste',
+                        data: pPessi,
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239,68,68,0.07)',
+                        borderWidth: 2,
+                        borderDash: [6, 4],
+                        pointRadius: 3,
+                        fill: false,
+                        tension: 0.3,
+                    },
+                    {
+                        label: 'Réaliste',
+                        data: pReal,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59,130,246,0.08)',
+                        borderWidth: 2.5,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#3b82f6',
+                        fill: true,
+                        tension: 0.3,
+                    },
+                    {
+                        label: 'Optimiste',
+                        data: pOpti,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16,185,129,0.06)',
+                        borderWidth: 2,
+                        borderDash: [6, 4],
+                        pointRadius: 3,
+                        fill: false,
+                        tension: 0.3,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                return ' ' + ctx.dataset.label + ' : ' + ctx.parsed.y.toLocaleString('fr-FR') + ' TND';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#9ca3af', font: { family: "'Josefin Sans', sans-serif", size: 10 } }
+                    },
+                    y: {
+                        grid: { color: 'rgba(0,0,0,0.04)' },
+                        ticks: {
+                            color: '#9ca3af',
+                            font: { family: "'Josefin Sans', sans-serif", size: 10 },
+                            callback: function(v) { return v.toLocaleString('fr-FR'); }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // ── AI Recommendations ────────────────────────────────────────────────
+    var aiBtn    = document.getElementById('aiRecoBtn');
+    var aiIdle   = document.getElementById('aiRecoBtnIdle');
+    var aiSpin   = document.getElementById('aiRecoBtnSpin');
+    var aiList   = document.getElementById('aiRecoList');
+    var aiError  = document.getElementById('aiRecoError');
+    var aiSource = document.getElementById('aiRecoSource');
+    var aiToken  = document.getElementById('aiRecoToken');
+    var AI_URL   = '{{ path('app_front_dashboard_investisseur_ai') }}';
+    var loaded   = false;
+
+    if (!aiBtn) return;
+
+    function setLoading(on) {
+        aiBtn.disabled        = on;
+        aiIdle.style.display  = on ? 'none' : 'inline-flex';
+        aiSpin.style.display  = on ? 'inline' : 'none';
+    }
+
+    aiBtn.addEventListener('click', function () {
+        if (loaded) return;
+        aiError.style.display = 'none';
+        setLoading(true);
+
+        var body = new FormData();
+        body.append('_token', aiToken.value);
+
+        fetch(AI_URL, { method: 'POST', body: body })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                setLoading(false);
+
+                if (data.error) {
+                    aiError.innerHTML = '<i class="fa fa-exclamation-triangle"></i> ' + data.error;
+                    aiError.style.display = 'block';
+                    return;
+                }
+
+                var items = data.items || [];
+                if (items.length === 0) return;
+
+                aiList.style.transition = 'opacity 0.25s';
+                aiList.style.opacity    = '0';
+                setTimeout(function () {
+                    aiList.innerHTML = '';
+                    items.forEach(function (text) {
+                        var li  = document.createElement('li');
+                        li.className = 'ai-reco-item';
+                        var dot = document.createElement('span');
+                        dot.className = 'ai-reco-dot';
+                        var txt = document.createElement('span');
+                        txt.textContent = text;
+                        li.appendChild(dot);
+                        li.appendChild(txt);
+                        aiList.appendChild(li);
+                    });
+                    aiList.style.opacity = '1';
+                    aiSource.textContent = data.source === 'openai'
+                        ? 'Généré par GPT-4o mini · Analyse IA personnalisée'
+                        : 'Basé sur votre profil · Conseils locaux';
+                    loaded = true;
+                    aiBtn.style.display = 'none';
+                }, 220);
+            })
+            .catch(function () {
+                setLoading(false);
+                aiError.innerHTML = '<i class="fa fa-exclamation-triangle"></i> Erreur réseau. Réessayez.';
+                aiError.style.display = 'block';
+            });
+    });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <title>Mon Panier - BizHub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #ffbe33;
+      --primary-dark: #e0a820;
+      --dark: #222831;
+      --dark2: #1a1f27;
+      --white: #ffffff;
+      --light-bg: #f8f8f8;
+      --text-muted: #666666;
+      --border: #ebebeb;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Lora', serif; background: var(--light-bg); color: var(--dark); overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column; }
+
+    main { flex: 1; padding-top: 72px; }
+
+    .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 72px; display: flex; align-items: center; padding: 0 5%; background: rgba(34,40,49,0.97); backdrop-filter: blur(10px); box-shadow: 0 2px 20px rgba(0,0,0,0.18); justify-content: space-between; }
+    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .brand-name { font-size: 1.4rem; font-weight: 700; color: var(--white); letter-spacing: 0.08em; font-family: 'Josefin Sans', sans-serif; text-transform: uppercase; }
+    .brand-name span { color: var(--primary); }
+    .nav-links { display: flex; align-items: center; gap: 2rem; list-style: none; }
+    .nav-links a { font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.75); text-decoration: none; letter-spacing: 0.12em; text-transform: uppercase; font-family: 'Josefin Sans', sans-serif; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--white); }
+
+    .page-hero { height: 200px; position: relative; display: flex; align-items: center; padding-top: 72px; overflow: hidden; background: linear-gradient(135deg, var(--dark2) 0%, var(--dark) 100%); }
+    .page-hero h1 { font-size: 2rem; font-weight: 700; color: var(--white); font-family: 'Lora', serif; margin-left: 5%; }
+    .page-hero h1 span { color: var(--primary); }
+
+    .section { padding: 60px 5%; max-width: 1200px; margin: 0 auto; width: 100%; }
+
+    .cart-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; }
+    .cart-items { background: var(--white); border-radius: 12px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .cart-summary { background: var(--white); border-radius: 12px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); height: fit-content; }
+
+    .empty-cart { text-align: center; padding: 60px 20px; }
+    .empty-cart i { font-size: 3rem; color: var(--primary); margin-bottom: 1rem; }
+    .empty-cart p { color: var(--text-muted); margin-bottom: 1.5rem; }
+
+    .cart-item { display: flex; justify-content: space-between; align-items: flex-start; padding: 16px 0; border-bottom: 1px solid var(--border); }
+    .cart-item:last-child { border-bottom: none; }
+    .item-info { flex: 1; }
+    .item-name { font-size: 0.95rem; font-weight: 600; color: var(--dark); margin-bottom: 4px; }
+    .item-price { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; }
+    .item-qty { display: flex; align-items: center; gap: 0.5rem; margin-top: 8px; }
+    .item-qty input { width: 50px; padding: 4px; border: 1px solid var(--border); border-radius: 4px; text-align: center; font-size: 0.85rem; }
+    .item-total { font-weight: 700; color: var(--dark); min-width: 80px; text-align: right; }
+    .item-actions { margin-left: 12px; }
+    .item-remove { background: none; border: none; color: #dc3545; cursor: pointer; font-size: 0.9rem; transition: color 0.2s; }
+    .item-remove:hover { color: #bb2d3b; }
+
+    .summary-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+    .summary-row:last-child { border-bottom: none; font-weight: 700; font-size: 1rem color: var(--dark); }
+    .summary-total { display: flex; justify-content: space-between; padding: 16px 0; font-weight: 700; font-size: 1.1rem; color: var(--dark); }
+
+    .cart-actions { display: flex; gap: 1rem; margin-top: 2rem; }
+    .btn { padding: 12px 24px; border: none; border-radius: 8px; font-weight: 700; font-family: 'Josefin Sans', sans-serif; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; text-decoration: none; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+    .btn-primary { background: var(--primary); color: var(--dark); }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-secondary { background: transparent; color: var(--dark); border: 1.5px solid var(--dark); flex: 1; }
+    .btn-secondary:hover { background: var(--dark); color: var(--white); }
+    .btn-danger { background: #dc3545; color: var(--white); font-size: 0.78rem; padding: 8px 16px; }
+    .btn-danger:hover { background: #bb2d3b; }
+
+    .alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; }
+    .alert-warning { background: rgba(255,193,7,0.1); border-left: 4px solid #ffc107; color: #856404; }
+
+    footer { background: var(--dark2); color: var(--white); padding: 40px 5%; text-align: center; font-size: 0.85rem; margin-top: auto; }
+
+    @media (max-width: 768px) {
+      .cart-grid { grid-template-columns: 1fr; }
+      .navbar { height: auto; flex-wrap: wrap; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="{{ path('app_front_index') }}" class="nav-brand">
+    <span class="brand-name">Biz<span>Hub</span></span>
+  </a>
+</nav>
+
+<div class="page-hero">
+  <h1><span>Mon</span> Panier</h1>
+</div>
+
+<main>
+  <section class="section">
+    {% if details|length > 0 %}
+      <div class="cart-grid">
+        <!-- ITEMS -->
+        <div class="cart-items">
+          <h5 style="margin-bottom: 1.5rem; font-size: 1.05rem; font-weight: 700;">{{ details|length }} article{{ details|length > 1 ? 's' : '' }}</h5>
+
+          {% for detail in details %}
+            <div class="cart-item">
+              <div class="item-info">
+                <div class="item-name">{{ detail.produit.nom }}</div>
+                <div class="item-price">{{ detail.prix_unit }} TND</div>
+                <div class="item-qty">
+                  <form method="POST" action="{{ path('panier_update', {id: detail.item.idPanier}) }}" style="display: flex; gap: 8px;">
+                    <input type="hidden" name="_token" value="{{ csrf_token('update_panier_' ~ detail.item.idPanier) }}">
+                    <input type="number" name="quantite" value="{{ detail.item.quantite }}" min="1" max="{{ detail.produit.quantite }}">
+                    <button type="submit" style="background: var(--primary); color: var(--dark); border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 700;">✓</button>
+                  </form>
+                </div>
+              </div>
+              <div class="item-total">{{ detail.total_ht|number_format(3, '.', '') }} TND</div>
+              <div class="item-actions">
+                <form method="POST" action="{{ path('panier_remove', {id: detail.item.idPanier}) }}" style="display: inline;">
+                  <input type="hidden" name="_token" value="{{ csrf_token('remove_panier_' ~ detail.item.idPanier) }}">
+                  <button type="submit" class="item-remove" title="Supprimer">🗑️</button>
+                </form>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- SUMMARY -->
+        <div class="cart-summary">
+          <h5 style="margin-bottom: 1.5rem; font-size: 1.05rem; font-weight: 700;">Résumé</h5>
+
+          <div class="summary-row">
+            <span>Total HT:</span>
+            <span>{{ total_ht|number_format(3, '.', '') }} TND</span>
+          </div>
+          <div class="summary-row">
+            <span>TVA (19%):</span>
+            <span>{{ tva|number_format(3, '.', '') }} TND</span>
+          </div>
+          <div class="summary-total">
+            <span>Total TTC:</span>
+            <span style="color: var(--primary);">{{ ttc|number_format(3, '.', '') }} TND</span>
+          </div>
+
+          <form method="POST" action="{{ path('commande_passer') }}" style="margin-top: 1.5rem;">
+            <input type="hidden" name="_token" value="{{ csrf_token('passer_commande') }}">
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+              <i class="fa fa-check"></i> Passer commande
+            </button>
+          </form>
+
+          <a href="{{ path('produit_index') }}" class="btn btn-secondary" style="width: 100%; margin-top: 0.5rem; justify-content: center;">Continuer shopping</a>
+
+          <form method="POST" action="{{ path('panier_vider') }}" style="margin-top: 0.5rem;">
+            <input type="hidden" name="_token" value="{{ csrf_token('vider_panier') }}">
+            <button type="submit" class="btn btn-danger" style="width: 100%;"><i class="fa fa-trash"></i> Vider</button>
+          </form>
+        </div>
+      </div>
+    {% else %}
+      <div class="empty-cart">
+        <i class="fa fa-shopping-cart"></i>
+        <h3 style="margin-bottom: 0.5rem;">Votre panier est vide</h3>
+        <p>Commencez à explorer notre marketplace et ajoutez des produits à votre panier.</p>
+        <a href="{{ path('produit_index') }}" class="btn btn-primary">
+          <i class="fa fa-store"></i> Voir le catalogue
+        </a>
+      </div>
+    {% endif %}
+  </section>
+</main>
+
+<footer>
+  <p>&copy; 2026 BizHub Platform. Tous droits réservés.</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,240 @@
+{% extends 'front/Marketplace/base_marketplace.html.twig' %}
+
+{% block title %}Commandes reçues{% endblock %}
+{% block hero_eyebrow %}Investisseur{% endblock %}
+{% block hero_title %}Commandes <span>Reçues</span>{% endblock %}
+{% block breadcrumb_extra %}
+  <i class="fa fa-chevron-right" style="font-size:.55rem"></i> Commandes reçues
+{% endblock %}
+
+{% block body %}
+<div style="max-width:1200px; margin:0 auto; padding:60px 5%;">
+
+  {# HEADER #}
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
+    <div>
+      <h2 style="font-family:'Lora',serif; font-weight:700; font-size:1.6rem; margin-bottom:0.3rem;">Commandes reçues</h2>
+      <p style="color:var(--muted); font-size:0.85rem;">{{ kpi.nb_total }} commande{{ kpi.nb_total != 1 ? 's' : '' }} au total</p>
+    </div>
+    <a href="{{ path('produit_mes') }}" class="btn-outline">
+      <i class="fa fa-arrow-left"></i> Retour
+    </a>
+  </div>
+
+  {# KPI CARDS #}
+  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:1.2rem; margin-bottom:2rem;">
+    <div style="background:var(--white); padding:18px 20px; border-radius:12px; border-left:4px solid var(--primary); box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:0.65rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:6px;">CA Total</div>
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:1.35rem; font-weight:800; color:var(--primary);">{{ kpi.ca_total }} <span style="font-size:0.7rem; color:var(--muted);">TND</span></div>
+    </div>
+    <div style="background:var(--white); padding:18px 20px; border-radius:12px; border-left:4px solid #28a745; box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:0.65rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:6px;">CA Confirmé</div>
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:1.35rem; font-weight:800; color:#28a745;">{{ kpi.ca_confirmee }} <span style="font-size:0.7rem; color:var(--muted);">TND</span></div>
+    </div>
+    <div style="background:var(--white); padding:18px 20px; border-radius:12px; border-left:4px solid #0d6efd; box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:0.65rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:6px;">CA Livré</div>
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:1.35rem; font-weight:800; color:#0d6efd;">{{ kpi.ca_livree }} <span style="font-size:0.7rem; color:var(--muted);">TND</span></div>
+    </div>
+    <div style="background:var(--white); padding:18px 20px; border-radius:12px; border-left:4px solid #ffc107; box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:0.65rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:6px;">En Attente</div>
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:1.35rem; font-weight:800; color:#ffc107;">{{ kpi.nb_attente }}</div>
+    </div>
+  </div>
+
+  {% if commandes|length > 0 %}
+
+    {# FILTRES #}
+    <div style="display:flex; gap:0.5rem; margin-bottom:1.5rem; flex-wrap:wrap;">
+      <a href="{{ path('commande_investisseur_recues') }}" class="filter-btn {% if not statut_filtre %}active{% endif %}" style="background: {% if not statut_filtre %}var(--primary){% else %}var(--white){% endif %}; color: {% if not statut_filtre %}var(--dark){% else %}var(--muted){% endif %}; border: 1.5px solid var(--border); padding: 8px 16px; border-radius: 100px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; text-decoration: none; cursor: pointer; transition: all 0.2s;">
+        <i class="fa fa-list"></i> Toutes
+      </a>
+      {% for status in statuts_dispo %}
+        <a href="{{ path('commande_investisseur_recues', {statut: status}) }}" style="background: {% if status == statut_filtre %}var(--primary){% else %}var(--white){% endif %}; color: {% if status == statut_filtre %}var(--dark){% else %}var(--muted){% endif %}; border: 1.5px solid var(--border); padding: 8px 16px; border-radius: 100px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; text-decoration: none; cursor: pointer; transition: all 0.2s;" class="filter-btn {% if status == statut_filtre %}active{% endif %}">
+          {{ status|capitalize }}
+        </a>
+      {% endfor %}
+    </div>
+
+    {# TABLEAU #}
+    <div style="background:var(--white); border-radius:14px; border:1.5px solid var(--border); overflow:hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.07);">
+      <table class="biz-table" style="width:100%; border-collapse:collapse;">
+        <thead>
+          <tr style="background:var(--light-bg); border-bottom:2px solid var(--border);">
+            <th style="padding:16px; text-align:left; font-family:'Josefin Sans',sans-serif; font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);">N°</th>
+            <th style="padding:16px; text-align:left; font-family:'Josefin Sans',sans-serif; font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);">Client</th>
+            <th style="padding:16px; text-align:left; font-family:'Josefin Sans',sans-serif; font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);">Produits</th>
+            <th style="padding:16px; text-align:center; font-family:'Josefin Sans',sans-serif; font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);">Qty</th>
+            <th style="padding:16px; text-align:left; font-family:'Josefin Sans',sans-serif; font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);">Total</th>
+            <th style="padding:16px; text-align:left; font-family:'Josefin Sans',sans-serif; font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);">Statut</th>
+            <th style="padding:16px; text-align:center; font-family:'Josefin Sans',sans-serif; font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cmd in commandes %}
+            <tr style="border-bottom:1px solid var(--border); transition:background 0.2s;" onmouseover="this.style.background='var(--light-bg)'" onmouseout="this.style.background='transparent'">
+              <td style="padding:16px; font-weight:700;">#{{ cmd.idCommande }}</td>
+              <td style="padding:16px; font-size:0.9rem;">Client #{{ cmd.idClient }}</td>
+              <td style="padding:16px;">
+                {% for ligne in cmd.lignes %}
+                  <div style="font-size:0.85rem; margin-bottom:4px;">
+                    <i class="fa fa-box"></i>
+                    {{ produits_map[ligne.idProduit] ?? ('Produit #' ~ ligne.idProduit) }}
+                    <span style="color:var(--muted);">×{{ ligne.quantite }}</span>
+                  </div>
+                {% endfor %}
+              </td>
+              <td style="padding:16px; text-align:center; font-weight:700;">{{ cmd.quantite ?? cmd.lignes|reduce((sum, l) => sum + l.quantite, 0) }}</td>
+              <td style="padding:16px; font-weight:700;">{{ cmd.totalTtc }} TND</td>
+              <td style="padding:16px;">
+                {% set sl = cmd.statut|trim|lower %}
+                <span style="display:inline-flex; align-items:center; gap:4px; padding:6px 12px; border-radius:6px;
+                  background:{{ sl == 'en_attente' ? 'rgba(255,193,7,0.12)' : (sl == 'confirmee' ? 'rgba(34,197,94,0.12)' : (sl == 'livree' ? 'rgba(13,110,253,0.12)' : 'rgba(220,53,69,0.12)')) }};
+                  color:{{ sl == 'en_attente' ? '#92400e' : (sl == 'confirmee' ? '#15803d' : (sl == 'livree' ? '#084298' : '#991b1b')) }};
+                  font-size:0.78rem; font-weight:700; text-transform:uppercase;">
+                  <i class="fa fa-{{ sl == 'en_attente' ? 'clock' : (sl == 'confirmee' ? 'check-circle' : (sl == 'livree' ? 'truck' : 'times-circle')) }}"></i>
+                  {{ cmd.statut }}
+                </span>
+              </td>
+              <td style="padding:16px; text-align:center;">
+                <div style="display:flex; gap:6px; justify-content:center; flex-wrap:wrap;">
+                  <a href="{{ path('commande_show', {id: cmd.idCommande}) }}" style="background:var(--primary); color:var(--dark); border:none; padding:6px 10px; border-radius:4px; cursor:pointer; font-weight:700; font-size:0.7rem; text-decoration:none; display:inline-flex; align-items:center; gap:4px; transition:background 0.2s;" onmouseover="this.style.background='var(--primary-dark)'" onmouseout="this.style.background='var(--primary)'">
+                    <i class="fa fa-eye"></i> Voir
+                  </a>
+
+                  {% if cmd.statut == 'en_attente' %}
+                    <form method="POST" action="{{ path('commande_confirmer', {id: cmd.idCommande}) }}" style="display:inline;"
+                          data-confirm="Confirmer la commande #{{ cmd.idCommande }} ? Le stock des produits sera décrémenté automatiquement."
+                          data-confirm-type="success">
+                      <input type="hidden" name="_token" value="{{ csrf_token('confirmer_' ~ cmd.idCommande) }}">
+                      <button type="submit" style="background:#28a745; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; font-weight:700; font-size:0.7rem; display:inline-flex; align-items:center; gap:4px;">
+                        <i class="fa fa-check"></i> Confirmer
+                      </button>
+                    </form>
+                    <form method="POST" action="{{ path('commande_refuser', {id: cmd.idCommande}) }}" style="display:inline;"
+                          data-confirm="Annuler la commande #{{ cmd.idCommande }} ? Elle sera marquée comme annulée."
+                          data-confirm-type="danger">
+                      <input type="hidden" name="_token" value="{{ csrf_token('refuser_' ~ cmd.idCommande) }}">
+                      <button type="submit" style="background:#dc3545; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; font-weight:700; font-size:0.7rem; display:inline-flex; align-items:center; gap:4px;">
+                        <i class="fa fa-times"></i> Annuler
+                      </button>
+                    </form>
+                  {% elseif cmd.statut == 'confirmee' %}
+                    <form method="POST" action="{{ path('commande_livrer', {id: cmd.idCommande}) }}" style="display:inline;"
+                          data-confirm="Marquer la commande #{{ cmd.idCommande }} comme livrée ? Le client sera notifié du changement de statut."
+                          data-confirm-type="deliver">
+                      <input type="hidden" name="_token" value="{{ csrf_token('livrer_' ~ cmd.idCommande) }}">
+                      <button type="submit" style="background:#0d6efd; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; font-weight:700; font-size:0.7rem; display:inline-flex; align-items:center; gap:4px;">
+                        <i class="fa fa-truck"></i> Livrer
+                      </button>
+                    </form>
+                  {% elseif cmd.statut == 'annulee' %}
+                    <span style="display:inline-flex; align-items:center; gap:4px; padding:6px 10px; background:rgba(220,53,69,0.1); border-radius:4px; color:#dc3545; font-weight:700; font-size:0.7rem;">
+                      <i class="fa fa-times-circle"></i> Annulée
+                    </span>
+                  {% elseif cmd.statut == 'livree' %}
+                    <span style="display:inline-flex; align-items:center; gap:4px; padding:6px 10px; background:rgba(13,110,253,0.1); border-radius:4px; color:#0d6efd; font-weight:700; font-size:0.7rem;">
+                      <i class="fa fa-check-double"></i> Livrée
+                    </span>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {# BAR CHART — produits les plus vendus #}
+    {% if chart_labels|length > 0 %}
+    <div style="background:var(--white); border-radius:14px; border:1.5px solid var(--border); padding:28px 32px; margin-top:2rem; box-shadow:0 4px 20px rgba(0,0,0,0.06);">
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-bottom:6px;">Statistiques des ventes</div>
+      <div style="font-family:'Lora',serif; font-size:1.15rem; font-weight:700; color:var(--dark); margin-bottom:20px;">Produits commandés — ordre décroissant</div>
+      <div style="position:relative; height:{{ max(chart_labels|length * 52, 160) }}px;">
+        <canvas id="barVentes"></canvas>
+      </div>
+    </div>
+    {% endif %}
+
+  {% else %}
+    <div style="text-align:center; padding:80px 20px; background:var(--light-bg); border-radius:16px; border:1.5px dashed var(--border);">
+      <div style="font-size:4rem; color:rgba(255,190,51,0.3); margin-bottom:1.2rem;"><i class="fa fa-inbox"></i></div>
+      <h3 style="font-family:'Lora',serif; font-size:1.3rem; font-weight:700; margin-bottom:0.5rem;">Pas de commandes</h3>
+      <p style="color:var(--muted); margin-bottom:1.5rem; max-width:400px; margin-left:auto; margin-right:auto;">Vous n'avez pas encore reçu de commandes pour vos produits. Publiez vos produits pour commencer à recevoir des commandes.</p>
+      <a href="{{ path('produit_mes') }}" style="display:inline-block; margin-top:1rem; padding:12px 24px; background:var(--primary); color:var(--dark); border-radius:8px; text-decoration:none; font-weight:700; text-transform:uppercase; font-size:0.85rem; transition:background 0.2s;" onmouseover="this.style.background='var(--primary-dark)'" onmouseout="this.style.background='var(--primary)'">
+        <i class="fa fa-plus"></i> Publier un produit
+      </a>
+    </div>
+  {% endif %}
+
+</div>
+
+{% if chart_labels|length > 0 %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+(function() {
+  var ctx = document.getElementById('barVentes');
+  if (!ctx) return;
+  var labels = {{ chart_labels|json_encode|raw }};
+  var values = {{ chart_values|json_encode|raw }};
+
+  /* Generate gradient shades of the brand yellow → orange */
+  var colors = labels.map(function(_, i) {
+    var ratio = labels.length > 1 ? i / (labels.length - 1) : 0;
+    var r = Math.round(255 - ratio * 30);
+    var g = Math.round(190 - ratio * 80);
+    var b = Math.round(51  - ratio * 20);
+    return 'rgba(' + r + ',' + g + ',' + b + ',0.85)';
+  });
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Quantité commandée',
+        data: values,
+        backgroundColor: colors,
+        borderColor: colors.map(function(c){ return c.replace('0.85','1'); }),
+        borderWidth: 1.5,
+        borderRadius: 6,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              return ' ' + ctx.parsed.x + ' unité' + (ctx.parsed.x > 1 ? 's' : '') + ' commandée' + (ctx.parsed.x > 1 ? 's' : '');
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          beginAtZero: true,
+          ticks: {
+            stepSize: 1,
+            font: { family: "'Josefin Sans', sans-serif", size: 11 },
+            color: '#888'
+          },
+          grid: { color: 'rgba(0,0,0,0.05)' }
+        },
+        y: {
+          ticks: {
+            font: { family: "'Lora', serif", size: 13 },
+            color: '#333'
+          },
+          grid: { display: false }
+        }
+      }
+    }
+  });
+})();
+</script>
+{% endif %}
+{% endblock %}

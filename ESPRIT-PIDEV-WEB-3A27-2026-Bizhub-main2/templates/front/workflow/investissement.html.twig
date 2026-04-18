@@ -1,0 +1,694 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Workflow — {{ investment.project ? investment.project.title : 'Investissement' }} — BizHub{% endblock %}
+
+{% block extra_styles %}
+/* ═══ HERO ═══════════════════════════════════════════════════════════════════ */
+.wf-hero {
+  background: linear-gradient(135deg, #151b26 0%, #1e2533 60%, #242e42 100%);
+  padding: 52px 5% 40px; position: relative; overflow: hidden;
+}
+.wf-hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 55% 90% at 85% 50%, rgba(255,190,51,0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+.wf-hero-inner { max-width: 1000px; margin: 0 auto; position: relative; }
+.wf-back-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: rgba(255,255,255,0.4); font-size: 0.75rem; font-weight: 700;
+  font-family: 'Josefin Sans', sans-serif; text-transform: uppercase;
+  letter-spacing: 0.08em; text-decoration: none; margin-bottom: 1.2rem;
+  transition: color 0.2s;
+}
+.wf-back-link:hover { color: #ffbe33; }
+.wf-hero-title { font-family: 'Josefin Sans', sans-serif; font-size: 1.7rem; font-weight: 700; color: #fff; margin-bottom: 0.3rem; line-height: 1.2; }
+.wf-hero-title span { color: #ffbe33; }
+.wf-hero-sub { color: rgba(255,255,255,0.45); font-size: 0.85rem; margin-bottom: 1.5rem; }
+.wf-hero-pills { display: flex; gap: 1rem; flex-wrap: wrap; }
+.wf-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 100px; padding: 5px 14px; font-size: 0.72rem; color: rgba(255,255,255,0.6);
+  font-family: 'Josefin Sans', sans-serif; font-weight: 600;
+}
+.wf-pill i { color: #ffbe33; }
+.wf-role-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 5px 14px; border-radius: 100px; font-size: 0.68rem; font-weight: 700;
+  font-family: 'Josefin Sans', sans-serif; text-transform: uppercase; letter-spacing: 0.1em;
+}
+.wf-role-investor { background: rgba(255,190,51,0.15); color: #ffbe33; border: 1px solid rgba(255,190,51,0.3); }
+.wf-role-startup  { background: rgba(91,110,245,0.15); color: #818cf8; border: 1px solid rgba(91,110,245,0.3); }
+
+/* ═══ BODY ═══════════════════════════════════════════════════════════════════ */
+.wf-body { max-width: 1000px; margin: 0 auto; padding: 44px 5% 60px; }
+
+/* ═══ 6-STEP PIPELINE ════════════════════════════════════════════════════════ */
+.wf-pipeline {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  position: relative; margin-bottom: 3rem;
+}
+.wf-pipeline::before {
+  content: ''; position: absolute; top: 21px; left: 5%; right: 5%;
+  height: 2px; background: #e5e7eb; z-index: 0;
+}
+.wf-step { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; flex: 1; }
+.wf-step-circle {
+  width: 44px; height: 44px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.85rem; font-weight: 700;
+  border: 2.5px solid #e5e7eb; background: #fff; transition: all 0.3s;
+}
+.wf-step.s-done .wf-step-circle {
+  background: #10b981; border-color: #10b981; color: #fff;
+}
+.wf-step.s-active .wf-step-circle {
+  background: #ffbe33; border-color: #ffbe33; color: #1e2533;
+  box-shadow: 0 0 0 5px rgba(255,190,51,0.2);
+}
+.wf-step.s-locked .wf-step-circle {
+  background: #f9fafb; border-color: #e5e7eb; color: #9ca3af;
+}
+.wf-step.s-error .wf-step-circle {
+  background: #ef4444; border-color: #ef4444; color: #fff;
+}
+.wf-step-label {
+  margin-top: 9px; font-size: 0.67rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.07em;
+  font-family: 'Josefin Sans', sans-serif; text-align: center; max-width: 70px;
+  line-height: 1.3;
+}
+.wf-step.s-done   .wf-step-label { color: #10b981; }
+.wf-step.s-active .wf-step-label { color: #d97706; }
+.wf-step.s-locked .wf-step-label { color: #9ca3af; }
+.wf-step.s-error  .wf-step-label { color: #ef4444; }
+
+/* ═══ ACTION CARDS ═══════════════════════════════════════════════════════════ */
+.wf-card {
+  background: #fff; border-radius: 16px; border: 1.5px solid #eef0f5;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 8px 28px rgba(0,0,0,0.04);
+  margin-bottom: 1rem; overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+.wf-card.c-done   { border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.02); }
+.wf-card.c-active { border-color: #ffbe33; box-shadow: 0 0 0 4px rgba(255,190,51,0.1), 0 8px 28px rgba(0,0,0,0.06); }
+.wf-card.c-locked { opacity: 0.55; }
+.wf-card.c-error  { border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.02); }
+.wf-card-inner { padding: 24px 28px; }
+.wf-card-head {
+  display: flex; align-items: center; gap: 14px; margin-bottom: 0.5rem;
+}
+.wf-step-icon {
+  width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+}
+.icon-done   { background: rgba(16,185,129,0.1);  color: #10b981; }
+.icon-active { background: rgba(255,190,51,0.12); color: #d97706; }
+.icon-locked { background: #f3f4f6; color: #9ca3af; }
+.icon-error  { background: rgba(239,68,68,0.1); color: #ef4444; }
+.wf-card-title {
+  font-family: 'Josefin Sans', sans-serif; font-size: 1rem; font-weight: 700;
+  color: #1e2533; margin-bottom: 2px;
+}
+.wf-card-step-tag {
+  font-size: 0.65rem; color: #9ca3af; font-family: 'Josefin Sans', sans-serif;
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+}
+.wf-card-desc { font-size: 0.85rem; color: #6b7280; line-height: 1.65; margin-bottom: 1.2rem; }
+.wf-card-body { padding-left: 58px; }
+
+/* Buttons */
+.btn-wf {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 26px; border-radius: 10px; font-weight: 700;
+  font-size: 0.87rem; font-family: 'Josefin Sans', sans-serif;
+  text-decoration: none; border: none; cursor: pointer; transition: all 0.2s;
+}
+.btn-wf-primary  { background: #ffbe33; color: #1e2533; box-shadow: 0 4px 14px rgba(255,190,51,0.35); }
+.btn-wf-primary:hover  { background: #e0a820; transform: translateY(-1px); }
+.btn-wf-blue     { background: #3b82f6; color: #fff; }
+.btn-wf-blue:hover     { background: #2563eb; }
+.btn-wf-stripe   { background: #635bff; color: #fff; box-shadow: 0 4px 14px rgba(99,91,255,0.3); }
+.btn-wf-stripe:hover   { background: #4f46e5; }
+.btn-wf-green    { background: #10b981; color: #fff; box-shadow: 0 4px 14px rgba(16,185,129,0.3); }
+.btn-wf-green:hover    { background: #059669; }
+.btn-wf-ghost    { background: transparent; color: #374151; border: 1.5px solid #e5e7eb; }
+.btn-wf-ghost:hover    { border-color: #ffbe33; color: #d97706; }
+
+/* Status items */
+.wf-done-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 16px; background: rgba(16,185,129,0.1);
+  color: #065f46; border-radius: 8px; font-weight: 700; font-size: 0.85rem;
+  border: 1px solid rgba(16,185,129,0.2);
+}
+.wf-wait-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 18px; background: rgba(107,114,128,0.07);
+  color: #6b7280; border-radius: 8px; font-size: 0.84rem; font-weight: 600;
+  border: 1px solid rgba(107,114,128,0.15);
+}
+.wf-lock-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; background: #f9fafb;
+  color: #9ca3af; border-radius: 8px; font-size: 0.82rem;
+  border: 1px solid #e5e7eb;
+}
+.wf-error-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; background: rgba(239,68,68,0.08);
+  color: #dc2626; border-radius: 8px; font-weight: 700; font-size: 0.85rem;
+  border: 1px solid rgba(239,68,68,0.2);
+}
+
+/* Divider in active card */
+.wf-divider { height: 1px; background: #f0f2f5; margin: 1rem 0; }
+
+/* Info row inside card */
+.wf-info-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 9px 14px; background: rgba(59,130,246,0.05);
+  border: 1px solid rgba(59,130,246,0.12); border-radius: 8px;
+  font-size: 0.82rem; color: #374151; margin-bottom: 0.8rem; line-height: 1.5;
+}
+.wf-info-row i { color: #3b82f6; font-size: 0.9rem; flex-shrink: 0; }
+
+/* Summary grid */
+.wf-summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-top: 2rem; }
+.wf-summary-card { background: #fff; border-radius: 14px; border: 1.5px solid #eef0f5; padding: 20px 22px; }
+.wf-summary-card h4 {
+  font-family: 'Josefin Sans', sans-serif; font-size: 0.7rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em; color: #9ca3af;
+  margin-bottom: 1rem; padding-bottom: 0.6rem; border-bottom: 1px solid #f0f2f5;
+}
+.wf-meta-row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 0.82rem; border-bottom: 1px solid #f5f6f8; }
+.wf-meta-row:last-child { border-bottom: none; }
+.wf-meta-label { color: #9ca3af; }
+.wf-meta-value { font-weight: 600; color: #1e2533; }
+
+/* Flash messages */
+.wf-flash { padding: 12px 18px; border-radius: 10px; margin-bottom: 1.2rem; font-size: 0.88rem; font-weight: 600; }
+.wf-flash-success { background: rgba(16,185,129,0.09); color: #065f46; border: 1px solid rgba(16,185,129,0.2); }
+.wf-flash-error   { background: rgba(239,68,68,0.07);  color: #991b1b; border: 1px solid rgba(239,68,68,0.18); }
+.wf-flash-warning { background: rgba(245,158,11,0.09); color: #92400e; border: 1px solid rgba(245,158,11,0.25); }
+.wf-flash-info    { background: rgba(59,130,246,0.08); color: #1e40af; border: 1px solid rgba(59,130,246,0.2); }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .wf-pipeline { flex-direction: column; gap: 0.8rem; }
+  .wf-pipeline::before { display: none; }
+  .wf-card-body { padding-left: 0; }
+  .wf-summary-grid { grid-template-columns: 1fr; }
+}
+{% endblock %}
+
+{% block content %}
+
+{# ── Compute step classes ── #}
+{% set stages = ['interet','negociation','accord','paiement','signature','signe','finalise'] %}
+{% set stepNames = ['Intérêt','Négociation','Accord','Paiement','Signature','Signé','Finalisé'] %}
+
+{% macro stepClass(stepIndex, stepNum, stage) %}
+  {% if stepIndex < stepNum %}s-done
+  {% elseif stepIndex == stepNum %}{% if stage in ['rejete','annule'] %}s-error{% else %}s-active{% endif %}
+  {% else %}s-locked{% endif %}
+{% endmacro %}
+
+{# ── HERO ── #}
+<div class="wf-hero">
+  <div class="wf-hero-inner">
+    <a href="{{ path('app_front_investissement_index') }}" class="wf-back-link">
+      <i class="fa fa-arrow-left"></i> Mes investissements
+    </a>
+
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+      <div>
+        <div class="wf-hero-title">
+          Workflow — <span>{{ investment.project ? investment.project.title : 'Investissement #' ~ investment.investment_id }}</span>
+        </div>
+        <div class="wf-hero-sub">Suivi complet du processus d'investissement</div>
+        <div class="wf-hero-pills">
+          <span class="wf-pill"><i class="fa fa-coins"></i> {{ investment.amount|number_format(0, ',', ' ') }} TND</span>
+          {% if investment.project and investment.project.secteur %}
+            <span class="wf-pill"><i class="fa fa-tag"></i> {{ investment.project.secteur|capitalize }}</span>
+          {% endif %}
+          <span class="wf-pill"><i class="fa fa-calendar"></i> {{ investment.createdAt|date('d/m/Y') }}</span>
+        </div>
+      </div>
+      <div>
+        {% if is_investor %}
+          <div class="wf-role-badge wf-role-investor"><i class="fa fa-user-tie"></i> Investisseur</div>
+        {% else %}
+          <div class="wf-role-badge wf-role-startup"><i class="fa fa-building"></i> Startup</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wf-body">
+
+  {# ── Flash messages ── #}
+  {% for type, msgs in app.flashes %}
+    {% for msg in msgs %}
+      <div class="wf-flash wf-flash-{{ type }}">{{ msg }}</div>
+    {% endfor %}
+  {% endfor %}
+
+  {# ════════════════════════════════════════════════════════════════════════════
+     6-STEP PIPELINE STEPPER
+  ════════════════════════════════════════════════════════════════════════════ #}
+  <div class="wf-pipeline">
+
+    {% set stepsData = [
+      {'num': 1, 'stage_id': 'interet',     'label': 'Intérêt',     'icon': 'fa-heart'},
+      {'num': 2, 'stage_id': 'negociation', 'label': 'Négociation', 'icon': 'fa-comments'},
+      {'num': 3, 'stage_id': 'accord',      'label': 'Accord',      'icon': 'fa-handshake'},
+      {'num': 4, 'stage_id': 'paiement',    'label': 'Paiement',    'icon': 'fa-credit-card'},
+      {'num': 5, 'stage_id': 'signature',   'label': 'Signature',   'icon': 'fa-pen-fancy'},
+      {'num': 6, 'stage_id': 'finalise',    'label': 'Finalisé',    'icon': 'fa-trophy'},
+    ] %}
+
+    {% for s in stepsData %}
+      {% if s.num < step_num %}
+        {% set cls = 's-done' %}
+      {% elseif s.num == step_num %}
+        {% set cls = stage in ['rejete','annule'] ? 's-error' : 's-active' %}
+      {% else %}
+        {% set cls = 's-locked' %}
+      {% endif %}
+
+      <div class="wf-step {{ cls }}">
+        <div class="wf-step-circle">
+          {% if s.num < step_num %}
+            <i class="fa fa-check"></i>
+          {% elseif s.num == step_num and stage in ['rejete','annule'] %}
+            <i class="fa fa-times"></i>
+          {% else %}
+            {{ s.num }}
+          {% endif %}
+        </div>
+        <div class="wf-step-label">{{ s.label }}</div>
+      </div>
+    {% endfor %}
+
+  </div>
+
+  {# ════════════════════════════════════════════════════════════════════════════
+     STEP 1 — INTÉRÊT
+  ════════════════════════════════════════════════════════════════════════════ #}
+  <div class="wf-card {{ step_num > 1 ? 'c-done' : 'c-active' }}">
+    <div class="wf-card-inner">
+      <div class="wf-card-head">
+        <div class="wf-step-icon {{ step_num > 1 ? 'icon-done' : 'icon-active' }}">
+          <i class="fa fa-heart"></i>
+        </div>
+        <div>
+          <div class="wf-card-step-tag">Étape 1</div>
+          <div class="wf-card-title">Intérêt enregistré</div>
+        </div>
+      </div>
+      <div class="wf-card-body">
+        <p class="wf-card-desc">Votre investissement a été enregistré sur la plateforme. L'étape suivante est d'ouvrir une négociation avec la startup pour convenir des conditions.</p>
+
+        {% if step_num == 1 %}
+          {# Current step: propose to start negotiation #}
+          {% if is_investor %}
+            <div class="wf-info-row">
+              <i class="fa fa-info-circle"></i>
+              <span>Démarrez une négociation pour discuter des conditions avec la startup et progresser vers un accord formel.</span>
+            </div>
+            <a href="{{ path('app_negociation_creer', {'id': investment.investment_id}) }}" class="btn-wf btn-wf-primary">
+              <i class="fa fa-comments"></i> Démarrer la négociation
+            </a>
+          {% else %}
+            <div class="wf-wait-badge">
+              <i class="fa fa-clock"></i> En attente que l'investisseur initie la négociation
+            </div>
+          {% endif %}
+
+        {% else %}
+          {# Done #}
+          <span class="wf-done-badge">
+            <i class="fa fa-check-circle"></i> Investi le {{ investment.createdAt|date('d/m/Y') }} · {{ investment.amount|number_format(0, ',', ' ') }} TND
+          </span>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+
+  {# ════════════════════════════════════════════════════════════════════════════
+     STEP 2 — NÉGOCIATION
+  ════════════════════════════════════════════════════════════════════════════ #}
+  {% set step2Class = step_num > 2 ? 'c-done' : (step_num == 2 ? (stage == 'rejete' ? 'c-error' : 'c-active') : 'c-locked') %}
+  <div class="wf-card {{ step2Class }}">
+    <div class="wf-card-inner">
+      <div class="wf-card-head">
+        <div class="wf-step-icon {{ step_num > 2 ? 'icon-done' : (step_num == 2 ? (stage == 'rejete' ? 'icon-error' : 'icon-active') : 'icon-locked') }}">
+          <i class="fa fa-comments"></i>
+        </div>
+        <div>
+          <div class="wf-card-step-tag">Étape 2</div>
+          <div class="wf-card-title">Négociation</div>
+        </div>
+      </div>
+      <div class="wf-card-body">
+        <p class="wf-card-desc">Les deux parties discutent des conditions : montant, type d'investissement, equity %, clauses. La startup accepte ou refuse la négociation.</p>
+
+        {% if stage == 'rejete' %}
+          <div class="wf-error-badge"><i class="fa fa-times-circle"></i> Négociation refusée par la startup</div>
+          <div style="margin-top:0.8rem;">
+            <a href="{{ path('app_front_investissement_index') }}" class="btn-wf btn-wf-ghost" style="font-size:0.8rem;">
+              <i class="fa fa-arrow-left"></i> Retour à mes investissements
+            </a>
+          </div>
+
+        {% elseif step_num == 2 %}
+          {% if negotiation %}
+            <div class="wf-info-row">
+              <i class="fa fa-circle" style="color:#f59e0b;font-size:0.65rem;"></i>
+              <span>
+                Négociation <strong>#{{ negotiation.negotiation_id }}</strong> ouverte le {{ negotiation.createdAt|date('d/m/Y') }}.
+                Montant proposé : <strong>{{ negotiation.proposedAmount ? (negotiation.proposedAmount|number_format(0, ',', ' ') ~ ' TND') : 'non défini' }}</strong>
+              </span>
+            </div>
+            <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+              <a href="{{ path('app_negociation_show', {'id': negotiation.negotiation_id}) }}" class="btn-wf btn-wf-primary">
+                <i class="fa fa-comments"></i> Voir la négociation
+              </a>
+            </div>
+          {% endif %}
+
+        {% elseif step_num > 2 %}
+          {% if negotiation %}
+            <span class="wf-done-badge">
+              <i class="fa fa-check-circle"></i>
+              Accord signé · Montant final :
+              {{ negotiation.finalAmount ? (negotiation.finalAmount|number_format(0, ',', ' ') ~ ' TND') : (negotiation.proposedAmount ? (negotiation.proposedAmount|number_format(0, ',', ' ') ~ ' TND') : '—') }}
+            </span>
+            <a href="{{ path('app_negociation_show', {'id': negotiation.negotiation_id}) }}" class="btn-wf btn-wf-ghost" style="margin-left:0.6rem;font-size:0.78rem;padding:7px 14px;">
+              <i class="fa fa-eye"></i> Détails
+            </a>
+          {% endif %}
+        {% else %}
+          <div class="wf-lock-badge"><i class="fa fa-lock"></i> Disponible après enregistrement de votre investissement</div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+
+  {# ════════════════════════════════════════════════════════════════════════════
+     STEP 3 — ACCORD (Deal créé, pending_payment)
+  ════════════════════════════════════════════════════════════════════════════ #}
+  {% set step3Class = step_num > 3 ? 'c-done' : (step_num == 3 ? 'c-active' : 'c-locked') %}
+  <div class="wf-card {{ step3Class }}">
+    <div class="wf-card-inner">
+      <div class="wf-card-head">
+        <div class="wf-step-icon {{ step_num > 3 ? 'icon-done' : (step_num == 3 ? 'icon-active' : 'icon-locked') }}">
+          <i class="fa fa-handshake"></i>
+        </div>
+        <div>
+          <div class="wf-card-step-tag">Étape 3</div>
+          <div class="wf-card-title">Accord & Paiement</div>
+        </div>
+      </div>
+      <div class="wf-card-body">
+        <p class="wf-card-desc">La négociation a abouti. Un deal a été créé automatiquement. L'investisseur procède au paiement sécurisé via Stripe.</p>
+
+        {% if step_num == 3 and deal %}
+          {% if is_investor and can_pay %}
+            <div class="wf-info-row">
+              <i class="fa fa-lock"></i>
+              <span>
+                Montant à régler : <strong>{{ deal.amount|number_format(0, ',', ' ') }} TND</strong>
+                · Paiement sécurisé par Stripe (carte bancaire)
+              </span>
+            </div>
+            <div style="display:flex;gap:0.6rem;flex-wrap:wrap;align-items:center;">
+              <a href="{{ path('app_deal_payer', {'id': deal.deal_id}) }}" class="btn-wf btn-wf-stripe">
+                <i class="fa fa-lock"></i> Payer {{ deal.amount|number_format(0, ',', ' ') }} TND via Stripe
+              </a>
+              <a href="{{ path('app_deal_show', {'id': deal.deal_id}) }}" class="btn-wf btn-wf-ghost" style="font-size:0.78rem;padding:8px 16px;">
+                <i class="fa fa-eye"></i> Voir le deal
+              </a>
+            </div>
+          {% elseif not is_investor %}
+            <div class="wf-wait-badge"><i class="fa fa-clock"></i> En attente du paiement de l'investisseur</div>
+          {% endif %}
+
+        {% elseif step_num > 3 and deal %}
+          <span class="wf-done-badge">
+            <i class="fa fa-check-circle"></i> Paiement confirmé · Deal #{{ deal.deal_id }}
+          </span>
+          {% if deal.stripePaymentIntentId %}
+            <div style="margin-top:6px;font-size:0.76rem;color:#9ca3af;">Réf. Stripe : {{ deal.stripePaymentIntentId }}</div>
+          {% endif %}
+          <a href="{{ path('app_deal_show', {'id': deal.deal_id}) }}" class="btn-wf btn-wf-ghost" style="margin-top:0.8rem;font-size:0.78rem;padding:7px 14px;">
+            <i class="fa fa-eye"></i> Voir le deal complet
+          </a>
+
+        {% else %}
+          <div class="wf-lock-badge"><i class="fa fa-lock"></i> Disponible après validation de la négociation</div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+
+  {# ════════════════════════════════════════════════════════════════════════════
+     STEP 4 — SIGNATURE
+  ════════════════════════════════════════════════════════════════════════════ #}
+  {% set step4Class = step_num > 4 ? 'c-done' : (step_num == 4 ? 'c-active' : 'c-locked') %}
+  <div class="wf-card {{ step4Class }}">
+    <div class="wf-card-inner">
+      <div class="wf-card-head">
+        <div class="wf-step-icon {{ step_num > 4 ? 'icon-done' : (step_num == 4 ? 'icon-active' : 'icon-locked') }}">
+          <i class="fa fa-pen-fancy"></i>
+        </div>
+        <div>
+          <div class="wf-card-step-tag">Étape 4</div>
+          <div class="wf-card-title">Signature du contrat</div>
+        </div>
+      </div>
+      <div class="wf-card-body">
+        <p class="wf-card-desc">Le contrat est généré automatiquement après paiement. L'investisseur le signe via un lien sécurisé envoyé par email (Yousign ou token classique).</p>
+
+        {% if step_num == 4 and deal %}
+          <div class="wf-info-row">
+            <i class="fa fa-file-contract"></i>
+            <span>
+              Contrat PDF généré.
+              {% if deal.signatureSentAt %}
+                Email de signature envoyé le {{ deal.signatureSentAt|date('d/m/Y à H:i') }}.
+              {% elseif deal.yousignSignatureRequestId %}
+                Demande Yousign envoyée — statut : <strong>{{ deal.yousignStatus ?? 'ongoing' }}</strong>
+              {% else %}
+                En attente d'envoi de la signature.
+              {% endif %}
+            </span>
+          </div>
+          <a href="{{ path('app_deal_show', {'id': deal.deal_id}) }}" class="btn-wf btn-wf-green">
+            <i class="fa fa-pen-fancy"></i> Gérer la signature
+          </a>
+
+        {% elseif step_num > 4 and deal %}
+          <span class="wf-done-badge">
+            <i class="fa fa-check-circle"></i>
+            Contrat signé
+            {% if deal.completedAt %} le {{ deal.completedAt|date('d/m/Y') }}{% endif %}
+          </span>
+          {% if deal.yousignSignatureRequestId %}
+            <div style="margin-top:6px;font-size:0.76rem;color:#9ca3af;"><i class="fa fa-shield-alt"></i> Yousign ID : {{ deal.yousignSignatureRequestId|slice(0,16) }}…</div>
+          {% endif %}
+
+        {% else %}
+          <div class="wf-lock-badge"><i class="fa fa-lock"></i> Disponible après paiement</div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+
+  {# ════════════════════════════════════════════════════════════════════════════
+     STEP 5 — TÉLÉCHARGEMENT
+  ════════════════════════════════════════════════════════════════════════════ #}
+  {% set step5Class = step_num > 5 ? 'c-done' : (step_num == 5 ? 'c-active' : 'c-locked') %}
+  <div class="wf-card {{ step5Class }}">
+    <div class="wf-card-inner">
+      <div class="wf-card-head">
+        <div class="wf-step-icon {{ step_num > 5 ? 'icon-done' : (step_num == 5 ? 'icon-active' : 'icon-locked') }}">
+          <i class="fa fa-file-pdf"></i>
+        </div>
+        <div>
+          <div class="wf-card-step-tag">Étape 5</div>
+          <div class="wf-card-title">Téléchargement du contrat</div>
+        </div>
+      </div>
+      <div class="wf-card-body">
+        <p class="wf-card-desc">Le contrat signé est disponible en PDF. Ce document a valeur contractuelle et légale entre les deux parties.</p>
+
+        {% if step_num == 5 and can_download %}
+          <a href="{{ path('app_deal_telecharger', {'id': deal.deal_id}) }}" class="btn-wf btn-wf-primary">
+            <i class="fa fa-download"></i> Télécharger le contrat PDF
+          </a>
+
+        {% elseif step_num > 5 %}
+          <span class="wf-done-badge"><i class="fa fa-check-circle"></i> Contrat téléchargé</span>
+          {% if deal %}
+            <a href="{{ path('app_deal_telecharger', {'id': deal.deal_id}) }}" class="btn-wf btn-wf-ghost" style="margin-left:0.6rem;font-size:0.78rem;padding:7px 14px;">
+              <i class="fa fa-download"></i> Re-télécharger
+            </a>
+          {% endif %}
+
+        {% else %}
+          <div class="wf-lock-badge"><i class="fa fa-lock"></i> Disponible après signature</div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+
+  {# ════════════════════════════════════════════════════════════════════════════
+     STEP 6 — FINALISÉ
+  ════════════════════════════════════════════════════════════════════════════ #}
+  {% set step6Class = step_num == 6 ? 'c-done' : 'c-locked' %}
+  <div class="wf-card {{ step6Class }}">
+    <div class="wf-card-inner">
+      <div class="wf-card-head">
+        <div class="wf-step-icon {{ step_num == 6 ? 'icon-done' : 'icon-locked' }}">
+          <i class="fa fa-trophy"></i>
+        </div>
+        <div>
+          <div class="wf-card-step-tag">Étape 6</div>
+          <div class="wf-card-title">Investissement finalisé</div>
+        </div>
+      </div>
+      <div class="wf-card-body">
+        <p class="wf-card-desc">L'ensemble du processus est terminé. Le deal est officiellement clôturé et les deux parties ont reçu leur copie du contrat signé.</p>
+
+        {% if step_num == 6 %}
+          <div style="text-align:center;padding:1.5rem 0 0.5rem;">
+            <div style="font-size:2.5rem;color:#ffbe33;margin-bottom:0.8rem;"><i class="fa fa-trophy"></i></div>
+            <div style="font-family:'Josefin Sans',sans-serif;font-size:1.1rem;font-weight:700;color:#1e2533;margin-bottom:0.4rem;">
+              Félicitations ! Votre investissement est finalisé.
+            </div>
+            <div style="font-size:0.84rem;color:#6b7280;margin-bottom:1.2rem;">
+              Le deal a été complété avec succès. Merci de contribuer à l'écosystème entrepreneurial BizHub.
+            </div>
+            <a href="{{ path('app_front_dashboard_investisseur') }}" class="btn-wf btn-wf-primary">
+              <i class="fa fa-tachometer-alt"></i> Retour au tableau de bord
+            </a>
+          </div>
+        {% else %}
+          <div class="wf-lock-badge"><i class="fa fa-lock"></i> Disponible après téléchargement du contrat</div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+
+  {# ════════════════════════════════════════════════════════════════════════════
+     SUMMARY — Investment + Deal details
+  ════════════════════════════════════════════════════════════════════════════ #}
+  <div class="wf-summary-grid">
+
+    <div class="wf-summary-card">
+      <h4><i class="fa fa-chart-pie" style="color:#ffbe33;margin-right:5px;"></i>Détails de l'investissement</h4>
+      <div class="wf-meta-row">
+        <span class="wf-meta-label">Référence</span>
+        <span class="wf-meta-value">INV-{{ investment.investment_id }}</span>
+      </div>
+      <div class="wf-meta-row">
+        <span class="wf-meta-label">Projet</span>
+        <span class="wf-meta-value">
+          {% if investment.project %}
+            <a href="{{ path('app_front_projet_show', {'id': investment.project.project_id}) }}" style="color:#ffbe33;text-decoration:none;">
+              {{ investment.project.title|slice(0,30) }}{% if investment.project.title|length > 30 %}…{% endif %}
+            </a>
+          {% else %}—{% endif %}
+        </span>
+      </div>
+      <div class="wf-meta-row">
+        <span class="wf-meta-label">Montant</span>
+        <span class="wf-meta-value" style="color:#ffbe33;">{{ investment.amount|number_format(0, ',', ' ') }} TND</span>
+      </div>
+      {% if investment.typeInvestissement %}
+      <div class="wf-meta-row">
+        <span class="wf-meta-label">Type</span>
+        <span class="wf-meta-value">
+          {% if investment.typeInvestissement == 'prise_participation' %}Prise de participation
+          {% elseif investment.typeInvestissement == 'pret_convertible' %}Prêt convertible
+          {% elseif investment.typeInvestissement == 'pret_simple' %}Prêt simple
+          {% elseif investment.typeInvestissement == 'don' %}Don
+          {% else %}{{ investment.typeInvestissement }}{% endif %}
+        </span>
+      </div>
+      {% endif %}
+      <div class="wf-meta-row">
+        <span class="wf-meta-label">Date</span>
+        <span class="wf-meta-value">{{ investment.createdAt|date('d/m/Y') }}</span>
+      </div>
+      <div class="wf-meta-row">
+        <span class="wf-meta-label">Statut</span>
+        <span class="wf-meta-value">
+          {% set statLabel = {
+            'en_attente': 'En attente', 'en_negociation': 'En négociation',
+            'accepte': 'Accepté', 'refuse': 'Refusé', 'contrat_genere': 'Contrat généré',
+            'signe': 'Signé', 'termine': 'Terminé'
+          } %}
+          {{ statLabel[investment.statut] ?? investment.statut }}
+        </span>
+      </div>
+    </div>
+
+    <div class="wf-summary-card">
+      <h4><i class="fa fa-shield-alt" style="color:#ffbe33;margin-right:5px;"></i>
+        {% if deal %}Deal #{{ deal.deal_id }}{% else %}Sécurité & garanties{% endif %}
+      </h4>
+      {% if deal %}
+        <div class="wf-meta-row">
+          <span class="wf-meta-label">Montant deal</span>
+          <span class="wf-meta-value" style="color:#ffbe33;">{{ deal.amount|number_format(0, ',', ' ') }} TND</span>
+        </div>
+        <div class="wf-meta-row">
+          <span class="wf-meta-label">Investisseur</span>
+          <span class="wf-meta-value">{{ buyer ? buyer.fullName : '—' }}</span>
+        </div>
+        <div class="wf-meta-row">
+          <span class="wf-meta-label">Startup</span>
+          <span class="wf-meta-value">{{ seller ? seller.fullName : '—' }}</span>
+        </div>
+        <div class="wf-meta-row">
+          <span class="wf-meta-label">Statut deal</span>
+          <span class="wf-meta-value">
+            {% set dealLabel = {
+              'pending_payment': 'Paiement en attente', 'paid': 'Payé',
+              'pending_signature': 'En attente de signature', 'signed': 'Signé',
+              'completed': 'Complété', 'cancelled': 'Annulé'
+            } %}
+            {{ dealLabel[deal.status] ?? deal.status }}
+          </span>
+        </div>
+        {% if deal.createdAt %}
+        <div class="wf-meta-row">
+          <span class="wf-meta-label">Créé le</span>
+          <span class="wf-meta-value">{{ deal.createdAt|date('d/m/Y H:i') }}</span>
+        </div>
+        {% endif %}
+      {% else %}
+        <div style="font-size:0.82rem;color:#9ca3af;line-height:1.8;padding-top:0.3rem;">
+          <p><i class="fa fa-check-circle" style="color:#10b981;margin-right:6px;"></i>Paiement sécurisé Stripe</p>
+          <p><i class="fa fa-check-circle" style="color:#10b981;margin-right:6px;"></i>Contrat généré automatiquement</p>
+          <p><i class="fa fa-check-circle" style="color:#10b981;margin-right:6px;"></i>Signature électronique sécurisée</p>
+          <p><i class="fa fa-check-circle" style="color:#10b981;margin-right:6px;"></i>Accès restreint aux parties</p>
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
