@@ -87,7 +87,7 @@ class NegotiationMessage
         return $this;
     }
 
-    #[ORM\Column(type: 'decimal', precision: 15, scale: 2, nullable: true)]
+    #[ORM\Column(type: 'decimal', nullable: true)]
     private ?float $proposed_amount = null;
 
     public function getProposed_amount(): ?float

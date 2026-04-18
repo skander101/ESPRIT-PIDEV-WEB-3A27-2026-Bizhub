@@ -18,6 +18,13 @@ parameters:
     face.api_secret: '%env(FACE_API_SECRET)%'
     app.cloudflare_api_token: '%env(default::CLOUDFLARE_API_TOKEN)%'
     app.cloudflare_acc_id: '%env(default::CLOUDFLARE_ACC_ID)%'
+    app.stripe_public_key: '%env(STRIPE_PUBLIC_KEY)%'
+    app.stripe_secret_key: '%env(STRIPE_SECRET_KEY)%'
+    app.openai_api_key: '%env(default::OPENAI_API_KEY)%'
+    app.twilio_account_sid: '%env(default::TWILIO_ACCOUNT_SID)%'
+    app.twilio_auth_token: '%env(default::TWILIO_AUTH_TOKEN)%'
+    app.twilio_whatsapp_from: '%env(default::TWILIO_WHATSAPP_FROM)%'
+    app.gnews_api_key: '%env(default::GNEWS_API_KEY)%'
 
 services:
     # default configuration for services in *this* file
@@ -53,6 +60,55 @@ services:
     App\EventListener\MfaEnforcementListener:
         tags:
             - { name: kernel.event_listener, event: kernel.request }
+
+    App\Controller\Investissement\DealController:
+        arguments:
+            $stripePublicKey: '%app.stripe_public_key%'
+            $stripeSecretKey: '%app.stripe_secret_key%'
+
+    App\Service\Investissement\AiNegotiationService:
+        arguments:
+            $openaiApiKey: '%app.openai_api_key%'
+
+    App\Service\Investissement\ContractPdfService:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+
+    App\Service\Investissement\DashboardInvestisseurService:
+        arguments:
+            $openaiApiKey: '%app.openai_api_key%'
+
+    App\Service\Investissement\PortfolioAnalysisService:
+        arguments:
+            $openaiApiKey: '%app.openai_api_key%'
+
+    App\Service\Investissement\ProjectAdvisorService:
+        arguments:
+            $openaiApiKey: '%app.openai_api_key%'
+
+    App\Service\Investissement\RoiSimulatorService:
+        arguments:
+            $openaiApiKey: '%app.openai_api_key%'
+
+    App\Service\AI\AiProjectService:
+        arguments:
+            $openaiApiKey: '%app.openai_api_key%'
+
+    App\Service\Investissement\YousignService:
+        arguments:
+            $apiKey: '%env(YOUSIGN_API_KEY)%'
+            $baseUrl: '%env(YOUSIGN_BASE_URL)%'
+            $projectDir: '%kernel.project_dir%'
+
+    App\Service\Marketplace\TwilioService:
+        arguments:
+            $twilioAccountSid: '%app.twilio_account_sid%'
+            $twilioAuthToken: '%app.twilio_auth_token%'
+            $twilioWhatsappFrom: '%app.twilio_whatsapp_from%'
+
+    App\Service\NewsService:
+        arguments:
+            $gnewsApiKey: '%app.gnews_api_key%'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

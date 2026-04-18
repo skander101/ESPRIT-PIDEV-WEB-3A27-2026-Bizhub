@@ -247,10 +247,8 @@
 
         <div style="margin-bottom:0.9rem;">
             <span class="badge badge-{{ projet.status }}">
-                {% if projet.status == 'pending' %}En attente
-                {% elseif projet.status == 'in_progress' %}En cours
-                {% elseif projet.status == 'funded' %}Financé
-                {% elseif projet.status == 'completed' %}Terminé
+                {% if projet.status == 'publie' %}Publié
+                {% elseif projet.status == 'en_cours' %}En cours
                 {% else %}{{ projet.status }}{% endif %}
             </span>
         </div>

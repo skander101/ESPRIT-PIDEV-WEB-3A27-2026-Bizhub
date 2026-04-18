@@ -54,8 +54,12 @@ class ProjetFrontType extends AbstractType
             ])
             ->add('status', ChoiceType::class, [
                 'label' => 'Statut',
-                'required' => true,
-                'choices' => Project::STATUTS,
+                'choices' => [
+                    'En attente' => 'pending',
+                    'En cours' => 'in_progress',
+                    'Financé' => 'funded',
+                    'Terminé' => 'completed',
+                ],
                 'attr' => ['class' => 'front-input'],
             ]);
     }
