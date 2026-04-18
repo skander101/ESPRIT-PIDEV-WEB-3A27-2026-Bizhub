@@ -135,8 +135,8 @@ class AuthController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        return $this->render('auth/verify_pending.html.twig', [
-            'user' => $user,
+        return $this->render('verify_email.html.twig', [
+            'email' => $user->getEmail(),
         ]);
     }
 

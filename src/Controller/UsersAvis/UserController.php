@@ -5,8 +5,10 @@ namespace App\Controller\UsersAvis;
 use App\Entity\UsersAvis\User;
 use App\Form\UsersAvis\UserType;
 use App\Form\UsersAvis\AvatarType;
+use App\Model\Ai\AiAvatarPromptInput;
 use App\Form\Auth\TotpLoginType;
 use App\Repository\UsersAvis\UserRepository;
+use App\Service\Ai\CloudflareAiService;
 use App\Service\Auth\AuthMailerService;
 use App\Service\Auth\SecureTokenService;
 use App\Service\Auth\UserAuthStateService;
@@ -18,16 +20,20 @@ use Psr\Log\LoggerInterface;
 use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Totp\TotpAuthenticator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('')]
 class UserController extends AbstractController
@@ -88,7 +94,7 @@ class UserController extends AbstractController
             } catch (UniqueConstraintViolationException) {
                 $form->get('email')->addError(new FormError('This email is already used.'));
 
-                return $this->render('signup.html.twig', ['form' => $form]);
+                return $this->render('register.html.twig', ['form' => $form]);
             } catch (\Throwable $e) {
                 $this->logger->error('Registration persistence failed.', [
                     'flow' => 'register',
@@ -98,7 +104,7 @@ class UserController extends AbstractController
                 ]);
                 $form->addError(new FormError('Account creation failed due to a temporary server issue. Please try again.'));
 
-                return $this->render('signup.html.twig', ['form' => $form]);
+                return $this->render('register.html.twig', ['form' => $form]);
             }
 
             $verificationUrl = $this->generateUrl('app_verify_email', ['token' => $verificationToken], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
@@ -121,12 +127,12 @@ class UserController extends AbstractController
                 $this->addFlash('error', 'We could not send the verification email right now. You can resend it from this page.');
             }
 
-            return $this->render('auth/register_success.html.twig', [
+            return $this->render('verify_email.html.twig', [
                 'email' => $user->getEmail(),
             ]);
         }
 
-        return $this->render('signup.html.twig', ['form' => $form]);
+        return $this->render('register.html.twig', ['form' => $form]);
     }
 
     #[Route('/login', name: 'app_login', methods: ['GET', 'POST'])]
@@ -345,7 +351,10 @@ class UserController extends AbstractController
     }
 
     #[Route('/profile', name: 'app_user_profile', methods: ['GET'])]
-    public function profile(): Response
+    public function profile(
+        CloudflareAiService $cloudflareAiService,
+        CsrfTokenManagerInterface $csrfTokenManager,
+    ): Response
     {
         /** @var User|null $user */
         $user = $this->getUser();
@@ -355,6 +364,9 @@ class UserController extends AbstractController
 
         return $this->render('front/user/profile.html.twig', [
             'user' => $user,
+            'aiAvatarEnabled' => $cloudflareAiService->isConfigured(),
+            'aiAvatarCsrfToken' => $csrfTokenManager->getToken('ai_avatar_generate')->getValue(),
+            'aiAvatarDefaultPrompt' => 'Professional headshot portrait, friendly, business profile photo, neutral background',
         ]);
     }
 
@@ -504,6 +516,115 @@ class UserController extends AbstractController
         return $this->render('front/user/avatar.html.twig', [
             'form' => $form,
             'user' => $user,
+        ]);
+    }
+
+    #[Route('/profile/avatar/ai-generate', name: 'app_user_avatar_ai_generate', methods: ['POST'])]
+    public function generateAiAvatar(
+        Request $request,
+        ValidatorInterface $validator,
+        CsrfTokenManagerInterface $csrfTokenManager,
+        CloudflareAiService $cloudflareAiService,
+    ): JsonResponse {
+        /** @var User|null $user */
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Authentication required.',
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $token = (string) $request->request->get('_token', '');
+        if (!$csrfTokenManager->isTokenValid(new CsrfToken('ai_avatar_generate', $token))) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Invalid CSRF token.',
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        if (!$cloudflareAiService->isConfigured()) {
+            return $this->json([
+                'success' => false,
+                'message' => 'AI picture generation is not configured. Please set CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACC_ID.',
+            ], Response::HTTP_SERVICE_UNAVAILABLE);
+        }
+
+        $input = (new AiAvatarPromptInput())->setPrompt((string) $request->request->get('prompt', ''));
+        $errors = $validator->validate($input);
+
+        if (count($errors) > 0) {
+            return $this->json([
+                'success' => false,
+                'message' => $errors[0]->getMessage(),
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        try {
+            $generatedImage = $cloudflareAiService->generateImage(
+                '@cf/stabilityai/stable-diffusion-xl-base-1.0',
+                (string) $input->getPrompt()
+            );
+        } catch (\Throwable $e) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Image generation failed. Please try again in a moment.',
+            ], Response::HTTP_BAD_GATEWAY);
+        }
+
+        $mimeType = $generatedImage['mimeType'] ?? 'image/png';
+        $extension = match ($mimeType) {
+            'image/jpeg' => 'jpg',
+            'image/webp' => 'webp',
+            'image/gif' => 'gif',
+            default => 'png',
+        };
+
+        $targetDirectory = $this->getParameter('kernel.project_dir').'/public/assets/images/avatars';
+        if (!is_dir($targetDirectory) && !mkdir($targetDirectory, 0775, true) && !is_dir($targetDirectory)) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Could not prepare avatar storage directory.',
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        $newFilename = sprintf('ai-avatar-%s.%s', uniqid('', true), $extension);
+        $targetPath = $targetDirectory.'/'.$newFilename;
+
+        if (file_put_contents($targetPath, $generatedImage['bytes']) === false) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Failed to save generated image.',
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        $oldAvatar = $user->getAvatarUrl();
+        if (is_string($oldAvatar) && str_starts_with($oldAvatar, '/assets/images/avatars/')) {
+            $oldPath = $this->getParameter('kernel.project_dir').'/public'.$oldAvatar;
+            if (is_file($oldPath)) {
+                @unlink($oldPath);
+            }
+        }
+
+        $avatarUrl = '/assets/images/avatars/'.$newFilename;
+        $user->setAvatarUrl($avatarUrl);
+
+        try {
+            $this->entityManager->flush();
+        } catch (\Throwable $e) {
+            @unlink($targetPath);
+
+            return $this->json([
+                'success' => false,
+                'message' => 'Failed to save your profile avatar.',
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return $this->json([
+            'success' => true,
+            'message' => 'AI profile picture generated successfully.',
+            'avatarUrl' => $avatarUrl,
+            'previewDataUri' => 'data:'.$mimeType.';base64,'.base64_encode($generatedImage['bytes']),
         ]);
     }
 }

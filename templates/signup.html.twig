@@ -159,6 +159,20 @@
             gap: 1rem;
         }
 
+        .phone-input-group {
+            display: flex;
+            gap: 0.65rem;
+        }
+
+        .phone-prefix {
+            flex: 0 0 42%;
+            min-width: 130px;
+        }
+
+        .phone-local {
+            flex: 1;
+        }
+
         .error-text {
             color: #c33;
             font-size: 0.8rem;
@@ -365,6 +379,15 @@
 
             .form-row {
                 grid-template-columns: 1fr;
+            }
+
+            .phone-input-group {
+                flex-direction: column;
+                gap: 0.6rem;
+            }
+
+            .phone-prefix {
+                min-width: 0;
             }
 
             .user-type-grid {
@@ -599,7 +622,14 @@
                 <div class="form-row">
                     <div class="form-group">
                         {{ form_label(form.phone, 'Telephone (optionnel)') }}
-                        {{ form_widget(form.phone, {'attr': {'placeholder': '+216 12 345 678 ou 12345678'}}) }}
+                        <div class="phone-input-group">
+                            <div class="phone-prefix">
+                                {{ form_widget(form.phone_country_code) }}
+                            </div>
+                            <div class="phone-local">
+                                {{ form_widget(form.phone, {'attr': {'placeholder': '12 345 678'}}) }}
+                            </div>
+                        </div>
                         {% if form.phone.vars.errors|length %}
                             <div class="error-text">
                                 {% for error in form.phone.vars.errors %}{{ error.message }}{% endfor %}
