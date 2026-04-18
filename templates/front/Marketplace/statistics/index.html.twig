@@ -1,0 +1,382 @@
+{% extends 'front/Marketplace/base_marketplace.html.twig' %}
+
+{% block title %}Statistiques Marketplace{% endblock %}
+{% block hero_eyebrow %}Analytics{% endblock %}
+{% block hero_title %}Statistiques <span>Marketplace</span>{% endblock %}
+{% block breadcrumb_extra %}
+  <i class="fa fa-chevron-right" style="font-size:.55rem"></i>
+  <a href="{{ path('produit_index') }}">Marketplace</a>
+  <i class="fa fa-chevron-right" style="font-size:.55rem"></i>
+  Statistiques
+{% endblock %}
+
+{% block body %}
+<div style="max-width:1300px; margin:0 auto; padding:60px 5%;">
+
+  {# ── HEADER + KPI CARDS ── #}
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:2rem; flex-wrap:wrap; gap:1rem;">
+    <div>
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:0.65rem; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:var(--primary-dark); margin-bottom:.3rem;">Performance globale</div>
+      <h2 style="font-family:'Lora',serif; font-size:1.6rem; font-weight:700; color:var(--dark); margin:0;">Dashboard Analytics</h2>
+    </div>
+    <a href="{{ path('produit_index') }}" class="btn-yellow btn-sm"><i class="fa fa-store"></i> Retour catalogue</a>
+  </div>
+
+  {# KPI CARDS #}
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1.2rem; margin-bottom:2.5rem;">
+    <div style="background:#fff; border-radius:14px; border:1.5px solid var(--border); padding:1.5rem; border-top:4px solid var(--primary); box-shadow:0 2px 12px rgba(0,0,0,.05);">
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:0.62rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:.6rem;">Total commandes</div>
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:2rem; font-weight:800; color:var(--primary);">{{ total_commandes }}</div>
+    </div>
+    <div style="background:#fff; border-radius:14px; border:1.5px solid var(--border); padding:1.5rem; border-top:4px solid #10b981; box-shadow:0 2px 12px rgba(0,0,0,.05);">
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:0.62rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:.6rem;">CA Total TTC</div>
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:1.5rem; font-weight:800; color:#10b981;">{{ total_revenue|number_format(3, '.', ' ') }} <span style="font-size:.75rem;">TND</span></div>
+    </div>
+    <div style="background:#fff; border-radius:14px; border:1.5px solid var(--border); padding:1.5rem; border-top:4px solid #6366f1; box-shadow:0 2px 12px rgba(0,0,0,.05);">
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:0.62rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:.6rem;">Mois analysés</div>
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:2rem; font-weight:800; color:#6366f1;">{{ months }}</div>
+    </div>
+    <div style="background:#fff; border-radius:14px; border:1.5px solid var(--border); padding:1.5rem; border-top:4px solid #f59e0b; box-shadow:0 2px 12px rgba(0,0,0,.05);">
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:0.62rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:.6rem;">Top commande</div>
+      {% if top_commandes|length > 0 %}
+        <div style="font-family:'Josefin Sans',sans-serif; font-size:1.4rem; font-weight:800; color:#f59e0b;">{{ top_commandes[0].totalTtc|number_format(3, '.', ' ') }} <span style="font-size:.7rem;">TND</span></div>
+      {% else %}
+        <div style="font-family:'Josefin Sans',sans-serif; font-size:1.2rem; color:var(--muted);">—</div>
+      {% endif %}
+    </div>
+  </div>
+
+  {# ── CHARTS ROW ── #}
+  <div style="display:grid; grid-template-columns:2fr 1fr; gap:1.5rem; margin-bottom:2.5rem;">
+
+    {# Revenue bar chart #}
+    <div style="background:#fff; border-radius:14px; border:1.5px solid var(--border); padding:1.8rem; box-shadow:0 4px 20px rgba(0,0,0,.06);">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.2rem;">
+        <div>
+          <div style="font-family:'Josefin Sans',sans-serif; font-size:0.62rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted);">Tendance</div>
+          <div style="font-family:'Lora',serif; font-size:1rem; font-weight:700; color:var(--dark);">Chiffre d'affaires mensuel</div>
+        </div>
+        <div style="font-family:'Josefin Sans',sans-serif; font-size:.7rem; color:var(--muted);">Commandes payées · {{ months }} derniers mois</div>
+      </div>
+      {% if revenue_labels|length > 0 %}
+        <canvas id="revenueChart" style="max-height:240px;"></canvas>
+      {% else %}
+        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:160px; color:var(--muted);">
+          <i class="fa fa-chart-bar" style="font-size:3rem; opacity:.2; margin-bottom:.8rem;"></i>
+          <p style="font-size:.85rem;">Aucune donnée de revenu disponible</p>
+        </div>
+      {% endif %}
+    </div>
+
+    {# Status donut #}
+    <div style="background:#fff; border-radius:14px; border:1.5px solid var(--border); padding:1.8rem; box-shadow:0 4px 20px rgba(0,0,0,.06);">
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:0.62rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:.4rem;">Répartition</div>
+      <div style="font-family:'Lora',serif; font-size:1rem; font-weight:700; color:var(--dark); margin-bottom:1.2rem;">Statuts des commandes</div>
+      {% if statut_labels|length > 0 %}
+        <canvas id="statutChart" style="max-height:180px;"></canvas>
+        <div style="margin-top:1rem; display:flex; flex-direction:column; gap:.5rem;">
+          {% set statut_colors = ['#fbbf24','#34d399','#10b981','#f87171','#60a5fa','#a78bfa','#fb923c'] %}
+          {% for s in by_statut %}
+            <div style="display:flex; align-items:center; gap:.6rem; font-size:.8rem;">
+              <div style="width:10px; height:10px; border-radius:3px; background:{{ statut_colors[loop.index0 % statut_colors|length] }}; flex-shrink:0;"></div>
+              <span style="flex:1; color:var(--dark); text-transform:capitalize;">{{ s.statut|replace({'_': ' '}) }}</span>
+              <span style="font-family:'Josefin Sans',sans-serif; font-weight:700; color:var(--dark);">{{ s.nb }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div style="color:var(--muted); font-size:.85rem; text-align:center; padding:2rem;">Aucune donnée</div>
+      {% endif %}
+    </div>
+
+  </div>
+
+  {# ── TOP 5 COMMANDES ── #}
+  <div style="background:#fff; border-radius:14px; border:1.5px solid var(--border); margin-bottom:2.5rem; box-shadow:0 4px 20px rgba(0,0,0,.06); overflow:hidden;">
+    <div style="padding:1.4rem 1.8rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; background:linear-gradient(135deg,#fffbee,#fff);">
+      <div>
+        <div style="font-family:'Josefin Sans',sans-serif; font-size:0.62rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--primary-dark); margin-bottom:.2rem;">Classement</div>
+        <div style="font-family:'Lora',serif; font-size:1.05rem; font-weight:700; color:var(--dark);">🏆 Top {{ top }} Commandes par montant TTC</div>
+      </div>
+    </div>
+
+    {% if top_commandes|length > 0 %}
+      <table class="biz-table">
+        <thead>
+          <tr>
+            <th>Rang</th>
+            <th>Commande</th>
+            <th>Client ID</th>
+            <th>Date</th>
+            <th>Statut</th>
+            <th style="text-align:right;">Total HT</th>
+            <th style="text-align:right;">TVA</th>
+            <th style="text-align:right;">Total TTC</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cmd in top_commandes %}
+            <tr>
+              <td>
+                <span style="font-family:'Josefin Sans',sans-serif; font-size:1rem; font-weight:800;">
+                  {{ loop.index == 1 ? '🥇' : (loop.index == 2 ? '🥈' : (loop.index == 3 ? '🥉' : '#' ~ loop.index)) }}
+                </span>
+              </td>
+              <td>
+                <span style="font-family:'Josefin Sans',sans-serif; font-weight:800; color:var(--primary-dark);">#{{ cmd.idCommande }}</span>
+              </td>
+              <td style="color:var(--muted);">Client #{{ cmd.idClient }}</td>
+              <td style="font-size:.82rem; color:var(--muted);">{{ cmd.dateCommande }}</td>
+              <td>
+                {% set sc = cmd.statut %}
+                {% set sc_bg    = sc == 'payee' ? 'rgba(16,185,129,.1)'
+                  : (sc == 'confirmee'      ? 'rgba(34,197,94,.1)'
+                  : (sc == 'livree'         ? 'rgba(99,102,241,.1)'
+                  : (sc == 'annulee'        ? 'rgba(239,68,68,.1)'
+                  : 'rgba(255,190,51,.12)'))) %}
+                {% set sc_color = sc == 'payee' ? '#065f46'
+                  : (sc == 'confirmee'      ? '#166534'
+                  : (sc == 'livree'         ? '#3730a3'
+                  : (sc == 'annulee'        ? '#991b1b'
+                  : '#92400e'))) %}
+                <span style="display:inline-block; padding:3px 10px; border-radius:100px; font-family:'Josefin Sans',sans-serif; font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; background:{{ sc_bg }}; color:{{ sc_color }};">
+                  {{ sc|replace({'_': ' '}) }}
+                </span>
+              </td>
+              <td style="text-align:right; font-family:'Josefin Sans',sans-serif; font-size:.88rem; color:var(--muted);">
+                {{ cmd.totalHt|number_format(3, '.', ' ') }} TND
+              </td>
+              <td style="text-align:right; font-family:'Josefin Sans',sans-serif; font-size:.88rem; color:var(--muted);">
+                {{ cmd.totalTva|number_format(3, '.', ' ') }} TND
+              </td>
+              <td style="text-align:right;">
+                <span style="font-family:'Josefin Sans',sans-serif; font-size:1rem; font-weight:800; color:var(--primary-dark);">
+                  {{ cmd.totalTtc|number_format(3, '.', ' ') }} TND
+                </span>
+                {# Visual bar relative to max #}
+                {% set maxTtc = top_commandes[0].totalTtc ?? 0 %}
+                {% set barW = maxTtc > 0 ? ((cmd.totalTtc / maxTtc) * 100)|round(0) : 0 %}
+                <div style="margin-top:4px; background:#f3f4f6; border-radius:3px; height:3px;">
+                  <div style="background:linear-gradient(90deg,#ffbe33,#ff9500); width:{{ barW }}%; height:3px; border-radius:3px;"></div>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div style="text-align:center; padding:3rem; color:var(--muted);">
+        <i class="fa fa-inbox" style="font-size:2.5rem; opacity:.2; display:block; margin-bottom:1rem;"></i>
+        Aucune commande avec un montant enregistré.
+      </div>
+    {% endif %}
+  </div>
+
+  {# ── TOP PRODUITS: 2 colonnes (fréquence + CA) ── #}
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:2.5rem;">
+
+    {# Top par fréquence #}
+    <div style="background:#fff; border-radius:14px; border:1.5px solid var(--border); box-shadow:0 4px 20px rgba(0,0,0,.06); overflow:hidden;">
+      <div style="padding:1.2rem 1.5rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; background:linear-gradient(135deg,#fffbee,#fff);">
+        <div style="font-family:'Lora',serif; font-size:1rem; font-weight:700; color:var(--dark);">🔥 Top {{ top }} — par quantité vendue</div>
+      </div>
+      {% if top_freq|length > 0 %}
+        <div style="padding:1rem 1.5rem;">
+          {% for p in top_freq %}
+            <div style="display:flex; align-items:center; gap:.8rem; padding:.7rem 0; {% if not loop.last %}border-bottom:1px solid var(--border);{% endif %}">
+              {# Rank #}
+              <div style="width:30px; height:30px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-family:'Josefin Sans',sans-serif; font-weight:800; font-size:.78rem; background:{% if loop.index == 1 %}linear-gradient(135deg,#f59e0b,#d97706); color:#fff{% elseif loop.index == 2 %}linear-gradient(135deg,#9ca3af,#6b7280); color:#fff{% elseif loop.index == 3 %}linear-gradient(135deg,#cd7f32,#a05c1e); color:#fff{% else %}var(--light-bg); color:var(--muted){% endif %};">
+                {{ loop.index }}
+              </div>
+              {# Name #}
+              <div style="flex:1; min-width:0;">
+                <div style="font-weight:700; font-size:.88rem; color:var(--dark); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ p.nomProduit }}</div>
+                {% if p.categorie %}<div style="font-size:.7rem; color:var(--muted);">{{ p.categorie }}</div>{% endif %}
+              </div>
+              {# Stats #}
+              <div style="text-align:right; flex-shrink:0;">
+                <div style="font-family:'Josefin Sans',sans-serif; font-weight:800; color:var(--primary);">{{ p.totalQuantite }} <span style="font-size:.6rem; color:var(--muted); font-weight:400;">unités</span></div>
+                <div style="font-size:.68rem; color:var(--muted);">{{ p.nbCommandes }} cmd{{ p.nbCommandes > 1 ? 's' : '' }}</div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div style="padding:2rem; text-align:center; color:var(--muted);">Aucune donnée de ligne de commande.</div>
+      {% endif %}
+    </div>
+
+    {# Top par CA #}
+    <div style="background:#fff; border-radius:14px; border:1.5px solid var(--border); box-shadow:0 4px 20px rgba(0,0,0,.06); overflow:hidden;">
+      <div style="padding:1.2rem 1.5rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; background:linear-gradient(135deg,#f0fdf4,#fff);">
+        <div style="font-family:'Lora',serif; font-size:1rem; font-weight:700; color:var(--dark);">💰 Top {{ top }} — par chiffre d'affaires</div>
+      </div>
+      {% if top_revenue|length > 0 %}
+        <div style="padding:1rem 1.5rem;">
+          {% set maxRevCA = top_revenue[0].totalRevenue ?? 0 %}
+          {% for p in top_revenue %}
+            {% set barW = maxRevCA > 0 ? ((p.totalRevenue / maxRevCA) * 100)|round(0) : 0 %}
+            <div style="padding:.7rem 0; {% if not loop.last %}border-bottom:1px solid var(--border);{% endif %}">
+              <div style="display:flex; align-items:center; gap:.8rem; margin-bottom:.4rem;">
+                <div style="width:30px; height:30px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-family:'Josefin Sans',sans-serif; font-weight:800; font-size:.78rem; background:{% if loop.index == 1 %}linear-gradient(135deg,#f59e0b,#d97706); color:#fff{% elseif loop.index == 2 %}linear-gradient(135deg,#9ca3af,#6b7280); color:#fff{% elseif loop.index == 3 %}linear-gradient(135deg,#cd7f32,#a05c1e); color:#fff{% else %}var(--light-bg); color:var(--muted){% endif %};">
+                  {{ loop.index }}
+                </div>
+                <div style="flex:1; min-width:0;">
+                  <div style="font-weight:700; font-size:.88rem; color:var(--dark); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ p.nomProduit }}</div>
+                </div>
+                <div style="font-family:'Josefin Sans',sans-serif; font-weight:800; color:#10b981; font-size:.85rem; flex-shrink:0;">
+                  {{ p.totalRevenue|number_format(0, '.', ' ') }} TND
+                </div>
+              </div>
+              <div style="background:#f3f4f6; border-radius:4px; height:4px; margin-left:38px;">
+                <div style="background:linear-gradient(90deg,#10b981,#34d399); width:{{ barW }}%; height:4px; border-radius:4px;"></div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div style="padding:2rem; text-align:center; color:var(--muted);">Aucune donnée de ligne de commande.</div>
+      {% endif %}
+    </div>
+
+  </div>
+
+  {# ── CA MENSUEL DÉTAILLÉ ── #}
+  {% if monthly|length > 0 %}
+  <div style="background:#fff; border-radius:14px; border:1.5px solid var(--border); box-shadow:0 4px 20px rgba(0,0,0,.06); overflow:hidden; margin-bottom:2.5rem;">
+    <div style="padding:1.2rem 1.5rem; border-bottom:1px solid var(--border); background:linear-gradient(135deg,#f0f6ff,#fff);">
+      <div style="font-family:'Lora',serif; font-size:1rem; font-weight:700; color:var(--dark);">📆 Détail mensuel — {{ months }} derniers mois</div>
+    </div>
+    <table class="biz-table">
+      <thead>
+        <tr>
+          <th>Mois</th>
+          <th style="text-align:center;">Nb commandes</th>
+          <th style="text-align:right;">CA TTC (TND)</th>
+          <th style="width:200px;">Tendance</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% set maxM = monthly|reduce((carry, m) => carry > m.total ? carry : m.total, 0) %}
+        {% for m in monthly %}
+          {% set barW = maxM > 0 ? ((m.total / maxM) * 100)|round(0) : 0 %}
+          <tr>
+            <td><span style="font-family:'Josefin Sans',sans-serif; font-weight:700;">{{ m.mois }}</span></td>
+            <td style="text-align:center; font-weight:700;">{{ m.nb }}</td>
+            <td style="text-align:right; font-family:'Josefin Sans',sans-serif; font-weight:800; color:var(--primary-dark);">{{ m.total|number_format(3, '.', ' ') }}</td>
+            <td>
+              <div style="display:flex; align-items:center; gap:.5rem;">
+                <div style="flex:1; background:#f3f4f6; border-radius:4px; height:6px;">
+                  <div style="background:linear-gradient(90deg,#6366f1,#818cf8); width:{{ barW }}%; height:6px; border-radius:4px;"></div>
+                </div>
+                <span style="font-size:.7rem; color:var(--muted); width:30px; text-align:right;">{{ barW }}%</span>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+</div>
+
+{# ── CHART.JS ── #}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+  // ── Revenue bar chart ──────────────────────────────────────────────────
+  var ctx1 = document.getElementById('revenueChart');
+  if (ctx1) {
+    new Chart(ctx1, {
+      type: 'bar',
+      data: {
+        labels: {{ revenue_labels|json_encode|raw }},
+        datasets: [
+          {
+            label: 'CA TTC (TND)',
+            data: {{ revenue_data|json_encode|raw }},
+            backgroundColor: 'rgba(99,102,241,0.7)',
+            borderColor: '#6366f1',
+            borderWidth: 2,
+            borderRadius: 6,
+            yAxisID: 'y',
+          },
+          {
+            label: 'Nb commandes',
+            data: {{ revenue_nb|json_encode|raw }},
+            type: 'line',
+            borderColor: '#f59e0b',
+            backgroundColor: 'rgba(245,158,11,0.1)',
+            borderWidth: 2,
+            pointRadius: 4,
+            pointBackgroundColor: '#f59e0b',
+            tension: 0.35,
+            yAxisID: 'y2',
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: { color: '#666', font: { size: 11 } }
+          }
+        },
+        scales: {
+          x: { grid: { color: 'rgba(0,0,0,.05)' }, ticks: { color: '#666', font: { size: 11 } } },
+          y: {
+            grid: { color: 'rgba(0,0,0,.05)' },
+            ticks: { color: '#666', font: { size: 11 }, callback: function(v){ return v.toLocaleString() + ' TND'; } },
+            beginAtZero: true, position: 'left'
+          },
+          y2: {
+            grid: { display: false },
+            ticks: { color: '#f59e0b', font: { size: 11 } },
+            beginAtZero: true, position: 'right'
+          }
+        }
+      }
+    });
+  }
+
+  // ── Status donut ───────────────────────────────────────────────────────
+  var ctx2 = document.getElementById('statutChart');
+  if (ctx2) {
+    new Chart(ctx2, {
+      type: 'doughnut',
+      data: {
+        labels: {{ statut_labels|json_encode|raw }},
+        datasets: [{
+          data: {{ statut_nb|json_encode|raw }},
+          backgroundColor: ['#fbbf24','#34d399','#10b981','#f87171','#60a5fa','#a78bfa','#fb923c'],
+          borderColor: '#fff',
+          borderWidth: 3,
+          hoverOffset: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '62%',
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                var total = ctx.dataset.data.reduce(function(a,b){return a+b;},0);
+                var pct = total > 0 ? Math.round(ctx.parsed / total * 100) : 0;
+                return ' ' + ctx.label + ': ' + ctx.parsed + ' (' + pct + '%)';
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+})();
+</script>
+{% endblock %}

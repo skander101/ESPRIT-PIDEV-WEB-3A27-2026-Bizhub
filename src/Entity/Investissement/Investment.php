@@ -68,7 +68,7 @@ class Investment
     #[Assert\NotNull(message: 'L\'investisseur est obligatoire.')]
     private ?User $user = null;
 
-    #[ORM\Column(type: 'decimal', nullable: false)]
+    #[ORM\Column(type: 'decimal', precision: 15, scale: 2, nullable: false)]
     #[Assert\NotNull(message: 'Le montant est obligatoire.')]
     #[Assert\Positive(message: 'Le montant doit être positif.')]
     private ?float $amount = null;

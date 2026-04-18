@@ -4,11 +4,18 @@ namespace App\Controller\Marketplace;
 
 use App\Entity\Marketplace\Commande;
 use App\Entity\Marketplace\CommandeLigne;
+use App\Entity\Marketplace\CommandeStatusHistory;
+use App\Event\CommandeConfirmeeEvent;
+use App\Repository\Marketplace\AutoConfirmNotificationRepository;
 use App\Repository\Marketplace\CommandeRepository;
 use App\Repository\Marketplace\PanierRepository;
 use App\Repository\Marketplace\ProduitServiceRepository;
+use App\Repository\UsersAvis\UserRepository;
+use App\Service\Marketplace\GrokService;
+use App\Service\Marketplace\OrderScoringService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -62,36 +69,57 @@ class CommandeController extends AbstractController
     // ════════════════════════════════════════════════════════════════════
 
     #[Route('', name: 'index', methods: ['GET'])]
-    public function index(CommandeRepository $repo, Request $request): Response
-    {
+    public function index(
+        CommandeRepository       $repo,
+        ProduitServiceRepository $produitRepo,
+        Request                  $request,
+    ): Response {
         if ($r = $this->requireStartup()) return $r;
 
         $userId    = $this->getUserId();
         $statut    = $request->query->get('statut');
         $toutes    = $repo->findByClient($userId);
+
+        // Use effectiveStatut for filtering so paid orders match 'payee' even if DB statut lags
         $commandes = $statut
-            ? array_values(array_filter($toutes, fn($c) => $c->getStatut() === $statut))
+            ? array_values(array_filter($toutes, fn($c) => $c->getEffectiveStatut() === $statut))
             : $toutes;
 
-        $nbAttente   = count(array_filter($toutes, fn($c) => $c->getStatut() === Commande::STATUT_ATTENTE));
-        $nbConfirmee = count(array_filter($toutes, fn($c) => $c->getStatut() === Commande::STATUT_CONFIRMEE));
-        $nbAnnulee   = count(array_filter($toutes, fn($c) => $c->getStatut() === Commande::STATUT_ANNULEE));
-        $nbLivree    = count(array_filter($toutes, fn($c) => $c->getStatut() === Commande::STATUT_LIVREE));
+        $nbAttente   = count(array_filter($toutes, fn($c) => $c->getEffectiveStatut() === Commande::STATUT_ATTENTE));
+        $nbConfirmee = count(array_filter($toutes, fn($c) => $c->getEffectiveStatut() === Commande::STATUT_CONFIRMEE));
+        $nbEnCours   = count(array_filter($toutes, fn($c) => $c->getEffectiveStatut() === Commande::STATUT_EN_COURS_PAIEMENT));
+        $nbPayeeChart = count(array_filter($toutes, fn($c) => in_array($c->getEffectiveStatut(), [Commande::STATUT_PAYEE, Commande::STATUT_EN_PREPARATION], true)));
+        $nbAnnulee   = count(array_filter($toutes, fn($c) => $c->getEffectiveStatut() === Commande::STATUT_ANNULEE));
+        $nbLivree    = count(array_filter($toutes, fn($c) => $c->getEffectiveStatut() === Commande::STATUT_LIVREE));
+
+        // Build product name map for display in the list
+        $produitsMap = [];
+        foreach ($toutes as $cmd) {
+            foreach ($cmd->getLignes() as $ligne) {
+                $id = $ligne->getIdProduit();
+                if ($id !== null && !array_key_exists($id, $produitsMap)) {
+                    $p = $produitRepo->find($id);
+                    $produitsMap[$id] = $p ? $p->getNom() : null;
+                }
+            }
+        }
 
         return $this->render('front/Marketplace/commandes/index.html.twig', [
             'commandes'     => $commandes,
             'statut_filtre' => $statut,
+            'produits_map'  => $produitsMap,
             'stats'         => [
                 'total'      => count($toutes),
                 'en_attente' => $nbAttente,
-                'confirmees' => $nbConfirmee,
+                'confirmees' => $nbConfirmee + $nbEnCours,
                 'annulees'   => $nbAnnulee,
                 'livrees'    => $nbLivree,
                 'payees'     => count(array_filter($toutes, fn($c) => $c->isEstPayee())),
             ],
             'chart_data'    => [
                 $nbAttente,
-                $nbConfirmee,
+                $nbConfirmee + $nbEnCours,
+                $nbPayeeChart,
                 $nbAnnulee,
                 $nbLivree,
             ],
@@ -113,7 +141,10 @@ class CommandeController extends AbstractController
         Request $request,
         PanierRepository $panierRepo,
         ProduitServiceRepository $produitRepo,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        OrderScoringService $scoringService,
+        UserRepository $userRepo,
+        EventDispatcherInterface $dispatcher,
     ): Response {
         if ($r = $this->requireStartup()) return $r;
 
@@ -167,7 +198,34 @@ class CommandeController extends AbstractController
         $panierRepo->viderPanier($userId);
         $em->flush();
 
-        $this->addFlash('success', '✅ Commande #' . $commande->getIdCommande() . ' passée ! En attente de confirmation.');
+        // ── Scoring automatique ──────────────────────────────────────────
+        $clientUser = $userRepo->find($userId);
+        if ($clientUser) {
+            $score    = $scoringService->calculateScore($commande, $clientUser);
+            $decision = $scoringService->decide($score);
+
+            $commande->setScoreAuto($score);
+
+            if ($decision === 'auto_confirm') {
+                $commande->setStatut(Commande::STATUT_CONFIRMEE);
+                $em->flush();
+                $dispatcher->dispatch(
+                    new CommandeConfirmeeEvent($commande, null),
+                    CommandeConfirmeeEvent::NAME
+                );
+                $this->addFlash('success', '✅ Commande #' . $commande->getIdCommande() . ' auto-confirmée (score : ' . $score . '/100). Notification WhatsApp envoyée.');
+            } elseif ($decision === 'auto_reject') {
+                $commande->setStatut(Commande::STATUT_ANNULEE);
+                $this->addFlash('warning', '⚠️ Commande #' . $commande->getIdCommande() . ' rejetée automatiquement (score trop faible : ' . $score . '/100).');
+            } else {
+                $this->addFlash('success', '✅ Commande #' . $commande->getIdCommande() . ' passée ! En attente de confirmation de l\'investisseur.');
+            }
+
+            $em->flush();
+        } else {
+            $this->addFlash('success', '✅ Commande #' . $commande->getIdCommande() . ' passée ! En attente de confirmation.');
+        }
+
         return $this->redirectToRoute('commande_index');
     }
 
@@ -225,7 +283,7 @@ class CommandeController extends AbstractController
     // ════════════════════════════════════════════════════════════════════
 
     #[Route('/investisseur/recues', name: 'investisseur_recues', methods: ['GET'])]
-    public function recues(CommandeRepository $repo, ProduitServiceRepository $produitRepo, Request $request): Response
+    public function recues(CommandeRepository $repo, ProduitServiceRepository $produitRepo, Request $request, AutoConfirmNotificationRepository $notifRepo): Response
     {
         if ($r = $this->requireInvestisseur()) return $r;
 
@@ -268,12 +326,15 @@ class CommandeController extends AbstractController
             $chartValues[] = $qty;
         }
 
+        $notifications = $notifRepo->findUnreadByInvestisseur($this->getUserId());
+
         return $this->render('front/Marketplace/commandes/investisseur.html.twig', [
             'commandes'      => $commandes,
             'produits_map'   => $produitsMap,
             'statut_filtre'  => $statut,
             'chart_labels'   => $chartLabels,
             'chart_values'   => $chartValues,
+            'notifications'  => $notifications,
             'kpi'            => [
                 'ca_total'     => number_format($caTotal, 3, '.', ' '),
                 'ca_confirmee' => number_format($caConfirmee, 3, '.', ' '),
@@ -294,9 +355,31 @@ class CommandeController extends AbstractController
     //  GENERIC PARAMETERIZED ROUTES (must come after specific routes)
     // ════════════════════════════════════════════════════════════════════
 
+    #[Route('/notifications/mark-read', name: 'notifications_mark_read', methods: ['POST'])]
+    public function markNotificationsRead(
+        AutoConfirmNotificationRepository $notifRepo,
+        EntityManagerInterface $em,
+    ): \Symfony\Component\HttpFoundation\JsonResponse {
+        if ($r = $this->requireInvestisseur()) {
+            return $this->json(['ok' => false], 403);
+        }
+        foreach ($notifRepo->findUnreadByInvestisseur($this->getUserId()) as $n) {
+            $n->setIsRead(true);
+        }
+        $em->flush();
+        return $this->json(['ok' => true]);
+    }
+
     #[Route('/{id}', name: 'show', methods: ['GET'], requirements: ['id' => '\d+'])]
-    public function show(Commande $commande, Request $request, ProduitServiceRepository $produitRepo): Response
-    {
+    public function show(
+        Commande                 $commande,
+        Request                  $request,
+        ProduitServiceRepository $produitRepo,
+        CommandeRepository       $commandeRepo,
+        OrderScoringService      $scoringService,
+        GrokService              $grok,
+        UserRepository           $userRepo,
+    ): Response {
         $user = $this->getUser();
 
         // Startup: voir ses propres commandes
@@ -307,7 +390,6 @@ class CommandeController extends AbstractController
         }
         // Investisseur: voir les commandes reçues pour ses produits
         elseif ($user->getUserType() === 'investisseur') {
-            // Vérifier si au moins un produit de cette commande lui appartient
             $hasAccess = false;
             foreach ($commande->getLignes() as $ligne) {
                 $produit = $produitRepo->find($ligne->getIdProduit());
@@ -330,16 +412,48 @@ class CommandeController extends AbstractController
         }
 
         $lignesDetail = [];
+        $firstProduit = null;
         foreach ($commande->getLignes() as $ligne) {
-            $lignesDetail[] = [
-                'ligne'   => $ligne,
-                'produit' => $produitRepo->find($ligne->getIdProduit()),
+            $p = $produitRepo->find($ligne->getIdProduit());
+            if (!$firstProduit) $firstProduit = $p;
+            $lignesDetail[] = ['ligne' => $ligne, 'produit' => $p];
+        }
+
+        // ── Bloc IA : score détaillé + recommandation Grok ──────────────
+        $aiData = null;
+        $clientUser = $userRepo->find($commande->getIdClient());
+        if ($clientUser) {
+            $detailed = $scoringService->getDetailedScore($commande, $clientUser);
+            $nbHistorique = count(array_filter(
+                $commandeRepo->findByClient($commande->getIdClient()),
+                fn($c) => in_array($c->getStatut(), [
+                    Commande::STATUT_CONFIRMEE,
+                    Commande::STATUT_PAYEE,
+                    Commande::STATUT_LIVREE,
+                ], true)
+            ));
+
+            $grokReco = $grok->generateOrderRecommendation(
+                $commande->getIdCommande(),
+                (float) $commande->getTotalTtc(),
+                $detailed['score'],
+                $detailed['decision'],
+                $nbHistorique
+            );
+
+            $aiData = [
+                'score'      => $detailed['score'],
+                'decision'   => $detailed['decision'],
+                'criteria'   => $detailed['criteria'],
+                'grok'       => $grokReco,
             ];
         }
 
         return $this->render('front/Marketplace/commandes/show.html.twig', [
             'commande'      => $commande,
             'lignes_detail' => $lignesDetail,
+            'first_produit' => $firstProduit,
+            'ai_data'       => $aiData,
         ]);
     }
 
@@ -367,7 +481,8 @@ class CommandeController extends AbstractController
         Commande $commande,
         Request $request,
         EntityManagerInterface $em,
-        ProduitServiceRepository $produitRepo
+        ProduitServiceRepository $produitRepo,
+        EventDispatcherInterface $dispatcher,
     ): Response {
         if ($r = $this->requireInvestisseur()) return $r;
 
@@ -382,7 +497,7 @@ class CommandeController extends AbstractController
 
         $commande->setStatut(Commande::STATUT_CONFIRMEE);
 
-        // ── Décrémentation automatique du stock ──────────────────────────
+        // ── Décrémentation automatique du stock (logique existante conservée) ──
         foreach ($commande->getLignes() as $ligne) {
             $produit = $produitRepo->find($ligne->getIdProduit());
             if ($produit) {
@@ -394,8 +509,24 @@ class CommandeController extends AbstractController
             }
         }
 
+        // ── Historique du changement de statut ───────────────────────────
+        $history = (new CommandeStatusHistory())
+            ->setCommande($commande)
+            ->setStatutPrecedent(Commande::STATUT_ATTENTE)
+            ->setStatutNouveau(Commande::STATUT_CONFIRMEE)
+            ->setChangedByUserId($this->getUserId())
+            ->setNote('Confirmée manuellement par l\'investisseur.');
+        $em->persist($history);
+
         $em->flush();
-        $this->addFlash('success', '✔ Commande #' . $commande->getIdCommande() . ' confirmée. Stock mis à jour.');
+
+        // ── Déclenchement de l'événement (Twilio SMS, logs, etc.) ───────
+        $dispatcher->dispatch(
+            new CommandeConfirmeeEvent($commande, $this->getUserId()),
+            CommandeConfirmeeEvent::NAME
+        );
+
+        $this->addFlash('success', '✔ Commande #' . $commande->getIdCommande() . ' confirmée. Stock mis à jour. SMS envoyé à la startup.');
         return $this->redirectToRoute('commande_investisseur_recues');
     }
 
@@ -432,14 +563,33 @@ class CommandeController extends AbstractController
             $this->addFlash('danger', 'Token invalide.');
             return $this->redirectToRoute('commande_investisseur_recues');
         }
-        if ($commande->getStatut() !== Commande::STATUT_CONFIRMEE) {
-            $this->addFlash('warning', 'Seules les commandes confirmées peuvent être marquées comme livrées.');
+        $livrableStatuts = [
+            Commande::STATUT_PAYEE,
+            Commande::STATUT_EN_PREPARATION,
+        ];
+        if (!in_array($commande->getStatut(), $livrableStatuts, true)) {
+            $this->addFlash('warning', 'Cette commande ne peut pas encore être marquée comme livrée.');
+            return $this->redirectToRoute('commande_investisseur_recues');
+        }
+        // Double sécurité : le paiement doit être confirmé même si le statut est correct
+        if (!$commande->isEstPayee()) {
+            $this->addFlash('danger', 'Livraison impossible : le paiement de cette commande n\'a pas encore été reçu.');
             return $this->redirectToRoute('commande_investisseur_recues');
         }
 
+        $statutPrecedent = $commande->getStatut();
         $commande->setStatut(Commande::STATUT_LIVREE);
+
+        $history = (new CommandeStatusHistory())
+            ->setCommande($commande)
+            ->setStatutPrecedent($statutPrecedent)
+            ->setStatutNouveau(Commande::STATUT_LIVREE)
+            ->setChangedByUserId($this->getUserId())
+            ->setNote('Marquée livrée par l\'investisseur.');
+        $em->persist($history);
+
         $em->flush();
-        $this->addFlash('success', '🚚 Commande #' . $commande->getIdCommande() . ' marquée comme livrée.');
+        $this->addFlash('success', 'Commande #' . $commande->getIdCommande() . ' marquée comme livrée.');
         return $this->redirectToRoute('commande_investisseur_recues');
     }
 

@@ -5,82 +5,287 @@
 
 {% block content %}
 <div style="padding:2rem;">
-  <div style="margin-bottom:2rem;">
-    <h2 style="font-size:1.5rem;color:var(--pg-text);margin:0 0 0.5rem 0;">Marketplace Dashboard</h2>
-    <p style="color:var(--pg-muted);margin:0;">Visualisation et gestion complète du marketplace</p>
+
+  {# ── TEST BANNER — StatisticsService connecté ── #}
+  <div style="background:#dcfce7; border:2px solid #16a34a; border-radius:8px; padding:10px 16px; margin-bottom:1.5rem; display:flex; align-items:center; gap:10px;">
+    <span style="font-size:1.2rem;">✅</span>
+    <span style="font-family:monospace; font-size:0.8rem; font-weight:700; color:#166534;">
+      STATS WORKING — StatisticsService connecté :
+      {{ stats.total_commandes }} commandes · {{ stats.total_produits }} produits · {{ top_commandes|length }} top commandes · {{ top_produits|length }} top produits
+    </span>
   </div>
 
-  <!-- Stats Grid -->
-  <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:1.5rem;margin-bottom:2rem;">
-    <div style="background:var(--pg-surface2);padding:1.5rem;border-radius:8px;border-left:4px solid #5b6ef5;">
-      <div style="font-size:2rem;font-weight:700;color:#5b6ef5;margin-bottom:0.5rem;">{{ stats.total_produits }}</div>
-      <div style="font-size:0.85rem;color:var(--pg-muted);text-transform:uppercase;font-weight:700;">Produits Total</div>
+  {# ── HEADER ── #}
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;">
+    <div>
+      <h2 style="font-size:1.5rem;color:var(--pg-text);margin:0 0 0.25rem 0;">Marketplace Dashboard</h2>
+      <p style="color:var(--pg-muted);margin:0;font-size:0.85rem;">Statistiques & gestion du marketplace en temps réel</p>
     </div>
-    <div style="background:var(--pg-surface2);padding:1.5rem;border-radius:8px;border-left:4px solid #06d6a0;">
-      <div style="font-size:2rem;font-weight:700;color:#06d6a0;margin-bottom:0.5rem;">{{ stats.produits_dispo }}</div>
-      <div style="font-size:0.85rem;color:var(--pg-muted);text-transform:uppercase;font-weight:700;">Disponibles</div>
-    </div>
-    <div style="background:var(--pg-surface2);padding:1.5rem;border-radius:8px;border-left:4px solid #8b5cf6;">
-      <div style="font-size:2rem;font-weight:700;color:#8b5cf6;margin-bottom:0.5rem;">{{ stats.total_commandes }}</div>
-      <div style="font-size:0.85rem;color:var(--pg-muted);text-transform:uppercase;font-weight:700;">Commandes Total</div>
-    </div>
-    <div style="background:var(--pg-surface2);padding:1.5rem;border-radius:8px;border-left:4px solid #fbbf24;">
-      <div style="font-size:2rem;font-weight:700;color:#fbbf24;margin-bottom:0.5rem;">{{ stats.en_attente }}</div>
-      <div style="font-size:0.85rem;color:var(--pg-muted);text-transform:uppercase;font-weight:700;">En Attente</div>
-    </div>
-    <div style="background:var(--pg-surface2);padding:1.5rem;border-radius:8px;border-left:4px solid #34d399;">
-      <div style="font-size:2rem;font-weight:700;color:#34d399;margin-bottom:0.5rem;">{{ stats.confirmees }}</div>
-      <div style="font-size:0.85rem;color:var(--pg-muted);text-transform:uppercase;font-weight:700;">Confirmées</div>
-    </div>
-    <div style="background:var(--pg-surface2);padding:1.5rem;border-radius:8px;border-left:4px solid #f472b6;">
-      <div style="font-size:2rem;font-weight:700;color:#f472b6;margin-bottom:0.5rem;">{{ stats.paniers_actifs }}</div>
-      <div style="font-size:0.85rem;color:var(--pg-muted);text-transform:uppercase;font-weight:700;">Paniers Actifs</div>
+    <div style="display:flex;gap:.6rem;">
+      <a href="{{ path('admin_marketplace_clients_index') }}" style="background:#5b6ef5;color:#fff;padding:8px 16px;border-radius:6px;text-decoration:none;font-size:0.8rem;font-weight:700;">👤 Clients</a>
+      <a href="{{ path('admin_marketplace_produits_index') }}" style="background:#06d6a0;color:#fff;padding:8px 16px;border-radius:6px;text-decoration:none;font-size:0.8rem;font-weight:700;">📦 Produits</a>
+      <a href="{{ path('admin_marketplace_commandes_index') }}" style="background:#8b5cf6;color:#fff;padding:8px 16px;border-radius:6px;text-decoration:none;font-size:0.8rem;font-weight:700;">🛍️ Commandes</a>
     </div>
   </div>
 
-  <!-- Main Grid -->
-  <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;">
-    <!-- Statuts Table -->
-    <div class="dash-panel">
-      <div style="padding:0 0 1rem 0;border-bottom:1px solid var(--pg-border);">
-        <h3 style="margin:0;font-size:1.1rem;color:var(--pg-text);">Statuts des Commandes</h3>
+  {# ── KPI CARDS ── #}
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.2rem;margin-bottom:2rem;">
+    {% set kpis = [
+      {v: stats.total_produits,  l: 'Produits Total',  c: '#5b6ef5', i: '📦'},
+      {v: stats.produits_dispo,  l: 'Disponibles',     c: '#06d6a0', i: '✅'},
+      {v: stats.total_commandes, l: 'Commandes Total', c: '#8b5cf6', i: '🛍️'},
+      {v: stats.en_attente,      l: 'En Attente',      c: '#fbbf24', i: '⏳'},
+      {v: stats.confirmees,      l: 'Confirmées',      c: '#34d399', i: '✔️'},
+      {v: stats.paniers_actifs,  l: 'Paniers Actifs',  c: '#f472b6', i: '🛒'},
+    ] %}
+    {% for kpi in kpis %}
+      <div style="background:var(--pg-surface2);padding:1.4rem;border-radius:10px;border-left:4px solid {{ kpi.c }};position:relative;overflow:hidden;">
+        <div style="font-size:1.8rem;font-weight:800;color:{{ kpi.c }};line-height:1;">{{ kpi.v }}</div>
+        <div style="font-size:0.72rem;color:var(--pg-muted);text-transform:uppercase;font-weight:700;margin-top:0.4rem;letter-spacing:.06em;">{{ kpi.l }}</div>
+        <div style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:2rem;opacity:.13;">{{ kpi.i }}</div>
       </div>
+    {% endfor %}
+  </div>
+
+  {# ── REVENUE CHART + STATUTS ── #}
+  <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;margin-bottom:2rem;">
+
+    {# Revenue bar chart #}
+    <div class="dash-panel" style="padding:1.5rem;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;">
+        <h3 style="margin:0;font-size:1rem;color:var(--pg-text);">💰 Chiffre d'affaires mensuel</h3>
+        <span style="font-size:0.72rem;color:var(--pg-muted);">6 derniers mois — commandes payées</span>
+      </div>
+      {% if revenue_labels|length > 0 %}
+        <canvas id="revenueChart" style="width:100%;max-height:220px;"></canvas>
+      {% else %}
+        <div style="text-align:center;padding:3rem;color:var(--pg-muted);font-size:0.85rem;">Aucune donnée de revenu disponible</div>
+      {% endif %}
+    </div>
+
+    {# Statuts breakdown #}
+    <div class="dash-panel" style="padding:1.5rem;">
+      <h3 style="margin:0 0 1rem;font-size:1rem;color:var(--pg-text);">📊 Répartition par statut</h3>
+      {% for statut, count in statuts %}
+        {% set pct = stats.total_commandes > 0 ? ((count / stats.total_commandes) * 100)|round(0) : 0 %}
+        {% set color = statut == 'en_attente' ? '#fbbf24'
+          : (statut == 'confirmee'      ? '#34d399'
+          : (statut == 'payee'          ? '#06d6a0'
+          : (statut == 'annulee'        ? '#f87171'
+          : (statut == 'livree'         ? '#60a5fa'
+          : '#a78bfa')))) %}
+        <div style="margin-bottom:0.9rem;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+            <span style="font-size:0.78rem;color:var(--pg-text);font-weight:600;text-transform:capitalize;">{{ statut|replace({'_': ' '}) }}</span>
+            <span style="font-size:0.78rem;color:var(--pg-muted);font-weight:700;">{{ count }} ({{ pct }}%)</span>
+          </div>
+          <div style="background:var(--pg-border);border-radius:4px;height:6px;">
+            <div style="background:{{ color }};width:{{ pct }}%;height:6px;border-radius:4px;transition:width .6s ease;"></div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+  </div>
+
+  {# ── TOP 5 COMMANDES (by amount) ── #}
+  <div class="dash-panel" style="margin-bottom:2rem;">
+    <div style="padding:1rem 1.5rem;border-bottom:1px solid var(--pg-border);display:flex;align-items:center;justify-content:space-between;">
+      <h3 style="margin:0;font-size:1rem;color:var(--pg-text);">🏆 Top 5 — Commandes par montant</h3>
+      <a href="{{ path('admin_marketplace_commandes_index') }}"
+         style="font-size:0.75rem;color:#5b6ef5;text-decoration:none;font-weight:700;">Voir toutes →</a>
+    </div>
+    {% if top_commandes|length > 0 %}
       <div style="overflow-x:auto;">
-        <table style="width:100%;color:var(--pg-text);">
+        <table style="width:100%;border-collapse:collapse;color:var(--pg-text);">
           <thead>
-            <tr style="border-bottom:1px solid var(--pg-border);background:var(--pg-surface2);">
-              <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);">Statut</th>
-              <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);">Nombre</th>
+            <tr style="background:var(--pg-surface2);">
+              <th style="padding:.9rem 1rem;text-align:left;font-size:0.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--pg-muted);font-weight:700;">#</th>
+              <th style="padding:.9rem 1rem;text-align:left;font-size:0.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--pg-muted);font-weight:700;">Commande</th>
+              <th style="padding:.9rem 1rem;text-align:left;font-size:0.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--pg-muted);font-weight:700;">Client</th>
+              <th style="padding:.9rem 1rem;text-align:left;font-size:0.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--pg-muted);font-weight:700;">Date</th>
+              <th style="padding:.9rem 1rem;text-align:left;font-size:0.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--pg-muted);font-weight:700;">Statut</th>
+              <th style="padding:.9rem 1rem;text-align:right;font-size:0.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--pg-muted);font-weight:700;">Total TTC</th>
             </tr>
           </thead>
           <tbody>
-            {% for statut, count in statuts %}
-              <tr style="border-bottom:1px solid var(--pg-border);">
-                <td style="padding:1rem;">
-                  <span style="display:inline-block;background:rgba(91,110,245,0.15);color:#5b6ef5;padding:0.3rem 0.8rem;border-radius:4px;font-size:0.85rem;font-weight:700;text-transform:capitalize;">
-                    {{ statut }}
+            {% for cmd in top_commandes %}
+              {% set medal = loop.index == 1 ? '🥇' : (loop.index == 2 ? '🥈' : (loop.index == 3 ? '🥉' : '')) %}
+              <tr style="border-top:1px solid var(--pg-border);transition:background .15s;" onmouseover="this.style.background='var(--pg-surface2)'" onmouseout="this.style.background='transparent'">
+                <td style="padding:.9rem 1rem;font-weight:700;font-size:0.9rem;">{{ medal }} {{ loop.index }}</td>
+                <td style="padding:.9rem 1rem;">
+                  <a href="{{ path('admin_marketplace_commandes_show', {id: cmd.idCommande}) }}"
+                     style="color:#5b6ef5;text-decoration:none;font-weight:700;">#{{ cmd.idCommande }}</a>
+                </td>
+                <td style="padding:.9rem 1rem;color:var(--pg-muted);">Client #{{ cmd.idClient }}</td>
+                <td style="padding:.9rem 1rem;font-size:0.82rem;">{{ cmd.dateCommande }}</td>
+                <td style="padding:.9rem 1rem;">
+                  {% set sc = cmd.statut %}
+                  {% set sc_color = sc == 'payee' ? '#06d6a0' : (sc == 'confirmee' ? '#34d399' : (sc == 'livree' ? '#60a5fa' : (sc == 'annulee' ? '#f87171' : '#fbbf24'))) %}
+                  <span style="display:inline-block;background:rgba(91,110,245,.12);color:{{ sc_color }};padding:3px 10px;border-radius:6px;font-size:0.72rem;font-weight:700;text-transform:capitalize;">
+                    {{ sc|replace({'_': ' '}) }}
                   </span>
                 </td>
-                <td style="padding:1rem;font-weight:700;">{{ count }}</td>
+                <td style="padding:.9rem 1rem;text-align:right;font-family:monospace;font-weight:800;color:#fbbf24;font-size:1rem;">
+                  {{ cmd.totalTtc|number_format(3, '.', ' ') }} <span style="font-size:0.7rem;color:var(--pg-muted);">TND</span>
+                </td>
               </tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
+    {% else %}
+      <div style="text-align:center;padding:2.5rem;color:var(--pg-muted);">Aucune commande avec un montant enregistré.</div>
+    {% endif %}
+  </div>
+
+  {# ── BOTTOM GRID: Top produits + Actions rapides ── #}
+  <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;">
+
+    {# Top 5 produits #}
+    <div class="dash-panel">
+      <div style="padding:1rem 1.5rem;border-bottom:1px solid var(--pg-border);display:flex;align-items:center;justify-content:space-between;">
+        <h3 style="margin:0;font-size:1rem;color:var(--pg-text);">🔥 Top 5 — Produits les plus commandés</h3>
+      </div>
+      {% if top_produits|length > 0 %}
+        <div style="padding:1rem 1.5rem;">
+          {% for p in top_produits %}
+            <div style="display:flex;align-items:center;gap:1rem;padding:.75rem 0;{% if not loop.last %}border-bottom:1px solid var(--pg-border);{% endif %}">
+              {# Rank badge #}
+              <div style="width:36px;height:36px;border-radius:50%;background:{% if loop.index == 1 %}linear-gradient(135deg,#f59e0b,#d97706){% elseif loop.index == 2 %}linear-gradient(135deg,#9ca3af,#6b7280){% elseif loop.index == 3 %}linear-gradient(135deg,#cd7f32,#a05c1e){% else %}var(--pg-surface2){% endif %};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.82rem;color:{% if loop.index <= 3 %}white{% else %}var(--pg-muted){% endif %};flex-shrink:0;">
+                {{ loop.index }}
+              </div>
+              {# Info #}
+              <div style="flex:1;min-width:0;">
+                <div style="font-weight:700;font-size:0.88rem;color:var(--pg-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ p.nomProduit }}</div>
+                {% if p.categorie %}
+                  <div style="font-size:0.7rem;color:var(--pg-muted);margin-top:2px;">{{ p.categorie }}</div>
+                {% endif %}
+              </div>
+              {# Metrics #}
+              <div style="text-align:right;flex-shrink:0;">
+                <div style="font-weight:800;font-size:0.95rem;color:#06d6a0;">{{ p.totalQuantite }} <span style="font-size:0.65rem;color:var(--pg-muted);">unités</span></div>
+                <div style="font-size:0.72rem;color:var(--pg-muted);">{{ p.nbCommandes }} cmd{{ p.nbCommandes > 1 ? 's' : '' }}</div>
+              </div>
+              {# Revenue bar #}
+              {% set maxRevenue = top_produits[0].totalRevenue ?? 0 %}
+              {% set barPct = maxRevenue > 0 ? ((p.totalRevenue / maxRevenue) * 100)|round(0) : 0 %}
+              <div style="width:60px;flex-shrink:0;">
+                <div style="background:var(--pg-border);border-radius:4px;height:6px;">
+                  <div style="background:#5b6ef5;width:{{ barPct }}%;height:6px;border-radius:4px;"></div>
+                </div>
+                <div style="font-size:0.65rem;color:var(--pg-muted);margin-top:3px;text-align:right;">{{ p.totalRevenue|number_format(0, '.', ' ') }} TND</div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div style="padding:2rem;text-align:center;color:var(--pg-muted);">Aucune ligne de commande enregistrée.</div>
+      {% endif %}
     </div>
 
-    <!-- Quick Actions -->
-    <div class="dash-panel">
-      <div style="padding:0 0 1rem 0;border-bottom:1px solid var(--pg-border);">
-        <h3 style="margin:0;font-size:1.1rem;color:var(--pg-text);">Actions Rapides</h3>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:0.75rem;">
-        <a href="{{ path('admin_marketplace_produits_new') }}" style="background:#5b6ef5;color:white;padding:0.75rem 1rem;border-radius:4px;text-decoration:none;font-weight:700;text-align:center;transition:background 0.2s;">+ Nouveau Produit</a>
-        <a href="{{ path('admin_marketplace_produits_index') }}" style="background:#8b5cf6;color:white;padding:0.75rem 1rem;border-radius:4px;text-decoration:none;font-weight:700;text-align:center;transition:background 0.2s;">📋 Tous les Produits</a>
-        <a href="{{ path('admin_marketplace_commandes_index') }}" style="background:#06d6a0;color:#000;padding:0.75rem 1rem;border-radius:4px;text-decoration:none;font-weight:700;text-align:center;transition:background 0.2s;">📦 Commandes</a>
-        <a href="{{ path('admin_marketplace_paniers_index') }}" style="background:#fbbf24;color:#000;padding:0.75rem 1rem;border-radius:4px;text-decoration:none;font-weight:700;text-align:center;transition:background 0.2s;">🛒 Paniers</a>
+    {# Navigation principale #}
+    <div class="dash-panel" style="padding:1.5rem;">
+      <h3 style="margin:0 0 1.2rem;font-size:1rem;color:var(--pg-text);">🗂️ Gestion Marketplace</h3>
+      <div style="display:flex;flex-direction:column;gap:1rem;">
+
+        {# Clients #}
+        <a href="{{ path('admin_marketplace_clients_index') }}"
+           style="display:flex;align-items:center;gap:1rem;background:var(--pg-surface2);border:1px solid var(--pg-border);border-radius:10px;padding:1rem 1.2rem;text-decoration:none;transition:border-color .2s,background .2s;"
+           onmouseover="this.style.borderColor='#5b6ef5';this.style.background='rgba(91,110,245,.08)'"
+           onmouseout="this.style.borderColor='var(--pg-border)';this.style.background='var(--pg-surface2)'">
+          <div style="width:42px;height:42px;border-radius:10px;background:rgba(91,110,245,.15);display:flex;align-items:center;justify-content:center;font-size:1.25rem;flex-shrink:0;">👥</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:700;font-size:.9rem;color:var(--pg-text);">Clients</div>
+            <div style="font-size:.72rem;color:var(--pg-muted);margin-top:2px;">Liste & profils des utilisateurs</div>
+          </div>
+          <div style="color:#5b6ef5;font-size:1rem;flex-shrink:0;">→</div>
+        </a>
+
+        {# Produits #}
+        <a href="{{ path('admin_marketplace_produits_index') }}"
+           style="display:flex;align-items:center;gap:1rem;background:var(--pg-surface2);border:1px solid var(--pg-border);border-radius:10px;padding:1rem 1.2rem;text-decoration:none;transition:border-color .2s,background .2s;"
+           onmouseover="this.style.borderColor='#06d6a0';this.style.background='rgba(6,214,160,.08)'"
+           onmouseout="this.style.borderColor='var(--pg-border)';this.style.background='var(--pg-surface2)'">
+          <div style="width:42px;height:42px;border-radius:10px;background:rgba(6,214,160,.15);display:flex;align-items:center;justify-content:center;font-size:1.25rem;flex-shrink:0;">📦</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:700;font-size:.9rem;color:var(--pg-text);">Produits</div>
+            <div style="font-size:.72rem;color:var(--pg-muted);margin-top:2px;">Catalogue & disponibilités</div>
+          </div>
+          <div style="color:#06d6a0;font-size:1rem;flex-shrink:0;">→</div>
+        </a>
+
+        {# Commandes #}
+        <a href="{{ path('admin_marketplace_commandes_index') }}"
+           style="display:flex;align-items:center;gap:1rem;background:var(--pg-surface2);border:1px solid var(--pg-border);border-radius:10px;padding:1rem 1.2rem;text-decoration:none;transition:border-color .2s,background .2s;"
+           onmouseover="this.style.borderColor='#fbbf24';this.style.background='rgba(251,191,36,.08)'"
+           onmouseout="this.style.borderColor='var(--pg-border)';this.style.background='var(--pg-surface2)'">
+          <div style="width:42px;height:42px;border-radius:10px;background:rgba(251,191,36,.15);display:flex;align-items:center;justify-content:center;font-size:1.25rem;flex-shrink:0;">🛍️</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:700;font-size:.9rem;color:var(--pg-text);">Commandes</div>
+            <div style="font-size:.72rem;color:var(--pg-muted);margin-top:2px;">Suivi & gestion des commandes</div>
+          </div>
+          <div style="color:#fbbf24;font-size:1rem;flex-shrink:0;">→</div>
+        </a>
+
       </div>
     </div>
+
   </div>
+
 </div>
+
+{# Chart.js — Revenue bar chart #}
+{% if revenue_labels|length > 0 %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+  var ctx = document.getElementById('revenueChart');
+  if (!ctx) return;
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: {{ revenue_labels|json_encode|raw }},
+      datasets: [{
+        label: 'CA TTC (TND)',
+        data: {{ revenue_data|json_encode|raw }},
+        backgroundColor: 'rgba(91,110,245,0.7)',
+        borderColor: '#5b6ef5',
+        borderWidth: 2,
+        borderRadius: 6,
+        hoverBackgroundColor: 'rgba(91,110,245,0.9)',
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              return ' ' + Number(ctx.parsed.y).toLocaleString('fr-TN', {minimumFractionDigits: 3}) + ' TND';
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(255,255,255,0.05)' },
+          ticks: { color: '#6b7280', font: { size: 11 } }
+        },
+        y: {
+          grid: { color: 'rgba(255,255,255,0.05)' },
+          ticks: {
+            color: '#6b7280', font: { size: 11 },
+            callback: function(v) { return v.toLocaleString() + ' TND'; }
+          },
+          beginAtZero: true
+        }
+      }
+    }
+  });
+})();
+</script>
+{% endif %}
 {% endblock %}

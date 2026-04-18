@@ -12,11 +12,6 @@
 .back-link:hover { color: var(--primary); }
 .project-title { font-size: 2rem; color: var(--white); font-family: 'Josefin Sans', sans-serif; font-weight: 700; margin-bottom: 0.5rem; }
 .status-badge { font-size: 0.72rem; font-weight: 700; padding: 5px 14px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.08em; font-family: 'Josefin Sans', sans-serif; display: inline-block; margin-bottom: 1rem; }
-.status-brouillon  { background: rgba(107,114,128,0.2); color: #9ca3af; }
-.status-publie     { background: rgba(59,130,246,0.2);  color: #60a5fa; }
-.status-en_cours   { background: rgba(91,110,245,0.2);  color: #8b9ef5; }
-.status-finance    { background: rgba(6,214,160,0.2);   color: #06d6a0; }
-.status-ferme      { background: rgba(239,68,68,0.15);  color: #f87171; }
 .status-pending     { background: rgba(107,114,128,0.2); color: #9ca3af; }
 .status-in_progress { background: rgba(91,110,245,0.2);  color: #8b9ef5; }
 .status-funded      { background: rgba(6,214,160,0.2);   color: #06d6a0; }
@@ -49,10 +44,10 @@
     <div class="project-hero-inner">
         <a href="{{ path('app_front_projet_index') }}" class="back-link"><i class="fa fa-arrow-left"></i> Retour</a>
         <span class="status-badge status-{{ projet.status }}">
-            {% if projet.status == 'brouillon' or projet.status == 'pending' %}En attente
-            {% elseif projet.status == 'publie' or projet.status == 'en_cours' or projet.status == 'in_progress' %}En cours
-            {% elseif projet.status == 'finance' or projet.status == 'funded' %}Financé
-            {% elseif projet.status == 'ferme' or projet.status == 'completed' %}Terminé
+            {% if projet.status == 'pending' %}En attente
+            {% elseif projet.status == 'in_progress' %}En cours
+            {% elseif projet.status == 'funded' %}Financé
+            {% elseif projet.status == 'completed' %}Terminé
             {% else %}{{ projet.status }}{% endif %}
         </span>
         <div class="project-title">{{ projet.title }}</div>
@@ -141,26 +136,35 @@
                     </button>
                 </form>
             {% elseif app.user and app.user.userType == 'investisseur' %}
-                <div style="font-size:0.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;font-family:'Josefin Sans',sans-serif;font-weight:700;margin-bottom:1rem;">Investir dans ce projet</div>
-                {% if projet.status in ['finance', 'ferme', 'funded', 'completed'] %}
+                <div style="font-size:0.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;font-family:'Josefin Sans',sans-serif;font-weight:700;margin-bottom:1rem;">Actions investisseur</div>
+                {% if projet.status in ['funded', 'completed'] %}
                     <div style="padding:14px;background:rgba(239,68,68,0.06);border-radius:8px;text-align:center;color:#ef4444;font-size:0.88rem;border:1px solid rgba(239,68,68,0.15);">
                         <i class="fa fa-lock" style="margin-right:5px;"></i>Ce projet n'accepte plus d'investissements.
                     </div>
-                {% elseif projet.status not in ['en_cours', 'publie', 'in_progress'] %}
+                {% elseif projet.status not in ['in_progress'] %}
                     <div style="padding:14px;background:rgba(91,110,245,0.07);border-radius:8px;text-align:center;color:#5b6ef5;font-size:0.88rem;border:1px solid rgba(91,110,245,0.2);">
                         <i class="fa fa-clock" style="margin-right:5px;"></i>Ce projet n'est pas encore ouvert aux investissements.
                     </div>
-                {% elseif deja_investi %}
-                    <div style="padding:14px;background:rgba(6,214,160,0.08);border-radius:8px;text-align:center;color:#06d6a0;font-size:0.88rem;font-weight:600;border:1px solid rgba(6,214,160,0.2);">
-                        <i class="fa fa-check-circle" style="margin-right:6px;"></i>Vous avez déjà investi dans ce projet.
-                    </div>
-                    <a href="{{ path('app_front_investir', {'id': projet.project_id}) }}" class="btn-yellow" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:0.8rem;width:100%;">
-                        <i class="fa fa-plus"></i> Investir à nouveau
-                    </a>
                 {% else %}
-                    <a href="{{ path('app_front_investir', {'id': projet.project_id}) }}" class="btn-yellow" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font-size:1rem;padding:16px;">
-                        <i class="fa fa-hand-holding-usd"></i> Investir maintenant
-                    </a>
+                    {# Bouton Investir #}
+                    {% if deja_investi %}
+                        <div style="padding:12px 14px;background:rgba(6,214,160,0.08);border-radius:8px;color:#06d6a0;font-size:0.85rem;font-weight:600;border:1px solid rgba(6,214,160,0.2);margin-bottom:0.7rem;">
+                            <i class="fa fa-check-circle" style="margin-right:6px;"></i>Vous avez déjà investi dans ce projet.
+                        </div>
+                        <a href="{{ path('app_front_investir', {'id': projet.project_id}) }}" class="btn-yellow" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-bottom:0.7rem;">
+                            <i class="fa fa-plus"></i> Investir à nouveau
+                        </a>
+                    {% else %}
+                        <a href="{{ path('app_front_investir', {'id': projet.project_id}) }}" class="btn-yellow" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font-size:1rem;padding:14px;margin-bottom:0.7rem;">
+                            <i class="fa fa-hand-holding-usd"></i> Investir maintenant
+                        </a>
+                    {% endif %}
+
+                    {# Bouton Négocier — ouvre un modal de saisie du montant #}
+                    <button type="button" onclick="document.getElementById('neg-modal').style.display='flex'"
+                            style="width:100%;padding:12px;background:rgba(99,102,241,0.08);color:#6366f1;border:1.5px solid rgba(99,102,241,0.25);border-radius:8px;font-family:'Josefin Sans',sans-serif;font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s;">
+                        <i class="fa fa-handshake"></i> Négocier
+                    </button>
                 {% endif %}
             {% endif %}
 
@@ -176,4 +180,46 @@
         </div>
     </div>
 </div>
+
+{% if app.user and app.user.userType == 'investisseur' and projet.status == 'in_progress' %}
+{# ── Modal initier négociation ── #}
+<div id="neg-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:var(--white);border-radius:16px;padding:32px;max-width:480px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.25);position:relative;">
+        <button onclick="document.getElementById('neg-modal').style.display='none'"
+                style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:1.2rem;color:var(--text-muted);cursor:pointer;">
+            <i class="fa fa-times"></i>
+        </button>
+        <div style="font-family:'Josefin Sans',sans-serif;font-size:1.1rem;font-weight:700;color:var(--dark);margin-bottom:0.4rem;">
+            <i class="fa fa-handshake" style="color:#6366f1;margin-right:8px;"></i>Initier une négociation
+        </div>
+        <div style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1.5rem;">
+            Proposez un montant d'investissement pour <strong>{{ projet.title }}</strong>.
+            La startup pourra accepter, rejeter ou faire une contre-offre.
+        </div>
+        <form method="post" action="{{ path('app_negociation_initier', {'projectId': projet.project_id}) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('initier_neg_' ~ projet.project_id) }}">
+            <label style="display:block;font-size:0.8rem;font-weight:700;color:var(--dark);margin-bottom:6px;font-family:'Josefin Sans',sans-serif;text-transform:uppercase;letter-spacing:0.06em;">
+                Montant proposé (TND) <span style="color:#ef4444;">*</span>
+            </label>
+            <input type="number" name="montant" min="1" step="1" placeholder="Ex : 50 000" required
+                   style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:1rem;color:var(--dark);background:var(--light-bg);margin-bottom:1rem;box-sizing:border-box;">
+            <label style="display:block;font-size:0.8rem;font-weight:700;color:var(--dark);margin-bottom:6px;font-family:'Josefin Sans',sans-serif;text-transform:uppercase;letter-spacing:0.06em;">
+                Message d'introduction (optionnel)
+            </label>
+            <textarea name="message" rows="3" placeholder="Présentez brièvement votre intérêt pour ce projet…"
+                      style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:0.9rem;color:var(--dark);background:var(--light-bg);resize:none;box-sizing:border-box;margin-bottom:1.2rem;font-family:inherit;"></textarea>
+            <div style="display:flex;gap:0.7rem;">
+                <button type="submit"
+                        style="flex:1;padding:13px;background:#6366f1;color:var(--white);border:none;border-radius:8px;font-family:'Josefin Sans',sans-serif;font-weight:700;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.06em;cursor:pointer;">
+                    <i class="fa fa-paper-plane" style="margin-right:6px;"></i>Envoyer l'offre
+                </button>
+                <button type="button" onclick="document.getElementById('neg-modal').style.display='none'"
+                        style="padding:13px 18px;background:var(--light-bg);color:var(--text-muted);border:1.5px solid var(--border);border-radius:8px;font-family:'Josefin Sans',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer;">
+                    Annuler
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
 {% endblock %}

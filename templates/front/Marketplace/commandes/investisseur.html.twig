@@ -8,6 +8,55 @@
 {% endblock %}
 
 {% block body %}
+
+{% if notifications is defined and notifications|length > 0 %}
+<div id="toast-container" style="position:fixed;top:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:12px;max-width:360px;">
+  {% for notif in notifications %}
+  <div class="biz-toast" data-id="{{ notif.id }}" style="background:#fff;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.14);border-left:5px solid #28a745;padding:18px 20px 16px;display:flex;flex-direction:column;gap:6px;animation:slideIn .35s ease;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:1.1rem;">🤖</span>
+        <span style="font-family:'Josefin Sans',sans-serif;font-size:0.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#28a745;">Confirmation automatique</span>
+      </div>
+      <button onclick="dismissToast(this)" style="background:none;border:none;cursor:pointer;color:#aaa;font-size:1rem;line-height:1;padding:0;margin-left:8px;">✕</button>
+    </div>
+    <div style="font-size:0.9rem;color:#222;font-weight:600;">
+      Commande <strong>#{{ notif.commandeId }}</strong> confirmée
+    </div>
+    <div style="font-size:0.82rem;color:#555;">
+      Client&nbsp;: {{ notif.startupName }}<br>
+      Montant TTC&nbsp;: <strong>{{ notif.montantTtc }} TND</strong><br>
+      Score IA&nbsp;: <span style="color:#28a745;font-weight:700;">{{ notif.scoreAuto }}/100</span>
+    </div>
+    <div style="font-size:0.75rem;color:#999;margin-top:2px;">{{ notif.createdAt|date('d/m/Y H:i') }}</div>
+  </div>
+  {% endfor %}
+</div>
+
+<style>
+@keyframes slideIn { from { transform:translateX(120%); opacity:0; } to { transform:translateX(0); opacity:1; } }
+.biz-toast { transition: opacity .3s, transform .3s; }
+</style>
+
+<script>
+function dismissToast(btn) {
+  const toast = btn.closest('.biz-toast');
+  toast.style.opacity = '0';
+  toast.style.transform = 'translateX(120%)';
+  setTimeout(() => toast.remove(), 320);
+}
+document.addEventListener('DOMContentLoaded', function () {
+  fetch('{{ path("commande_notifications_mark_read") }}', { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+  setTimeout(function () {
+    document.querySelectorAll('.biz-toast').forEach(function (t) {
+      t.style.opacity = '0'; t.style.transform = 'translateX(120%)';
+      setTimeout(() => t.remove(), 320);
+    });
+  }, 8000);
+});
+</script>
+{% endif %}
+
 <div style="max-width:1200px; margin:0 auto; padding:60px 5%;">
 
   {# HEADER #}
@@ -66,6 +115,7 @@
             <th style="padding:16px; text-align:center; font-family:'Josefin Sans',sans-serif; font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);">Qty</th>
             <th style="padding:16px; text-align:left; font-family:'Josefin Sans',sans-serif; font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);">Total</th>
             <th style="padding:16px; text-align:left; font-family:'Josefin Sans',sans-serif; font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);">Statut</th>
+            <th style="padding:16px; text-align:center; font-family:'Josefin Sans',sans-serif; font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);">Score IA</th>
             <th style="padding:16px; text-align:center; font-family:'Josefin Sans',sans-serif; font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);">Actions</th>
           </tr>
         </thead>
@@ -86,24 +136,73 @@
               <td style="padding:16px; text-align:center; font-weight:700;">{{ cmd.quantite ?? cmd.lignes|reduce((sum, l) => sum + l.quantite, 0) }}</td>
               <td style="padding:16px; font-weight:700;">{{ cmd.totalTtc }} TND</td>
               <td style="padding:16px;">
-                {% set sl = cmd.statut|trim|lower %}
-                <span style="display:inline-flex; align-items:center; gap:4px; padding:6px 12px; border-radius:6px;
-                  background:{{ sl == 'en_attente' ? 'rgba(255,193,7,0.12)' : (sl == 'confirmee' ? 'rgba(34,197,94,0.12)' : (sl == 'livree' ? 'rgba(13,110,253,0.12)' : 'rgba(220,53,69,0.12)')) }};
-                  color:{{ sl == 'en_attente' ? '#92400e' : (sl == 'confirmee' ? '#15803d' : (sl == 'livree' ? '#084298' : '#991b1b')) }};
-                  font-size:0.78rem; font-weight:700; text-transform:uppercase;">
-                  <i class="fa fa-{{ sl == 'en_attente' ? 'clock' : (sl == 'confirmee' ? 'check-circle' : (sl == 'livree' ? 'truck' : 'times-circle')) }}"></i>
-                  {{ cmd.statut }}
+                {% set sl = cmd.effectiveStatut|trim|lower %}
+                {% set sl_d = sl in ['en_cours_paiement', 'payee'] ? 'confirmee' : sl %}
+                {% set inv_bg =
+                  sl_d == 'en_attente'      ? 'rgba(255,193,7,0.12)' :
+                  (sl_d == 'confirmee'      ? 'rgba(34,197,94,0.12)' :
+                  (sl_d == 'en_preparation' ? 'rgba(245,158,11,0.12)' :
+                  (sl_d == 'livree'         ? 'rgba(13,110,253,0.12)' :
+                  'rgba(220,53,69,0.12)')))
+                %}
+                {% set inv_color =
+                  sl_d == 'en_attente'      ? '#92400e' :
+                  (sl_d == 'confirmee'      ? '#15803d' :
+                  (sl_d == 'en_preparation' ? '#78350f' :
+                  (sl_d == 'livree'         ? '#084298' :
+                  '#991b1b')))
+                %}
+                {% set inv_icon =
+                  sl_d == 'en_attente'      ? 'clock' :
+                  (sl_d == 'confirmee'      ? 'check-circle' :
+                  (sl_d == 'en_preparation' ? 'box-open' :
+                  (sl_d == 'livree'         ? 'truck' :
+                  (sl_d == 'annulee'        ? 'ban' :
+                  'circle-question'))))
+                %}
+                <span style="display:inline-flex; align-items:center; gap:4px; padding:6px 12px; border-radius:6px; background:{{ inv_bg }}; color:{{ inv_color }}; font-size:0.78rem; font-weight:700; text-transform:uppercase;">
+                  <i class="fa fa-{{ inv_icon }}"></i>
+                  {{ sl_d|replace({'_': ' '})|title }}
                 </span>
+                {% if cmd.estPayee %}
+                <span style="display:inline-flex; align-items:center; gap:3px; padding:3px 7px; border-radius:4px; background:rgba(16,185,129,0.1); color:#065f46; font-size:0.62rem; font-weight:700; text-transform:uppercase; margin-top:3px;">
+                  <i class="fa fa-coins"></i> Payée
+                </span>
+                {% endif %}
               </td>
+              {# ── Colonne Score IA ── #}
+              <td style="padding:16px; text-align:center;">
+                {% if cmd.scoreAuto is not null %}
+                  {% set sc = cmd.scoreAuto %}
+                  {% set sc_color = sc >= 70 ? '#065f46' : (sc >= 40 ? '#92400e' : '#991b1b') %}
+                  {% set sc_bg    = sc >= 70 ? 'rgba(16,185,129,0.12)' : (sc >= 40 ? 'rgba(245,158,11,0.12)' : 'rgba(220,53,69,0.12)') %}
+                  {% set sc_label = sc >= 70 ? 'Élevé' : (sc >= 40 ? 'Modéré' : 'Faible') %}
+                  <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                    <span style="font-family:'Josefin Sans',sans-serif; font-size:1rem; font-weight:800; color:{{ sc_color }};">{{ sc }}<span style="font-size:0.65rem; color:var(--muted);">/100</span></span>
+                    <span style="padding:3px 8px; border-radius:4px; background:{{ sc_bg }}; color:{{ sc_color }}; font-family:'Josefin Sans',sans-serif; font-size:0.62rem; font-weight:700; text-transform:uppercase;">{{ sc_label }}</span>
+                    {# Mini jauge #}
+                    <div style="width:60px; height:4px; background:var(--border); border-radius:2px; overflow:hidden;">
+                      <div style="height:100%; width:{{ sc }}%; background:{{ sc_color }}; border-radius:2px;"></div>
+                    </div>
+                  </div>
+                {% else %}
+                  <span style="color:var(--muted); font-size:0.75rem;">—</span>
+                {% endif %}
+              </td>
+
+              {# ── Colonne Actions ── #}
               <td style="padding:16px; text-align:center;">
                 <div style="display:flex; gap:6px; justify-content:center; flex-wrap:wrap;">
+
+                  {# Voir détail #}
                   <a href="{{ path('commande_show', {id: cmd.idCommande}) }}" style="background:var(--primary); color:var(--dark); border:none; padding:6px 10px; border-radius:4px; cursor:pointer; font-weight:700; font-size:0.7rem; text-decoration:none; display:inline-flex; align-items:center; gap:4px; transition:background 0.2s;" onmouseover="this.style.background='var(--primary-dark)'" onmouseout="this.style.background='var(--primary)'">
                     <i class="fa fa-eye"></i> Voir
                   </a>
 
-                  {% if cmd.statut == 'en_attente' %}
+                  {# ── En attente : confirmer ou refuser ── #}
+                  {% if cmd.effectiveStatut == 'en_attente' %}
                     <form method="POST" action="{{ path('commande_confirmer', {id: cmd.idCommande}) }}" style="display:inline;"
-                          data-confirm="Confirmer la commande #{{ cmd.idCommande }} ? Le stock des produits sera décrémenté automatiquement."
+                          data-confirm="Confirmer la commande #{{ cmd.idCommande }} ? Le stock sera décrémenté et un SMS envoyé à la startup."
                           data-confirm-type="success">
                       <input type="hidden" name="_token" value="{{ csrf_token('confirmer_' ~ cmd.idCommande) }}">
                       <button type="submit" style="background:#28a745; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; font-weight:700; font-size:0.7rem; display:inline-flex; align-items:center; gap:4px;">
@@ -111,31 +210,73 @@
                       </button>
                     </form>
                     <form method="POST" action="{{ path('commande_refuser', {id: cmd.idCommande}) }}" style="display:inline;"
-                          data-confirm="Annuler la commande #{{ cmd.idCommande }} ? Elle sera marquée comme annulée."
+                          data-confirm="Refuser la commande #{{ cmd.idCommande }} ?"
                           data-confirm-type="danger">
                       <input type="hidden" name="_token" value="{{ csrf_token('refuser_' ~ cmd.idCommande) }}">
                       <button type="submit" style="background:#dc3545; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; font-weight:700; font-size:0.7rem; display:inline-flex; align-items:center; gap:4px;">
-                        <i class="fa fa-times"></i> Annuler
+                        <i class="fa fa-times"></i> Refuser
                       </button>
                     </form>
-                  {% elseif cmd.statut == 'confirmee' %}
+
+                  {# ── Confirmée : attente paiement — Livrer BLOQUÉ ── #}
+                  {% elseif cmd.effectiveStatut == 'confirmee' %}
+                    <span style="display:inline-flex; align-items:center; gap:4px; padding:6px 10px; background:rgba(99,102,241,0.1); border-radius:4px; color:#3730a3; font-weight:700; font-size:0.7rem;">
+                      <i class="fa fa-hourglass-half"></i> Attend paiement
+                    </span>
+                    {# Bouton désactivé avec tooltip #}
+                    <button disabled title="Livraison disponible après paiement de la startup"
+                      style="background:#e5e7eb; color:#9ca3af; border:none; padding:6px 10px; border-radius:4px; cursor:not-allowed; font-weight:700; font-size:0.7rem; display:inline-flex; align-items:center; gap:4px; opacity:0.7;">
+                      <i class="fa fa-lock"></i> Livrer
+                    </button>
+
+                  {# ── En cours de paiement ── #}
+                  {% elseif cmd.effectiveStatut == 'en_cours_paiement' %}
+                    <span style="display:inline-flex; align-items:center; gap:4px; padding:6px 10px; background:rgba(99,102,241,0.1); border-radius:4px; color:#3730a3; font-weight:700; font-size:0.7rem;">
+                      <i class="fa fa-spinner fa-spin"></i> Paiement en cours
+                    </span>
+                    <button disabled title="Livraison disponible après confirmation du paiement"
+                      style="background:#e5e7eb; color:#9ca3af; border:none; padding:6px 10px; border-radius:4px; cursor:not-allowed; font-weight:700; font-size:0.7rem; display:inline-flex; align-items:center; gap:4px; opacity:0.7;">
+                      <i class="fa fa-lock"></i> Livrer
+                    </button>
+
+                  {# ── Payée : investisseur peut livrer ── #}
+                  {% elseif cmd.effectiveStatut == 'payee' %}
+                    <span style="display:inline-flex; align-items:center; gap:4px; padding:6px 10px; background:rgba(16,185,129,0.1); border-radius:4px; color:#065f46; font-weight:700; font-size:0.7rem;">
+                      <i class="fa fa-coins"></i> Payée
+                    </span>
                     <form method="POST" action="{{ path('commande_livrer', {id: cmd.idCommande}) }}" style="display:inline;"
-                          data-confirm="Marquer la commande #{{ cmd.idCommande }} comme livrée ? Le client sera notifié du changement de statut."
-                          data-confirm-type="deliver">
+                          data-confirm="Marquer la commande #{{ cmd.idCommande }} comme livrée ?"
+                          data-confirm-type="info">
                       <input type="hidden" name="_token" value="{{ csrf_token('livrer_' ~ cmd.idCommande) }}">
                       <button type="submit" style="background:#0d6efd; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; font-weight:700; font-size:0.7rem; display:inline-flex; align-items:center; gap:4px;">
                         <i class="fa fa-truck"></i> Livrer
                       </button>
                     </form>
+
+                  {# ── En préparation ── #}
+                  {% elseif cmd.effectiveStatut == 'en_preparation' %}
+                    <form method="POST" action="{{ path('commande_livrer', {id: cmd.idCommande}) }}" style="display:inline;"
+                          data-confirm="Commande #{{ cmd.idCommande }} prête à être livrée ?"
+                          data-confirm-type="info">
+                      <input type="hidden" name="_token" value="{{ csrf_token('livrer_' ~ cmd.idCommande) }}">
+                      <button type="submit" style="background:#0d6efd; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; font-weight:700; font-size:0.7rem; display:inline-flex; align-items:center; gap:4px;">
+                        <i class="fa fa-truck"></i> Livrer
+                      </button>
+                    </form>
+
+                  {# ── Annulée ── #}
                   {% elseif cmd.statut == 'annulee' %}
                     <span style="display:inline-flex; align-items:center; gap:4px; padding:6px 10px; background:rgba(220,53,69,0.1); border-radius:4px; color:#dc3545; font-weight:700; font-size:0.7rem;">
                       <i class="fa fa-times-circle"></i> Annulée
                     </span>
+
+                  {# ── Livrée ── #}
                   {% elseif cmd.statut == 'livree' %}
                     <span style="display:inline-flex; align-items:center; gap:4px; padding:6px 10px; background:rgba(13,110,253,0.1); border-radius:4px; color:#0d6efd; font-weight:700; font-size:0.7rem;">
                       <i class="fa fa-check-double"></i> Livrée
                     </span>
                   {% endif %}
+
                 </div>
               </td>
             </tr>

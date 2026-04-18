@@ -1,0 +1,160 @@
+{% extends 'front/Marketplace/base_marketplace.html.twig' %}
+
+{% block title %}Analyse de marché — {{ produit.nom }}{% endblock %}
+{% block hero_eyebrow %}Intelligence artificielle{% endblock %}
+{% block hero_title %}Analyse de <span>marché</span>{% endblock %}
+{% block breadcrumb_extra %}
+  <i class="fa fa-chevron-right" style="font-size:.55rem"></i>
+  <a href="{{ back_url }}">{{ back_label }}</a>
+  <i class="fa fa-chevron-right" style="font-size:.55rem"></i>
+  Analyse IA
+{% endblock %}
+
+{% block body %}
+<div style="max-width:960px; margin:0 auto; padding:60px 5%;">
+
+  {# ── HEADER PRODUIT ─────────────────────────────────────────────────── #}
+  <div style="background:var(--white); border-radius:14px; border:1.5px solid var(--border); padding:24px 28px; margin-bottom:2rem; box-shadow:0 4px 20px rgba(0,0,0,0.07); display:flex; align-items:center; gap:20px; flex-wrap:wrap;">
+
+    <div style="width:56px; height:56px; border-radius:14px; background:linear-gradient(135deg,#6366f1,#8b5cf6); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+      <i class="fa fa-chart-line" style="font-size:1.4rem; color:white;"></i>
+    </div>
+
+    <div style="flex:1; min-width:200px;">
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:0.65rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;">Produit analysé</div>
+      <div style="font-family:'Lora',serif; font-size:1.3rem; font-weight:700; color:var(--dark);">{{ produit.nom }}</div>
+      {% if produit.categorie is defined and produit.categorie %}
+        <div style="font-size:0.82rem; color:var(--muted); margin-top:2px;">
+          <i class="fa fa-tag" style="margin-right:4px;"></i>{{ produit.categorie }}
+        </div>
+      {% endif %}
+    </div>
+
+    <div style="text-align:right;">
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:0.65rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;">Prix unitaire</div>
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:1.4rem; font-weight:800; color:var(--primary);">
+        {{ produit.prix }} <span style="font-size:0.8rem; color:var(--muted);">TND</span>
+      </div>
+    </div>
+
+    {% if analysis.source == 'groq' %}
+      <span style="padding:6px 14px; border-radius:20px; background:linear-gradient(135deg,#6366f1,#8b5cf6); color:white; font-family:'Josefin Sans',sans-serif; font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; flex-shrink:0;">
+        <i class="fa fa-bolt"></i> Grok AI
+      </span>
+    {% else %}
+      <span style="padding:6px 14px; border-radius:20px; background:var(--light-bg); color:var(--muted); font-family:'Josefin Sans',sans-serif; font-size:0.65rem; font-weight:700; text-transform:uppercase; flex-shrink:0;">
+        <i class="fa fa-robot"></i> Analyse locale
+      </span>
+    {% endif %}
+
+  </div>
+
+  {# ── KPI CARDS : Demande / Concurrence / Potentiel ──────────────────── #}
+  <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1.2rem; margin-bottom:2rem;">
+
+    {# Demande #}
+    {% set d_val = analysis.demand ?? 'moyenne' %}
+    {% set d_color = d_val == 'forte' ? '#10b981' : (d_val == 'moyenne' ? '#f59e0b' : '#ef4444') %}
+    {% set d_bg    = d_val == 'forte' ? 'rgba(16,185,129,0.08)' : (d_val == 'moyenne' ? 'rgba(245,158,11,0.08)' : 'rgba(239,68,68,0.08)') %}
+    {% set d_icon  = d_val == 'forte' ? 'arrow-trend-up' : (d_val == 'moyenne' ? 'arrows-left-right' : 'arrow-trend-down') %}
+    <div style="background:var(--white); border-radius:14px; border:1.5px solid var(--border); padding:24px; text-align:center; box-shadow:0 2px 12px rgba(0,0,0,0.05); border-top:4px solid {{ d_color }};">
+      <div style="width:48px; height:48px; border-radius:12px; background:{{ d_bg }}; display:flex; align-items:center; justify-content:center; margin:0 auto 12px;">
+        <i class="fa fa-chart-bar" style="font-size:1.2rem; color:{{ d_color }};"></i>
+      </div>
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:0.62rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px;">Demande estimée</div>
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:1.1rem; font-weight:800; color:{{ d_color }}; text-transform:capitalize;">{{ d_val }}</div>
+    </div>
+
+    {# Concurrence #}
+    {% set c_val = analysis.competition ?? 'moyenne' %}
+    {% set c_color = c_val == 'faible' ? '#10b981' : (c_val == 'moyenne' ? '#f59e0b' : '#ef4444') %}
+    {% set c_bg    = c_val == 'faible' ? 'rgba(16,185,129,0.08)' : (c_val == 'moyenne' ? 'rgba(245,158,11,0.08)' : 'rgba(239,68,68,0.08)') %}
+    <div style="background:var(--white); border-radius:14px; border:1.5px solid var(--border); padding:24px; text-align:center; box-shadow:0 2px 12px rgba(0,0,0,0.05); border-top:4px solid {{ c_color }};">
+      <div style="width:48px; height:48px; border-radius:12px; background:{{ c_bg }}; display:flex; align-items:center; justify-content:center; margin:0 auto 12px;">
+        <i class="fa fa-users" style="font-size:1.2rem; color:{{ c_color }};"></i>
+      </div>
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:0.62rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px;">Niveau concurrence</div>
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:1.1rem; font-weight:800; color:{{ c_color }}; text-transform:capitalize;">{{ c_val }}</div>
+    </div>
+
+    {# Potentiel #}
+    {% set p_val = analysis.potential ?? 'prometteur' %}
+    {% set p_color = p_val == 'élevé' ? '#10b981' : (p_val == 'prometteur' ? '#6366f1' : '#ef4444') %}
+    {% set p_bg    = p_val == 'élevé' ? 'rgba(16,185,129,0.08)' : (p_val == 'prometteur' ? 'rgba(99,102,241,0.08)' : 'rgba(239,68,68,0.08)') %}
+    {% set p_icon  = p_val == 'élevé' ? 'rocket' : (p_val == 'prometteur' ? 'seedling' : 'exclamation-triangle') %}
+    <div style="background:var(--white); border-radius:14px; border:1.5px solid var(--border); padding:24px; text-align:center; box-shadow:0 2px 12px rgba(0,0,0,0.05); border-top:4px solid {{ p_color }};">
+      <div style="width:48px; height:48px; border-radius:12px; background:{{ p_bg }}; display:flex; align-items:center; justify-content:center; margin:0 auto 12px;">
+        <i class="fa fa-{{ p_icon }}" style="font-size:1.2rem; color:{{ p_color }};"></i>
+      </div>
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:0.62rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px;">Potentiel commercial</div>
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:1.1rem; font-weight:800; color:{{ p_color }}; text-transform:capitalize;">{{ p_val }}</div>
+    </div>
+
+  </div>
+
+  {# ── RÉSUMÉ STRATÉGIQUE ──────────────────────────────────────────────── #}
+  {% if analysis.summary is defined and analysis.summary %}
+  <div style="background:var(--white); border-radius:14px; border:1.5px solid var(--border); padding:28px; margin-bottom:2rem; box-shadow:0 4px 20px rgba(0,0,0,0.07);">
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+      <div style="width:32px; height:32px; border-radius:8px; background:linear-gradient(135deg,#6366f1,#8b5cf6); display:flex; align-items:center; justify-content:center;">
+        <i class="fa fa-lightbulb" style="color:white; font-size:0.85rem;"></i>
+      </div>
+      <span style="font-family:'Lora',serif; font-size:1rem; font-weight:700; color:var(--dark);">Résumé stratégique</span>
+    </div>
+    <p style="font-size:0.92rem; color:var(--dark); line-height:1.7; margin:0; padding:16px 20px; background:linear-gradient(135deg, rgba(99,102,241,0.04), rgba(139,92,246,0.04)); border-left:3px solid #6366f1; border-radius:0 10px 10px 0;">
+      <i class="fa fa-quote-left" style="color:#6366f1; margin-right:8px; font-size:0.8rem;"></i>{{ analysis.summary }}
+    </p>
+  </div>
+  {% endif %}
+
+  {# ── CONSEILS STRATÉGIQUES ───────────────────────────────────────────── #}
+  {% if analysis.tips is defined and analysis.tips|length > 0 %}
+  <div style="background:var(--white); border-radius:14px; border:1.5px solid var(--border); padding:28px; margin-bottom:2rem; box-shadow:0 4px 20px rgba(0,0,0,0.07);">
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+      <div style="width:32px; height:32px; border-radius:8px; background:rgba(255,190,51,0.2); display:flex; align-items:center; justify-content:center;">
+        <i class="fa fa-star" style="color:var(--primary); font-size:0.85rem;"></i>
+      </div>
+      <span style="font-family:'Lora',serif; font-size:1rem; font-weight:700; color:var(--dark);">Recommandations</span>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      {% for tip in analysis.tips %}
+        <div style="display:flex; align-items:flex-start; gap:14px; padding:14px 18px; background:var(--light-bg); border-radius:10px; border:1px solid var(--border);">
+          <div style="width:28px; height:28px; border-radius:50%; background:var(--primary); display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;">
+            <span style="font-family:'Josefin Sans',sans-serif; font-size:0.7rem; font-weight:800; color:var(--dark);">{{ loop.index }}</span>
+          </div>
+          <p style="font-size:0.88rem; color:var(--dark); line-height:1.55; margin:0; padding-top:4px;">{{ tip }}</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {# ── NOTE DISCLAIMER ─────────────────────────────────────────────────── #}
+  <div style="padding:16px 20px; background:rgba(245,158,11,0.06); border-radius:10px; border:1px solid rgba(245,158,11,0.2); display:flex; align-items:flex-start; gap:12px; margin-bottom:2rem;">
+    <i class="fa fa-info-circle" style="color:#f59e0b; font-size:1rem; flex-shrink:0; margin-top:2px;"></i>
+    <p style="font-size:0.8rem; color:var(--muted); line-height:1.55; margin:0;">
+      Cette analyse est générée automatiquement par intelligence artificielle à titre indicatif.
+      Elle ne constitue pas un conseil financier ou commercial. Consultez des experts sectoriels pour des décisions stratégiques importantes.
+      {% if analysis.source == 'fallback' %}
+        <strong>(Mode hors-ligne — résultats génériques)</strong>
+      {% endif %}
+    </p>
+  </div>
+
+  {# ── ACTIONS ─────────────────────────────────────────────────────────── #}
+  <div style="display:flex; gap:1rem; flex-wrap:wrap; align-items:center;">
+    <a href="{{ back_url }}" class="btn-outline">
+      <i class="fa fa-arrow-left"></i> {{ back_label }}
+    </a>
+    {% if context == 'commande' and commande is not null %}
+      <a href="{{ path('commande_show', {id: commande.idCommande}) }}" class="btn-ghost">
+        <i class="fa fa-file-invoice"></i> Voir la commande
+      </a>
+    {% endif %}
+    <a href="{{ path('produit_index') }}" class="btn-ghost">
+      <i class="fa fa-store"></i> Marketplace
+    </a>
+  </div>
+
+</div>
+{% endblock %}

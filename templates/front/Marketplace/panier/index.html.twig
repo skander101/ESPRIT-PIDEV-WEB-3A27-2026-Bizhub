@@ -174,6 +174,85 @@
   </section>
 </main>
 
+{# ── SUGGESTIONS COMPLÉMENTAIRES ── #}
+{% if suggestions is defined and suggestions|length > 0 %}
+<section style="background:var(--white); border-top:1.5px solid var(--border); padding:50px 5%;">
+  <div style="max-width:1200px; margin:0 auto;">
+
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:1.8rem;">
+      <div style="width:4px; height:28px; background:var(--primary); border-radius:2px;"></div>
+      <div>
+        <div style="font-family:'Josefin Sans',sans-serif; font-size:0.6rem; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:var(--primary-dark);">Vous pourriez aussi aimer</div>
+        <div style="font-family:'Lora',serif; font-size:1.15rem; font-weight:700; color:var(--dark);">Suggestions complémentaires</div>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:1.2rem;">
+      {% for p in suggestions %}
+        <div style="background:var(--light-bg); border-radius:12px; border:1.5px solid var(--border); overflow:hidden; display:flex; flex-direction:column; transition:transform .2s, box-shadow .2s;"
+             onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 10px 28px rgba(0,0,0,.1)'"
+             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+
+          {# Image #}
+          <a href="{{ path('produit_show', {id: p.idProduit}) }}"
+             style="display:flex; align-items:center; justify-content:center; height:140px; overflow:hidden; background:var(--white);">
+            {% if p.imagePath %}
+              <img src="{{ asset('assets/images/productimages/' ~ p.imagePath) }}" alt="{{ p.nom }}"
+                   style="width:100%; height:140px; object-fit:cover; transition:transform .35s;"
+                   onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+            {% else %}
+              <i class="fa fa-cube" style="font-size:2.5rem; color:rgba(255,190,51,.3);"></i>
+            {% endif %}
+          </a>
+
+          {# Body #}
+          <div style="padding:14px; flex:1; display:flex; flex-direction:column; gap:.35rem;">
+            {% if p.categorie %}
+              <span style="font-family:'Josefin Sans',sans-serif; font-size:.58rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--primary-dark);">{{ p.categorie }}</span>
+            {% endif %}
+            <a href="{{ path('produit_show', {id: p.idProduit}) }}"
+               style="font-family:'Lora',serif; font-size:.88rem; font-weight:700; color:var(--dark); text-decoration:none; line-height:1.35; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;"
+               onmouseover="this.style.color='var(--primary-dark)'" onmouseout="this.style.color='var(--dark)'">
+              {{ p.nom }}
+            </a>
+            <span style="font-family:'Josefin Sans',sans-serif; font-size:.98rem; font-weight:800; color:var(--dark); margin-top:auto;">
+              {{ p.prix }} <span style="font-size:.65rem; color:var(--text-muted); font-weight:400;">TND</span>
+            </span>
+          </div>
+
+          {# Actions #}
+          <div style="padding:10px 14px; border-top:1px solid var(--border); display:flex; gap:.5rem;">
+            <a href="{{ path('produit_show', {id: p.idProduit}) }}"
+               style="flex:1; text-align:center; padding:7px; border:1.5px solid var(--border); border-radius:6px; font-family:'Josefin Sans',sans-serif; font-size:.7rem; font-weight:700; text-transform:uppercase; text-decoration:none; color:var(--dark); transition:all .15s;"
+               onmouseover="this.style.borderColor='var(--dark)'" onmouseout="this.style.borderColor='var(--border)'">
+              <i class="fa fa-eye"></i>
+            </a>
+            {% if p.disponible %}
+              <form method="post" action="{{ path('panier_add', {id: p.idProduit}) }}" style="flex:2;">
+                <input type="hidden" name="_token" value="{{ csrf_token('add_panier_' ~ p.idProduit) }}">
+                <input type="hidden" name="quantite" value="1">
+                <input type="hidden" name="redirect" value="panier">
+                <button type="submit"
+                        style="width:100%; padding:7px; background:var(--primary); border:none; border-radius:6px; font-family:'Josefin Sans',sans-serif; font-size:.7rem; font-weight:700; text-transform:uppercase; cursor:pointer; color:var(--dark); transition:background .15s; display:flex; align-items:center; justify-content:center; gap:5px;"
+                        onmouseover="this.style.background='var(--primary-dark)'" onmouseout="this.style.background='var(--primary)'">
+                  <i class="fa fa-cart-plus"></i> Ajouter
+                </button>
+              </form>
+            {% else %}
+              <div style="flex:2; padding:7px; text-align:center; background:rgba(220,53,69,.08); border-radius:6px; font-family:'Josefin Sans',sans-serif; font-size:.65rem; font-weight:700; color:#dc3545;">
+                Indisponible
+              </div>
+            {% endif %}
+          </div>
+
+        </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+{% endif %}
+
 <footer>
   <p>&copy; 2026 BizHub Platform. Tous droits réservés.</p>
 </footer>

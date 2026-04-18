@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Facture {{ facture.numeroFacture }}</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: DejaVu Sans, sans-serif;
+      font-size: 11px;
+      color: #1e293b;
+      line-height: 1.5;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: #1e293b;
+      color: white;
+      padding: 28px 36px;
+      display: table;
+      width: 100%;
+    }
+    .header-left  { display: table-cell; vertical-align: top; }
+    .header-right { display: table-cell; vertical-align: top; text-align: right; }
+    .brand { font-size: 22px; font-weight: 900; color: #ffbe33; letter-spacing: -0.5px; }
+    .brand-sub { font-size: 9px; color: rgba(255,255,255,0.55); margin-top: 2px; }
+    .facture-label { font-size: 9px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1.5px; }
+    .facture-num { font-size: 18px; font-weight: 800; color: white; }
+    .facture-date { font-size: 9px; color: rgba(255,255,255,0.65); margin-top: 4px; }
+
+    /* ── Badge payé ── */
+    .badge-paid {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 3px 12px;
+      background: rgba(16,185,129,0.25);
+      border: 1px solid rgba(16,185,129,0.5);
+      border-radius: 12px;
+      color: #6ee7b7;
+      font-size: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* ── Parties ── */
+    .parties { display: table; width: 100%; border-bottom: 1px solid #e2e8f0; }
+    .party { display: table-cell; padding: 20px 36px; width: 50%; }
+    .party + .party { border-left: 1px solid #e2e8f0; }
+    .label-section { font-size: 8px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
+    .party-name { font-size: 11px; font-weight: 700; color: #1e293b; margin-bottom: 3px; }
+    .party-info { font-size: 10px; color: #64748b; margin-top: 2px; }
+    .ref-row { display: table; width: 100%; margin-bottom: 5px; }
+    .ref-label { display: table-cell; color: #64748b; font-size: 10px; }
+    .ref-value { display: table-cell; text-align: right; font-weight: 700; color: #1e293b; font-size: 10px; }
+
+    /* ── Table articles ── */
+    .articles { width: 100%; border-collapse: collapse; }
+    .articles thead tr { background: #f8fafc; }
+    .articles th {
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 8px;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .articles th.right { text-align: right; }
+    .articles th.center { text-align: center; }
+    .articles td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 10px;
+      color: #1e293b;
+    }
+    .articles td.right { text-align: right; }
+    .articles td.center { text-align: center; font-weight: 700; }
+    .articles td.bold { font-weight: 700; }
+    .articles td .sub { font-size: 9px; color: #94a3b8; margin-top: 2px; }
+
+    /* ── Totaux ── */
+    .totaux { padding: 16px 36px; background: #f8fafc; border-top: 2px solid #e2e8f0; }
+    .totaux-row { display: table; width: 100%; margin-bottom: 5px; max-width: 300px; margin-left: auto; }
+    .totaux-label { display: table-cell; font-size: 10px; color: #64748b; }
+    .totaux-value { display: table-cell; text-align: right; font-size: 10px; font-weight: 600; color: #1e293b; }
+    .totaux-total-row { display: table; width: 100%; max-width: 300px; margin-left: auto; margin-top: 10px; border-top: 2px solid #e2e8f0; padding-top: 10px; }
+    .totaux-total-label { display: table-cell; font-size: 10px; font-weight: 700; color: #1e293b; text-transform: uppercase; letter-spacing: 0.5px; }
+    .totaux-total-value { display: table-cell; text-align: right; font-size: 16px; font-weight: 900; color: #ffbe33; }
+    .totaux-total-cur { font-size: 10px; color: #94a3b8; }
+
+    /* ── Footer ── */
+    .footer {
+      padding: 14px 36px;
+      border-top: 1px solid #e2e8f0;
+      display: table;
+      width: 100%;
+    }
+    .footer-left  { display: table-cell; font-size: 8.5px; color: #94a3b8; font-style: italic; vertical-align: middle; }
+    .footer-right { display: table-cell; text-align: right; vertical-align: middle; }
+    .stripe-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      background: rgba(16,185,129,0.08);
+      border-radius: 10px;
+      color: #10b981;
+      font-size: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+  </style>
+</head>
+<body>
+
+  {# Header #}
+  <div class="header">
+    <div class="header-left">
+      <div style="display:table; margin-bottom:4px;">
+        <div style="display:table-cell; vertical-align:middle; width:40px; height:40px; background:#ffbe33; border-radius:8px; text-align:center; padding-top:8px;">
+          <span style="font-size:16px; font-weight:900; color:#1e293b; font-family:DejaVu Sans,sans-serif;">B</span>
+        </div>
+        <div style="display:table-cell; vertical-align:middle; padding-left:10px;">
+          <div class="brand">BizHub</div>
+          <div class="brand-sub">Plateforme B2B Startups &amp; Investisseurs</div>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="facture-label">FACTURE</div>
+      <div class="facture-num">{{ facture.numeroFacture }}</div>
+      <div class="facture-date">Date : {{ facture.dateFacture|date('d/m/Y') }}</div>
+      <div class="badge-paid">✓ PAYÉE</div>
+    </div>
+  </div>
+
+  {# Parties #}
+  <div class="parties">
+    <div class="party">
+      <div class="label-section">ÉMISE À</div>
+      <div class="party-name">Client #{{ commande.idClient }}</div>
+      <div class="party-info">Commande #{{ commande.idCommande }}</div>
+      <div class="party-info">{{ commande.dateCommande|date('d/m/Y') }}</div>
+    </div>
+    <div class="party">
+      <div class="label-section">RÉFÉRENCES</div>
+      <div class="ref-row"><span class="ref-label">N° Facture</span><span class="ref-value">{{ facture.numeroFacture }}</span></div>
+      <div class="ref-row"><span class="ref-label">Date paiement</span><span class="ref-value">{{ commande.paidAt ? commande.paidAt|date('d/m/Y') : facture.dateFacture|date('d/m/Y') }}</span></div>
+      {% if facture.stripeRef %}
+      <div class="ref-row" style="margin-top:6px; border-top:1px dashed #e2e8f0; padding-top:6px;">
+        <span class="ref-label">Réf. Stripe</span>
+        <span class="ref-value" style="font-size:8px; font-family:monospace;">{{ facture.stripeRef|slice(0, 28) }}</span>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  {# Articles #}
+  <table class="articles">
+    <thead>
+      <tr>
+        <th style="padding-left:36px;">Désignation</th>
+        <th class="center">Qté</th>
+        <th class="right">PU HT</th>
+        <th class="right">TVA</th>
+        <th class="right">Total HT</th>
+        <th class="right" style="padding-right:36px;">Total TTC</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for detail in lignes_detail %}
+        {% set ligne = detail.ligne %}
+        <tr>
+          <td style="padding-left:36px;" class="bold">
+            {{ detail.nom }}
+            {% if detail.produit and detail.produit.categorie is defined and detail.produit.categorie %}
+              <div class="sub">{{ detail.produit.categorie }}</div>
+            {% endif %}
+          </td>
+          <td class="center">{{ ligne ? ligne.quantite : 1 }}</td>
+          <td class="right">{{ ligne ? ligne.prixHtUnitaire : facture.totalHt }} TND</td>
+          <td class="right" style="color:#64748b;">{{ ligne ? ligne.tvaRate : '19.00' }}%</td>
+          <td class="right" style="color:#64748b;">
+            {% if ligne %}
+              {{ (ligne.prixHtUnitaire * ligne.quantite)|number_format(3, '.', ' ') }}
+            {% else %}
+              {{ facture.totalHt }}
+            {% endif %}
+            TND
+          </td>
+          <td class="right bold" style="padding-right:36px;">
+            {{ ligne ? ligne.totalTtc|number_format(3, '.', ' ') : facture.totalTtc }} TND
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {# Totaux #}
+  <div class="totaux">
+    <div class="totaux-row">
+      <span class="totaux-label">Sous-total HT</span>
+      <span class="totaux-value">{{ facture.totalHt }} TND</span>
+    </div>
+    <div class="totaux-row">
+      <span class="totaux-label">TVA (19%)</span>
+      <span class="totaux-value">{{ facture.totalTva }} TND</span>
+    </div>
+    <div class="totaux-total-row">
+      <span class="totaux-total-label">Total TTC</span>
+      <span class="totaux-total-value">{{ facture.totalTtc }} <span class="totaux-total-cur">TND</span></span>
+    </div>
+  </div>
+
+  {# Footer #}
+  <div class="footer">
+    <div class="footer-left">
+      Document généré automatiquement par BizHub. Non contractuel sans signature originale.
+    </div>
+    <div class="footer-right">
+      <span class="stripe-badge">✓ Paiement sécurisé Stripe</span>
+    </div>
+  </div>
+
+</body>
+</html>
