@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\AI;
+namespace App\Service\Ai;
 
 use Doctrine\DBAL\Connection;
 use Psr\Log\LoggerInterface;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\AI;
+namespace App\Service\Ai;
 
 class AiNavigationBotService
 {

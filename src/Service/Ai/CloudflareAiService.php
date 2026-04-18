@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\AI;
+namespace App\Service\Ai;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
