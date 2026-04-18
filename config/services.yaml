@@ -52,7 +52,7 @@ services:
             $faceApiKey: '%face.api_key%'
             $faceApiSecret: '%face.api_secret%'
 
-    App\Service\Ai\CloudflareAiService:
+    App\Service\AI\CloudflareAiService:
         arguments:
             $cloudflareApiToken: '%app.cloudflare_api_token%'
             $cloudflareAccountId: '%app.cloudflare_acc_id%'
@@ -109,6 +109,12 @@ services:
     App\Service\NewsService:
         arguments:
             $gnewsApiKey: '%app.gnews_api_key%'
+
+    App\Command\TwilioTestCommand:
+        arguments:
+            $twilioAccountSid: '%app.twilio_account_sid%'
+            $twilioAuthToken: '%app.twilio_auth_token%'
+            $twilioWhatsappFrom: '%app.twilio_whatsapp_from%'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

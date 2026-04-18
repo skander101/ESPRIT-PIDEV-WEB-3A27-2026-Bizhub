@@ -566,6 +566,16 @@ class CommandeController extends AbstractController
         $livrableStatuts = [
             Commande::STATUT_PAYEE,
             Commande::STATUT_EN_PREPARATION,
+<<<<<<< HEAD
+            Commande::STATUT_CONFIRMEE,
+        ];
+        if (!in_array($commande->getEffectiveStatut(), $livrableStatuts, true)) {
+            $this->addFlash('warning', 'Cette commande ne peut pas encore être marquée comme livrée.');
+            return $this->redirectToRoute('commande_investisseur_recues');
+        }
+        // Paiement requis sauf pour les commandes confirmées manuellement par l'investisseur
+        if (!$commande->isEstPayee() && $commande->getStatut() !== Commande::STATUT_CONFIRMEE) {
+=======
         ];
         if (!in_array($commande->getStatut(), $livrableStatuts, true)) {
             $this->addFlash('warning', 'Cette commande ne peut pas encore être marquée comme livrée.');
@@ -573,6 +583,7 @@ class CommandeController extends AbstractController
         }
         // Double sécurité : le paiement doit être confirmé même si le statut est correct
         if (!$commande->isEstPayee()) {
+>>>>>>> 519f5a51f3bf7c581ad4c50416902763a63db3e9
             $this->addFlash('danger', 'Livraison impossible : le paiement de cette commande n\'a pas encore été reçu.');
             return $this->redirectToRoute('commande_investisseur_recues');
         }

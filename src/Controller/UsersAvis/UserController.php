@@ -8,7 +8,11 @@ use App\Form\UsersAvis\AvatarType;
 use App\Model\Ai\AiAvatarPromptInput;
 use App\Form\Auth\TotpLoginType;
 use App\Repository\UsersAvis\UserRepository;
+<<<<<<< HEAD
+use App\Service\AI\CloudflareAiService;
+=======
 use App\Service\Ai\CloudflareAiService;
+>>>>>>> 519f5a51f3bf7c581ad4c50416902763a63db3e9
 use App\Service\Auth\AuthMailerService;
 use App\Service\Auth\SecureTokenService;
 use App\Service\Auth\UserAuthStateService;
