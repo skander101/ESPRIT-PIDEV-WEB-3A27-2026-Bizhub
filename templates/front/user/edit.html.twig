@@ -68,7 +68,14 @@
         <div class="form-row">
             <div class="form-group">
                 {{ form_label(form.phone) }}
-                {{ form_widget(form.phone) }}
+                <div style="display:flex;gap:0.65rem;align-items:stretch;flex-wrap:wrap;">
+                    <div style="flex:0 1 170px;min-width:140px;">
+                        {{ form_widget(form.phone_country_code) }}
+                    </div>
+                    <div style="flex:1 1 220px;">
+                        {{ form_widget(form.phone, {'attr': {'placeholder': '12 345 678'}}) }}
+                    </div>
+                </div>
                 {% if form.phone.vars.errors|length %}
                     <div style="color:#c33;font-size:0.85rem;margin-top:0.4rem;">
                         {% for error in form.phone.vars.errors %}

@@ -1,476 +1,162 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Connexion - BizHub</title>
+{% extends 'auth_base.html.twig' %}
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+{% block title %}Connexion - BizHub{% endblock %}
 
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+{% block auth_content %}
+    {% for message in app.flashes('success') %}
+        <div style="margin-bottom:12px;padding:11px 12px;border:1px solid #b7e1c1;background:#e8f5e9;color:#2e7d32;border-radius:8px;font-size:14px;">{{ message }}</div>
+    {% endfor %}
 
-        :root {
-            --primary:      #ffbe33;
-            --primary-dark: #e0a820;
-            --dark:         #222831;
-            --dark2:        #1a1f27;
-            --white:        #ffffff;
-            --light-bg:     #f8f8f8;
-            --text-muted:   #666666;
-            --border:       #ebebeb;
-        }
+    {% for message in app.flashes('error') %}
+        <div style="margin-bottom:12px;padding:11px 12px;border:1px solid #f3c4c4;background:#ffebee;color:#b71c1c;border-radius:8px;font-size:14px;">{{ message }}</div>
+    {% endfor %}
 
-        body {
-            font-family: 'Lora', serif;
-            background: var(--dark2);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at 30% 20%, rgba(255,190,51,0.08) 0%, transparent 50%),
-                        radial-gradient(circle at 70% 80%, rgba(255,190,51,0.05) 0%, transparent 40%);
-            pointer-events: none;
-        }
-
-        .auth-wrapper {
-            width: 100%;
-            max-width: 440px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .auth-brand {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .auth-brand a {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--white);
-            letter-spacing: 0.1em;
-            font-family: 'Josefin Sans', sans-serif;
-            text-transform: uppercase;
-            text-decoration: none;
-        }
-
-        .auth-brand a span {
-            color: var(--primary);
-        }
-
-        .auth-container {
-            background: var(--white);
-            border-radius: 16px;
-            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
-            padding: 48px 40px;
-            border: 1px solid var(--border);
-        }
-
-        .auth-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .auth-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 0.5rem;
-            font-family: 'Lora', serif;
-        }
-
-        .auth-subtitle {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-        }
-
-        .auth-form {
-            display: flex;
-            flex-direction: column;
-            gap: 1.2rem;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .form-group label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--dark);
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            font-family: 'Josefin Sans', sans-serif;
-        }
-
-        .form-group input {
-            width: 100%;
-            background: var(--white);
-            border: 1.5px solid var(--border);
-            border-radius: 8px;
-            padding: 14px 16px;
-            font-family: 'Lora', serif;
-            font-size: 0.95rem;
-            color: var(--dark);
-            outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        .form-group input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(255,190,51,0.15);
-        }
-
-        .form-group input::placeholder {
-            color: #aaa;
-        }
-
-        .form-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 0.3rem;
-        }
-
-        .remember-me {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            cursor: pointer;
-        }
-
-        .remember-me input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            accent-color: var(--primary);
-            cursor: pointer;
-        }
-
-        .forgot-link {
-            font-size: 0.85rem;
-            color: var(--primary-dark);
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.2s;
-        }
-
-        .forgot-link:hover {
-            color: var(--primary);
-        }
-
-        .error-box {
-            padding: 14px 16px;
-            background: rgba(220, 53, 69, 0.08);
-            border: 1px solid rgba(220, 53, 69, 0.2);
-            border-radius: 8px;
-            color: #c33;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .error-box i {
-            font-size: 1.1rem;
-        }
-
-        .auth-submit {
-            width: 100%;
-            background: var(--primary);
-            color: var(--dark);
-            border: none;
-            padding: 16px;
-            border-radius: 8px;
-            font-family: 'Josefin Sans', sans-serif;
-            font-size: 0.95rem;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 0.5rem;
-        }
-
-        .auth-submit:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(255,190,51,0.4);
-        }
-
-        .auth-submit:active {
-            transform: translateY(0);
-        }
-
-        .oauth-google {
-            width: 100%;
-            border: 1px solid var(--border);
-            background: #fff;
-            color: var(--dark);
-            padding: 13px;
-            border-radius: 8px;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            font-weight: 700;
-            font-family: 'Josefin Sans', sans-serif;
-            letter-spacing: 0.05em;
-        }
-
-        .oauth-google:hover {
-            border-color: var(--primary);
-            background: #fffdf5;
-        }
-
-        .flash-box {
-            padding: 12px 14px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            margin-bottom: 0.8rem;
-        }
-
-        .flash-success {
-            background: rgba(25, 135, 84, 0.1);
-            border: 1px solid rgba(25, 135, 84, 0.2);
-            color: #1f7a4d;
-        }
-
-        .flash-error {
-            background: rgba(220, 53, 69, 0.08);
-            border: 1px solid rgba(220, 53, 69, 0.2);
-            color: #c33;
-        }
-
-        .resend-box {
-            margin-top: 1rem;
-            padding: 12px;
-            border: 1px dashed var(--border);
-            border-radius: 8px;
-            font-size: 0.85rem;
-        }
-
-        .resend-box form {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 0.7rem;
-        }
-
-        .resend-box input[type="email"] {
-            flex: 1;
-            padding: 0.55rem 0.7rem;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-            font-size: 0.85rem;
-        }
-
-        .resend-box button {
-            border: 0;
-            background: var(--dark);
-            color: #fff;
-            border-radius: 6px;
-            padding: 0.55rem 0.8rem;
-            font-size: 0.8rem;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .auth-divider {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            margin: 1.5rem 0;
-        }
-
-        .auth-divider::before,
-        .auth-divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--border);
-        }
-
-        .auth-footer {
-            text-align: center;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--border);
-        }
-
-        .auth-footer a {
-            color: var(--primary-dark);
-            text-decoration: none;
-            font-weight: 700;
-            transition: color 0.2s;
-        }
-
-        .auth-footer a:hover {
-            color: var(--primary);
-        }
-
-        .back-home {
-            text-align: center;
-            margin-top: 1.5rem;
-        }
-
-        .back-home a {
-            color: rgba(255,255,255,0.5);
-            text-decoration: none;
-            font-size: 0.85rem;
-            transition: color 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .back-home a:hover {
-            color: var(--primary);
-        }
-
-        @media (max-width: 480px) {
-            .auth-container {
-                padding: 36px 24px;
-            }
-
-            .auth-title {
-                font-size: 1.5rem;
-            }
-
-            .form-row {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.8rem;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="auth-wrapper">
-        <div class="auth-brand">
-            <a href="{{ path('app_index') }}">Biz<span>Hub</span></a>
+    {% if last_username is not empty %}
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:16px;">
+            <div style="width:80px;height:80px;border-radius:50%;background:#eef3fe;color:#1877F2;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;">
+                {{ last_username|slice(0, 1)|upper }}
+            </div>
+            <div style="font-weight:700;font-size:16px;color:#1c1e21;word-break:break-word;text-align:center;">{{ last_username }}</div>
         </div>
+    {% endif %}
 
-        <div class="auth-container">
-            <div class="auth-header">
-                <h1 class="auth-title">Connexion</h1>
-                <p class="auth-subtitle">Accedez a votre compte BizHub</p>
-            </div>
+    <h1 class="auth-heading">Connectez-vous a BizHub</h1>
+    <p class="auth-subtext">Accedez a votre espace professionnel.</p>
 
-            <div class="resend-box" style="margin-bottom: 1rem;">
-                <strong>Connexion rapide</strong>
-                <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                    <a class="oauth-google" href="{{ path('app_login_totp') }}" style="padding: 10px 12px; flex: 1 1 220px;">
-                        <i class="fa-solid fa-shield-halved"></i>
-                        <span>Application Authenticator (TOTP)</span>
-                    </a>
-                    <a class="oauth-google" href="{{ path('app_login_face') }}" style="padding: 10px 12px; flex: 1 1 220px;">
-                        <i class="fa-solid fa-camera"></i>
-                        <span>Reconnaissance faciale</span>
-                    </a>
-                </div>
-                <div style="margin-top: 0.6rem; color: var(--text-muted);">Ou connexion classique avec email et mot de passe ci-dessous.</div>
-            </div>
-
-            {% for message in app.flashes('success') %}
-                <div class="flash-box flash-success">{{ message }}</div>
-            {% endfor %}
-
-            {% for message in app.flashes('error') %}
-                <div class="flash-box flash-error">{{ message }}</div>
-            {% endfor %}
-
-            <form method="POST" action="{{ path('app_login') }}" class="auth-form" novalidate>
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-
-                <div class="form-group">
-                    <label for="email">Adresse Email</label>
-                    <input
-                        type="text"
-                        id="email"
-                        name="email"
-                        value="{{ last_username }}"
-                        placeholder="vous@exemple.com"
-                        autocomplete="email"
-                    />
-                </div>
-
-                <div class="form-group">
-                    <label for="password">Mot de Passe</label>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        placeholder="Entrez votre mot de passe"
-                        autocomplete="current-password"
-                    />
-                </div>
-
-                <div class="form-row">
-                    <label class="remember-me">
-                        <input type="checkbox" name="_remember_me" />
-                        <span>Se souvenir de moi</span>
-                    </label>
-                    <a href="{{ path('app_forgot_password') }}" class="forgot-link">Mot de passe oublie ?</a>
-                </div>
-
-                {% if error %}
-                    <div class="error-box">
-                        <i class="fa fa-exclamation-circle"></i>
-                        <span>{{ error.messageKey|trans(error.messageData, 'security') }}</span>
-                    </div>
-                {% endif %}
-
-                <button type="submit" class="auth-submit">
-                    <span>Se connecter</span>
-                    <i class="fa fa-arrow-right"></i>
-                </button>
-            </form>
-
-            <div class="resend-box">
-                <strong>Email non verifie ?</strong>
-                <div>Renvoyez un lien de verification.</div>
-                <form method="post" action="{{ path('app_verify_email_resend') }}">
-                    <input type="hidden" name="_token" value="{{ csrf_token('resend_verification_email') }}" />
-                    <input type="email" name="email" placeholder="vous@exemple.com" value="{{ resend_email|default('') }}" required />
-                    <button type="submit">Renvoyer</button>
-                </form>
-            </div>
-
-            <div class="auth-footer">
-                Pas encore de compte ? <a href="{{ path('app_register') }}">Creer un compte</a>
-            </div>
-        </div>
-
-        <div class="back-home">
-            <a href="{{ path('app_index') }}"><i class="fa fa-arrow-left"></i> Retour a l'accueil</a>
-        </div>
+    <div class="social-stack" style="margin-bottom:14px;">
+        <a class="btn-secondary" href="{{ path('app_login_totp') }}">Connexion via Authenticator (TOTP)</a>
+        <a class="btn-secondary" href="{{ path('app_login_face') }}">Connexion par reconnaissance faciale</a>
     </div>
-</body>
-</html>
+
+    <p class="muted-center" style="margin:-4px 0 12px;">Ou continuez avec votre email et mot de passe</p>
+
+    <form id="loginForm" method="POST" action="{{ path('app_login') }}" novalidate>
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+        <div class="field-group">
+            <label class="field-label" for="login_email">Email ou nom d'utilisateur</label>
+            <input class="input-field" type="text" id="login_email" name="email" value="{{ last_username }}" placeholder="Email ou nom d'utilisateur" autocomplete="email" />
+            <div id="login_email_error" class="field-error" style="display:none;"></div>
+        </div>
+
+        <div class="field-group">
+            <label class="field-label" for="login_password">Mot de passe</label>
+            <div class="field-with-icon">
+                <input class="input-field" type="password" id="login_password" name="password" placeholder="Mot de passe" autocomplete="current-password" />
+                <button class="password-toggle" id="toggleLoginPassword" type="button" aria-label="Afficher ou masquer le mot de passe">&#128065;</button>
+            </div>
+            <div id="login_password_error" class="field-error" style="display:none;"></div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;margin:-4px 0 12px;">
+            <a class="link-brand" href="{{ path('app_forgot_password') }}">Mot de passe oublie ?</a>
+        </div>
+
+        {% if error %}
+            <div style="margin-bottom:12px;padding:11px 12px;border:1px solid #f3c4c4;background:#ffebee;color:#b71c1c;border-radius:8px;font-size:14px;">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+        {% endif %}
+
+        <button class="btn-primary" type="submit">Se connecter</button>
+
+        <div class="divider-text">ou</div>
+
+        <div class="social-stack">
+            <a class="btn-secondary" href="{{ path('app_google_oauth_connect') }}">
+                <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="#EA4335" d="M12 10.2v3.9h5.5c-.2 1.3-1.5 3.8-5.5 3.8-3.3 0-6-2.7-6-6.1s2.7-6.1 6-6.1c1.9 0 3.1.8 3.9 1.5l2.7-2.6C17 3.1 14.7 2.2 12 2.2 6.9 2.2 2.8 6.4 2.8 11.6S6.9 21 12 21c6.9 0 9.1-4.9 9.1-7.4 0-.5 0-.9-.1-1.2H12z"/>
+                </svg>
+                Continuer avec Google
+            </a>
+            <button class="btn-secondary" type="button" id="linkedinLoginBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="#0A66C2" d="M4.98 3.5A2.49 2.49 0 0 0 2.5 6a2.48 2.48 0 0 0 2.48 2.5A2.49 2.49 0 0 0 7.5 6 2.5 2.5 0 0 0 4.98 3.5zM2.8 8.9h4.4V21H2.8V8.9zM9.4 8.9h4.2v1.7h.1c.6-1.1 2-2.2 4.2-2.2 4.5 0 5.3 3 5.3 6.8V21h-4.4v-5.2c0-1.2 0-2.9-1.8-2.9s-2.1 1.4-2.1 2.8V21H9.4V8.9z"/>
+                </svg>
+                Continuer avec LinkedIn
+            </button>
+        </div>
+
+        <hr class="section-separator" />
+
+        <p class="muted-center">
+            Pas encore de compte ?
+            <a class="link-brand" href="{{ path('app_register') }}">Creer un compte</a>
+        </p>
+    </form>
+{% endblock %}
+
+{% block auth_scripts %}
+<script>
+(function () {
+    const loginForm = document.getElementById('loginForm');
+    const emailInput = document.getElementById('login_email');
+    const passwordInput = document.getElementById('login_password');
+    const emailError = document.getElementById('login_email_error');
+    const passwordError = document.getElementById('login_password_error');
+    const togglePasswordBtn = document.getElementById('toggleLoginPassword');
+    const linkedinBtn = document.getElementById('linkedinLoginBtn');
+
+    function showError(input, errorEl, message) {
+        input.classList.add('input-error');
+        errorEl.textContent = message;
+        errorEl.style.display = 'block';
+    }
+
+    function clearError(input, errorEl) {
+        input.classList.remove('input-error');
+        errorEl.textContent = '';
+        errorEl.style.display = 'none';
+    }
+
+    function isEmail(value) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    }
+
+    if (togglePasswordBtn) {
+        togglePasswordBtn.addEventListener('click', function () {
+            const currentType = passwordInput.getAttribute('type');
+            passwordInput.setAttribute('type', currentType === 'password' ? 'text' : 'password');
+        });
+    }
+
+    if (linkedinBtn) {
+        linkedinBtn.addEventListener('click', function () {
+            alert('Connexion LinkedIn bientot disponible.');
+        });
+    }
+
+    if (!loginForm) {
+        return;
+    }
+
+    loginForm.addEventListener('submit', function (event) {
+        let valid = true;
+
+        clearError(emailInput, emailError);
+        clearError(passwordInput, passwordError);
+
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+
+        if (email === '') {
+            showError(emailInput, emailError, 'L\'email est requis.');
+            valid = false;
+        } else if (!isEmail(email)) {
+            showError(emailInput, emailError, 'Veuillez saisir un email valide.');
+            valid = false;
+        }
+
+        if (password.trim() === '') {
+            showError(passwordInput, passwordError, 'Le mot de passe est requis.');
+            valid = false;
+        } else if (password.length < 6) {
+            showError(passwordInput, passwordError, 'Le mot de passe doit contenir au moins 6 caracteres.');
+            valid = false;
+        }
+
+        if (!valid) {
+            event.preventDefault();
+        }
+    });
+})();
+</script>
+{% endblock %}

@@ -1,97 +1,121 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Face Login - BizHub</title>
-    <style>
-        body { font-family: Arial, sans-serif; background: #0f1524; color: #fff; margin: 0; padding: 2rem; }
-        .card { max-width: 680px; margin: 0 auto; background: #141d2f; border: 1px solid #2a3957; border-radius: 12px; padding: 1.5rem; }
-        h1 { margin-top: 0; }
-        p { color: #c9d5ea; }
-        .row { display: grid; grid-template-columns: 1fr; gap: 1rem; }
-        video, img { width: 100%; max-width: 420px; border-radius: 10px; border: 1px solid #2f4367; }
-        .actions { margin-top: 1rem; display: flex; gap: 0.75rem; flex-wrap: wrap; }
-        button, .btn {
-            border: 0;
-            border-radius: 8px;
-            padding: 0.8rem 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .btn-primary { background: #ffbe33; color: #111; }
-        .btn-secondary { background: #2a3957; color: #fff; }
-        .flash { margin-bottom: 0.8rem; padding: 0.7rem; border-radius: 8px; }
-        .flash-error { background: #3a1521; color: #ffd5df; }
-        .flash-success { background: #123525; color: #c5f5d9; }
-    </style>
-</head>
-<body>
-<div class="card">
-    <h1>Sign in with Face Scan</h1>
-    <p>Capture your face and confirm. If matching succeeds, you will be logged in.</p>
+{% extends 'auth_base.html.twig' %}
 
+{% block title %}Connexion faciale - BizHub{% endblock %}
+
+{% block auth_page_styles %}
+.face-frame {
+    width: 100%;
+    margin-bottom: 12px;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #dbe6ff;
+    background: #0f1724;
+    box-shadow: 0 10px 30px rgba(15, 23, 36, 0.25);
+}
+
+.face-frame video,
+.face-frame img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+}
+
+.face-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+{% endblock %}
+
+{% block auth_content %}
     {% for message in app.flashes('success') %}
-        <div class="flash flash-success">{{ message }}</div>
+        <div style="margin-bottom:12px;padding:11px 12px;border:1px solid #b7e1c1;background:#e8f5e9;color:#2e7d32;border-radius:8px;font-size:14px;">{{ message }}</div>
     {% endfor %}
 
     {% for message in app.flashes('error') %}
-        <div class="flash flash-error">{{ message }}</div>
+        <div style="margin-bottom:12px;padding:11px 12px;border:1px solid #f3c4c4;background:#ffebee;color:#b71c1c;border-radius:8px;font-size:14px;">{{ message }}</div>
     {% endfor %}
 
-    <div class="row">
+    <h1 class="auth-heading">Connexion par reconnaissance faciale</h1>
+    <p class="auth-subtext">Capturez votre visage puis confirmez pour lancer la verification.</p>
+
+    <div id="camera_error" class="field-error" style="display:none;margin-bottom:12px;text-align:center;"></div>
+
+    <div class="face-frame">
         <video id="video" autoplay playsinline></video>
-        <canvas id="canvas" style="display: none;"></canvas>
-        <img id="preview" alt="Preview" style="display: none;" />
+        <canvas id="canvas" style="display:none;"></canvas>
+        <img id="preview" alt="Apercu de capture" style="display:none;" />
     </div>
 
-    <div class="actions">
-        <button id="captureBtn" class="btn-primary" disabled>Capture</button>
+    <div class="face-actions">
+        <button id="captureBtn" class="btn-primary" type="button" disabled>Capturer mon visage</button>
     </div>
 
-    <form id="faceLoginForm" method="post" action="{{ path('app_login_face') }}" style="display: none; margin-top: 1rem;">
+    <form id="faceLoginForm" method="post" action="{{ path('app_login_face') }}" style="display:none;margin-top:12px;">
         <input type="hidden" name="image" id="capturedImage" />
-        <div class="actions">
-            <button type="submit" class="btn-primary">Login with this image</button>
-            <a href="{{ path('app_login') }}" class="btn-secondary">Back to email login</a>
+
+        <div class="face-actions">
+            <button type="submit" class="btn-primary">Se connecter avec cette image</button>
+            <a href="{{ path('app_login') }}" class="btn-secondary">Retour a la connexion</a>
         </div>
     </form>
 
-    <div class="actions" style="margin-top: 1rem;">
-        <a href="{{ path('app_login') }}" class="btn-secondary">Back to email login</a>
-    </div>
-</div>
+    <hr class="section-separator" />
 
+    <p class="muted-center">
+        <a class="link-brand" href="{{ path('app_login') }}">Retour a la connexion classique</a>
+    </p>
+{% endblock %}
+
+{% block auth_scripts %}
 <script>
-const video = document.getElementById('video');
-const canvas = document.getElementById('canvas');
-const preview = document.getElementById('preview');
-const captureBtn = document.getElementById('captureBtn');
-const capturedImage = document.getElementById('capturedImage');
-const faceLoginForm = document.getElementById('faceLoginForm');
+(function () {
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const preview = document.getElementById('preview');
+    const captureBtn = document.getElementById('captureBtn');
+    const capturedImage = document.getElementById('capturedImage');
+    const faceLoginForm = document.getElementById('faceLoginForm');
+    const cameraError = document.getElementById('camera_error');
 
-navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
-    .then(stream => {
-        video.srcObject = stream;
-        captureBtn.disabled = false;
-    })
-    .catch(err => {
-        alert('Could not access camera: ' + err.message);
+    function showCameraError(message) {
+        cameraError.textContent = message;
+        cameraError.style.display = 'block';
+    }
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showCameraError('Votre navigateur ne prend pas en charge l\'acces a la camera.');
+        return;
+    }
+
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
+        .then(function (stream) {
+            video.srcObject = stream;
+            captureBtn.disabled = false;
+        })
+        .catch(function (err) {
+            showCameraError('Impossible d\'acceder a la camera : ' + err.message);
+        });
+
+    captureBtn.addEventListener('click', function () {
+        if (!video.videoWidth || !video.videoHeight) {
+            showCameraError('La camera n\'est pas encore prete. Veuillez reessayer dans un instant.');
+            return;
+        }
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+        preview.src = dataUrl;
+        preview.style.display = 'block';
+        video.style.display = 'none';
+        capturedImage.value = dataUrl;
+        faceLoginForm.style.display = 'block';
     });
-
-captureBtn.addEventListener('click', () => {
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    canvas.getContext('2d').drawImage(video, 0, 0);
-
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
-    preview.src = dataUrl;
-    preview.style.display = 'block';
-    capturedImage.value = dataUrl;
-    faceLoginForm.style.display = 'block';
-});
+})();
 </script>
-</body>
-</html>
+{% endblock %}

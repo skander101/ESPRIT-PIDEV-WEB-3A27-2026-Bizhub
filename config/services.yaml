@@ -16,6 +16,8 @@ parameters:
     app.auth0_client_secret: '%env(trim:AUTH0_CLIENT_SECRET)%'
     face.api_key: '%env(FACE_API_KEY)%'
     face.api_secret: '%env(FACE_API_SECRET)%'
+    app.cloudflare_api_token: '%env(default::CLOUDFLARE_API_TOKEN)%'
+    app.cloudflare_acc_id: '%env(default::CLOUDFLARE_ACC_ID)%'
 
 services:
     # default configuration for services in *this* file
@@ -42,6 +44,11 @@ services:
         arguments:
             $faceApiKey: '%face.api_key%'
             $faceApiSecret: '%face.api_secret%'
+
+    App\Service\Ai\CloudflareAiService:
+        arguments:
+            $cloudflareApiToken: '%app.cloudflare_api_token%'
+            $cloudflareAccountId: '%app.cloudflare_acc_id%'
 
     App\EventListener\MfaEnforcementListener:
         tags:

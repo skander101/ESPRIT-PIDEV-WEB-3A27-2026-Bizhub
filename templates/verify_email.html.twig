@@ -1,0 +1,262 @@
+{% extends 'auth_base.html.twig' %}
+
+{% block title %}Verification Email - BizHub{% endblock %}
+
+{% block auth_page_styles %}
+.verify-icon-wrap {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #e8f5e9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 14px;
+}
+
+.verify-email-pill {
+    margin: 10px 0 16px;
+    background: #f1f3f5;
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+}
+
+.steps-card {
+    background: #e3f2fd;
+    border-left: 4px solid #1877F2;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 0 0 16px;
+}
+
+.steps-card-title {
+    margin: 0 0 10px;
+    color: #1877F2;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.steps-card ul {
+    margin: 0;
+    padding-left: 18px;
+    color: #35506b;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.steps-card li + li {
+    margin-top: 4px;
+}
+
+.resend-box {
+    margin-top: 14px;
+}
+
+.resend-row {
+    display: grid;
+    grid-template-columns: 1fr 140px;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+@media (max-width: 767px) {
+    .resend-row {
+        grid-template-columns: 1fr;
+    }
+}
+{% endblock %}
+
+{% block auth_content %}
+    {% set userEmail = email|default(app.user ? app.user.email : '') %}
+    {% set emailDomain = userEmail and ('@' in userEmail) ? (userEmail|split('@')|last|lower) : '' %}
+
+    {% set providerName = 'messagerie' %}
+    {% set providerUrl = 'https://mail.google.com/mail/u/0/#inbox' %}
+    {% if emailDomain == 'gmail.com' %}
+        {% set providerName = 'Gmail' %}
+        {% set providerUrl = 'https://mail.google.com/mail/u/0/#inbox' %}
+    {% elseif emailDomain in ['outlook.com', 'hotmail.com', 'live.com'] %}
+        {% set providerName = 'Outlook' %}
+        {% set providerUrl = 'https://outlook.live.com/mail/0/inbox' %}
+    {% elseif emailDomain == 'yahoo.com' %}
+        {% set providerName = 'Yahoo Mail' %}
+        {% set providerUrl = 'https://mail.yahoo.com/' %}
+    {% endif %}
+
+    {% for message in app.flashes('success') %}
+        <div style="margin-bottom:12px;padding:11px 12px;border:1px solid #b7e1c1;background:#e8f5e9;color:#2e7d32;border-radius:8px;font-size:14px;">{{ message }}</div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div style="margin-bottom:12px;padding:11px 12px;border:1px solid #f3c4c4;background:#ffebee;color:#b71c1c;border-radius:8px;font-size:14px;">{{ message }}</div>
+    {% endfor %}
+
+    <div class="verify-icon-wrap" aria-hidden="true">
+        <svg width="44" height="44" viewBox="0 0 24 24">
+            <path fill="#2e7d32" d="M2 6.5A2.5 2.5 0 0 1 4.5 4h15A2.5 2.5 0 0 1 22 6.5v11a2.5 2.5 0 0 1-2.5 2.5h-15A2.5 2.5 0 0 1 2 17.5v-11zm2.8-.5L12 11.2 19.2 6H4.8zm14.7 2.1-6.9 4.9a1 1 0 0 1-1.2 0L4.5 8.1V17.5c0 .3.2.5.5.5h14a.5.5 0 0 0 .5-.5V8.1z"/>
+            <path fill="#2e7d32" d="m9.2 19.1-2.3-2.3 1.1-1.1 1.2 1.2 3-3 1.1 1.1z"/>
+        </svg>
+    </div>
+
+    <h1 class="auth-heading" style="text-align:center;">Verifiez votre email</h1>
+    <p class="auth-subtext" style="text-align:center;margin-bottom:8px;">
+        Un lien de verification a ete envoye a :
+    </p>
+
+    <div style="text-align:center;">
+        <div class="verify-email-pill">
+            <span>&#9993;</span>
+            <span>{{ userEmail }}</span>
+        </div>
+    </div>
+
+    <div class="steps-card">
+        <p class="steps-card-title">Prochaines etapes</p>
+        <ul>
+            <li>Ouvrez votre boite email</li>
+            <li>Cherchez le message de BizHub</li>
+            <li>Cliquez sur le lien de verification</li>
+            <li>Completez la configuration MFA</li>
+        </ul>
+    </div>
+
+    <a class="btn-primary" href="{{ providerUrl }}" target="_blank" rel="noopener noreferrer" style="margin-bottom:14px;">Ouvrir {{ providerName|capitalize }}</a>
+
+    <div class="resend-box">
+        <p class="muted-center" style="margin:0 0 8px;">Vous n'avez pas recu l'email ?</p>
+        <form id="resendForm" method="post" action="{{ path('app_verify_email_resend') }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('resend_verification_email') }}" />
+            <div class="resend-row">
+                <input class="input-field" type="email" id="resend_email" name="email" value="{{ userEmail }}" required />
+                <button class="btn-secondary" type="submit" id="resendButton">Renvoyer</button>
+            </div>
+            <div id="resend_error" class="field-error" style="display:none;"></div>
+        </form>
+    </div>
+
+    <p class="muted-center" style="margin-top:16px;">
+        Deja verifie ?
+        <a class="link-brand" href="{{ path('app_login') }}">Se connecter</a>
+    </p>
+
+    <div id="resendToast" class="toast">Email renvoye !</div>
+{% endblock %}
+
+{% block auth_scripts %}
+<script>
+(function () {
+    const form = document.getElementById('resendForm');
+    const emailInput = document.getElementById('resend_email');
+    const resendButton = document.getElementById('resendButton');
+    const resendError = document.getElementById('resend_error');
+    const toast = document.getElementById('resendToast');
+
+    if (!form || !emailInput || !resendButton) {
+        return;
+    }
+
+    let cooldownRemaining = 0;
+    let cooldownTimer = null;
+
+    function setButtonState() {
+        if (cooldownRemaining > 0) {
+            resendButton.disabled = true;
+            resendButton.textContent = 'Renvoyer (' + cooldownRemaining + 's)';
+            resendButton.style.opacity = '0.7';
+            resendButton.style.cursor = 'not-allowed';
+        } else {
+            resendButton.disabled = false;
+            resendButton.textContent = 'Renvoyer';
+            resendButton.style.opacity = '1';
+            resendButton.style.cursor = 'pointer';
+        }
+    }
+
+    function showToast(message, isError) {
+        toast.textContent = message;
+        if (isError) {
+            toast.style.background = '#ffebee';
+            toast.style.borderColor = '#f3c4c4';
+            toast.style.color = '#b71c1c';
+        } else {
+            toast.style.background = '#e8f5e9';
+            toast.style.borderColor = '#c8e6c9';
+            toast.style.color = '#2e7d32';
+        }
+
+        toast.classList.add('show');
+        setTimeout(function () {
+            toast.classList.remove('show');
+        }, 2200);
+    }
+
+    function startCooldown(seconds) {
+        cooldownRemaining = seconds;
+        setButtonState();
+
+        if (cooldownTimer) {
+            clearInterval(cooldownTimer);
+        }
+
+        cooldownTimer = setInterval(function () {
+            cooldownRemaining -= 1;
+            if (cooldownRemaining <= 0) {
+                clearInterval(cooldownTimer);
+                cooldownTimer = null;
+                cooldownRemaining = 0;
+            }
+            setButtonState();
+        }, 1000);
+    }
+
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        resendError.style.display = 'none';
+        emailInput.classList.remove('input-error');
+
+        if (cooldownRemaining > 0) {
+            return;
+        }
+
+        const email = emailInput.value.trim();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            emailInput.classList.add('input-error');
+            resendError.textContent = 'Veuillez saisir une adresse email valide.';
+            resendError.style.display = 'block';
+            return;
+        }
+
+        const body = new FormData(form);
+        body.set('email', email);
+
+        fetch(form.action, {
+            method: 'POST',
+            body: body,
+            credentials: 'same-origin',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        }).then(function (response) {
+            if (!response.ok) {
+                throw new Error('failed');
+            }
+
+            showToast('Email renvoye !', false);
+            startCooldown(60);
+        }).catch(function () {
+            showToast('Impossible de renvoyer l\'email pour le moment.', true);
+        });
+    });
+
+    setButtonState();
+})();
+</script>
+{% endblock %}
