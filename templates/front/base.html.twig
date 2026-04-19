@@ -312,11 +312,17 @@
     }
     .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; display: inline-block; flex-shrink: 0; }
 
-    /* Statuts Projet — valeurs DB anglaises */
-    .badge-pending     { background: rgba(107,114,128,0.12); color: #6b7280;  border: 1px solid rgba(107,114,128,0.2); }
-    .badge-in_progress { background: rgba(139,92,246,0.1);   color: #8b5cf6;  border: 1px solid rgba(139,92,246,0.2); }
-    .badge-funded      { background: rgba(16,185,129,0.12);  color: #10b981;  border: 1px solid rgba(16,185,129,0.25); }
-    .badge-completed   { background: rgba(239,68,68,0.08);   color: #ef4444;  border: 1px solid rgba(239,68,68,0.2); }
+    /* Statuts Projet */
+    .badge-brouillon  { background: rgba(107,114,128,0.12); color: #6b7280;  border: 1px solid rgba(107,114,128,0.2); }
+    .badge-publie     { background: rgba(59,130,246,0.1);   color: #3b82f6;  border: 1px solid rgba(59,130,246,0.2); }
+    .badge-en_cours   { background: rgba(139,92,246,0.1);   color: #8b5cf6;  border: 1px solid rgba(139,92,246,0.2); }
+    .badge-finance    { background: rgba(16,185,129,0.12);  color: #10b981;  border: 1px solid rgba(16,185,129,0.25); }
+    .badge-ferme      { background: rgba(239,68,68,0.08);   color: #ef4444;  border: 1px solid rgba(239,68,68,0.2); }
+    /* DB enum aliases */
+    .badge-pending     { background: rgba(107,114,128,0.12); color: #6b7280; border: 1px solid rgba(107,114,128,0.2); }
+    .badge-in_progress { background: rgba(139,92,246,0.1);   color: #8b5cf6; border: 1px solid rgba(139,92,246,0.2); }
+    .badge-funded      { background: rgba(16,185,129,0.12);  color: #10b981; border: 1px solid rgba(16,185,129,0.25); }
+    .badge-completed   { background: rgba(239,68,68,0.08);   color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
 
     /* Statuts Investissement */
     .badge-en_attente     { background: rgba(245,158,11,0.12);  color: #d97706;  border: 1px solid rgba(245,158,11,0.25); }
@@ -818,9 +824,6 @@
   {% if app.user and app.user.userType == 'investisseur' %}
   <a href="{{ path('app_front_investissement_index') }}">Mes Investissements</a>
   {% endif %}
-  {% if app.user and app.user.userType in ['investisseur', 'startup'] %}
-  <a href="{{ path('app_negociation_index') }}">Mes Négociations</a>
-  {% endif %}
   <a href="{{ path('app_logout') }}" style="color:var(--primary);">Déconnexion</a>
 </div>
 
@@ -838,12 +841,8 @@
     <li><a href="{{ path('app_avis_list') }}" {% if app.request.get('_route') == 'app_avis_list' %}class="active"{% endif %}>Mes Avis</a></li>
     <li><a href="{{ path('produit_index') }}" {% if 'produit_' in app.request.get('_route') or 'commande_' in app.request.get('_route') or 'panier_' in app.request.get('_route') %}class="active"{% endif %}>Marketplace</a></li>
     <li><a href="{{ path('app_front_projet_index') }}" {% if 'projet' in app.request.get('_route') or 'investir' in app.request.get('_route') %}class="active"{% endif %}>Investissement</a></li>
-    <li><a href="{{ path('app_front_formations_index') }}" {% if 'formations' in app.request.get('_route') %}class="active"{% endif %}>Formations</a></li>
     {% if app.user and app.user.userType == 'investisseur' %}
     <li><a href="{{ path('app_front_investissement_index') }}" {% if 'investissement_index' in app.request.get('_route') or 'investissement_edit' in app.request.get('_route') %}class="active"{% endif %}>Mes Investissements</a></li>
-    {% endif %}
-    {% if app.user and app.user.userType in ['investisseur', 'startup'] %}
-    <li><a href="{{ path('app_negociation_index') }}" {% if 'negociation' in app.request.get('_route') %}class="active"{% endif %}><i class="fa fa-handshake" style="margin-right:4px;"></i>Négociations</a></li>
     {% endif %}
     {% if app.user %}
     <li><a href="{{ path('app_logout') }}" class="btn-nav"><i class="fa fa-sign-out-alt"></i> Déconnexion</a></li>
@@ -887,7 +886,10 @@
       <ul>
         <li><a href="{{ path('produit_index') }}">Marketplace</a></li>
         <li><a href="{{ path('app_front_projet_index') }}">Investissement</a></li>
-        <li><a href="{{ path('app_front_formations_index') }}">Formations</a></li>
+        {% if app.user and app.user.userType == 'investisseur' %}
+        <li><a href="{{ path('app_front_investissement_index') }}">Mes Investissements</a></li>
+        {% endif %}
+        <li><a href="#">Formations</a></li>
         <li><a href="#">Incubation</a></li>
       </ul>
     </div>
@@ -982,8 +984,6 @@
     });
   });
 </script>
-
-{% include 'partials/ai_chat_sidebar.html.twig' %}
 
 {% block javascripts %}{% endblock %}
 </body>

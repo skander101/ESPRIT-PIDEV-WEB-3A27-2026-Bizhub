@@ -135,6 +135,58 @@ class InvestmentRepository extends ServiceEntityRepository
 
     // ── Méthodes dashboard startup ───────────────────────────────────────────
 
+    /** Tous les investissements d'un utilisateur, triés par date */
+    public function findAllByUser(User $user): array
+    {
+        return $this->createQueryBuilder('i')
+            ->andWhere('i.user = :user')
+            ->setParameter('user', $user)
+            ->orderBy('i.created_at', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Agrégation mensuelle des investissements d'un utilisateur.
+     * Retourne un tableau indexé par 'YYYY-MM' => montant total.
+     */
+    public function getMonthlyTotalByUser(User $user, int $months = 6): array
+    {
+        $since = (new \DateTime())->modify("-{$months} months");
+
+        $rows = $this->createQueryBuilder('i')
+            ->select('SUBSTRING(i.created_at, 1, 7) AS month, SUM(i.amount) AS total')
+            ->andWhere('i.user = :user')
+            ->andWhere('i.created_at >= :since')
+            ->setParameter('user', $user)
+            ->setParameter('since', $since)
+            ->groupBy('month')
+            ->orderBy('month', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result[$row['month']] = (float) $row['total'];
+        }
+        return $result;
+    }
+
+    /**
+     * Find the single Investment for a given project+buyer (used for Investment–Deal status sync).
+     */
+    public function findOneByProjectIdAndBuyerId(int $projectId, int $buyerId): ?Investment
+    {
+        return $this->createQueryBuilder('i')
+            ->andWhere('IDENTITY(i.project) = :pid')
+            ->andWhere('IDENTITY(i.user)    = :uid')
+            ->setParameter('pid', $projectId)
+            ->setParameter('uid', $buyerId)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     /** Derniers N investissements reçus sur une liste de projets */
     public function findLastReceivedByProjects(array $projects, int $limit = 5): array
     {

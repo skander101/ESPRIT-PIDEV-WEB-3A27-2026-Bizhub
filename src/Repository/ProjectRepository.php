@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Investissement\Investment;
 use App\Entity\Investissement\Project;
 use App\Entity\UsersAvis\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -165,6 +166,31 @@ class ProjectRepository extends ServiceEntityRepository
             $result[$key] = (int) $row['total'];
         }
         return $result;
+    }
+
+    /**
+     * Open projects that the given investor has NOT yet invested in.
+     * Used by the matching engine — returns up to 20 candidates.
+     */
+    public function findOpenForMatching(User $investor): array
+    {
+        // Subquery: project IDs already invested in by this investor
+        $sub = $this->getEntityManager()->createQueryBuilder()
+            ->select('IDENTITY(i.project)')
+            ->from(Investment::class, 'i')
+            ->andWhere('i.user = :investor');
+
+        $qb = $this->createQueryBuilder('p');
+
+        return $qb
+            ->andWhere('p.status = :status')
+            ->andWhere($qb->expr()->notIn('p.project_id', $sub->getDQL()))
+            ->setParameter('status', Project::STATUS_EN_COURS)
+            ->setParameter('investor', $investor)
+            ->orderBy('p.created_at', 'DESC')
+            ->setMaxResults(20)
+            ->getQuery()
+            ->getResult();
     }
 
     /** Projets en cours pour l'investisseur (ouverts aux investissements) */

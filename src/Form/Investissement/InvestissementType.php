@@ -12,7 +12,6 @@ use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints as Assert;
 
 class InvestissementType extends AbstractType
 {
@@ -24,27 +23,17 @@ class InvestissementType extends AbstractType
                 'class'        => Project::class,
                 'choice_label' => 'title',
                 'placeholder'  => '-- Sélectionner un projet --',
-                'constraints'  => [
-                    new Assert\NotNull(message: 'Veuillez sélectionner un projet.'),
-                ],
             ])
             ->add('user', EntityType::class, [
                 'label'        => 'Investisseur',
                 'class'        => User::class,
                 'choice_label' => 'email',
                 'placeholder'  => '-- Sélectionner un investisseur --',
-                'constraints'  => [
-                    new Assert\NotNull(message: 'Veuillez sélectionner un investisseur.'),
-                ],
             ])
             ->add('amount', MoneyType::class, [
                 'label'    => 'Montant investi (TND)',
                 'currency' => false,
                 'attr'     => ['placeholder' => '10000'],
-                'constraints' => [
-                    new Assert\NotBlank(message: 'Le montant est obligatoire.'),
-                    new Assert\Positive(message: 'Le montant doit être positif.'),
-                ],
             ])
             ->add('investment_date', DateTimeType::class, [
                 'label'    => "Date d'investissement",
@@ -55,9 +44,6 @@ class InvestissementType extends AbstractType
                 'label'    => 'URL du contrat',
                 'required' => false,
                 'attr'     => ['placeholder' => 'https://…'],
-                'constraints' => [
-                    new Assert\Url(message: "L'URL du contrat n'est pas valide."),
-                ],
             ]);
     }
 

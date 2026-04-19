@@ -14,10 +14,10 @@ use App\Service\Investissement\YousignService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -37,9 +37,9 @@ class DealController extends AbstractController
         private string                 $stripeSecretKey,
     ) {}
 
-    // ─────────────────────────────────────────────────────────────────────────
+    // ────────────────────────────────────────────────────────────────────────
     // VUE PRINCIPALE DU DEAL (stepper workflow)
-    // ─────────────────────────────────────────────────────────────────────────
+    // ────────────────────────────────────────────────────────────────────────
 
     #[Route('/{id}', name: 'app_deal_show', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function show(
@@ -58,21 +58,21 @@ class DealController extends AbstractController
         $seller = $this->em->getRepository(User::class)->find($deal->getSeller_id());
 
         return $this->render('front/deal/show.html.twig', [
-            'deal'           => $deal,
-            'negotiation'    => $negotiation,
-            'buyer'          => $buyer,
-            'seller'         => $seller,
-            'can_pay'        => $this->workflow->canPay($deal),
-            'can_sign'       => $this->workflow->canSign($deal),
-            'can_download'   => $this->workflow->canDownload($deal),
-            'stripe_pub_key' => $this->stripePublicKey,
-            'is_buyer'       => $user->getUserId() === $deal->getBuyer_id(),
+            'deal'            => $deal,
+            'negotiation'     => $negotiation,
+            'buyer'           => $buyer,
+            'seller'          => $seller,
+            'can_pay'         => $this->workflow->canPay($deal),
+            'can_sign'        => $this->workflow->canSign($deal),
+            'can_download'    => $this->workflow->canDownload($deal),
+            'stripe_pub_key'  => $this->stripePublicKey,
+            'is_buyer'        => $user->getUserId() === $deal->getBuyer_id(),
         ]);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
+    // ────────────────────────────────────────────────────────────────────────
     // INITIER LE PAIEMENT STRIPE (Checkout)
-    // ─────────────────────────────────────────────────────────────────────────
+    // ────────────────────────────────────────────────────────────────────────
 
     #[Route('/{id}/payer', name: 'app_deal_payer', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function payer(
@@ -109,7 +109,7 @@ class DealController extends AbstractController
                         'unit_amount'  => $amountCents,
                         'product_data' => [
                             'name'        => sprintf('Investissement BizHub — Deal #%d', $deal->getDeal_id()),
-                            'description' => sprintf('Montant : %s TND (~€%s EUR)',
+                            'description' => sprintf('Montant : %s TND (~€%s EUR) — Paiement sécurisé via BizHub',
                                 number_format($amountTnd, 0, ',', ' '),
                                 number_format($amountEur, 2, ',', ' ')
                             ),
@@ -131,9 +131,9 @@ class DealController extends AbstractController
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
+    // ────────────────────────────────────────────────────────────────────────
     // RETOUR STRIPE — SUCCÈS
-    // ─────────────────────────────────────────────────────────────────────────
+    // ────────────────────────────────────────────────────────────────────────
 
     #[Route('/{id}/stripe-success', name: 'app_deal_stripe_success', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function stripeSuccess(
@@ -161,24 +161,25 @@ class DealController extends AbstractController
                 $buyer  = $this->em->getRepository(User::class)->find($deal->getBuyer_id());
                 $seller = $this->em->getRepository(User::class)->find($deal->getSeller_id());
 
-                if ($buyer && $seller) {
+                if ($negotiation && $buyer && $seller) {
                     $pdfPath = $this->pdfService->generate($deal, $negotiation, $buyer, $seller);
                     $this->workflow->generateContract($deal, $pdfPath);
 
                     // Envoyer la demande de signature électronique via Yousign
                     try {
                         $this->yousignService->sendSignatureRequest($deal, $buyer);
-                        $this->addFlash('success', '✓ Paiement reçu ! Un email de signature électronique (Yousign) a été envoyé à ' . $buyer->getEmail() . '.');
+                        $this->addFlash('success', '✅ Paiement reçu ! Un email de signature électronique (Yousign) a été envoyé à ' . $buyer->getEmail() . '.');
                     } catch (\Exception $yousignEx) {
+                        // Yousign failed — fallback to token-based email
                         try {
                             $this->signatureEmailService->sendSignatureEmail($deal, $buyer);
-                            $this->addFlash('warning', '✓ Paiement reçu ! (Yousign indisponible — email de signature classique envoyé.)');
+                            $this->addFlash('warning', '✅ Paiement reçu ! (Yousign indisponible — email de signature classique envoyé.)');
                         } catch (\Exception $mailEx) {
-                            $this->addFlash('warning', '✓ Paiement reçu ! Contrat généré. Utilisez « Envoyer la signature » depuis la page du deal.');
+                            $this->addFlash('warning', '✅ Paiement reçu ! Contrat généré. Utilisez « Envoyer la signature » depuis la page du deal.');
                         }
                     }
                 } else {
-                    $this->addFlash('success', '✓ Paiement reçu !');
+                    $this->addFlash('success', '✅ Paiement reçu !');
                 }
 
             } catch (\Exception $e) {
@@ -191,9 +192,9 @@ class DealController extends AbstractController
         return $this->redirectToRoute('app_deal_show', ['id' => $deal->getDeal_id()]);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
+    // ────────────────────────────────────────────────────────────────────────
     // RETOUR STRIPE — ANNULATION
-    // ─────────────────────────────────────────────────────────────────────────
+    // ────────────────────────────────────────────────────────────────────────
 
     #[Route('/{id}/stripe-cancel', name: 'app_deal_stripe_cancel', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function stripeCancel(
@@ -204,9 +205,9 @@ class DealController extends AbstractController
         return $this->redirectToRoute('app_deal_show', ['id' => $deal->getDeal_id()]);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // CONFIRMATION DE SIGNATURE VIA LIEN EMAIL
-    // ─────────────────────────────────────────────────────────────────────────
+    // ────────────────────────────────────────────────────────────────────────
+    // CONFIRMATION DE SIGNATURE VIA LIEN EMAIL (GET = afficher, POST = signer)
+    // ────────────────────────────────────────────────────────────────────────
 
     #[Route('/{id}/signer/{token}', name: 'app_deal_sign_token', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
     public function signByToken(
@@ -227,12 +228,13 @@ class DealController extends AbstractController
         $buyer  = $this->em->getRepository(User::class)->find($deal->getBuyer_id());
         $seller = $this->em->getRepository(User::class)->find($deal->getSeller_id());
 
+        // Validate token
         $tokenValid   = true;
         $errorMessage = '';
 
         if (!$deal->getSignature_token() || $deal->getSignature_token() !== $token) {
             $tokenValid   = false;
-            $errorMessage = 'Ce lien de signature est invalide ou a déjà été utilisé.';
+            $errorMessage = 'Ce lien de signature est invalide. Il a peut-être déjà été utilisé ou remplacé par un nouveau lien.';
         } elseif (!$deal->getSignature_token_expires_at() || $deal->getSignature_token_expires_at() < new \DateTime()) {
             $tokenValid   = false;
             $errorMessage = 'Ce lien de signature a expiré (validité 48h). Demandez un renvoi depuis la page du deal.';
@@ -241,6 +243,7 @@ class DealController extends AbstractController
             $errorMessage = 'Ce contrat n\'est plus en attente de signature (statut actuel : ' . $deal->getStatus() . ').';
         }
 
+        // POST — process signing
         if ($request->isMethod('POST')) {
             if (!$this->isCsrfTokenValid('sign_token_' . $deal->getDeal_id(), $request->request->get('_token'))) {
                 $this->addFlash('error', 'Token de sécurité invalide.');
@@ -282,6 +285,7 @@ class DealController extends AbstractController
             }
         }
 
+        // GET — show confirmation page
         return $this->render('front/deal/sign_confirm.html.twig', [
             'deal'          => $deal,
             'token'         => $token,
@@ -293,9 +297,9 @@ class DealController extends AbstractController
         ]);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
+    // ────────────────────────────────────────────────────────────────────────
     // RENVOYER L'EMAIL DE SIGNATURE
-    // ─────────────────────────────────────────────────────────────────────────
+    // ────────────────────────────────────────────────────────────────────────
 
     #[Route('/{id}/resend-signature', name: 'app_deal_resend_signature', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function resendSignature(
@@ -326,7 +330,7 @@ class DealController extends AbstractController
 
         try {
             $this->signatureEmailService->sendSignatureEmail($deal, $buyer);
-            $this->addFlash('success', '✓ Email de signature renvoyé ! Vérifiez votre boîte mail (lien valide 48h).');
+            $this->addFlash('success', '✅ Email de signature renvoyé ! Vérifiez votre boîte mail (lien valide 48h).');
         } catch (\Exception $e) {
             $this->addFlash('error', 'Erreur lors de l\'envoi de l\'email : ' . $e->getMessage());
         }
@@ -334,9 +338,9 @@ class DealController extends AbstractController
         return $this->redirectToRoute('app_deal_show', ['id' => $deal->getDeal_id()]);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // ENVOYER / RENVOYER VIA YOUSIGN
-    // ─────────────────────────────────────────────────────────────────────────
+    // ────────────────────────────────────────────────────────────────────────
+    // ENVOYER / RENVOYER VIA YOUSIGN (POST)
+    // ────────────────────────────────────────────────────────────────────────
 
     #[Route('/{id}/yousign-send', name: 'app_deal_yousign_send', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function yousignSend(
@@ -372,7 +376,7 @@ class DealController extends AbstractController
 
         try {
             $this->yousignService->sendSignatureRequest($deal, $buyer);
-            $this->addFlash('success', '✓ Demande de signature envoyée via Yousign à ' . $buyer->getEmail() . '.');
+            $this->addFlash('success', '✅ Demande de signature envoyée via Yousign à ' . $buyer->getEmail() . '.');
         } catch (\Exception $e) {
             $this->addFlash('error', 'Erreur Yousign : ' . $e->getMessage());
         }
@@ -380,15 +384,16 @@ class DealController extends AbstractController
         return $this->redirectToRoute('app_deal_show', ['id' => $deal->getDeal_id()]);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // WEBHOOK YOUSIGN
-    // ─────────────────────────────────────────────────────────────────────────
+    // ────────────────────────────────────────────────────────────────────────
+    // WEBHOOK YOUSIGN (POST — appelé par Yousign, pas par l'utilisateur)
+    // ────────────────────────────────────────────────────────────────────────
 
     #[Route('/yousign-webhook', name: 'app_deal_yousign_webhook', methods: ['POST'])]
     public function yousignWebhook(Request $request): JsonResponse
     {
         $payload = json_decode($request->getContent(), true) ?? [];
 
+        // Retrieve the signature_request ID from the payload
         $signatureRequestId = $payload['data']['signature_request']['id']
             ?? $payload['signature_request_id']
             ?? null;
@@ -397,16 +402,19 @@ class DealController extends AbstractController
             return $this->json(['error' => 'Missing signature_request id'], 400);
         }
 
+        // Find the matching Deal
         $deal = $this->dealRepo->findOneBy([
             'yousign_signature_request_id' => $signatureRequestId,
         ]);
 
         if (!$deal) {
+            // Not a deal we know — return 200 so Yousign stops retrying
             return $this->json(['ok' => true]);
         }
 
         $signed = $this->yousignService->handleWebhook($payload, $deal);
 
+        // If Yousign just confirmed the signature, sync the Investment status
         if ($signed) {
             $this->workflow->markAsSignedFromYousign($deal);
         }
@@ -414,9 +422,9 @@ class DealController extends AbstractController
         return $this->json(['ok' => true]);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // SYNCHRONISER LE STATUT YOUSIGN (bouton manuel)
-    // ─────────────────────────────────────────────────────────────────────────
+    // ────────────────────────────────────────────────────────────────────────
+    // SYNCHRONISER LE STATUT YOUSIGN (bouton manuel — fallback webhook)
+    // ────────────────────────────────────────────────────────────────────────
 
     #[Route('/{id}/yousign-sync', name: 'app_deal_yousign_sync', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function yousignSync(
@@ -445,17 +453,21 @@ class DealController extends AbstractController
             $done = $this->yousignService->syncDealStatus($deal);
 
             if ($done) {
+                // Sync investment status
                 $this->workflow->markAsSignedFromYousign($deal);
 
+                // Download the signed PDF from Yousign and replace the contract path
                 try {
                     $signedPath = $this->yousignService->downloadSignedDocument($deal);
                     if ($signedPath) {
                         $deal->setContract_pdf_path($signedPath);
                         $this->em->flush();
                     }
-                } catch (\Throwable) {}
+                } catch (\Throwable) {
+                    // Signed PDF unavailable — keep the original unsigned contract
+                }
 
-                $this->addFlash('success', '✓ Signature confirmée par Yousign ! Le contrat est disponible au téléchargement.');
+                $this->addFlash('success', '✅ Signature confirmée par Yousign ! Le contrat est maintenant disponible au téléchargement.');
             } else {
                 $status = $deal->getYousign_status() ?? 'ongoing';
                 $labels = [
@@ -473,9 +485,9 @@ class DealController extends AbstractController
         return $this->redirectToRoute('app_deal_show', ['id' => $deal->getDeal_id()]);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
+    // ────────────────────────────────────────────────────────────────────────
     // TÉLÉCHARGER LE CONTRAT PDF
-    // ─────────────────────────────────────────────────────────────────────────
+    // ────────────────────────────────────────────────────────────────────────
 
     #[Route('/{id}/telecharger', name: 'app_deal_telecharger', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function telecharger(
@@ -514,9 +526,9 @@ class DealController extends AbstractController
         return $response;
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
+    // ────────────────────────────────────────────────────────────────────────
     // INTERNAL
-    // ─────────────────────────────────────────────────────────────────────────
+    // ────────────────────────────────────────────────────────────────────────
 
     private function assertParticipant(Deal $deal, int $userId): void
     {

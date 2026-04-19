@@ -23,9 +23,9 @@ use Symfony\Component\Routing\Attribute\Route;
 class WorkflowController extends AbstractController
 {
     public function __construct(
-        private InvestmentRepository   $investmentRepo,
-        private NegotiationRepository  $negotiationRepo,
-        private DealWorkflowService    $workflow,
+        private InvestmentRepository  $investmentRepo,
+        private NegotiationRepository $negotiationRepo,
+        private DealWorkflowService   $workflow,
         private EntityManagerInterface $em,
     ) {}
 
@@ -39,22 +39,27 @@ class WorkflowController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        $investorId  = $investment->getUser()?->getUserId();
-        $startupId   = $investment->getProject()?->getUser()?->getUserId();
+        $investorId = $investment->getUser()?->getUserId();
+        $projectUser = $investment->getProject()?->getUser();
+        $startupId  = $projectUser?->getUserId();
 
+        // Only the investor or the startup owning the project may view this
         if ($user->getUserId() !== $investorId && $user->getUserId() !== $startupId) {
             throw $this->createAccessDeniedException('Accès refusé à ce workflow.');
         }
 
+        // Find negotiation
         $negotiation = $this->negotiationRepo->findOneBy([
             'project'  => $investment->getProject(),
             'investor' => $investment->getUser(),
         ]);
 
+        // Find deal
         $deal = $negotiation
             ? $this->workflow->findDealByNegotiation($negotiation)
             : $this->workflow->findDealByInvestment($investment);
 
+        // Resolve Users for deal
         $buyer  = null;
         $seller = null;
         if ($deal) {
@@ -62,16 +67,19 @@ class WorkflowController extends AbstractController
             $seller = $this->em->getRepository(User::class)->find($deal->getSeller_id());
         }
 
-        $stage   = $this->computeStage($negotiation, $deal);
+        // ── Compute workflow stage ────────────────────────────────────────────
+        $stage = $this->computeStage($negotiation, $deal);
+
+        // ── Current step number (1-6) ─────────────────────────────────────────
         $stepNum = match($stage) {
-            'interet'     => 1,
-            'negociation' => 2,
-            'accord'      => 3,
+            'interet'      => 1,
+            'negociation'  => 2,
+            'accord'       => 3,
             'paiement',
-            'signature'   => 4,
-            'signe'       => 5,
-            'finalise'    => 6,
-            default       => 1,
+            'signature'    => 4,
+            'signe'        => 5,
+            'finalise'     => 6,
+            default        => 1, // rejete, annule → back to 1 visually
         };
 
         return $this->render('front/workflow/investissement.html.twig', [
@@ -90,6 +98,8 @@ class WorkflowController extends AbstractController
         ]);
     }
 
+    // ── Internal ──────────────────────────────────────────────────────────────
+
     private function computeStage(?Negotiation $neg, ?Deal $deal): string
     {
         if ($neg === null) {
@@ -101,17 +111,17 @@ class WorkflowController extends AbstractController
         }
 
         if ($deal === null) {
-            return 'negociation';
+            return 'negociation'; // open OR accepted but deal not yet created
         }
 
         return match($deal->getStatus()) {
-            Deal::STATUS_PENDING_PAYMENT   => 'accord',
-            Deal::STATUS_PAID              => 'paiement',
+            Deal::STATUS_PENDING_PAYMENT  => 'accord',
+            Deal::STATUS_PAID             => 'paiement',
             Deal::STATUS_PENDING_SIGNATURE => 'signature',
-            Deal::STATUS_SIGNED            => 'signe',
-            Deal::STATUS_COMPLETED         => 'finalise',
-            Deal::STATUS_CANCELLED         => 'annule',
-            default                        => 'accord',
+            Deal::STATUS_SIGNED           => 'signe',
+            Deal::STATUS_COMPLETED        => 'finalise',
+            Deal::STATUS_CANCELLED        => 'annule',
+            default                       => 'accord',
         };
     }
 }

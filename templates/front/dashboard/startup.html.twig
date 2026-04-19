@@ -420,9 +420,100 @@
   </div>
 
   {# ══════════════════════════════════════════════════
+     NÉGOCIATIONS EN COURS
+  ══════════════════════════════════════════════════ #}
+  <div class="panel">
+    <div class="panel-head">
+      <div class="panel-title"><i class="fa fa-comments"></i>Négociations reçues</div>
+      {% set nbOpen = 0 %}
+      {% for neg in negotiations %}{% if neg.status == 'open' %}{% set nbOpen = nbOpen + 1 %}{% endif %}{% endfor %}
+      {% if nbOpen > 0 %}
+        <span style="background:rgba(59,130,246,0.12);color:#2563eb;border:1px solid #bfdbfe;border-radius:100px;padding:3px 10px;font-size:0.68rem;font-weight:700;font-family:'Josefin Sans',sans-serif;">{{ nbOpen }} active{{ nbOpen > 1 ? 's' : '' }}</span>
+      {% endif %}
+    </div>
+
+    {% if negotiations|length > 0 %}
+      <table class="d-table">
+        <thead>
+          <tr>
+            <th>Investisseur</th>
+            <th>Projet</th>
+            <th>Montant proposé</th>
+            <th>Statut</th>
+            <th>Dernière activité</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for neg in negotiations %}
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:9px;">
+                  <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-family:'Josefin Sans',sans-serif;font-size:0.7rem;font-weight:700;color:#fff;flex-shrink:0;">
+                    {{ neg.investor ? neg.investor.fullName|slice(0,1)|upper : '?' }}
+                  </div>
+                  <span style="font-weight:600;font-size:0.84rem;">{{ neg.investor ? neg.investor.fullName : 'Investisseur inconnu' }}</span>
+                </div>
+              </td>
+              <td>
+                {% if neg.project %}
+                  <a href="{{ path('app_front_projet_show', {'id': neg.project.project_id}) }}" class="t-link">
+                    {{ neg.project.title|slice(0,22) }}{% if neg.project.title|length > 22 %}…{% endif %}
+                  </a>
+                {% else %}
+                  <span class="t-muted">—</span>
+                {% endif %}
+              </td>
+              <td class="t-amount">
+                {% if neg.proposed_amount %}
+                  {{ neg.proposed_amount|number_format(0, ',', ' ') }} TND
+                {% else %}
+                  <span class="t-muted">—</span>
+                {% endif %}
+              </td>
+              <td>
+                {% set s = neg.status %}
+                <span class="sb sb-{{ s == 'open' ? 'en_negociation' : (s == 'accepted' ? 'accepte' : (s == 'rejected' ? 'refuse' : 'en_attente')) }}">
+                  {% if s == 'open' %}En cours
+                  {% elseif s == 'accepted' %}Acceptée
+                  {% elseif s == 'rejected' %}Refusée
+                  {% elseif s == 'expired' %}Expirée
+                  {% else %}{{ s }}{% endif %}
+                </span>
+              </td>
+              <td class="t-muted" style="font-size:0.8rem;">
+                {{ neg.updated_at ? neg.updated_at|date('d/m/Y H:i') : (neg.created_at ? neg.created_at|date('d/m/Y') : '—') }}
+              </td>
+              <td>
+                <a href="{{ path('app_negociation_show', {'id': neg.negotiation_id}) }}"
+                   style="display:inline-flex;align-items:center;gap:5px;background:{% if neg.status == 'open' %}#ffbe33{% else %}#f3f4f6{% endif %};color:{% if neg.status == 'open' %}#1e2533{% else %}#6b7280{% endif %};border:none;border-radius:7px;padding:6px 12px;font-size:0.75rem;font-weight:700;font-family:'Josefin Sans',sans-serif;text-decoration:none;transition:background 0.2s;">
+                  <i class="fa fa-comments"></i> Voir
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="d-empty">
+        <div class="d-empty-icon"><i class="fa fa-comments"></i></div>
+        <p>Aucune négociation reçue pour l'instant. Les investisseurs pourront initier des négociations sur vos projets publiés.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  {# ══════════════════════════════════════════════════
      MARCHÉ FINANCIER & CRYPTO
   ══════════════════════════════════════════════════ #}
   {% include 'front/dashboard/_market_widget.html.twig' %}
+
+  {# ══════════════════════════════════════════════════
+     ACTUALITÉS MONDIALES
+  ══════════════════════════════════════════════════ #}
+  {% include 'front/dashboard/_news_widget.html.twig' with {
+      'news': news,
+      'news_category': news_category|default('business')
+  } %}
 
   {# ══════════════════════════════════════════════════
      GRAPHIQUE SECTEURS

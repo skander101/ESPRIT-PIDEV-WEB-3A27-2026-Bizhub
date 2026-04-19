@@ -44,8 +44,8 @@ class NegotiationMessage
         return $this;
     }
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'negotiationMessages')]
-    #[ORM\JoinColumn(name: 'sender_id', referencedColumnName: 'user_id')]
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'sender_id', referencedColumnName: 'user_id', nullable: true)]
     private ?User $user = null;
 
     public function getUser(): ?User
@@ -87,7 +87,7 @@ class NegotiationMessage
         return $this;
     }
 
-    #[ORM\Column(type: 'decimal', nullable: true)]
+    #[ORM\Column(type: 'float', nullable: true)]
     private ?float $proposed_amount = null;
 
     public function getProposed_amount(): ?float

@@ -7,6 +7,7 @@ use App\Entity\UsersAvis\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
@@ -20,119 +21,38 @@ class SignatureEmailService
     ) {}
 
     /**
-     * Envoie l'email de signature avec un token (lien /front/deal/{id}/signer/{token}).
-     * Appelé par DealController comme fallback quand Yousign est indisponible.
+     * Generate a new signature token, persist it, then send the email.
      */
-    public function sendSignatureEmail(Deal $deal, User $recipient): void
+    public function sendSignatureEmail(Deal $deal, User $buyer): void
     {
-        $token = $deal->getSignature_token();
-        if (!$token) {
-            // Générer un token si absent
-            $token = bin2hex(random_bytes(32));
-            $deal->setSignature_token($token);
-            $deal->setSignature_token_expires_at((new \DateTime())->modify('+48 hours'));
-            $this->em->flush();
-        }
+        // Generate secure 64-char token
+        $token     = bin2hex(random_bytes(32));
+        $expiresAt = new \DateTime('+48 hours');
 
-        $signatureUrl = $this->urlGenerator->generate(
+        $deal->setSignature_token($token);
+        $deal->setSignature_token_expires_at($expiresAt);
+        $deal->setSignature_sent_at(new \DateTime());
+        $this->em->flush();
+
+        $signingUrl = $this->urlGenerator->generate(
             'app_deal_sign_token',
             ['id' => $deal->getDeal_id(), 'token' => $token],
             UrlGeneratorInterface::ABSOLUTE_URL
         );
 
-        $this->sendSignatureInvitation($deal, $recipient, $signatureUrl);
-    }
-
-    /**
-     * Envoie l'email d'invitation à signer le contrat.
-     */
-    public function sendSignatureInvitation(Deal $deal, User $recipient, string $signatureUrl): void
-    {
-        $subject = sprintf('BizHub — Votre contrat #%d est prêt à être signé', $deal->getDeal_id());
-
-        $body = $this->buildBody($deal, $recipient, $signatureUrl);
+        $html = $this->twig->render('emails/deal_signature.html.twig', [
+            'deal'        => $deal,
+            'buyer'       => $buyer,
+            'signing_url' => $signingUrl,
+            'expires_at'  => $expiresAt,
+        ]);
 
         $email = (new Email())
-            ->from('noreply@bizhub.tn')
-            ->to($recipient->getEmail())
-            ->subject($subject)
-            ->html($body);
+            ->from(new Address('noreply@bizhub.tn', 'BizHub'))
+            ->to(new Address($buyer->getEmail(), $buyer->getFullName()))
+            ->subject(sprintf('BizHub — Signez votre contrat d\'investissement #%d', $deal->getDeal_id()))
+            ->html($html);
 
         $this->mailer->send($email);
-
-        // Marquer l'email comme envoyé
-        $deal->setEmail_sent(true);
-        $this->em->flush();
-    }
-
-    /**
-     * Envoie une notification de confirmation après signature.
-     */
-    public function sendSignatureConfirmation(Deal $deal, User $recipient): void
-    {
-        $subject = sprintf('BizHub — Contrat #%d signé avec succès', $deal->getDeal_id());
-
-        $body = $this->buildConfirmationBody($deal, $recipient);
-
-        $email = (new Email())
-            ->from('noreply@bizhub.tn')
-            ->to($recipient->getEmail())
-            ->subject($subject)
-            ->html($body);
-
-        $this->mailer->send($email);
-    }
-
-    // ── Private helpers ────────────────────────────────────────────────────────
-
-    private function buildBody(Deal $deal, User $recipient, string $signatureUrl): string
-    {
-        $amount  = number_format((float) $deal->getAmount(), 2, ',', ' ');
-        $dealId  = $deal->getDeal_id();
-        $name    = $recipient->getFirstName() ?? $recipient->getEmail();
-
-        return <<<HTML
-<!DOCTYPE html>
-<html lang="fr">
-<head><meta charset="UTF-8"><style>
-  body { font-family: Arial, sans-serif; background:#f9f9f9; padding:30px; }
-  .card { background:#fff; border-radius:12px; padding:30px; max-width:560px; margin:0 auto; }
-  h2 { color:#1a1a1a; } .btn { display:inline-block; padding:12px 28px;
-  background:#ffbe33; color:#1a1a1a; font-weight:700; border-radius:8px;
-  text-decoration:none; margin-top:20px; }
-  .footer { color:#888; font-size:11px; margin-top:30px; }
-</style></head>
-<body><div class="card">
-  <h2>Bonjour $name,</h2>
-  <p>Votre contrat d'investissement <strong>#$dealId</strong> pour un montant de <strong>$amount TND</strong> est prêt à être signé.</p>
-  <p>Cliquez sur le bouton ci-dessous pour signer électroniquement via YouSign :</p>
-  <a href="$signatureUrl" class="btn">Signer le contrat</a>
-  <p class="footer">BizHub — Si vous n'êtes pas à l'origine de cet investissement, ignorez cet email.</p>
-</div></body></html>
-HTML;
-    }
-
-    private function buildConfirmationBody(Deal $deal, User $recipient): string
-    {
-        $amount = number_format((float) $deal->getAmount(), 2, ',', ' ');
-        $dealId = $deal->getDeal_id();
-        $name   = $recipient->getFirstName() ?? $recipient->getEmail();
-
-        return <<<HTML
-<!DOCTYPE html>
-<html lang="fr">
-<head><meta charset="UTF-8"><style>
-  body { font-family: Arial, sans-serif; background:#f9f9f9; padding:30px; }
-  .card { background:#fff; border-radius:12px; padding:30px; max-width:560px; margin:0 auto; }
-  h2 { color:#06d6a0; } .footer { color:#888; font-size:11px; margin-top:30px; }
-</style></head>
-<body><div class="card">
-  <h2>Contrat signé !</h2>
-  <p>Bonjour $name,</p>
-  <p>Le contrat d'investissement <strong>#$dealId</strong> (montant : <strong>$amount TND</strong>) a été signé avec succès.</p>
-  <p>Votre partenariat est désormais officiel. Connectez-vous à BizHub pour suivre son évolution.</p>
-  <p class="footer">BizHub — L'équipe BizHub</p>
-</div></body></html>
-HTML;
     }
 }

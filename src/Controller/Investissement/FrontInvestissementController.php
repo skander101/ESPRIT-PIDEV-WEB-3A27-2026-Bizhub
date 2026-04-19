@@ -19,9 +19,9 @@ use Symfony\Component\Routing\Attribute\Route;
 class FrontInvestissementController extends AbstractController
 {
     public function __construct(
-        private InvestmentRepository  $investmentRepository,
-        private ProjectRepository     $projectRepository,
-        private EntityManagerInterface $entityManager
+        private InvestmentRepository   $investmentRepository,
+        private ProjectRepository      $projectRepository,
+        private EntityManagerInterface $entityManager,
     ) {}
 
     // ────────────────────────────────────────────────────────────────────────
@@ -75,8 +75,14 @@ class FrontInvestissementController extends AbstractController
             return $this->redirectToRoute('app_front_projet_index');
         }
 
-        // 3. Seuls les projets publiés ou en cours acceptent des investissements
-        $statutsOuverts = [Project::STATUS_PUBLIE, Project::STATUS_EN_COURS];
+        // 3. Seuls les projets publiés / en cours acceptent des investissements.
+        // Support des anciens statuts (publie, en_cours) pendant la transition.
+        $statutsOuverts = [
+            Project::STATUS_PUBLIE,
+            Project::STATUS_EN_COURS,
+            'publie',
+            'en_cours',
+        ];
         if (!in_array($projet->getStatus(), $statutsOuverts)) {
             $this->addFlash('error', 'Ce projet n\'accepte pas d\'investissements pour l\'instant.');
             return $this->redirectToRoute('app_front_projet_show', ['id' => $id]);

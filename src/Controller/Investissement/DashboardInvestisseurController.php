@@ -38,15 +38,19 @@ class DashboardInvestisseurController extends AbstractController
         }
 
         if ($user->getUserType() !== 'investisseur') {
-            return $this->redirectToRoute('app_biz_dashboard');
+            return $this->redirectToRoute('app_front_dashboard');
         }
 
         $portfolio = $this->dashboardService->buildPortfolio($user);
 
+        // Read portfolio analysis from session (set by the analyser route)
         $sessionKey = 'portfolio_analysis_' . $user->getUserId();
         $analysis   = $request->getSession()->get($sessionKey);
 
-        $matches        = $this->matchingService->matchProjects($user);
+        // Matching: recommended projects for this investor
+        $matches = $this->matchingService->matchProjects($user);
+
+        // Legacy variables used by included partials
         $derniers       = $this->investmentRepository->findLastByUser($user, 5);
         $parStatut      = $this->investmentRepository->countByStatutForUser($user);
         $projetsEnCours = $this->projectRepository->findEnCours(4);
@@ -56,6 +60,7 @@ class DashboardInvestisseurController extends AbstractController
             'portfolio'           => $portfolio,
             'analysis'            => $analysis,
             'matches'             => $matches,
+            // Legacy variables (used by included partials & existing sections)
             'total_investi'       => $portfolio['total_investi'],
             'nb_investissements'  => $portfolio['nb_investissements'],
             'nb_projets'          => $portfolio['nb_investissements'],
@@ -69,6 +74,9 @@ class DashboardInvestisseurController extends AbstractController
         ]);
     }
 
+    /**
+     * Server-side portfolio analysis — stores result in session, then redirects.
+     */
     #[Route('/investisseur/analyser', name: 'app_front_dashboard_investisseur_analyser', methods: ['POST'])]
     public function analyser(Request $request): Response
     {
@@ -87,13 +95,16 @@ class DashboardInvestisseurController extends AbstractController
             $result = $this->portfolioAnalysis->analyzePortfolio($user);
             $request->getSession()->set('portfolio_analysis_' . $user->getUserId(), $result);
             $this->addFlash('success', 'Analyse du portefeuille générée avec succès.');
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
             $this->addFlash('error', 'Erreur lors de l\'analyse. Veuillez réessayer.');
         }
 
         return $this->redirectToRoute('app_front_dashboard_investisseur');
     }
 
+    /**
+     * AJAX endpoint — returns AI-generated portfolio recommendations.
+     */
     #[Route('/investisseur/ai-reco', name: 'app_front_dashboard_investisseur_ai', methods: ['POST'])]
     public function aiRecommendations(Request $request): JsonResponse
     {
