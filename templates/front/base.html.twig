@@ -96,64 +96,77 @@
     /* ═══════════════════════════════════════════════
        NAVBAR
     ═══════════════════════════════════════════════ */
-    .navbar {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 1000;
-      height: 68px;
-      display: flex;
-      align-items: center;
-      padding: 0 4%;
-      background: rgba(21,27,38,0.96);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      box-shadow: 0 2px 24px rgba(0,0,0,0.2);
-      justify-content: space-between;
-      transition: height var(--transition), background var(--transition);
-    }
-    .navbar.scrolled {
-      height: 60px;
-      background: rgba(13,17,23,0.98);
-    }
+    .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 72px; display: flex; align-items: center; padding: 0 5%; background: rgba(34,40,49,0.97); backdrop-filter: blur(10px); box-shadow: 0 2px 20px rgba(0,0,0,0.18); justify-content: space-between; transition: height 0.3s; }
+    .navbar.scrolled { height: 60px; }
 
     /* Brand */
-    .nav-brand {
-      display: flex; align-items: center; gap: 10px;
-      text-decoration: none; flex-shrink: 0;
-    }
-    .brand-name {
-      font-size: 1.35rem; font-weight: 800;
-      color: var(--white); letter-spacing: 0.06em;
-      font-family: 'Josefin Sans', sans-serif;
-      text-transform: uppercase;
-    }
+    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-brand img { height: 36px; }
+    .brand-name { font-size: 1.4rem; font-weight: 700; font-family: 'Josefin Sans', sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: var(--white); }
     .brand-name span { color: var(--primary); }
 
     /* Nav links */
     .nav-links {
       display: flex; align-items: center;
       gap: 0.2rem; list-style: none;
+      flex: 1 1 auto;
+      min-width: 0;
+      margin-left: 0;
     }
-    .nav-links li a {
-      font-size: 0.78rem; font-weight: 600;
-      color: rgba(255,255,255,0.6);
-      text-decoration: none;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+    .nav-links::before { content: ''; flex: 1 1 auto; }
+    .nav-links .nav-spacer { flex: 1 1 auto; }
+    .nav-links li { position: relative; }
+    .nav-links li a { font-size: 0.78rem; font-weight: 600; font-family: 'Josefin Sans', sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.6); text-decoration: none; transition: color 0.2s, background 0.2s; position: relative; padding: 6px 12px; border-radius: 6px; display: block; }
+    .nav-links li a::after { display: none; }
+    .nav-links li a:hover { color: var(--white); background: rgba(255,255,255,0.06); }
+    .nav-links li a.active { color: var(--primary); background: rgba(255,190,51,0.1); }
+
+    /* Navbar dropdowns */
+    .nav-dropdown > a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .nav-dropdown .caret { font-size: 0.58rem; opacity: 0.75; }
+    .dropdown-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      min-width: 230px;
+      background: rgba(26,31,39,0.98);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      box-shadow: 0 14px 34px rgba(0,0,0,0.35);
+      padding: 8px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(6px);
+      transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+      z-index: 1200;
+    }
+    .dropdown-menu a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      white-space: nowrap;
+      font-size: 0.74rem;
+      font-weight: 600;
       font-family: 'Josefin Sans', sans-serif;
-      transition: color var(--transition), background var(--transition);
-      padding: 6px 12px;
-      border-radius: var(--radius-sm);
-      display: block;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.78);
+      transition: color 0.2s, background 0.2s;
     }
-    .nav-links li a:hover {
-      color: var(--white);
-      background: rgba(255,255,255,0.06);
-    }
-    .nav-links li a.active {
-      color: var(--primary);
-      background: rgba(255,190,51,0.1);
+    .dropdown-menu a::after { display: none; }
+    .dropdown-menu a:hover { color: #fff; background: rgba(255,255,255,0.08); }
+    .dropdown-menu a.active { color: var(--primary); background: rgba(255,190,51,0.1); }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
     }
 
     /* Nav CTA button */
@@ -161,59 +174,326 @@
       background: var(--primary) !important;
       color: var(--dark) !important;
       padding: 8px 18px !important;
-      border-radius: var(--radius-md) !important;
+      border-radius: 10px !important;
       font-weight: 700 !important;
       margin-left: 0.5rem;
-      transition: background var(--transition), transform var(--transition), box-shadow var(--transition) !important;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s !important;
     }
     .nav-links .btn-nav:hover {
       background: var(--primary-dark) !important;
       transform: translateY(-1px);
-      box-shadow: 0 4px 14px rgba(255,190,51,0.4) !important;
+      box-shadow: 0 4px 14px rgba(255,190,51,0.3) !important;
     }
 
     /* Hamburger */
     .hamburger {
       display: none; flex-direction: column; gap: 5px;
-      cursor: pointer; background: none; border: none; padding: 6px;
+      cursor: pointer; background: none; border: none; padding: 8px;
     }
     .hamburger span {
-      width: 22px; height: 2px;
+      width: 24px; height: 2px;
       background: var(--white); display: block;
-      border-radius: 2px; transition: all 0.3s;
+      border-radius: 2px;
     }
 
     /* Mobile nav — slide from right */
     .mobile-nav {
       display: none;
       position: fixed; inset: 0;
-      background: rgba(13,17,23,0.98);
+      background: var(--dark2);
       z-index: 999;
       flex-direction: column;
       align-items: center; justify-content: center;
-      gap: 1rem;
-      backdrop-filter: blur(20px);
+      gap: 1.5rem;
     }
     .mobile-nav.open { display: flex; }
     .mobile-nav a {
       font-size: 1.4rem; font-weight: 700;
       font-family: 'Josefin Sans', sans-serif;
-      color: rgba(255,255,255,0.8);
+      color: var(--white);
       text-decoration: none;
       text-transform: uppercase; letter-spacing: 0.1em;
-      transition: color var(--transition);
+      transition: color 0.2s;
       padding: 8px 24px; border-radius: var(--radius-md);
     }
     .mobile-nav a:hover { color: var(--primary); }
     .mobile-close {
       position: absolute; top: 20px; right: 5%;
-      background: rgba(255,255,255,0.08); border: none;
-      color: var(--white); font-size: 1.2rem; cursor: pointer;
+      background: none; border: none;
+      color: var(--white); font-size: 1.5rem; cursor: pointer;
       width: 40px; height: 40px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      transition: background var(--transition);
+      transition: background 0.2s;
     }
-    .mobile-close:hover { background: rgba(255,255,255,0.15); }
+    .mobile-close:hover { background: rgba(255,255,255,0.08); }
+
+    /* Cart toggle button in navbar */
+    .cart-toggle-btn {
+      position: relative;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px 10px;
+      border-radius: 8px;
+      color: rgba(255,255,255,0.75);
+      font-size: 1.1rem;
+      transition: color 0.2s, background 0.2s;
+      display: flex;
+      align-items: center;
+    }
+    .cart-toggle-btn:hover { color: #fff; background: rgba(255,255,255,0.08); }
+    .cart-toggle-btn .badge-cart {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: #ef4444;
+      color: #fff;
+      font-size: 0.55rem;
+      font-weight: 900;
+      border-radius: 50%;
+      min-width: 16px;
+      height: 16px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 0 3px;
+      border: 2px solid rgba(34,40,49,0.97);
+    }
+    .cart-toggle-btn .badge-cart.visible { display: flex; }
+
+    /* Cart drawer */
+    #cart-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1100;
+      background: rgba(0,0,0,0);
+      backdrop-filter: blur(0);
+      pointer-events: none;
+      transition: background 0.3s, backdrop-filter 0.3s;
+    }
+    #cart-overlay.open {
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(3px);
+      pointer-events: all;
+    }
+    #cart-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: min(400px, 92vw);
+      z-index: 1101;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      box-shadow: -8px 0 40px rgba(0,0,0,0.18);
+      transform: translateX(100%);
+      transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+    }
+    #cart-drawer.open { transform: translateX(0); }
+    .cart-drawer-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 20px 16px;
+      border-bottom: 1.5px solid #ebebeb;
+      flex-shrink: 0;
+    }
+    .cart-drawer-title {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .cart-drawer-title .cnt {
+      background: #ffbe33;
+      color: #1e293b;
+      font-size: 0.65rem;
+      font-weight: 900;
+      border-radius: 100px;
+      padding: 2px 8px;
+    }
+    .cart-drawer-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748b;
+      font-size: 1rem;
+      transition: background 0.2s, color 0.2s;
+    }
+    .cart-drawer-close:hover { background: #f1f5f9; color: #1e293b; }
+    .cart-drawer-loading {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 12px;
+      color: #94a3b8;
+      font-size: 0.82rem;
+      font-family: 'Josefin Sans', sans-serif;
+    }
+    .cart-drawer-loading .spin {
+      width: 32px;
+      height: 32px;
+      border: 3px solid #e2e8f0;
+      border-top-color: #ffbe33;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #cart-drawer-body {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .cart-sb-items {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 16px;
+      min-height: 0;
+      scrollbar-width: thin;
+      scrollbar-color: #e2e8f0 transparent;
+    }
+    .cart-sb-items::-webkit-scrollbar { width: 4px; }
+    .cart-sb-items::-webkit-scrollbar-track { background: transparent; }
+    .cart-sb-items::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
+    .cart-sb-item { display: flex; align-items: flex-start; gap: 10px; padding: 14px 0; border-bottom: 1px solid #f1f5f9; }
+    .cart-sb-item:last-child { border-bottom: none; }
+    .cart-sb-item-icon { width: 42px; height: 42px; border-radius: 10px; background: rgba(255,190,51,0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .cart-sb-item-info { flex: 1; min-width: 0; }
+    .cart-sb-item-name { font-family: 'Josefin Sans', sans-serif; font-size: 0.82rem; font-weight: 700; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+    .cart-sb-item-price { font-size: 0.75rem; color: #94a3b8; margin-bottom: 6px; }
+    .cart-sb-qty-form { display: inline-block; }
+    .cart-sb-qty-row { display: flex; align-items: center; gap: 4px; }
+    .cart-sb-qty-btn {
+      width: 24px;
+      height: 24px;
+      border: 1.5px solid #e2e8f0;
+      background: #f8fafc;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #475569;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.2s, background 0.2s;
+      padding: 0;
+    }
+    .cart-sb-qty-btn:hover { border-color: #ffbe33; background: rgba(255,190,51,0.08); }
+    .cart-sb-qty-input {
+      width: 40px;
+      height: 24px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 6px;
+      text-align: center;
+      font-size: 0.78rem;
+      font-weight: 700;
+      background: #fff;
+      color: #1e293b;
+      outline: none;
+      font-family: 'Josefin Sans', sans-serif;
+    }
+    .cart-sb-qty-input:focus { border-color: #ffbe33; }
+    .cart-sb-item-total { font-family: 'Josefin Sans', sans-serif; font-size: 0.82rem; font-weight: 800; color: #1e293b; text-align: right; flex-shrink: 0; min-width: 52px; }
+    .cart-sb-remove {
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #cbd5e1;
+      font-size: 0.75rem;
+      transition: color 0.2s, background 0.2s;
+      flex-shrink: 0;
+    }
+    .cart-sb-remove:hover { color: #ef4444; background: rgba(239,68,68,0.07); }
+    .cart-sb-footer { padding: 16px; border-top: 1.5px solid #ebebeb; flex-shrink: 0; background: #f8fafc; }
+    .cart-sb-totaux { display: flex; flex-direction: column; gap: 6px; }
+    .cart-sb-total-row { display: flex; justify-content: space-between; font-size: 0.82rem; color: #475569; }
+    .cart-sb-grand { font-family: 'Josefin Sans', sans-serif; font-weight: 800; color: #1e293b; font-size: 0.9rem; border-top: 1.5px solid #e2e8f0; padding-top: 8px; margin-top: 4px; }
+    .cart-sb-checkout {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg,#ffbe33,#e0a820);
+      color: #1e293b;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: 'Josefin Sans', sans-serif;
+      font-weight: 800;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .cart-sb-checkout:hover { opacity: 0.88; }
+    .cart-sb-continue {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 12px;
+      background: #fff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #475569;
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .cart-sb-continue:hover { border-color: #94a3b8; color: #1e293b; }
+    .cart-sb-clear {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 12px;
+      background: #fff;
+      border: 1.5px solid #fecaca;
+      border-radius: 8px;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #ef4444;
+      cursor: pointer;
+      transition: background 0.2s;
+      width: 100%;
+    }
+    .cart-sb-clear:hover { background: rgba(239,68,68,0.06); }
+    .cart-sb-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; text-align: center; }
 
     /* ═══════════════════════════════════════════════
        BUTTONS — SYSTÈME COMPLET
@@ -814,17 +1094,29 @@
 <!-- ── Mobile nav ── -->
 <div class="mobile-nav" id="mobileNav">
   <button class="mobile-close" id="mobileClose"><i class="fa fa-times"></i></button>
-  <a href="{{ path('app_front_index') }}">Home</a>
+  <a href="{{ path('app_front_index') }}"><i class="fa fa-home"></i> Home</a>
+  <a href="{{ path('app_user_profile') }}"><i class="fa fa-user"></i> Profil</a>
+  <a href="{{ path('app_avis_list') }}"><i class="fa fa-comment"></i> Mes Avis</a>
+
+  <a href="{{ path('produit_index') }}"><i class="fa fa-store"></i> Marketplace</a>
+  {% if app.user and app.user.userType == 'startup' %}
+  <a href="{{ path('panier_index') }}" style="font-size:1.1rem;opacity:0.9;"><i class="fa fa-shopping-cart"></i> Panier <span class="badge-cart" id="cartBadgeMobile" style="display:none;"></span></a>
+  <a href="{{ path('commande_index') }}" style="font-size:1.1rem;opacity:0.9;"><i class="fa fa-file-invoice"></i> Mes Commandes</a>
+  <a href="{{ path('tracking_index') }}" style="font-size:1.1rem;opacity:0.9;"><i class="fa fa-route"></i> Suivi</a>
+  {% elseif app.user and app.user.userType == 'investisseur' %}
+  <a href="{{ path('produit_mes') }}" style="font-size:1.1rem;opacity:0.9;"><i class="fa fa-store"></i> Mes Produits</a>
+  <a href="{{ path('commande_investisseur_recues') }}" style="font-size:1.1rem;opacity:0.9;"><i class="fa fa-inbox"></i> Commandes reçues</a>
+  {% endif %}
+
+  <a href="{{ path('app_front_projet_index') }}"><i class="fa fa-rocket"></i> Investissement</a>
+  <a href="{{ path('app_front_formations_index') }}"><i class="fa fa-graduation-cap"></i> Formations</a>
   {% if app.user %}
-  <a href="{{ path('app_front_dashboard') }}">Dashboard</a>
+  <a href="{{ path('app_front_dashboard') }}" style="font-size:1.1rem;opacity:0.9;"><i class="fa fa-chart-line"></i> Dashboard</a>
   {% endif %}
-  <a href="{{ path('app_user_profile') }}">Profil</a>
-  <a href="{{ path('app_avis_list') }}">Mes Avis</a>
-  <a href="{{ path('app_front_projet_index') }}">Investissement</a>
   {% if app.user and app.user.userType == 'investisseur' %}
-  <a href="{{ path('app_front_investissement_index') }}">Mes Investissements</a>
+  <a href="{{ path('app_front_investissement_index') }}" style="font-size:1.1rem;opacity:0.9;"><i class="fa fa-hand-holding-usd"></i> Mes Investissements</a>
   {% endif %}
-  <a href="{{ path('app_logout') }}" style="color:var(--primary);">Déconnexion</a>
+  <a href="{{ path('app_logout') }}" style="color:var(--primary);"><i class="fa fa-sign-out-alt"></i> Déconnexion</a>
 </div>
 
 <!-- ── Navbar ── -->
@@ -832,18 +1124,56 @@
   <a href="{{ path('app_front_index') }}" class="nav-brand">
     <span class="brand-name">Biz<span>Hub</span></span>
   </a>
+  {% set currentRoute = app.request.get('_route') %}
   <ul class="nav-links">
-    <li><a href="{{ path('app_front_index') }}" {% if app.request.get('_route') == 'app_front_index' %}class="active"{% endif %}>Home</a></li>
-    {% if app.user %}
-    <li><a href="{{ path('app_front_dashboard') }}" {% if 'dashboard' in app.request.get('_route') %}class="active"{% endif %}>Dashboard</a></li>
+    <li><a href="{{ path('app_front_index') }}" {% if currentRoute == 'app_front_index' %}class="active"{% endif %}><i class="fa fa-home"></i> Home</a></li>
+    <li><a href="{{ path('app_user_profile') }}" {% if currentRoute == 'app_user_profile' %}class="active"{% endif %}><i class="fa fa-user"></i> Profil</a></li>
+    <li><a href="{{ path('app_avis_list') }}" {% if currentRoute == 'app_avis_list' %}class="active"{% endif %}><i class="fa fa-comment"></i> Mes Avis</a></li>
+
+    <li class="nav-dropdown">
+      <a href="{{ path('produit_index') }}" {% if 'produit' in currentRoute or 'commande' in currentRoute or 'panier' in currentRoute or 'tracking' in currentRoute %}class="active"{% endif %}>
+        <i class="fa fa-store"></i> Marketplace <i class="fa fa-chevron-down caret"></i>
+      </a>
+      <div class="dropdown-menu">
+        <a href="{{ path('produit_index') }}" {% if 'produit' in currentRoute %}class="active"{% endif %}><i class="fa fa-store"></i> Module Marketplace</a>
+        {% if app.user and app.user.userType == 'startup' %}
+        <a href="{{ path('commande_index') }}" {% if 'commande' in currentRoute and currentRoute != 'commande_investisseur_recues' %}class="active"{% endif %}><i class="fa fa-file-invoice"></i> Mes Commandes</a>
+        <a href="{{ path('tracking_index') }}" {% if 'tracking' in currentRoute %}class="active"{% endif %}><i class="fa fa-route"></i> Suivi</a>
+        {% endif %}
+        {% if app.user and app.user.userType == 'investisseur' %}
+        <a href="{{ path('produit_mes') }}" {% if currentRoute == 'produit_mes' %}class="active"{% endif %}><i class="fa fa-store"></i> Mes Produits</a>
+        <a href="{{ path('commande_investisseur_recues') }}" {% if currentRoute == 'commande_investisseur_recues' %}class="active"{% endif %}><i class="fa fa-inbox"></i> Commandes reçues</a>
+        {% endif %}
+      </div>
+    </li>
+
+    <li class="nav-dropdown">
+      <a href="{{ path('app_front_projet_index') }}" {% if 'projet' in currentRoute or 'investir' in currentRoute or 'investissement' in currentRoute or 'dashboard' in currentRoute %}class="active"{% endif %}>
+        <i class="fa fa-rocket"></i> Investissement <i class="fa fa-chevron-down caret"></i>
+      </a>
+      <div class="dropdown-menu">
+        <a href="{{ path('app_front_projet_index') }}" {% if 'projet' in currentRoute or 'investir' in currentRoute %}class="active"{% endif %}><i class="fa fa-rocket"></i> Marketplace Invest</a>
+        {% if app.user %}
+        <a href="{{ path('app_front_dashboard') }}" {% if 'dashboard' in currentRoute %}class="active"{% endif %}><i class="fa fa-chart-line"></i> Dashboard</a>
+        {% endif %}
+        {% if app.user and app.user.userType == 'investisseur' %}
+        <a href="{{ path('app_front_investissement_index') }}" {% if 'investissement_index' in currentRoute or 'investissement_edit' in currentRoute %}class="active"{% endif %}><i class="fa fa-hand-holding-usd"></i> Mes Investissements</a>
+        {% endif %}
+      </div>
+    </li>
+
+    <li><a href="{{ path('app_front_formations_index') }}" {% if 'formation' in currentRoute %}class="active"{% endif %}><i class="fa fa-graduation-cap"></i> Formations</a></li>
+    <li class="nav-spacer" aria-hidden="true"></li>
+
+    {% if app.user and app.user.userType == 'startup' %}
+    <li>
+      <a href="{{ path('panier_index') }}" class="cart-toggle-btn" id="cartToggle" onclick="openCartDrawer(); return false;" aria-label="Ouvrir le panier" title="Panier">
+        <i class="fa fa-shopping-cart"></i>
+        <span class="badge-cart" id="cartBadge"></span>
+      </a>
+    </li>
     {% endif %}
-    <li><a href="{{ path('app_user_profile') }}" {% if app.request.get('_route') == 'app_user_profile' %}class="active"{% endif %}>Profil</a></li>
-    <li><a href="{{ path('app_avis_list') }}" {% if app.request.get('_route') == 'app_avis_list' %}class="active"{% endif %}>Mes Avis</a></li>
-    <li><a href="{{ path('produit_index') }}" {% if 'produit_' in app.request.get('_route') or 'commande_' in app.request.get('_route') or 'panier_' in app.request.get('_route') %}class="active"{% endif %}>Marketplace</a></li>
-    <li><a href="{{ path('app_front_projet_index') }}" {% if 'projet' in app.request.get('_route') or 'investir' in app.request.get('_route') %}class="active"{% endif %}>Investissement</a></li>
-    {% if app.user and app.user.userType == 'investisseur' %}
-    <li><a href="{{ path('app_front_investissement_index') }}" {% if 'investissement_index' in app.request.get('_route') or 'investissement_edit' in app.request.get('_route') %}class="active"{% endif %}>Mes Investissements</a></li>
-    {% endif %}
+
     {% if app.user %}
     <li><a href="{{ path('app_logout') }}" class="btn-nav"><i class="fa fa-sign-out-alt"></i> Déconnexion</a></li>
     {% else %}
@@ -858,6 +1188,28 @@
 <main>
   {% block content %}{% endblock %}
 </main>
+
+{% if app.user and app.user.userType == 'startup' %}
+<div id="cart-overlay" onclick="closeCartDrawer()"></div>
+<div id="cart-drawer" role="dialog" aria-label="Panier" aria-modal="true">
+  <div class="cart-drawer-head">
+    <div class="cart-drawer-title">
+      <i class="fa fa-shopping-cart" style="color:#ffbe33;"></i>
+      Mon Panier
+      <span class="cnt" id="cartDrawerCount">0</span>
+    </div>
+    <button class="cart-drawer-close" onclick="closeCartDrawer()" aria-label="Fermer">
+      <i class="fa fa-times"></i>
+    </button>
+  </div>
+  <div id="cart-drawer-body">
+    <div class="cart-drawer-loading">
+      <div class="spin"></div>
+      Chargement…
+    </div>
+  </div>
+</div>
+{% endif %}
 
 <!-- ── Footer ── -->
 <footer>
@@ -927,6 +1279,113 @@
   document.querySelectorAll('.mobile-nav a').forEach(a => {
     a.addEventListener('click', () => document.getElementById('mobileNav').classList.remove('open'));
   });
+
+  {% if app.user and app.user.userType == 'startup' %}
+  let _cartOpen = false;
+
+  function openCartDrawer() {
+    const overlay = document.getElementById('cart-overlay');
+    const drawer = document.getElementById('cart-drawer');
+    if (!overlay || !drawer) return;
+    overlay.classList.add('open');
+    drawer.classList.add('open');
+    _cartOpen = true;
+    document.body.style.overflow = 'hidden';
+    loadCartDrawer();
+  }
+
+  function closeCartDrawer() {
+    const overlay = document.getElementById('cart-overlay');
+    const drawer = document.getElementById('cart-drawer');
+    if (!overlay || !drawer) return;
+    overlay.classList.remove('open');
+    drawer.classList.remove('open');
+    _cartOpen = false;
+    document.body.style.overflow = '';
+  }
+
+  function loadCartDrawer() {
+    const body = document.getElementById('cart-drawer-body');
+    if (!body) return;
+    body.innerHTML = '<div class="cart-drawer-loading"><div class="spin"></div>Chargement…</div>';
+
+    fetch('{{ path("panier_sidebar") }}', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+      .then(r => {
+        if (r.status === 204) { body.innerHTML = ''; return null; }
+        return r.text();
+      })
+      .then(html => {
+        if (!html) return;
+        body.innerHTML = html;
+        body.querySelectorAll('form[data-drawer-form]').forEach(form => {
+          form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            fetch(form.action, {
+              method: form.method || 'POST',
+              body: new FormData(form),
+              headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            }).then(() => {
+              updateCartBadge();
+              if (_cartOpen) loadCartDrawer();
+            });
+          });
+        });
+      })
+      .catch(() => {
+        body.innerHTML = '<div style="padding:20px;text-align:center;color:#ef4444;font-size:0.82rem;">Erreur de chargement.</div>';
+      });
+  }
+
+  function updateCartBadge() {
+    fetch('{{ path("panier_badge") }}')
+      .then(r => r.json())
+      .then(data => {
+        const badge = document.getElementById('cartBadge');
+        const badgeMobile = document.getElementById('cartBadgeMobile');
+        const count = document.getElementById('cartDrawerCount');
+        if (data.count > 0) {
+          if (badge) {
+            badge.textContent = data.count;
+            badge.classList.add('visible');
+          }
+          if (badgeMobile) {
+            badgeMobile.textContent = data.count;
+            badgeMobile.style.display = 'inline-block';
+          }
+          if (count) count.textContent = data.count;
+        } else {
+          if (badge) badge.classList.remove('visible');
+          if (badgeMobile) badgeMobile.style.display = 'none';
+          if (count) count.textContent = '0';
+        }
+      });
+  }
+
+  function sbQty(btn, delta) {
+    const input = btn.parentElement.querySelector('input[type="number"]');
+    const val = parseInt(input.value, 10) || 1;
+    const min = parseInt(input.min, 10) || 1;
+    const max = parseInt(input.max, 10) || 999;
+    input.value = Math.min(max, Math.max(min, val + delta));
+    input.dispatchEvent(new Event('change'));
+  }
+
+  window.openCartDrawer = openCartDrawer;
+  window.closeCartDrawer = closeCartDrawer;
+  window.sbQty = sbQty;
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && _cartOpen) closeCartDrawer();
+  });
+
+  updateCartBadge();
+
+  document.querySelectorAll('form[action*="panier_add"]').forEach(form => {
+    form.addEventListener('submit', function() {
+      setTimeout(updateCartBadge, 600);
+    });
+  });
+  {% endif %}
 
   /* ── Auto-dismiss flash après 5s ── */
   document.querySelectorAll('.flash').forEach(el => {

@@ -26,14 +26,60 @@
     .nav-brand img { height: 36px; }
     .brand-name { font-size: 1.4rem; font-weight: 700; font-family: 'Josefin Sans', sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: var(--white); }
     .brand-name span { color: var(--primary); }
-    .nav-links { display: flex; align-items: center; gap: 1.8rem; list-style: none; }
-    .nav-links a { font-size: 0.82rem; font-weight: 600; font-family: 'Josefin Sans', sans-serif; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.75); text-decoration: none; transition: color 0.2s; position: relative; padding-bottom: 4px; }
-    .nav-links a::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background: var(--primary); border-radius: 2px; transition: width 0.25s ease; }
-    .nav-links a:hover, .nav-links a.active { color: var(--white); }
-    .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
-    .nav-links .btn-nav { background: var(--primary); color: var(--dark) !important; padding: 9px 22px; border-radius: 6px; font-weight: 700; }
+    .nav-links { display: flex; align-items: center; gap: 0.2rem; list-style: none; flex: 1 1 auto; min-width: 0; margin-left: 0; }
+    .nav-links::before { content: ''; flex: 1 1 auto; }
+    .nav-links .nav-spacer { flex: 1 1 auto; }
+    .nav-links li { position: relative; }
+    .nav-links a { font-size: 0.78rem; font-weight: 600; font-family: 'Josefin Sans', sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.6); text-decoration: none; transition: color 0.2s, background 0.2s; position: relative; padding: 6px 12px; border-radius: 6px; display: block; }
+    .nav-links a::after { display: none; }
+    .nav-links a:hover { color: var(--white); background: rgba(255,255,255,0.06); }
+    .nav-links a.active { color: var(--primary); background: rgba(255,190,51,0.1); }
+    .nav-links .btn-nav { background: var(--primary) !important; color: var(--dark) !important; padding: 8px 18px !important; border-radius: 10px !important; font-weight: 700 !important; margin-left: 0.5rem; }
     .nav-links .btn-nav::after { display: none; }
-    .nav-links .btn-nav:hover { background: var(--primary-dark); }
+    .nav-links .btn-nav:hover { background: var(--primary-dark) !important; }
+
+    .nav-dropdown > a { display: inline-flex; align-items: center; gap: 6px; }
+    .nav-dropdown .caret { font-size: 0.58rem; opacity: 0.75; }
+    .dropdown-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      min-width: 230px;
+      background: rgba(26,31,39,0.98);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      box-shadow: 0 14px 34px rgba(0,0,0,0.35);
+      padding: 8px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(6px);
+      transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+      z-index: 1200;
+    }
+    .dropdown-menu a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      white-space: nowrap;
+      font-size: 0.74rem;
+      font-weight: 600;
+      font-family: 'Josefin Sans', sans-serif;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.78);
+      transition: color 0.2s, background 0.2s;
+    }
+    .dropdown-menu a::after { display: none; }
+    .dropdown-menu a:hover { color: #fff; background: rgba(255,255,255,0.08); }
+    .dropdown-menu a.active { color: var(--primary); background: rgba(255,190,51,0.1); }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
     .badge-cart { background: var(--danger); color: #fff; font-size: 0.6rem; border-radius: 50%; padding: 2px 5px; vertical-align: super; margin-left: 2px; }
     .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 8px; }
     .hamburger span { width: 24px; height: 2px; background: var(--white); display: block; border-radius: 2px; }
@@ -426,16 +472,27 @@
 <div class="mobile-nav" id="mobileNav">
   <button class="mobile-close" id="mobileClose"><i class="fa fa-times"></i></button>
   <a href="{{ path('app_front_index') }}"><i class="fa fa-home"></i> Home</a>
+  <a href="{{ path('app_user_profile') }}"><i class="fa fa-user"></i> Profil</a>
+  <a href="{{ path('app_avis_list') }}"><i class="fa fa-comment"></i> Mes Avis</a>
+
   <a href="{{ path('produit_index') }}" class="{{ app.request.attributes.get('_route') starts with 'produit' ? 'active' : '' }}"><i class="fa fa-store"></i> Marketplace</a>
   {% if app.user %}
     {% if app.user.userType == 'startup' %}
-      <a href="#" onclick="document.getElementById('mobileNav').classList.remove('open'); openCartDrawer(); return false;"><i class="fa fa-shopping-cart"></i> Panier <span class="badge-cart" id="cartBadgeMobile" style="display:none;"></span></a>
+      <a href="{{ path('panier_index') }}"><i class="fa fa-shopping-cart"></i> Panier <span class="badge-cart" id="cartBadgeMobile" style="display:none;"></span></a>
       <a href="{{ path('commande_index') }}" class="{{ app.request.attributes.get('_route') starts with 'commande' and app.request.attributes.get('_route') != 'commande_investisseur_recues' ? 'active' : '' }}"><i class="fa fa-file-invoice"></i> Mes Commandes</a>
-      <a href="{{ path('tracking_index') }}" class="{{ app.request.attributes.get('_route') starts with 'tracking' ? 'active' : '' }}"><i class="fa fa-radar"></i> Suivi</a>
+      <a href="{{ path('tracking_index') }}" class="{{ app.request.attributes.get('_route') starts with 'tracking' ? 'active' : '' }}"><i class="fa fa-route"></i> Suivi</a>
     {% elseif app.user.userType == 'investisseur' %}
       <a href="{{ path('produit_mes') }}" class="{{ app.request.attributes.get('_route') == 'produit_mes' ? 'active' : '' }}"><i class="fa fa-store"></i> Mes Produits</a>
       <a href="{{ path('commande_investisseur_recues') }}" class="{{ app.request.attributes.get('_route') == 'commande_investisseur_recues' ? 'active' : '' }}"><i class="fa fa-inbox"></i> Commandes reçues</a>
     {% endif %}
+
+    <a href="{{ path('app_front_projet_index') }}"><i class="fa fa-rocket"></i> Investissement</a>
+    <a href="{{ path('app_front_formations_index') }}"><i class="fa fa-graduation-cap"></i> Formations</a>
+    <a href="{{ path('app_front_dashboard') }}"><i class="fa fa-chart-line"></i> Dashboard</a>
+    {% if app.user.userType == 'investisseur' %}
+      <a href="{{ path('app_front_investissement_index') }}"><i class="fa fa-hand-holding-usd"></i> Mes Investissements</a>
+    {% endif %}
+
     <a href="{{ path('app_logout') }}" style="color:var(--primary);"><i class="fa fa-sign-out-alt"></i> Déconnexion</a>
   {% endif %}
 </div>
@@ -445,22 +502,51 @@
   <a href="{{ path('app_front_index') }}" class="nav-brand">
     <span class="brand-name">Biz<span>Hub</span></span>
   </a>
+  {% set currentRoute = app.request.attributes.get('_route') %}
   <ul class="nav-links">
-    <li><a href="{{ path('app_front_index') }}"><i class="fa fa-home"></i> Home</a></li>
-    <li><a href="{{ path('produit_index') }}" class="{{ app.request.attributes.get('_route') starts with 'produit' ? 'active' : '' }}"><i class="fa fa-store"></i> Marketplace</a></li>
+    <li><a href="{{ path('app_front_index') }}" class="{{ currentRoute == 'app_front_index' ? 'active' : '' }}"><i class="fa fa-home"></i> Home</a></li>
+    <li><a href="{{ path('app_user_profile') }}" class="{{ currentRoute == 'app_user_profile' ? 'active' : '' }}"><i class="fa fa-user"></i> Profil</a></li>
+    <li><a href="{{ path('app_avis_list') }}" class="{{ currentRoute == 'app_avis_list' ? 'active' : '' }}"><i class="fa fa-comment"></i> Mes Avis</a></li>
+
+    <li class="nav-dropdown">
+      <a href="{{ path('produit_index') }}" class="{{ 'produit' in currentRoute or 'commande' in currentRoute or 'panier' in currentRoute or 'tracking' in currentRoute ? 'active' : '' }}"><i class="fa fa-store"></i> Marketplace <i class="fa fa-chevron-down caret"></i></a>
+      <div class="dropdown-menu">
+        <a href="{{ path('produit_index') }}" class="{{ 'produit' in currentRoute ? 'active' : '' }}"><i class="fa fa-store"></i> Module Marketplace</a>
+        {% if app.user and app.user.userType == 'startup' %}
+          <a href="{{ path('commande_index') }}" class="{{ 'commande' in currentRoute and currentRoute != 'commande_investisseur_recues' ? 'active' : '' }}"><i class="fa fa-file-invoice"></i> Mes Commandes</a>
+          <a href="{{ path('tracking_index') }}" class="{{ 'tracking' in currentRoute ? 'active' : '' }}"><i class="fa fa-route"></i> Suivi</a>
+        {% endif %}
+        {% if app.user and app.user.userType == 'investisseur' %}
+          <a href="{{ path('produit_mes') }}" class="{{ currentRoute == 'produit_mes' ? 'active' : '' }}"><i class="fa fa-store"></i> Mes Produits</a>
+          <a href="{{ path('commande_investisseur_recues') }}" class="{{ currentRoute == 'commande_investisseur_recues' ? 'active' : '' }}"><i class="fa fa-inbox"></i> Commandes reçues</a>
+        {% endif %}
+      </div>
+    </li>
+
+    <li class="nav-dropdown">
+      <a href="{{ path('app_front_projet_index') }}" class="{{ 'projet' in currentRoute or 'investissement' in currentRoute or 'investir' in currentRoute or 'dashboard' in currentRoute ? 'active' : '' }}"><i class="fa fa-rocket"></i> Investissement <i class="fa fa-chevron-down caret"></i></a>
+      <div class="dropdown-menu">
+        <a href="{{ path('app_front_projet_index') }}" class="{{ 'projet' in currentRoute or 'investir' in currentRoute ? 'active' : '' }}"><i class="fa fa-rocket"></i> Module Invest</a>
+        {% if app.user %}
+          <a href="{{ path('app_front_dashboard') }}" class="{{ 'dashboard' in currentRoute ? 'active' : '' }}"><i class="fa fa-chart-line"></i> Dashboard</a>
+        {% endif %}
+        {% if app.user and app.user.userType == 'investisseur' %}
+          <a href="{{ path('app_front_investissement_index') }}" class="{{ 'investissement_index' in currentRoute or 'investissement_edit' in currentRoute ? 'active' : '' }}"><i class="fa fa-hand-holding-usd"></i> Mes Investissements</a>
+        {% endif %}
+      </div>
+    </li>
+
+    <li><a href="{{ path('app_front_formations_index') }}" class="{{ 'formation' in currentRoute ? 'active' : '' }}"><i class="fa fa-graduation-cap"></i> Formations</a></li>
+    <li class="nav-spacer" aria-hidden="true"></li>
+
     {% if app.user %}
       {% if app.user.userType == 'startup' %}
         <li>
-          <button class="cart-toggle-btn" id="cartToggle" onclick="openCartDrawer()" aria-label="Ouvrir le panier">
+          <a href="{{ path('panier_index') }}" class="cart-toggle-btn" id="cartToggle" onclick="openCartDrawer(); return false;" aria-label="Ouvrir le panier" title="Panier">
             <i class="fa fa-shopping-cart"></i>
             <span class="badge-cart" id="cartBadge"></span>
-          </button>
+          </a>
         </li>
-        <li><a href="{{ path('commande_index') }}" class="{{ app.request.attributes.get('_route') starts with 'commande' and app.request.attributes.get('_route') != 'commande_investisseur_recues' ? 'active' : '' }}"><i class="fa fa-file-invoice"></i> Mes Commandes</a></li>
-        <li><a href="{{ path('tracking_index') }}" class="{{ app.request.attributes.get('_route') starts with 'tracking' ? 'active' : '' }}"><i class="fa fa-radar"></i> Suivi</a></li>
-      {% elseif app.user.userType == 'investisseur' %}
-        <li><a href="{{ path('produit_mes') }}" class="btn-nav {{ app.request.attributes.get('_route') == 'produit_mes' ? 'active' : '' }}"><i class="fa fa-store"></i> Mes Produits</a></li>
-        <li><a href="{{ path('commande_investisseur_recues') }}" class="{{ app.request.attributes.get('_route') == 'commande_investisseur_recues' ? 'active' : '' }}"><i class="fa fa-inbox"></i> Commandes reçues</a></li>
       {% endif %}
       <li>
         <a href="{{ path('app_logout') }}" class="btn-nav" style="display:inline-flex; align-items:center; gap:6px; font-size:0.78rem;">

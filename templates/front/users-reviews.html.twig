@@ -3,34 +3,7 @@
 {% block title %}Reviews - BizHub{% endblock %}
 
 {% block content %}
-    box-shadow: 0 2px 20px rgba(0,0,0,0.18);
-    justify-content: space-between; transition: height 0.3s;
-  }
-  .navbar.scrolled { height: 60px; }
-  .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-  .nav-brand img { height: 36px; }
-  .brand-name { font-size: 1.4rem; font-weight: 700; font-family: 'Josefin Sans', sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: var(--white); }
-  .brand-name span { color: var(--primary); }
-  .nav-links { display: flex; align-items: center; gap: 1.8rem; list-style: none; }
-  .nav-links a {
-    font-size: 0.82rem; font-weight: 600; font-family: 'Josefin Sans', sans-serif;
-    letter-spacing: 0.12em; text-transform: uppercase;
-    color: rgba(255,255,255,0.75); text-decoration: none;
-    transition: color 0.2s; position: relative; padding-bottom: 4px;
-  }
-  .nav-links a::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background: var(--primary); border-radius: 2px; transition: width 0.25s ease; }
-  .nav-links a:hover, .nav-links a.active { color: var(--white); }
-  .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
-  .nav-links .btn-nav { background: var(--primary); color: var(--dark) !important; padding: 9px 22px; border-radius: 6px; font-weight: 700; }
-  .nav-links .btn-nav::after { display: none; }
-  .nav-links .btn-nav:hover { background: var(--primary-dark); }
-  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 8px; }
-  .hamburger span { width: 24px; height: 2px; background: var(--white); display: block; border-radius: 2px; }
-  .mobile-nav { display: none; position: fixed; inset: 0; background: var(--dark2); z-index: 999; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem; }
-  .mobile-nav.open { display: flex; }
-  .mobile-nav a { font-size: 1.6rem; font-weight: 700; font-family: 'Josefin Sans', sans-serif; color: var(--white); text-decoration: none; }
-  .mobile-nav a:hover { color: var(--primary); }
-  .mobile-close { position: absolute; top: 20px; right: 5%; background: none; border: none; color: var(--white); font-size: 1.5rem; cursor: pointer; }
+<style>
 
   /* PAGE HERO BANNER */
   .page-hero {
@@ -167,34 +140,6 @@
 </style>
 </head>
 <body>
-<div class="mobile-nav" id="mobileNav">
-  <button class="mobile-close" id="mobileClose"><i class="fa fa-times"></i></button>
-  <a href="{{ path('app_index') }} {#{# TODO: route not found #}}">Home</a>
-<a href="{{ path('app_dashboard') }} {#{# TODO: route not found #}}">Dashboard</a>
-<a href="{{ path('app_users_reviews') }} {#{# TODO: route not found #}}">Profile</a>
-<a href="{{ path('app_forums_events') }} {#{# TODO: route not found #}}">Forums</a>
-<a href="{{ path('app_market_products') }} {#{# TODO: route not found #}}">Marketplace</a>
-<a href="{{ path('app_donations_investments') }} {#{# TODO: route not found #}}">Investment</a>
-<a href="{{ path('app_elearning_incubation') }} {#{# TODO: route not found #}}">Formations</a>
-</div>
-<nav class="navbar" id="mainNav">
-  <a href="{{ path('app_index') }} {#{# TODO: route not found #}}" class="nav-brand">
-    <img src="images/logo.png" alt="BizHub logo">
-    <span class="brand-name">Biz<span>Hub</span></span>
-  </a>
-  <ul class="nav-links">
-    <li><a href="{{ path('app_index') }} {#{# TODO: route not found #}}">Home</a></li>
-<li><a href="{{ path('app_dashboard') }} {#{# TODO: route not found #}}">Dashboard</a></li>
-<li><a href="{{ path('app_users_reviews') }} {#{# TODO: route not found #}}" class="active">Profile</a></li>
-<li><a href="{{ path('app_forums_events') }} {#{# TODO: route not found #}}">Forums</a></li>
-<li><a href="{{ path('app_market_products') }} {#{# TODO: route not found #}}">Marketplace</a></li>
-<li><a href="{{ path('app_donations_investments') }} {#{# TODO: route not found #}}">Investment</a></li>
-<li><a href="{{ path('app_elearning_incubation') }} {#{# TODO: route not found #}}">Formations</a></li>
-
-    <li><a href="#" class="btn-nav">S'inscrire</a></li>
-  </ul>
-  <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
-</nav>
 <div class="page-hero">
   <div class="page-hero-bg"></div>
   <div class="page-hero-overlay"></div>

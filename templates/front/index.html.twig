@@ -14,99 +14,7 @@
       overflow-x: hidden;
     }
 
-    /* ══════════════ NAV ══════════════ */
-    .navbar {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 1000;
-      height: 72px;
-      display: flex;
-      align-items: center;
-      padding: 0 5%;
-      background: rgba(34,40,49,0.97);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 2px 20px rgba(0,0,0,0.18);
-      justify-content: space-between;
-      transition: height 0.3s;
-    }
-    .navbar.scrolled { height: 60px; }
-
-    .nav-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-    }
-    .nav-brand img { height: 36px; width: auto; }
-    .brand-name { font-size: 1.4rem; font-weight: 700; color: var(--white); letter-spacing: 0.08em; font-family: 'Josefin Sans', sans-serif; text-transform: uppercase; }
-    .brand-name span { color: var(--primary); }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 2rem;
-      list-style: none;
-    }
-    .nav-links a {
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: rgba(255,255,255,0.75);
-      text-decoration: none;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      font-family: 'Josefin Sans', sans-serif;
-      transition: color 0.2s;
-      position: relative;
-      padding-bottom: 4px;
-    }
-    .nav-links a::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0;
-      width: 0; height: 2px;
-      background: var(--primary);
-      border-radius: 2px;
-      transition: width 0.25s ease;
-    }
-    .nav-links a:hover, .nav-links a.active { color: var(--white); }
-    .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
-    .nav-links .btn-nav {
-      background: var(--primary);
-      color: var(--dark) !important;
-      padding: 9px 22px;
-      border-radius: 6px;
-      font-weight: 700;
-      font-size: 0.82rem;
-    }
-    .nav-links .btn-nav::after { display: none; }
-    .nav-links .btn-nav:hover { background: var(--primary-dark); }
-
-    .hamburger {
-      display: none;
-      flex-direction: column;
-      gap: 5px;
-      cursor: pointer;
-      background: none;
-      border: none;
-      padding: 8px;
-    }
-    .hamburger span { width: 24px; height: 2px; background: var(--white); display: block; border-radius: 2px; }
-
-    .mobile-nav {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: var(--dark2);
-      z-index: 999;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 1.5rem;
-    }
-    .mobile-nav.open { display: flex; }
-    .mobile-nav a { font-size: 1.6rem; font-weight: 700; color: var(--white); text-decoration: none; transition: color 0.2s; }
-    .mobile-nav a:hover { color: var(--primary); }
-    .mobile-close { position: absolute; top: 20px; right: 5%; background: none; border: none; color: var(--white); font-size: 1.5rem; cursor: pointer; }
+    /* Navbar uses the unified styles defined in front/base.html.twig */
 
     /* ══════════════ HERO ══════════════ */
     .hero {
@@ -513,37 +421,6 @@
 <body>
 
 <!-- MOBILE NAV -->
-<div class="mobile-nav" id="mobileNav">
-  <button class="mobile-close" id="mobileClose"><i class="fa fa-times"></i></button>
-  <a href="{{ path('app_front_dashboard') }}">Dashboard</a>
-  <a href="#">Forums</a>
-  <a href="{{ path('produit_index') }}">Marketplace</a>
-  <a href="{{ path('app_front_projet_index') }}">Investissement</a>
-  <a href="{{ path('app_front_formations_index') }}">Formations</a>
-  <a href="#contact" style="color:var(--primary)">Nous contacter</a>
-</div>
-
-<!-- NAV -->
-<nav class="navbar" id="mainNav">
-  <a href="{{ path('app_front_index') }}" class="nav-brand">
-  <link rel="shortcut icon" href="{{ asset('assets/front/images/logo.png') }}" type="image/png" />
-    <span class="brand-name">Biz<span>Hub</span></span>
-  </a>
-  <ul class="nav-links">
-    <li><a href="{{ path('app_front_index') }}" class="active">Home</a></li>
-    <li><a href="{{ path('app_front_dashboard') }}">Dashboard</a></li>
-    <li><a href="{{ path('app_user_profile') }}">Profil</a></li>
-    <li><a href="#">Forums</a></li>
-    <li><a href="{{ path('produit_index') }}">Marketplace</a></li>
-    <li><a href="{{ path('app_front_projet_index') }}">Investissement</a></li>
-    <li><a href="{{ path('app_front_formations_index') }}">Formations</a></li>
-    <li><a href="#contact" class="btn-nav">Contact</a></li>
-  </ul>
-  <button class="hamburger" id="hamburger">
-    <span></span><span></span><span></span>
-  </button>
-</nav>
-
 <!-- HERO -->
 <section class="hero" id="hero">
   <div class="hero-bg"></div>
