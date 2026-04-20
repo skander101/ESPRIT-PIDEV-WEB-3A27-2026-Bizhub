@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
-  <rect width="200" height="200" fill="#1a1d27" rx="20"/>
-  <g transform="translate(100, 100)">
-    <polygon points="-40,-20 40,-20 40,40 -40,40" fill="#ffbe33" stroke="#e2e8f0" stroke-width="2"/>
-    <polygon points="-40,-20 0,-50 40,-20 0,10" fill="#ffd966" stroke="#e2e8f0" stroke-width="2"/>
-    <polygon points="40,-20 80,10 80,70 40,40" fill="#ff9500" stroke="#e2e8f0" stroke-width="2"/>
-  </g>
-  <text x="100" y="160" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#e2e8f0">BizHub</text>
-</svg>

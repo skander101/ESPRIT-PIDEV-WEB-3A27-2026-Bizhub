@@ -1,4 +1,0 @@
-# Turbo CSRF header check (disponible depuis Symfony 6.3)
-framework:
-    csrf_protection:
-        check_header: true
