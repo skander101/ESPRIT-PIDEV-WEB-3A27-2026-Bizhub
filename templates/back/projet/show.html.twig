@@ -1,0 +1,167 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Projet — {{ projet.title }}{% endblock %}
+{% block breadcrumb %}Investissement / Projets / {{ projet.title|length > 30 ? projet.title|slice(0, 30) ~ '…' : projet.title }}{% endblock %}
+
+{% block content %}
+{% set statusColor = {
+  'pending':     '#f97316',
+  'in_progress': '#3b82f6',
+  'funded':      '#10b981',
+  'completed':   '#6b7280'
+} %}
+{% set statusLabel = {
+  'pending':     'En attente',
+  'in_progress': 'En cours',
+  'funded':      'Finance',
+  'completed':   'Termine'
+} %}
+
+<div style="padding:2rem;">
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;">
+    <h2 style="font-size:1.4rem;color:var(--pg-text);margin:0;">{{ projet.title }}</h2>
+    <div style="display:flex;gap:0.7rem;">
+      <a href="{{ path('app_admin_projet_index') }}" style="background:var(--pg-surface);color:var(--pg-text);padding:0.6rem 1.2rem;border-radius:6px;text-decoration:none;font-weight:600;border:1px solid var(--pg-border);">← Retour</a>
+      <form method="post" action="{{ path('app_admin_projet_delete', {id: projet.project_id}) }}" onsubmit="return confirm('Supprimer ce projet ? Cette action est irreversible.');" style="margin:0;">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete_projet_' ~ projet.project_id) }}">
+        <button type="submit" style="background:#dc2626;color:#fff;padding:0.6rem 1.2rem;border-radius:6px;border:none;font-weight:600;cursor:pointer;">Supprimer</button>
+      </form>
+    </div>
+  </div>
+
+  {% for type, messages in app.flashes %}
+    {% for msg in messages %}
+      <div style="padding:0.8rem 1.2rem;border-radius:6px;margin-bottom:1rem;background:{{ type == 'success' ? 'rgba(6,214,160,0.15)' : 'rgba(239,68,68,0.15)' }};color:{{ type == 'success' ? '#06d6a0' : '#f87171' }};border:1px solid {{ type == 'success' ? 'rgba(6,214,160,0.3)' : 'rgba(239,68,68,0.3)' }};">
+        {{ msg }}
+      </div>
+    {% endfor %}
+  {% endfor %}
+
+  <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;">
+
+    <div>
+      <div class="dash-panel" style="margin-bottom:1.5rem;">
+        <h5 style="margin-bottom:1.2rem;">Informations du projet</h5>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;">
+          <div>
+            <div style="font-size:0.72rem;color:var(--pg-muted);text-transform:uppercase;font-weight:700;margin-bottom:0.4rem;">Titre</div>
+            <div style="color:var(--pg-text);font-weight:500;">{{ projet.title }}</div>
+          </div>
+          <div>
+            <div style="font-size:0.72rem;color:var(--pg-muted);text-transform:uppercase;font-weight:700;margin-bottom:0.4rem;">Secteur</div>
+            <div style="color:var(--pg-text);text-transform:capitalize;">{{ projet.secteur ?? '—' }}</div>
+          </div>
+          <div>
+            <div style="font-size:0.72rem;color:var(--pg-muted);text-transform:uppercase;font-weight:700;margin-bottom:0.4rem;">Budget requis</div>
+            <div style="color:var(--pg-text);font-weight:600;">{{ projet.requiredBudget|number_format(0, ',', ' ') }} TND</div>
+          </div>
+          <div>
+            <div style="font-size:0.72rem;color:var(--pg-muted);text-transform:uppercase;font-weight:700;margin-bottom:0.4rem;">Montant investi</div>
+            <div style="color:#10b981;font-weight:600;">{{ montant|number_format(0, ',', ' ') }} TND</div>
+          </div>
+          <div>
+            <div style="font-size:0.72rem;color:var(--pg-muted);text-transform:uppercase;font-weight:700;margin-bottom:0.4rem;">Statut actuel</div>
+            <span style="display:inline-block;padding:0.25rem 0.7rem;border-radius:4px;font-size:0.82rem;font-weight:700;background:{{ statusColor[projet.status] ?? '#6b7280' }}22;color:{{ statusColor[projet.status] ?? '#6b7280' }};">
+              {{ statusLabel[projet.status] ?? projet.status }}
+            </span>
+          </div>
+          <div>
+            <div style="font-size:0.72rem;color:var(--pg-muted);text-transform:uppercase;font-weight:700;margin-bottom:0.4rem;">Cree le</div>
+            <div style="color:var(--pg-muted);">{{ projet.createdAt ? projet.createdAt|date('d/m/Y H:i') : '—' }}</div>
+          </div>
+        </div>
+        {% if projet.description %}
+          <div style="margin-top:1.2rem;">
+            <div style="font-size:0.72rem;color:var(--pg-muted);text-transform:uppercase;font-weight:700;margin-bottom:0.4rem;">Description</div>
+            <div style="color:var(--pg-text);line-height:1.6;font-size:0.9rem;">{{ projet.description }}</div>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="dash-panel">
+        <h5 style="margin-bottom:1.2rem;">Investissements ({{ investments|length }})</h5>
+        {% if investments is empty %}
+          <p style="color:var(--pg-muted);font-size:0.9rem;">Aucun investissement pour ce projet.</p>
+        {% else %}
+          <table style="width:100%;border-collapse:collapse;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--pg-border);">
+                <th style="padding:0.6rem 0.8rem;text-align:left;font-size:0.72rem;color:var(--pg-muted);text-transform:uppercase;font-weight:700;">Investisseur</th>
+                <th style="padding:0.6rem 0.8rem;text-align:left;font-size:0.72rem;color:var(--pg-muted);text-transform:uppercase;font-weight:700;">Montant</th>
+                <th style="padding:0.6rem 0.8rem;text-align:left;font-size:0.72rem;color:var(--pg-muted);text-transform:uppercase;font-weight:700;">Statut</th>
+                <th style="padding:0.6rem 0.8rem;text-align:left;font-size:0.72rem;color:var(--pg-muted);text-transform:uppercase;font-weight:700;">Date</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% set invStatutLabel = {
+                'en_attente':    'En attente',
+                'en_negociation':'En negociation',
+                'accepte':       'Accepte',
+                'refuse':        'Refuse',
+                'contrat_genere':'Contrat genere',
+                'signe':         'Signe',
+                'termine':       'Termine'
+              } %}
+              {% for inv in investments %}
+                <tr style="border-bottom:1px solid var(--pg-border);">
+                  <td style="padding:0.7rem 0.8rem;color:var(--pg-text);font-size:0.88rem;">{{ inv.user ? inv.user.fullName : '—' }}</td>
+                  <td style="padding:0.7rem 0.8rem;color:var(--pg-text);font-size:0.88rem;font-weight:600;">{{ inv.amount|number_format(0, ',', ' ') }} TND</td>
+                  <td style="padding:0.7rem 0.8rem;font-size:0.82rem;">{{ invStatutLabel[inv.statut] ?? inv.statut }}</td>
+                  <td style="padding:0.7rem 0.8rem;color:var(--pg-muted);font-size:0.82rem;">{{ inv.createdAt|date('d/m/Y') }}</td>
+                  <td style="padding:0.7rem 0.8rem;">
+                    <a href="{{ path('app_admin_investment_show', {id: inv.investment_id}) }}" style="color:var(--nb-accent);font-size:0.82rem;font-weight:600;text-decoration:none;">Voir</a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% endif %}
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:1.5rem;">
+
+      <div class="dash-panel">
+        <h5 style="margin-bottom:1rem;">Startup proprietaire</h5>
+        {% if projet.user %}
+          <div style="display:flex;flex-direction:column;gap:0.8rem;">
+            <div>
+              <div style="font-size:0.72rem;color:var(--pg-muted);text-transform:uppercase;font-weight:700;margin-bottom:0.3rem;">Nom</div>
+              <div style="color:var(--pg-text);font-weight:500;">{{ projet.user.fullName }}</div>
+            </div>
+            <div>
+              <div style="font-size:0.72rem;color:var(--pg-muted);text-transform:uppercase;font-weight:700;margin-bottom:0.3rem;">Email</div>
+              <div style="color:var(--pg-muted);">{{ projet.user.email }}</div>
+            </div>
+            {% if projet.user.companyName %}
+            <div>
+              <div style="font-size:0.72rem;color:var(--pg-muted);text-transform:uppercase;font-weight:700;margin-bottom:0.3rem;">Entreprise</div>
+              <div style="color:var(--pg-text);">{{ projet.user.companyName }}</div>
+            </div>
+            {% endif %}
+          </div>
+        {% else %}
+          <p style="color:var(--pg-muted);font-size:0.9rem;">Aucun proprietaire assigne.</p>
+        {% endif %}
+      </div>
+
+      <div class="dash-panel">
+        <h5 style="margin-bottom:1rem;">Changer le statut</h5>
+        <form method="post" action="{{ path('app_admin_projet_statut', {id: projet.project_id}) }}">
+          <input type="hidden" name="_token" value="{{ csrf_token('statut_projet_' ~ projet.project_id) }}">
+          <select name="statut" style="width:100%;background:var(--pg-surface);border:1px solid var(--pg-border);color:var(--pg-text);padding:0.65rem 0.9rem;border-radius:6px;margin-bottom:0.8rem;">
+            <option value="pending"     {{ projet.status == 'pending'     ? 'selected' : '' }}>En attente</option>
+            <option value="in_progress" {{ projet.status == 'in_progress' ? 'selected' : '' }}>En cours</option>
+            <option value="funded"      {{ projet.status == 'funded'      ? 'selected' : '' }}>Finance</option>
+            <option value="completed"   {{ projet.status == 'completed'   ? 'selected' : '' }}>Termine</option>
+          </select>
+          <button type="submit" style="width:100%;background:var(--nb-accent);color:#fff;padding:0.7rem;border-radius:6px;border:none;font-weight:700;cursor:pointer;">Appliquer</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

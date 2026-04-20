@@ -40,6 +40,8 @@
 .btn-edit:hover { border-color: var(--primary); background: rgba(255,190,51,0.08); }
 .btn-delete { background: rgba(239,68,68,0.08); color: #ef4444; border: 1.5px solid rgba(239,68,68,0.2); }
 .btn-delete:hover { background: rgba(239,68,68,0.18); }
+.btn-negociation { background: rgba(255,190,51,0.1); color: var(--dark); border: 1.5px solid rgba(255,190,51,0.35); }
+.btn-negociation:hover { background: rgba(255,190,51,0.22); border-color: var(--primary); }
 .badge-editable { display: inline-flex; align-items: center; gap: 4px; font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; background: rgba(6,214,160,0.12); color: #06d6a0; border: 1px solid rgba(6,214,160,0.25); font-family: 'Josefin Sans', sans-serif; text-transform: uppercase; letter-spacing: 0.06em; }
 .badge-locked { display: inline-flex; align-items: center; gap: 4px; font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; background: rgba(107,114,128,0.1); color: #9ca3af; border: 1px solid rgba(107,114,128,0.2); font-family: 'Josefin Sans', sans-serif; text-transform: uppercase; letter-spacing: 0.06em; }
 .status-badge { font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.08em; font-family: 'Josefin Sans', sans-serif; display: inline-block; margin-top: 0.4rem; }
@@ -57,9 +59,14 @@
             <h1><i class="fa fa-chart-pie" style="color:var(--primary);margin-right:0.5rem;"></i>Mes Investissements</h1>
             <p>{{ investissements|length }} investissement(s) au total</p>
         </div>
-        <a href="{{ path('app_front_projet_index') }}" class="btn-yellow" style="display:flex;align-items:center;gap:8px;">
-            <i class="fa fa-search"></i> Explorer les projets
-        </a>
+        <div style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;">
+            <a href="{{ path('app_negociation_index') }}" class="btn-sm btn-negociation" style="padding:10px 16px;">
+                <i class="fa fa-handshake"></i> Mes négociations
+            </a>
+            <a href="{{ path('app_front_projet_index') }}" class="btn-yellow" style="display:flex;align-items:center;gap:8px;">
+                <i class="fa fa-search"></i> Explorer les projets
+            </a>
+        </div>
     </div>
 </div>
 
@@ -89,6 +96,7 @@
 
         {% for inv in investissements %}
             {% set editable = inv.statut == 'en_attente' %}
+            {% set negotiable = inv.project and (inv.statut in ['en_attente', 'en_negociation']) %}
             <div class="inv-card">
                 <div class="inv-card-body">
                     <div>
@@ -162,8 +170,20 @@
                     </div>
                 </div>
 
-                {% if editable %}
+                {% if editable or negotiable %}
                 <div class="inv-actions">
+                    {% if negotiable %}
+                        <a href="{{ path('app_negociation_creer', {'id': inv.investment_id}) }}" class="btn-sm btn-negociation">
+                            <i class="fa fa-comments"></i>
+                            {% if inv.statut == 'en_negociation' %}
+                                Continuer la négociation
+                            {% else %}
+                                Démarrer la négociation
+                            {% endif %}
+                        </a>
+                    {% endif %}
+
+                    {% if editable %}
                     <a href="{{ path('app_front_investissement_edit', {'id': inv.investment_id}) }}" class="btn-sm btn-edit">
                         <i class="fa fa-pen"></i> Modifier
                     </a>
@@ -177,6 +197,7 @@
                             <i class="fa fa-trash"></i> Supprimer
                         </button>
                     </form>
+                    {% endif %}
                 </div>
                 {% endif %}
             </div>

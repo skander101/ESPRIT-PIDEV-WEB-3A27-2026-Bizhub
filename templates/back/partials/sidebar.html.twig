@@ -40,9 +40,9 @@
           <span class="text">Marketplace</span>
         </a>
         <ul id="ddmenu_marketplace" class="collapse dropdown-nav">
-          <li><a href="#">Products</a></li>
-          <li><a href="#">Cart</a></li>
-          <li><a href="#">Orders</a></li>
+          <li><a href="{{ path('admin_marketplace_produits_index') }}">Products</a></li>
+          <li><a href="{{ path('admin_marketplace_paniers_index') }}">Cart</a></li>
+          <li><a href="{{ path('admin_marketplace_commandes_index') }}">Orders</a></li>
         </ul>
       </li>
 
@@ -53,10 +53,10 @@
           <span class="text">Investment</span>
         </a>
         <ul id="ddmenu_investment" class="collapse dropdown-nav">
-          <li><a href="#">Projects</a></li>
-          <li><a href="#">Investments</a></li>
-          <li><a href="#">Negotiations</a></li>
-          <li><a href="#">Deals</a></li>
+          <li><a href="{{ path('app_admin_projet_index') }}">Projects</a></li>
+          <li><a href="{{ path('app_admin_investment_index') }}">Investments</a></li>
+          <li><a href="{{ path('app_admin_investment_index') }}">Negotiations</a></li>
+          <li><a href="{{ path('app_admin_investment_index') }}">Deals</a></li>
         </ul>
       </li>
 

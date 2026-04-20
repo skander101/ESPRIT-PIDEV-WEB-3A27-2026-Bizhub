@@ -1068,6 +1068,36 @@
 </head>
 <body>
 
+<!-- ── Video Preloader ── -->
+<div id="video-preloader" style="position:fixed;inset:0;z-index:999999;opacity:1;visibility:visible;transition:opacity .4s,visibility .4s;pointer-events:all;display:flex;align-items:center;justify-content:center;background:#000;">
+  <video autoplay muted playsinline preload="auto" id="preloader-video" style="width:100vw;height:100vh;object-fit:contain;">
+    <source src="{{ asset('assets/front/images/transition.mp4') }}" type="video/mp4">
+  </video>
+</div>
+<script>
+(function(){
+  var preloader = document.getElementById('video-preloader');
+  var video = document.getElementById('preloader-video');
+  var hidden = false;
+  
+  function hide() {
+    if (hidden || !preloader) return;
+    hidden = true;
+    preloader.style.opacity = '0';
+    preloader.style.visibility = 'hidden';
+    preloader.style.pointerEvents = 'none';
+  }
+  
+  if (video) {
+    var play = video.play();
+    if (play && play.catch) play.catch(function(){});
+    setTimeout(hide, 5200);
+  } else {
+    hide();
+  }
+})();
+</script>
+
 <!-- ── Flash messages (toast) ── -->
 <div class="flash-container" id="flashContainer">
   {% for type, messages in app.flashes %}

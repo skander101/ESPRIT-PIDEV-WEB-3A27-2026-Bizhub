@@ -380,6 +380,8 @@ class CommandeController extends AbstractController
         GrokService              $grok,
         UserRepository           $userRepo,
     ): Response {
+        if ($r = $this->requireLogin()) return $r;
+
         $user = $this->getUser();
 
         // Startup: voir ses propres commandes

@@ -264,7 +264,7 @@
           {# my_id est l'entier pur passé par le contrôleur — évite les proxies Doctrine #}
           {% set senderId = msg.user ? msg.user.userId : null %}
           {% set isMine   = senderId is not null and senderId == my_id %}
-          {% set isSystem = msg.message_type == 'system' %}
+          {% set isSystem = msg.message_type in ['system', 'ai_suggestion'] %}
           <div class="msg-row {{ isSystem ? 'system' : (isMine ? 'mine' : 'other') }}">
             {% if not isSystem %}
               <div class="msg-avatar">

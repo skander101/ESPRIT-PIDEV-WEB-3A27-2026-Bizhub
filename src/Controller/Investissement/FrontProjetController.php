@@ -44,8 +44,38 @@ class FrontProjetController extends AbstractController
                 ['user' => $user],
                 ['created_at' => 'DESC']
             );
+
+            $startupNegotiations = $this->negotiationRepo->findBy(
+                ['startup' => $user],
+                ['updated_at' => 'DESC']
+            );
+
+            $startupNegCountByProject = [];
+            $startupOpenNegCountByProject = [];
+            $startupLatestNegByProject = [];
+
+            foreach ($startupNegotiations as $negociation) {
+                $projectId = $negociation->getProject()?->getProject_id();
+                if (!$projectId) {
+                    continue;
+                }
+
+                $startupNegCountByProject[$projectId] = ($startupNegCountByProject[$projectId] ?? 0) + 1;
+
+                if ($negociation->getStatus() === 'open') {
+                    $startupOpenNegCountByProject[$projectId] = ($startupOpenNegCountByProject[$projectId] ?? 0) + 1;
+                }
+
+                if (!isset($startupLatestNegByProject[$projectId])) {
+                    $startupLatestNegByProject[$projectId] = $negociation;
+                }
+            }
+
             return $this->render('front/projet/index.html.twig', [
                 'projets' => $projets,
+                'startup_neg_count_by_project' => $startupNegCountByProject,
+                'startup_open_neg_count_by_project' => $startupOpenNegCountByProject,
+                'startup_latest_neg_by_project' => $startupLatestNegByProject,
             ]);
         }
 

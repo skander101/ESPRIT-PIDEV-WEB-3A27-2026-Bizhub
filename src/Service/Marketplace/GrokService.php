@@ -17,6 +17,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class GrokService
 {
     private const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+    private const DEFAULT_MODEL = 'llama-3.1-8b-instant';
     private const TIMEOUT = 12; // secondes
 
     public function __construct(
@@ -161,7 +162,7 @@ PROMPT;
                     'Content-Type'  => 'application/json',
                 ],
                 'json' => [
-                    'model'       => $this->model,
+                    'model'       => $this->resolveModel(),
                     'messages'    => [
                         [
                             'role'    => 'system',
@@ -183,7 +184,27 @@ PROMPT;
             }
 
             $data = $response->toArray(false);
-            return $data['choices'][0]['message']['content'] ?? null;
+            $content = $data['choices'][0]['message']['content'] ?? null;
+
+            if (is_string($content)) {
+                return $content;
+            }
+
+            // Some providers can return segmented content blocks.
+            if (is_array($content)) {
+                $parts = [];
+                foreach ($content as $part) {
+                    if (is_array($part) && isset($part['text']) && is_string($part['text'])) {
+                        $parts[] = $part['text'];
+                    }
+                }
+
+                if ($parts !== []) {
+                    return implode("\n", $parts);
+                }
+            }
+
+            return null;
 
         } catch (\Throwable $e) {
             $this->logger->warning('GrokService: API call failed', [
@@ -192,6 +213,12 @@ PROMPT;
             ]);
             return null;
         }
+    }
+
+    private function resolveModel(): string
+    {
+        $model = trim($this->model);
+        return $model !== '' ? $model : self::DEFAULT_MODEL;
     }
 
     // ── Fallbacks statiques ──────────────────────────────────────────────
