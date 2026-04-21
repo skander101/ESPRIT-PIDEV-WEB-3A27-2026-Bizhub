@@ -93,8 +93,8 @@
     {% for p in suggestions %}
       <div style="display:flex; align-items:center; gap:10px; padding:6px 0; border-bottom:1px solid #f0f0f0;">
         <div style="width:36px; height:36px; background:#f8f8f8; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-          {% if p.imagePath %}
-            <img src="{{ asset('assets/images/productimages/' ~ p.imagePath) }}" style="width:36px; height:36px; object-fit:cover; border-radius:6px;">
+          {% if p.imageName %}
+            <img src="{{ vich_uploader_asset(p, 'imageFile') }}" style="width:36px; height:36px; object-fit:cover; border-radius:6px;">
           {% else %}
             <i class="fa fa-cube" style="color:#ffbe33; font-size:0.9rem;"></i>
           {% endif %}

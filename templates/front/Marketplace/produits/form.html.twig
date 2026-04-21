@@ -79,26 +79,36 @@
         {% endif %}
       </div>
 
-      {# Photo du produit #}
+      {# Photo du produit — géré par VichUploaderBundle #}
       <div class="biz-form-group">
-        <label class="biz-label" for="{{ form.imagePath.vars.id }}">
+        <label class="biz-label">
           <i class="fa fa-image" style="color:var(--primary);"></i> Photo du produit
           <span style="font-weight:400; text-transform:none; letter-spacing:0; color:var(--muted);"> (optionnel)</span>
         </label>
-        {% if mode == 'edit' and produit is defined and produit.imagePath %}
+
+        {# Aperçu de l'image actuelle en mode édition #}
+        {% if mode == 'edit' and produit is defined and produit.imageName %}
           <div style="margin-bottom:10px;">
-            <img src="{{ asset('assets/images/productimages/' ~ produit.imagePath) }}"
+            <img src="{{ vich_uploader_asset(produit, 'imageFile') }}"
                  alt="Photo actuelle"
                  style="max-height:140px; max-width:100%; border-radius:8px; border:1.5px solid var(--border); object-fit:cover;">
-            <p style="font-size:0.75rem; color:var(--muted); margin-top:4px;">Image actuelle — choisissez-en une nouvelle pour la remplacer.</p>
+            <p style="font-size:0.75rem; color:var(--muted); margin-top:4px;">
+              Image actuelle — choisissez-en une nouvelle pour la remplacer.
+            </p>
           </div>
         {% endif %}
-        {{ form_widget(form.imagePath, {attr: {class: 'biz-input', id: 'produit_image_input'}}) }}
+
+        {# Widget Vich : gère le file input + case "supprimer" automatiquement #}
+        {{ form_widget(form.imageFile, {attr: {class: 'biz-input', id: 'produit_image_input', accept: 'image/*'}}) }}
+
+        {# Aperçu immédiat avant soumission (JS) #}
         <div id="image-preview-wrap" style="margin-top:10px; display:none;">
-          <img id="image-preview" src="#" alt="Aperçu" style="max-height:140px; max-width:100%; border-radius:8px; border:1.5px solid var(--border); object-fit:cover;">
+          <img id="image-preview" src="#" alt="Aperçu"
+               style="max-height:140px; max-width:100%; border-radius:8px; border:1.5px solid var(--border); object-fit:cover;">
         </div>
-        {% if form.imagePath.vars.errors|length %}
-          <span class="biz-error">{{ form_errors(form.imagePath) }}</span>
+
+        {% if form.imageFile.vars.errors|length %}
+          <span class="biz-error">{{ form_errors(form.imageFile) }}</span>
         {% endif %}
       </div>
 
@@ -129,14 +139,18 @@
 </div>
 
 <script>
-/* ── Image preview ── */
-document.getElementById('produit_image_input').addEventListener('change', function () {
-  const wrap = document.getElementById('image-preview-wrap');
-  const preview = document.getElementById('image-preview');
-  const file = this.files[0];
-  if (file) { preview.src = URL.createObjectURL(file); wrap.style.display = 'block'; }
-  else { wrap.style.display = 'none'; }
-});
+/* ── Image preview — VichImageType génère un input[type=file] dans le widget #produit_image_input ── */
+(function () {
+  var imgInput = document.querySelector('#produit_image_input input[type="file"], #produit_image_input');
+  if (!imgInput) return;
+  imgInput.addEventListener('change', function () {
+    var wrap = document.getElementById('image-preview-wrap');
+    var preview = document.getElementById('image-preview');
+    var file = this.files[0];
+    if (file) { preview.src = URL.createObjectURL(file); wrap.style.display = 'block'; }
+    else { wrap.style.display = 'none'; }
+  });
+})();
 
 /* ── Validation temps réel ── */
 (function () {
@@ -213,7 +227,7 @@ document.getElementById('produit_image_input').addEventListener('change', functi
   });
 
   /* IMAGE — validation taille/type côté client */
-  var imgInput = document.getElementById('produit_image_input');
+  var imgInput = document.querySelector('#produit_image_input input[type="file"]') || document.getElementById('produit_image_input');
   if (imgInput) imgInput.addEventListener('change', function () {
     var file = this.files[0];
     if (!file) return setFieldState(this, null, '');

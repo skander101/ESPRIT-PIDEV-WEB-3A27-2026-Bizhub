@@ -5,13 +5,13 @@ namespace App\Form\Marketplace;
 use App\Entity\Marketplace\ProduitService;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Vich\UploaderBundle\Form\Type\VichImageType;
 
 class ProduitType extends AbstractType
 {
@@ -57,15 +57,16 @@ class ProduitType extends AbstractType
                     'maxlength' => 100,
                 ],
             ])
-            ->add('imagePath', FileType::class, [
-                'label'    => 'Photo du produit',
-                'required' => false,
-                'mapped'   => false,
-                'attr'     => [
-                    'accept'       => 'image/*',
-                    'class'        => 'form-control',
-                    'data-browse'  => 'Choisir une image...',
-                ],
+            ->add('imageFile', VichImageType::class, [
+                // VichImageType est fourni par le bundle — il lie directement
+                // l'upload à la propriété imageFile de l'entité.
+                // Vich s'occupe du reste : nommage, déplacement, suppression.
+                'label'           => 'Photo du produit',
+                'required'        => false,
+                'allow_delete'    => true,   // affiche une case "supprimer l'image"
+                'download_uri'    => false,  // pas de lien de téléchargement
+                'image_uri'       => true,   // affiche un aperçu de l'image actuelle
+                'attr'            => ['accept' => 'image/*'],
             ])
             ->add('disponible', CheckboxType::class, [
                 'label'    => 'Disponible',

@@ -1,0 +1,18 @@
+vich_uploader:
+    db_driver: orm
+
+    mappings:
+        product_images:
+            # Dossier de stockage physique (relatif à %kernel.project_dir%/public)
+            uri_prefix: /assets/images/productimages
+            upload_destination: '%kernel.project_dir%/public/assets/images/productimages'
+
+            # Nommage automatique : slug du nom original + id unique
+            # ex: photo-produit-64a3f1b2c9d8e.jpg
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+
+            # Vich efface l'ancien fichier quand on en uploade un nouveau
+            delete_on_update: true
+
+            # Vich efface le fichier quand l'entité est supprimée
+            delete_on_remove: true

@@ -57,8 +57,8 @@
       <tr>
         <td>
           <div style="display:flex; align-items:center; gap:10px;">
-            {% if p.imagePath %}
-              <img src="{{ asset('assets/images/productimages/' ~ p.imagePath) }}" alt="{{ p.nom }}" style="width:42px; height:42px; object-fit:cover; border-radius:6px; border:1.5px solid var(--border); flex-shrink:0;">
+            {% if p.imageName %}
+              <img src="{{ vich_uploader_asset(p, 'imageFile') }}" alt="{{ p.nom }}" style="width:42px; height:42px; object-fit:cover; border-radius:6px; border:1.5px solid var(--border); flex-shrink:0;">
             {% else %}
               <div style="width:42px; height:42px; background:var(--light-bg); border-radius:6px; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
                 <i class="fa fa-cube" style="color:rgba(255,190,51,0.5); font-size:1.1rem;"></i>

@@ -12,7 +12,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/marketplace/produits', name: 'produit_')]
 class ProduitController extends AbstractController
@@ -110,7 +109,7 @@ class ProduitController extends AbstractController
     }
 
     #[Route('/mes-produits/new', name: 'new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $em, SluggerInterface $slugger): Response
+    public function new(Request $request, EntityManagerInterface $em): Response
     {
         $response = $this->requireInvestisseur();
         if ($response) {
@@ -126,14 +125,9 @@ class ProduitController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $imageFile = $form->get('imagePath')->getData();
-            if ($imageFile) {
-                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeFilename     = $slugger->slug($originalFilename);
-                $newFilename      = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
-                $imageFile->move($this->getParameter('kernel.project_dir') . '/public/assets/images/productimages', $newFilename);
-                $produit->setImagePath($newFilename);
-            }
+            // VichUploaderBundle détecte imageFile sur l'entité et gère
+            // automatiquement le déplacement + le nommage du fichier.
+            // Plus besoin de code manuel ici.
             $em->persist($produit);
             $em->flush();
             $this->addFlash('success', '✅ Produit «' . $produit->getNom() . '» publié avec succès.');
@@ -148,7 +142,7 @@ class ProduitController extends AbstractController
     }
 
     #[Route('/mes-produits/{id}/edit', name: 'edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
-    public function edit(ProduitService $produit, Request $request, EntityManagerInterface $em, SluggerInterface $slugger): Response
+    public function edit(ProduitService $produit, Request $request, EntityManagerInterface $em): Response
     {
         $response = $this->requireInvestisseur();
         if ($response) {
@@ -162,22 +156,10 @@ class ProduitController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $imageFile = $form->get('imagePath')->getData();
-            if ($imageFile) {
-                // Delete old image if it exists
-                $oldImage = $produit->getImagePath();
-                if ($oldImage) {
-                    $oldPath = $this->getParameter('kernel.project_dir') . '/public/assets/images/productimages/' . $oldImage;
-                    if (file_exists($oldPath)) {
-                        unlink($oldPath);
-                    }
-                }
-                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeFilename     = $slugger->slug($originalFilename);
-                $newFilename      = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
-                $imageFile->move($this->getParameter('kernel.project_dir') . '/public/assets/images/productimages', $newFilename);
-                $produit->setImagePath($newFilename);
-            }
+            // Vich détecte si une nouvelle image a été choisie :
+            //   - si oui  → upload + suppression de l'ancienne (delete_on_update: true)
+            //   - si non  → imageName reste inchangé
+            // Aucun code manuel nécessaire.
             $em->flush();
             $this->addFlash('success', '✏️ Produit «' . $produit->getNom() . '» modifié.');
             return $this->redirectToRoute('produit_mes');

@@ -4,7 +4,11 @@ namespace App\Entity\Marketplace;
 
 use App\Repository\Marketplace\ProduitServiceRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
+// #[Vich\Uploadable] indique à VichUploaderBundle que cette entité utilise l'upload
+#[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: ProduitServiceRepository::class)]
 #[ORM\Table(name: 'produit_service')]
 #[ORM\HasLifecycleCallbacks]
@@ -39,8 +43,22 @@ class ProduitService
     #[ORM\Column(name: 'owner_user_id', type: 'integer', nullable: true)]
     private ?int $ownerUserId = null;
 
+    /**
+     * imageFile : l'objet File PHP lors de l'upload.
+     * Non persisté en base — Vich s'en occupe via ses listeners.
+     * #[Vich\UploadableField] lie ce champ au mapping 'product_images'
+     * et stocke le nom final dans la propriété 'imageName'.
+     */
+    #[Vich\UploadableField(mapping: 'product_images', fileNameProperty: 'imageName')]
+    private ?File $imageFile = null;
+
+    /**
+     * imageName : le nom du fichier enregistré sur le disque (ex: photo-abc123.jpg).
+     * C'est la seule valeur stockée en base (colonne image_path).
+     * Aucune migration nécessaire — on garde le nom de colonne existant.
+     */
     #[ORM\Column(name: 'image_path', type: 'string', length: 255, nullable: true)]
-    private ?string $imagePath = null;
+    private ?string $imageName = null;
 
     public function getIdProduit(): ?int
     {
@@ -143,16 +161,40 @@ class ProduitService
         return $this;
     }
 
-    public function getImagePath(): ?string
+    /**
+     * setImageFile : appelé par le formulaire quand l'utilisateur choisit un fichier.
+     * Vich détecte que imageFile n'est pas null → déclenche l'upload automatiquement.
+     */
+    public function setImageFile(?File $imageFile = null): self
     {
-        return $this->imagePath;
+        $this->imageFile = $imageFile;
+        return $this;
     }
 
-    public function setImagePath(?string $v): self
+    public function getImageFile(): ?File
     {
-        $this->imagePath = $v;
+        return $this->imageFile;
+    }
 
+    /** Nom du fichier stocké en base (colonne image_path). */
+    public function setImageName(?string $imageName): self
+    {
+        $this->imageName = $imageName;
         return $this;
+    }
+
+    public function getImageName(): ?string
+    {
+        return $this->imageName;
+    }
+
+    /**
+     * Alias de compatibilité — certains templates utilisent encore imagePath.
+     * Redirige vers getImageName() sans changer la base de données.
+     */
+    public function getImagePath(): ?string
+    {
+        return $this->imageName;
     }
 
     public function __toString(): string

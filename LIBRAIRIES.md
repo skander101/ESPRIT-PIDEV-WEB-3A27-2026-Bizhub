@@ -8,12 +8,21 @@
 
 | Nom | Version | Lien | Rôle |
 |-----|---------|------|------|
-| **TbbcMoneyBundle** | ^7.1 | https://github.com/TheBigBrainsCompany/TbbcMoneyBundle | Intègre moneyphp dans Symfony : filtres Twig, FormTypes, gestion multi-devises |
-| **SchebTwoFactorBundle** | ^6.0 | https://github.com/scheb/two-factor-bundle | Authentification à deux facteurs (2FA / TOTP) |
+| **FrameworkBundle** | 6.4.* | https://github.com/symfony/framework-bundle | Noyau Symfony : routing, controllers, services, configuration |
+| **SecurityBundle** | 6.4.* | https://github.com/symfony/security-bundle | Authentification, rôles, firewall, Google OAuth |
+| **TwigBundle** | 6.4.* | https://github.com/symfony/twig-bundle | Moteur de templates Twig intégré à Symfony |
+| **DoctrineBundle** | ^2.18 | https://github.com/doctrine/DoctrineBundle | Intégration Doctrine ORM dans Symfony |
 | **DoctrineMigrationsBundle** | ^3.7 | https://github.com/doctrine/DoctrineMigrationsBundle | Gestion des migrations de base de données |
+| **MonologBundle** | ^3.0 | https://github.com/symfony/monolog-bundle | Logging applicatif via Monolog |
+| **TbbcMoneyBundle** | ^7.1 | https://github.com/TheBigBrainsCompany/TbbcMoneyBundle | Intègre moneyphp dans Symfony : filtres Twig, FormTypes, gestion multi-devises |
+| **VichUploaderBundle** | ^2.9 | https://github.com/dustin10/VichUploaderBundle | Upload de fichiers / images géré automatiquement via Doctrine (module Marketplace) |
+| **SchebTwoFactorBundle** | ^6.0 | https://github.com/scheb/two-factor-bundle | Authentification à deux facteurs (2FA / TOTP) |
 | **SymfonyCasts VerifyEmailBundle** | ^1.17 | https://github.com/SymfonyCasts/verify-email-bundle | Vérification d'adresse email à l'inscription |
 | **StimulusBundle** | ^2.0 | https://github.com/symfony/stimulus-bundle | Intégration Stimulus JS (interactions frontend légères) |
 | **UX Turbo** | ^2.0 | https://github.com/symfony/ux-turbo | Navigation rapide sans rechargement de page (Turbo Drive) |
+| **TwigExtraBundle** | ^3.0 | https://github.com/twigphp/Twig | Extensions Twig supplémentaires (filtres avancés) |
+| **MakerBundle** | ^1.0 | https://github.com/symfony/maker-bundle | Génération de code (dev uniquement) |
+| **WebProfilerBundle** | 6.4.* | https://github.com/symfony/web-profiler-bundle | Barre de débogage Symfony (dev uniquement) |
 
 ---
 
@@ -67,4 +76,4 @@
 
 ## Phrase de présentation
 
-> *« Dans ce projet, j'ai utilisé des bundles et librairies éprouvées pour chaque besoin métier : moneyphp pour la précision des calculs financiers, Dompdf pour la génération de PDF, Stripe et Yousign pour le workflow de paiement et de signature, et des APIs externes comme CoinGecko pour les données de marché en temps réel. Chaque outil a été choisi pour sa fiabilité, sa compatibilité avec Symfony 6.4 et sa valeur ajoutée dans le contexte d'une plateforme d'investissement professionnelle. »*
+> *« Dans ce projet, j'ai utilisé des bundles et librairies éprouvées pour chaque besoin métier : moneyphp pour la précision des calculs financiers, Dompdf pour la génération de PDF, VichUploaderBundle pour la gestion des images produits, Stripe et Yousign pour le workflow de paiement et de signature, et des APIs externes comme CoinGecko pour les données de marché en temps réel. Chaque outil a été choisi pour sa fiabilité, sa compatibilité avec Symfony 6.4 et sa valeur ajoutée dans le contexte d'une plateforme d'investissement professionnelle. »*

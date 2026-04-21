@@ -196,8 +196,8 @@
           {# Image #}
           <a href="{{ path('produit_show', {id: p.idProduit}) }}"
              style="display:flex; align-items:center; justify-content:center; height:140px; overflow:hidden; background:var(--white);">
-            {% if p.imagePath %}
-              <img src="{{ asset('assets/images/productimages/' ~ p.imagePath) }}" alt="{{ p.nom }}"
+            {% if p.imageName %}
+              <img src="{{ vich_uploader_asset(p, 'imageFile') }}" alt="{{ p.nom }}"
                    style="width:100%; height:140px; object-fit:cover; transition:transform .35s;"
                    onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
             {% else %}
