@@ -74,12 +74,12 @@ class WorkflowController extends AbstractController
         $stepNum = match($stage) {
             'interet'      => 1,
             'negociation'  => 2,
-            'accord'       => 3,
-            'paiement',
-            'signature'    => 4,
-            'signe'        => 5,
-            'finalise'     => 6,
-            default        => 1, // rejete, annule → back to 1 visually
+            'accord'      => 3,
+            'paiement'    => 3,
+            'signature'   => 4,
+            'signe'       => 5,
+            'finalise'    => 6,
+            default       => 1, // rejete, annule → back to 1 visually
         };
 
         return $this->render('front/workflow/investissement.html.twig', [

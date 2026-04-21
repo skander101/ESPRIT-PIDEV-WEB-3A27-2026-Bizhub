@@ -5,16 +5,20 @@ namespace App\Repository;
 use App\Entity\Investissement\Investment;
 use App\Entity\Investissement\Project;
 use App\Entity\UsersAvis\User;
+use App\Service\Investissement\MoneyHelper;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Money\Money;
 
 /**
  * @extends ServiceEntityRepository<Investment>
  */
 class InvestmentRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        private MoneyHelper $moneyHelper,
+    ) {
         parent::__construct($registry, Investment::class);
     }
 
@@ -38,6 +42,25 @@ class InvestmentRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
 
         return $result ? (float) $result : 0.0;
+    }
+
+    /**
+     * Retourne le total investi sous forme d'objet Money (précision garantie).
+     * Utilise des entiers en interne → pas d'erreur de float.
+     */
+    public function getTotalAsMoneyByProject(Project $project, string $currency = 'TND'): Money
+    {
+        $investments = $this->findByProject($project);
+        return $this->moneyHelper->sumInvestments($investments, $currency);
+    }
+
+    /**
+     * Retourne le total investi par un utilisateur sous forme d'objet Money.
+     */
+    public function getTotalAsMoneyByUser(User $user, string $currency = 'TND'): Money
+    {
+        $investments = $this->findAllByUser($user);
+        return $this->moneyHelper->sumInvestments($investments, $currency);
     }
 
     public function getTotalInvested(): float

@@ -279,7 +279,7 @@
               <div class="msg-bubble">
                 {{ msg.message }}
                 {% if msg.proposed_amount and msg.message_type == 'offer' %}
-                  <div class="msg-offer"><i class="fa fa-coins"></i> Proposition : {{ msg.proposed_amount|number_format(0, ',', ' ') }} TND</div>
+                  <div class="msg-offer"><i class="fa fa-coins"></i> Proposition : {{ msg.proposed_amount|money_fmt }}</div>
                 {% endif %}
               </div>
               {% if not isSystem %}
@@ -332,10 +332,10 @@
       <h4><i class="fa fa-folder-open"></i> Projet</h4>
       <div style="font-weight:700;color:var(--dark);margin-bottom:10px;">{{ negociation.project.title }}</div>
       <div class="info-row"><span class="info-label">Secteur</span><span class="info-value">{{ negociation.project.secteur ? negociation.project.secteur|capitalize : '—' }}</span></div>
-      <div class="info-row"><span class="info-label">Budget</span><span class="info-value">{{ negociation.project.requiredBudget|number_format(0,',',' ') }} TND</span></div>
-      <div class="info-row"><span class="info-label">Montant proposé</span><span class="info-value" style="color:var(--primary);">{{ negociation.proposed_amount|number_format(0,',',' ') }} TND</span></div>
+      <div class="info-row"><span class="info-label">Budget</span><span class="info-value">{{ negociation.project.requiredBudget|money_fmt }}</span></div>
+      <div class="info-row"><span class="info-label">Montant proposé</span><span class="info-value" style="color:var(--primary);">{{ negociation.proposed_amount|money_fmt }}</span></div>
       {% if negociation.final_amount %}
-        <div class="info-row"><span class="info-label">Montant final</span><span class="info-value" style="color:#10b981;">{{ negociation.final_amount|number_format(0,',',' ') }} TND</span></div>
+        <div class="info-row"><span class="info-label">Montant final</span><span class="info-value" style="color:#10b981;">{{ negociation.final_amount|money_fmt }}</span></div>
       {% endif %}
       <div class="info-row"><span class="info-label">Startup</span><span class="info-value">{{ negociation.startup.fullName }}</span></div>
       <div class="info-row"><span class="info-label">Investisseur</span><span class="info-value">{{ negociation.investor.fullName }}</span></div>

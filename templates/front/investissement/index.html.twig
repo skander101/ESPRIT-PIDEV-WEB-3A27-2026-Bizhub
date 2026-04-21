@@ -75,7 +75,7 @@
     <div class="stats-bar-inner">
         <div>
             <div class="stat-item-label">Total investi</div>
-            <div class="stat-item-value"><span>{{ total_investi|number_format(0, ',', ' ') }}</span> TND</div>
+            <div class="stat-item-value"><span>{{ total_investi|money_fmt }}</span></div>
         </div>
         <div>
             <div class="stat-item-label">Nombre de projets</div>
@@ -158,8 +158,7 @@
 
                     <div class="inv-amount-block">
                         <div class="inv-amount-label">Montant</div>
-                        <div class="inv-amount">{{ inv.amount|number_format(0, ',', ' ') }}</div>
-                        <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;">TND</div>
+                        <div class="inv-amount">{{ inv.amount|money_fmt }}</div>
                         <div style="margin-top:8px;">
                             {% if editable %}
                                 <span class="badge-editable"><i class="fa fa-unlock-alt"></i> Modifiable</span>
@@ -190,7 +189,7 @@
                     <form method="post"
                           action="{{ path('app_front_investissement_delete', {'id': inv.investment_id}) }}"
                           style="margin:0;"
-                          data-confirm="Votre investissement de {{ inv.amount|number_format(0,',',' ') }} TND dans « {{ inv.project ? inv.project.title : 'ce projet' }} » sera supprimé définitivement."
+                          data-confirm="Votre investissement de {{ inv.amount|money_fmt }} dans « {{ inv.project ? inv.project.title : 'ce projet' }} » sera supprimé définitivement."
                           data-confirm-title="Supprimer cet investissement ?">
                         <input type="hidden" name="_token" value="{{ csrf_token('delete_investment_' ~ inv.investment_id) }}">
                         <button type="submit" class="btn-sm btn-delete">

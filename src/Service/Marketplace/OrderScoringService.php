@@ -12,16 +12,19 @@ use App\Repository\Marketplace\CommandeRepository;
  * Architecture évolutive : remplacer la méthode calculateScore() par un appel
  * à une API ML externe sans modifier les consommateurs (CommandeController).
  *
- * Résultat :
- *   score >= 50  → confirmation automatique
- *   score <= 40  → rejet automatique
- *   41–49        → attente validation manuelle
+ * Résultat après pénalité de 10 points:
+ *   score >= 50  → confirmation automatique (raw >= 60)
+ *   score <= 40  → rejet automatique (raw <= 50)
+ *   41–49        → attente validation manuelle (raw 51-59)
  */
 class OrderScoringService
 {
-    // Seuils de décision (ajustables via .env si besoin d'externaliser)
-    private const SEUIL_AUTO_CONFIRM = 50;
-    private const SEUIL_AUTO_REJECT  = 40;
+    // Seuils de décision (après pénalité de 10 points)
+    private const SEUIL_AUTO_CONFIRM = 60; // 50 + 10 pénalité
+    private const SEUIL_AUTO_REJECT  = 50; // 40 + 10 pénalité
+
+    // Points de pénalité appliqués au score final
+    private const PENALTY_POINTS = 10;
 
     // Poids des critères (total = 100)
     private const POIDS_MONTANT      = 20;

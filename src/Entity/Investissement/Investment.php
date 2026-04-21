@@ -5,6 +5,8 @@ namespace App\Entity\Investissement;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Money\Currency;
+use Money\Money;
 use Symfony\Component\Validator\Constraints as Assert;
 
 use App\Repository\InvestmentRepository;
@@ -137,6 +139,35 @@ class Investment
 
     public function getAmount(): ?float { return $this->amount; }
     public function setAmount(float $amount): self { $this->amount = $amount; return $this; }
+
+    /**
+     * Retourne le montant sous forme d'objet Money (précision garantie).
+     * La devise TND est la devise par défaut de BizHub.
+     * L'objet Money stocke en millimes pour éviter les erreurs de float.
+     */
+    public function getAmountMoney(string $currency = 'TND'): Money
+    {
+        // moneyphp stocke en entiers (millimes pour TND = ×1000, centimes pour EUR/USD = ×100)
+        // On passe par le format décimal pour respecter la précision ISO 4217 de chaque devise
+        $currencies = new \Money\Currencies\ISOCurrencies();
+        $parser     = new \Money\Parser\DecimalMoneyParser($currencies);
+        return $parser->parse(
+            number_format((float) ($this->amount ?? 0), 6, '.', ''),
+            new Currency(strtoupper($currency))
+        );
+    }
+
+    /**
+     * Applique un objet Money comme montant (reconvertit en float pour la DB).
+     * Permet d'utiliser Money dans les services sans changer la structure DB.
+     */
+    public function setAmountFromMoney(Money $money): self
+    {
+        $currencies = new \Money\Currencies\ISOCurrencies();
+        $formatter  = new \Money\Formatter\DecimalMoneyFormatter($currencies);
+        $this->amount = (float) $formatter->format($money);
+        return $this;
+    }
 
     public function getInvestment_date(): ?\DateTimeInterface { return $this->investment_date; }
     public function getInvestmentDate(): ?\DateTimeInterface { return $this->investment_date; }

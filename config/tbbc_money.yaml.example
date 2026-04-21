@@ -1,0 +1,10 @@
+# Configuration TbbcMoneyBundle / moneyphp
+# Devise de référence : TND (Dinar Tunisien)
+# Devises gérées : TND (principal), EUR et USD (pour conversions futures)
+tbbc_money:
+    currencies:
+        reference_currency: TND
+        managed_currencies:
+            - TND
+            - EUR
+            - USD

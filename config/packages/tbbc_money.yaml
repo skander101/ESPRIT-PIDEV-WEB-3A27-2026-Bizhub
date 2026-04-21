@@ -1,0 +1,7 @@
+# TbbcMoneyBundle v7 — configuration BizHub
+# Syntaxe v7 : currencies est un tableau plat au niveau racine
+tbbc_money:
+    currencies: [TND, EUR, USD]
+    reference_currency: TND
+    decimals: 3          # TND = 3 décimales (1 TND = 1000 millimes, ISO 4217)
+    enable_pair_history: false

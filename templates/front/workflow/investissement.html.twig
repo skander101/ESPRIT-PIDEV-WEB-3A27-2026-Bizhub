@@ -44,7 +44,7 @@
 /* ═══ BODY ═══════════════════════════════════════════════════════════════════ */
 .wf-body { max-width: 1000px; margin: 0 auto; padding: 44px 5% 60px; }
 
-/* ═══ 6-STEP PIPELINE ════════════════════════════════════════════════════════ */
+/* ═══ 6-STEP PIPELINE ════════════════════════════════════════════════════════════════ */
 .wf-pipeline {
   display: flex; align-items: flex-start; justify-content: space-between;
   position: relative; margin-bottom: 3rem;
@@ -84,7 +84,7 @@
 .wf-step.s-locked .wf-step-label { color: #9ca3af; }
 .wf-step.s-error  .wf-step-label { color: #ef4444; }
 
-/* ═══ ACTION CARDS ═══════════════════════════════════════════════════════════ */
+/* ═══ ACTION CARDS ═══════════════════════════════════════════════════════════════════ */
 .wf-card {
   background: #fff; border-radius: 16px; border: 1.5px solid #eef0f5;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 8px 28px rgba(0,0,0,0.04);
@@ -229,7 +229,7 @@
         </div>
         <div class="wf-hero-sub">Suivi complet du processus d'investissement</div>
         <div class="wf-hero-pills">
-          <span class="wf-pill"><i class="fa fa-coins"></i> {{ investment.amount|number_format(0, ',', ' ') }} TND</span>
+          <span class="wf-pill"><i class="fa fa-coins"></i> {{ investment.amount|money_fmt }}</span>
           {% if investment.project and investment.project.secteur %}
             <span class="wf-pill"><i class="fa fa-tag"></i> {{ investment.project.secteur|capitalize }}</span>
           {% endif %}
@@ -331,7 +331,7 @@
         {% else %}
           {# Done #}
           <span class="wf-done-badge">
-            <i class="fa fa-check-circle"></i> Investi le {{ investment.createdAt|date('d/m/Y') }} · {{ investment.amount|number_format(0, ',', ' ') }} TND
+            <i class="fa fa-check-circle"></i> Investi le {{ investment.createdAt|date('d/m/Y') }} · {{ investment.amount|money_fmt }}
           </span>
         {% endif %}
 
@@ -371,7 +371,7 @@
               <i class="fa fa-circle" style="color:#f59e0b;font-size:0.65rem;"></i>
               <span>
                 Négociation <strong>#{{ negotiation.negotiation_id }}</strong> ouverte le {{ negotiation.createdAt|date('d/m/Y') }}.
-                Montant proposé : <strong>{{ negotiation.proposedAmount ? (negotiation.proposedAmount|number_format(0, ',', ' ') ~ ' TND') : 'non défini' }}</strong>
+                Montant proposé : <strong>{{ negotiation.proposedAmount ? negotiation.proposedAmount|money_fmt : 'non défini' }}</strong>
               </span>
             </div>
             <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
@@ -423,13 +423,13 @@
             <div class="wf-info-row">
               <i class="fa fa-lock"></i>
               <span>
-                Montant à régler : <strong>{{ deal.amount|number_format(0, ',', ' ') }} TND</strong>
+                Montant à régler : <strong>{{ deal.amount|money_fmt }}</strong>
                 · Paiement sécurisé par Stripe (carte bancaire)
               </span>
             </div>
             <div style="display:flex;gap:0.6rem;flex-wrap:wrap;align-items:center;">
               <a href="{{ path('app_deal_payer', {'id': deal.deal_id}) }}" class="btn-wf btn-wf-stripe">
-                <i class="fa fa-lock"></i> Payer {{ deal.amount|number_format(0, ',', ' ') }} TND via Stripe
+                <i class="fa fa-lock"></i> Payer {{ deal.amount|money_fmt }} via Stripe
               </a>
               <a href="{{ path('app_deal_show', {'id': deal.deal_id}) }}" class="btn-wf btn-wf-ghost" style="font-size:0.78rem;padding:8px 16px;">
                 <i class="fa fa-eye"></i> Voir le deal
@@ -551,7 +551,7 @@
     </div>
   </div>
 
-  {# ════════════════════════════════════════════════════════════════════════════
+  {# ════════════════════════════════════════════════════════════════════
      STEP 6 — FINALISÉ
   ════════════════════════════════════════════════════════════════════════════ #}
   {% set step6Class = step_num == 6 ? 'c-done' : 'c-locked' %}
@@ -613,7 +613,7 @@
       </div>
       <div class="wf-meta-row">
         <span class="wf-meta-label">Montant</span>
-        <span class="wf-meta-value" style="color:#ffbe33;">{{ investment.amount|number_format(0, ',', ' ') }} TND</span>
+        <span class="wf-meta-value" style="color:#ffbe33;">{{ investment.amount|money_fmt }}</span>
       </div>
       {% if investment.typeInvestissement %}
       <div class="wf-meta-row">
@@ -651,7 +651,7 @@
       {% if deal %}
         <div class="wf-meta-row">
           <span class="wf-meta-label">Montant deal</span>
-          <span class="wf-meta-value" style="color:#ffbe33;">{{ deal.amount|number_format(0, ',', ' ') }} TND</span>
+          <span class="wf-meta-value" style="color:#ffbe33;">{{ deal.amount|money_fmt }}</span>
         </div>
         <div class="wf-meta-row">
           <span class="wf-meta-label">Investisseur</span>

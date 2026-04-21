@@ -3,24 +3,23 @@
 namespace App\Service\Auth;
 
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-/**
- * Handles Google OAuth2 authorization URL generation and token/userinfo exchanges.
- */
 class GoogleOAuthService
 {
     public function __construct(
         private HttpClientInterface $httpClient,
+        private RouterInterface $router,
         private string $googleClientId,
         private string $googleClientSecret,
     ) {
     }
 
-    /**
-     * Builds Google authorization URL using OAuth2 authorization code flow.
-     */
-    public function buildAuthorizationUrl(string $redirectUri, string $state): string
+    public function buildAuthorizationUrl(string $state): string
     {
+        $redirectUri = $this->router->generate('connect_google_check', [], UrlGeneratorInterface::ABSOLUTE_URL);
+
         $query = http_build_query([
             'client_id' => trim($this->googleClientId),
             'redirect_uri' => $redirectUri,
@@ -34,13 +33,10 @@ class GoogleOAuthService
         return 'https://accounts.google.com/o/oauth2/v2/auth?' . $query;
     }
 
-    /**
-     * Exchanges authorization code for access and ID tokens.
-     *
-     * @return array<string, mixed>
-     */
-    public function exchangeCodeForTokens(string $code, string $redirectUri): array
+    public function exchangeCodeForTokens(string $code): array
     {
+        $redirectUri = $this->router->generate('connect_google_check', [], UrlGeneratorInterface::ABSOLUTE_URL);
+
         $response = $this->httpClient->request('POST', 'https://oauth2.googleapis.com/token', [
             'body' => [
                 'code' => $code,
@@ -51,14 +47,21 @@ class GoogleOAuthService
             ],
         ]);
 
-        return $response->toArray(false);
+        $data = $response->toArray(false);
+
+        if (isset($data['error'])) {
+            $error = $data['error'];
+            $errorDescription = $data['error_description'] ?? 'No description provided';
+            throw new \RuntimeException(sprintf(
+                'Google OAuth error: %s - %s',
+                $error,
+                $errorDescription
+            ));
+        }
+
+        return $data;
     }
 
-    /**
-     * Fetches user profile from Google using access token.
-     *
-     * @return array<string, mixed>
-     */
     public function fetchUserInfo(string $accessToken): array
     {
         $response = $this->httpClient->request('GET', 'https://openidconnect.googleapis.com/v1/userinfo', [

@@ -79,11 +79,11 @@
         <div class="hero-meta">
             <div class="hero-stat">
                 <div class="hero-stat-label">Budget requis</div>
-                <div class="hero-stat-value"><span>{{ projet.requiredBudget|number_format(0, ',', ' ') }}</span> TND</div>
+                <div class="hero-stat-value"><span>{{ projet.requiredBudget|money_fmt }}</div>
             </div>
             <div class="hero-stat">
                 <div class="hero-stat-label">Déjà investi</div>
-                <div class="hero-stat-value"><span>{{ total_investi|number_format(0, ',', ' ') }}</span> TND</div>
+                <div class="hero-stat-value"><span>{{ total_investi|money_fmt }}</div>
             </div>
             <div class="hero-stat">
                 <div class="hero-stat-label">Investisseurs</div>
@@ -199,7 +199,7 @@
                                 <div class="inv-date">{{ inv.investmentDate ? inv.investmentDate|date('d/m/Y') : inv.createdAt|date('d/m/Y') }}</div>
                             </div>
                             <div style="text-align:right;">
-                                <div class="inv-amount">{{ inv.amount|number_format(0, ',', ' ') }} TND</div>
+                                <div class="inv-amount">{{ inv.amount|money_fmt }}</div>
                                 {% if invNeg %}
                                     {% if invNeg.status == 'open' %}
                                         <span class="neg-status-badge neg-open"><i class="fa fa-comments"></i> Négo. en cours</span>
@@ -335,6 +335,12 @@
                     <div><i class="fa fa-user" style="width:18px;color:var(--primary);"></i> {{ projet.user.fullName }}</div>
                     {% endif %}
                 </div>
+                <a href="{{ path('app_front_projet_pdf', {'id': projet.project_id}) }}"
+                   style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:1rem;width:100%;padding:11px;background:rgba(255,190,51,0.08);color:#b8860b;border:1.5px solid rgba(255,190,51,0.3);border-radius:8px;font-family:'Josefin Sans',sans-serif;font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;text-decoration:none;transition:all 0.2s;"
+                   onmouseover="this.style.background='rgba(255,190,51,0.18)'"
+                   onmouseout="this.style.background='rgba(255,190,51,0.08)'">
+                    <i class="fa fa-file-pdf"></i> Télécharger la fiche PDF
+                </a>
             </div>
         </div>
     </div>

@@ -273,78 +273,26 @@ class AuthController extends AbstractController
         $state = $this->tokenService->generateToken(32);
         $request->getSession()->set('google_oauth_state', $state);
 
-        $redirectUri = $this->generateUrl('app_google_oauth_callback', [], UrlGeneratorInterface::ABSOLUTE_URL);
-        $authorizationUrl = $this->googleOAuthService->buildAuthorizationUrl($redirectUri, $state);
+        $authorizationUrl = $this->googleOAuthService->buildAuthorizationUrl($state);
 
         return $this->redirect($authorizationUrl);
     }
 
     /**
-     * Handles Google OAuth callback and authenticates or provisions local users.
+     * Google OAuth callback - triggers GoogleAuthenticator.
+     */
+    #[Route('/connect/google/check', name: 'connect_google_check', methods: ['GET'])]
+    public function googleCallback(): Response
+    {
+        return new Response('', 200);
+    }
+
+    /**
+     * Legacy callback - redirects to the new authenticator route.
      */
     #[Route('/oauth/google/callback', name: 'app_google_oauth_callback', methods: ['GET'])]
-    public function googleCallback(
-        Request $request,
-        UserAuthenticatorInterface $userAuthenticator,
-    ): Response {
-        $state = (string) $request->query->get('state', '');
-        $savedState = (string) $request->getSession()->get('google_oauth_state', '');
-
-        if ($state === '' || $savedState === '' || !$this->tokenService->equals($savedState, $state)) {
-            $this->addFlash('error', 'Invalid OAuth state. Please try again.');
-            return $this->redirectToRoute('app_login');
-        }
-
-        $request->getSession()->remove('google_oauth_state');
-
-        $code = (string) $request->query->get('code', '');
-        if ($code === '') {
-            $this->addFlash('error', 'Google login failed: missing authorization code.');
-            return $this->redirectToRoute('app_login');
-        }
-
-        $redirectUri = $this->generateUrl('app_google_oauth_callback', [], UrlGeneratorInterface::ABSOLUTE_URL);
-        $tokens = $this->googleOAuthService->exchangeCodeForTokens($code, $redirectUri);
-
-        if (!isset($tokens['access_token']) || !is_string($tokens['access_token'])) {
-            $this->addFlash('error', 'Google login failed: token exchange was rejected.');
-            return $this->redirectToRoute('app_login');
-        }
-
-        $googleUser = $this->googleOAuthService->fetchUserInfo($tokens['access_token']);
-        $googleUserId = isset($googleUser['sub']) ? (string) $googleUser['sub'] : '';
-        $email = isset($googleUser['email']) ? (string) $googleUser['email'] : '';
-        $fullName = isset($googleUser['name']) ? (string) $googleUser['name'] : '';
-
-        if ($googleUserId === '' || $email === '') {
-            $this->addFlash('error', 'Google did not return required profile fields.');
-            return $this->redirectToRoute('app_login');
-        }
-
-        $user = $this->userAuthStateService->findUserByOauthIdentity('google', $googleUserId) ?? $this->userRepository->findByEmail($email);
-
-        if (!$user instanceof User) {
-            // New users created from OAuth login are marked as verified by provider trust.
-            $user = (new User())
-                ->setEmail($email)
-                ->setFullName($fullName !== '' ? $fullName : 'Google User')
-                ->setUserType('startup')
-                ->setCreatedAt(new \DateTime())
-                ->setIsActive(true);
-
-            $user->setPasswordHash($this->passwordHasher->hashPassword($user, $this->tokenService->generateToken()));
-        }
-
-        $this->entityManager->persist($user);
-
-        $authState = $this->userAuthStateService->getOrCreate($user);
-        $authState
-            ->setIsVerified(true)
-            ->setOauthProvider('google')
-            ->setOauthProviderId($googleUserId);
-
-        $this->entityManager->flush();
-
-        return $userAuthenticator->authenticateUser($user, $formLoginAuthenticator, $request);
+    public function googleCallbackLegacy(): RedirectResponse
+    {
+        return $this->redirectToRoute('connect_google_check');
     }
 }

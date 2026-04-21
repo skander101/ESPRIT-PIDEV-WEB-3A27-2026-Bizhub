@@ -344,6 +344,15 @@
     "symfonycasts/verify-email-bundle": {
         "version": "v1.18.0"
     },
+    "tbbc/money-bundle": {
+        "version": "7.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "4.0",
+            "ref": "e97ae40ca09c6fa35e69accec8833d1e10445a06"
+        }
+    },
     "twig/extra-bundle": {
         "version": "v3.24.0"
     }

@@ -51,12 +51,20 @@ class TwilioService
 
     public function sendConfirmationWhatsApp(Commande $commande, User $startup, ?User $investisseur): void
     {
-        $phone = $startup->getPhone();
+        // Correction : La notification doit être pour l'investisseur (vendeur), pas la startup (acheteur).
+        if (!$investisseur) {
+            $this->logger->info('WhatsApp non envoyé : pas d\'investisseur associé à la commande.', [
+                'commande_id' => $commande->getIdCommande(),
+            ]);
+            return;
+        }
+
+        $phone = $investisseur->getPhone();
 
         if (empty($phone)) {
-            $this->logger->warning('WhatsApp non envoyé : numéro de téléphone absent', [
-                'startup_id'  => $startup->getUserId(),
-                'commande_id' => $commande->getIdCommande(),
+            $this->logger->warning('WhatsApp non envoyé : numéro de téléphone de l\'investisseur absent', [
+                'investisseur_id' => $investisseur->getUserId(),
+                'commande_id'     => $commande->getIdCommande(),
             ]);
             return;
         }

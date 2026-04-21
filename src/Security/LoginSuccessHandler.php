@@ -27,16 +27,16 @@ class LoginSuccessHandler implements AuthenticationSuccessHandlerInterface
             $request->getSession()->remove('login_via_totp');
             $request->getSession()->set('mfa_verified', true);
 
-            return new RedirectResponse($this->urlGenerator->generate('app_index'));
+            return new RedirectResponse($this->urlGenerator->generate('app_transition'));
         }
 
         if ((bool) $request->getSession()->get('login_via_face', false)) {
             $request->getSession()->remove('login_via_face');
             $request->getSession()->set('mfa_verified', true);
 
-            return new RedirectResponse($this->urlGenerator->generate('app_index'));
+            return new RedirectResponse($this->urlGenerator->generate('app_transition'));
         }
 
-        return new RedirectResponse($this->urlGenerator->generate('app_index'));
+        return new RedirectResponse($this->urlGenerator->generate('app_transition'));
     }
 }

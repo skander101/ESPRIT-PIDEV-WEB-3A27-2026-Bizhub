@@ -23,6 +23,9 @@ security:
             lazy: true
             provider: app_user_provider
             user_checker: App\Security\VerifiedUserChecker
+            custom_authenticators:
+                - App\Security\GoogleAuthenticator
+            entry_point: App\Security\GoogleAuthenticator
 
             form_login:
                 login_path: app_login
@@ -42,6 +45,7 @@ security:
     # Note: Only the *first* matching rule is applied
     access_control:
         - { path: ^/$, roles: PUBLIC_ACCESS }
+        - { path: ^/transition, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/back, roles: ROLE_ADMIN }
         - { path: ^/front, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/login$, roles: PUBLIC_ACCESS }
@@ -54,6 +58,7 @@ security:
         - { path: ^/reset-password, roles: PUBLIC_ACCESS }
         - { path: ^/verify-email, roles: PUBLIC_ACCESS }
         - { path: ^/oauth/google, roles: PUBLIC_ACCESS }
+        - { path: ^/connect/google, roles: PUBLIC_ACCESS }
         - { path: ^/2fa/setup, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:

@@ -11,6 +11,7 @@ use App\Repository\ProjectRepository;
 use App\Service\AI\AiProjectService;
 use App\Service\Investissement\DealWorkflowService;
 use App\Service\Investissement\ProjectAdvisorService;
+use App\Service\Investissement\ProjetPdfService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -406,6 +407,29 @@ class FrontProjetController extends AbstractController
         }
 
         return $this->redirectToRoute('app_front_projet_coach', ['id' => $id]);
+    }
+
+    // ── Export PDF ────────────────────────────────────────────────────────────
+
+    #[Route('/{id}/pdf', name: 'app_front_projet_pdf', methods: ['GET'], requirements: ['id' => '\d+'])]
+    public function downloadPdf(int $id, ProjetPdfService $pdfService): Response
+    {
+        $projet = $this->projectRepository->find($id);
+        if (!$projet) {
+            $this->addFlash('error', 'Projet introuvable.');
+            return $this->redirectToRoute('app_front_projet_index');
+        }
+
+        $pdfContent = $pdfService->generateProjetPdf($projet);
+
+        $slug     = preg_replace('/[^a-z0-9]+/i', '-', $projet->getTitle() ?? 'projet');
+        $slug     = strtolower(trim($slug, '-'));
+        $filename = sprintf('fiche-projet-%s-%s.pdf', $slug, date('Ymd'));
+
+        return new Response($pdfContent, 200, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => sprintf('attachment; filename="%s"', $filename),
+        ]);
     }
 
     // ── Suppression ───────────────────────────────────────────────────────────

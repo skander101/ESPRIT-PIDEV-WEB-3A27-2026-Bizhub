@@ -226,7 +226,7 @@
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem;">
                             <div>
                                 <div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;font-family:'Josefin Sans',sans-serif;">Objectif</div>
-                                <div style="font-size:1.05rem;font-weight:700;color:var(--dark);font-family:'Josefin Sans',sans-serif;">{{ projet.requiredBudget|number_format(0, ',', ' ') }} TND</div>
+                                <div style="font-size:1.05rem;font-weight:700;color:var(--dark);font-family:'Josefin Sans',sans-serif;">{{ projet.requiredBudget|money_fmt }}</div>
                             </div>
                             <div style="text-align:right;">
                                 <div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;font-family:'Josefin Sans',sans-serif;">Investisseurs</div>

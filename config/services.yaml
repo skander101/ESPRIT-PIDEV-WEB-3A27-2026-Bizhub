@@ -47,6 +47,7 @@ services:
 
     App\Service\Auth\GoogleOAuthService:
         arguments:
+            $router: '@router'
             $googleClientId: '%app.google_client_id%'
             $googleClientSecret: '%app.google_client_secret%'
 
@@ -97,6 +98,11 @@ services:
         arguments:
             $openaiApiKey: '%app.openai_api_key%'
 
+    App\Service\Marketplace\StripeService:
+        arguments:
+            $stripeSecretKey: '%env(STRIPE_SECRET_KEY)%'
+            $stripeWebhookSecret: '%env(STRIPE_WEBHOOK_SECRET)%'
+
     App\Service\Investissement\YousignService:
         arguments:
             $apiKey: '%env(YOUSIGN_API_KEY)%'
@@ -123,6 +129,10 @@ services:
             $twilioAccountSid: '%app.twilio_account_sid%'
             $twilioAuthToken: '%app.twilio_auth_token%'
             $twilioWhatsappFrom: '%app.twilio_whatsapp_from%'
+
+    App\EventListener\CommandeConfirmeeListener:
+        tags:
+            - { name: kernel.event_listener, event: App\Event\CommandeConfirmeeEvent::NAME, method: __invoke }
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
