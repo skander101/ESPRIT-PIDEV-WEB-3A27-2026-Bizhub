@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Setup TOTP - BizHub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --primary:      #ffbe33;
+            --primary-dark: #e0a820;
+            --dark:         #222831;
+            --dark2:        #1a1f27;
+            --white:        #ffffff;
+            --light-bg:     #f8f8f8;
+            --text-muted:   #666666;
+            --border:       #ebebeb;
+        }
+        body { font-family: 'Lora', serif; background: var(--dark2); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; position: relative; overflow-x: hidden; }
+        .container { width: 100%; max-width: 480px; }
+        .card { background: var(--dark); border-radius: 16px; padding: 2rem; border: 1px solid #2a3957; }
+        h1 { color: var(--white); margin-bottom: 1.5rem; font-size: 1.5rem; font-weight: 600; }
+        p { color: var(--text-muted); margin-bottom: 1rem; line-height: 1.5; }
+        .qr-container { text-align: center; margin: 1.5rem 0; }
+        .qr-container img { max-width: 200px; border-radius: 8px; }
+        .form-group { margin-bottom: 1.25rem; }
+        label { display: block; color: var(--white); font-weight: 600; margin-bottom: 0.5rem; font-family: 'Josefin Sans', sans-serif; }
+        input[type="text"] { width: 100%; padding: 0.875rem; border-radius: 8px; border: 1px solid #324663; background: #091224; color: var(--white); font-size: 1rem; }
+        input[type="text"]:focus { outline: none; border-color: var(--primary); }
+        .btn { display: inline-block; padding: 0.875rem 1.5rem; border-radius: 8px; font-weight: 600; font-family: 'Josefin Sans', sans-serif; cursor: pointer; border: none; transition: all 0.2s; }
+        .btn-primary { background: var(--primary); color: var(--dark); width: 100%; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .input-group { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+        .input-group input { flex: 1; }
+        .input-group .btn { padding: 0.875rem 1rem; background: #2a3957; color: var(--white); }
+        .flash { padding: 0.875rem; border-radius: 8px; margin-bottom: 1rem; }
+        .flash-error { background: #3a1521; color: #ffd5df; }
+        .flash-success { background: #123525; color: #c5f5d9; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Setup Two-Factor Authentication</h1>
+            
+            {% for message in app.flashes('success') %}
+                <div class="flash flash-success">{{ message }}</div>
+            {% endfor %}
+            
+            {% for message in app.flashes('error') %}
+                <div class="flash flash-error">{{ message }}</div>
+            {% endfor %}
+            
+            <p>Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.):</p>
+            
+            <div class="qr-container">
+                <img src="data:image/svg+xml;base64,{{ qrCode }}" alt="QR Code">
+            </div>
+            
+            <p>Or enter this secret manually:</p>
+            <div class="input-group">
+                <input type="text" value="{{ secret }}" readonly id="totpSecret">
+                <button class="btn" type="button" onclick="copySecret()">Copy</button>
+            </div>
+            
+            <form method="post" action="{{ path('app_2fa_setup_confirm') }}">
+                <div class="form-group">
+                    <label for="code">Enter 6-digit code</label>
+                    <input type="text" id="code" name="code" maxlength="6" pattern="[0-9]*" inputmode="numeric" required autofocus>
+                </div>
+                <button type="submit" class="btn btn-primary">Verify & Enable</button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+    function copySecret() {
+        const secretInput = document.getElementById('totpSecret');
+        secretInput.select();
+        secretInput.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(secretInput.value);
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+# Configure MAILER_DSN and APP_AUTH_MAIL_FROM_EMAIL in .env.local (never commit secrets).
+#
+# Gmail (compte avec validation en 2 étapes + mot de passe d’application) :
+#   1) Mot de passe d’application : enlever les espaces affichés par Google (16 caractères).
+#   2) Si le mot de passe contient @ # etc., utiliser rawurlencode() ou un DSN smtp explicite.
+#   3) APP_AUTH_MAIL_FROM_EMAIL doit être la MÊME adresse que dans MAILER_DSN (sinon Gmail refuse souvent).
+#
+# Exemple :
+#   MAILER_DSN="gmail+smtp://benmoussaaziz.contact@gmail.com:VOTRE_MOT_DE_PASSE_APP_16_CHARS@default"
+#   APP_AUTH_MAIL_FROM_EMAIL=benmoussaaziz.contact@gmail.com
+#
+# Dev sans envoi réel : MAILER_DSN=null://null
+framework:
+    mailer:
+        dsn: '%env(MAILER_DSN)%'

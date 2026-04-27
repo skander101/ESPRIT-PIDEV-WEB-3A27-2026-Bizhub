@@ -1,0 +1,196 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Paiement sécurisé — {{ formation.title|default('Formation') }} — BizHub{% endblock %}
+
+{% block head_extra %}
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+{% endblock %}
+
+{% block extra_styles %}
+  .pay-page { min-height: 100vh; padding: 88px 0 48px; background: linear-gradient(180deg, #e8f4fc 0%, #f0f7fb 40%, #eef2f7 100%); }
+  .pay-shell { max-width: 1120px; margin: 0 auto; padding: 0 5%; }
+  .pay-hero {
+    background: linear-gradient(135deg, #0f172a 0%, #0c4a6e 42%, #0369a1 100%);
+    color: #fff; border-radius: 20px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem;
+    box-shadow: 0 18px 50px rgba(3,105,161,0.25);
+  }
+  .pay-hero h1 { font-size: 1.15rem; font-weight: 800; margin: 0; letter-spacing: .02em; font-family: 'Josefin Sans', sans-serif; }
+  .pay-hero p { margin: 0.35rem 0 0; opacity: 0.85; font-size: 0.88rem; }
+  .pay-card-preview-wrap { perspective: 1200px; margin-bottom: 1.25rem; }
+  .pay-card-preview {
+    border-radius: 18px; padding: 1.35rem 1.25rem; min-height: 200px;
+    background: linear-gradient(145deg, #1e293b 0%, #0f172a 50%, #082f49 100%);
+    color: #e2e8f0; position: relative; overflow: hidden;
+    box-shadow: 0 20px 50px rgba(15,23,42,0.35); transform: rotateX(2deg);
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+  }
+  .pay-card-preview:hover { transform: rotateX(0deg) translateY(-4px); box-shadow: 0 28px 60px rgba(15,23,42,0.45); }
+  .pay-card-preview .chip { width: 46px; height: 34px; border-radius: 8px; background: linear-gradient(135deg,#fcd34d,#f59e0b); margin-bottom: 1.5rem; }
+  .pay-card-preview .num { font-size: 1.15rem; letter-spacing: 0.14em; font-family: ui-monospace, monospace; margin-bottom: 1.25rem; word-break: break-all; }
+  .pay-card-preview .rowx { display: flex; justify-content: space-between; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.75; }
+  .pay-card-preview .rowx strong { display: block; font-size: 0.95rem; letter-spacing: 0.04em; opacity: 1; margin-top: 0.2rem; text-transform: none; }
+  .pay-summary { background: #fff; border-radius: 18px; padding: 1.25rem 1.35rem; border: 1px solid #e2e8f0; box-shadow: 0 8px 28px rgba(15,23,42,0.06); }
+  .pay-summary h2 { font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin: 0 0 1rem; font-weight: 800; }
+  .pay-summary .line { display: flex; justify-content: space-between; font-size: 0.9rem; color: #334155; margin-bottom: 0.45rem; }
+  .pay-summary .total { font-size: 1.35rem; font-weight: 900; color: #0f172a; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 2px dashed #e2e8f0; }
+  .pay-form-card {
+    background: #fff; border-radius: 18px; padding: 1.5rem 1.35rem 1.35rem;
+    border: 1px solid #e2e8f0; box-shadow: 0 12px 36px rgba(15,23,42,0.08);
+  }
+  .pay-form-card .form-label { font-weight: 600; font-size: 0.82rem; color: #475569; }
+  .pay-input-icon { position: relative; }
+  .pay-input-icon i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; z-index: 2; }
+  .pay-input-icon .form-control { padding-left: 2.35rem; border-radius: 12px; }
+  .pay-btn-submit {
+    border: none; border-radius: 14px; padding: 0.95rem 1rem; width: 100%;
+    font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; font-size: 0.82rem;
+    background: linear-gradient(135deg, #22d3ee, #0369a1); color: #fff;
+    box-shadow: 0 10px 28px rgba(14,165,233,0.35); transition: transform 0.15s ease, box-shadow 0.2s ease;
+  }
+  .pay-btn-submit:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 14px 36px rgba(14,165,233,0.45); color: #fff; }
+  .pay-btn-submit:disabled { opacity: 0.65; cursor: not-allowed; }
+  .pay-ssl { text-align: center; font-size: 0.78rem; color: #059669; margin-top: 0.75rem; font-weight: 600; }
+  .pay-back { color: #64748b; text-decoration: none; font-weight: 600; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 0.35rem; margin-bottom: 1rem; }
+  .pay-back:hover { color: #0369a1; }
+  .pay-formation-thumb {
+    width: 100%; height: 120px; object-fit: cover; border-radius: 14px; margin-bottom: 0.75rem;
+    background: linear-gradient(135deg,#bae6fd,#e0f2fe);
+  }
+  .pay-promo-row { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: stretch; }
+  .pay-promo-row .form-control { flex: 1 1 180px; border-radius: 12px; }
+  .pay-promo-apply {
+    border-radius: 12px; padding: 0.55rem 1rem; font-weight: 700; font-size: 0.82rem;
+    border: 1px solid #0ea5e9; color: #0369a1; background: #f0f9ff; transition: all 0.2s ease;
+  }
+  .pay-promo-apply:hover { background: #e0f2fe; color: #0c4a6e; }
+  #promo-feedback { font-size: 0.82rem; margin-top: 0.35rem; min-height: 1.25rem; }
+  #promo-feedback.is-ok { color: #059669; font-weight: 600; }
+  #promo-feedback.is-err { color: #dc2626; font-weight: 600; }
+  .pay-line-discount { color: #059669; font-weight: 700; }
+{% endblock %}
+
+{% block content %}
+<div class="pay-page">
+  <div class="pay-shell">
+    <a href="{{ path('app_front_formation_show', { formation_id: formation.formation_id }) }}" class="pay-back"><i class="fa-solid fa-arrow-left"></i> Retour</a>
+
+    <div class="pay-hero d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <div>
+        <h1><i class="fa-solid fa-lock me-2"></i>Paiement sécurisé</h1>
+        <p>Simulation de passerelle — prête pour intégration Stripe.</p>
+      </div>
+      <div class="d-flex gap-2 small text-white-50">
+        <span><i class="fa-solid fa-shield-halved me-1"></i> SSL</span>
+        <span><i class="fa-solid fa-bolt me-1"></i> Instantané</span>
+      </div>
+    </div>
+
+    {% for label, messages in app.flashes %}
+      {% for message in messages %}
+        <div class="alert alert-{{ label == 'error' or label == 'danger' ? 'danger' : (label == 'success' ? 'success' : 'info') }} mb-3" style="border-radius:12px;">{{ message }}</div>
+      {% endfor %}
+    {% endfor %}
+
+    <div class="row g-4 align-items-start">
+      <div class="col-lg-5">
+        <div class="pay-card-preview-wrap">
+          <div class="pay-card-preview" id="js-card-preview">
+            <div class="chip"></div>
+            <div class="num" id="preview-pan">•••• •••• •••• ••••</div>
+            <div class="rowx">
+              <div>Titulaire<div><strong id="preview-holder">NOM PRÉNOM</strong></div></div>
+              <div style="text-align:right;">Expiration<div><strong id="preview-exp">MM/AA</strong></div></div>
+            </div>
+            <div style="margin-top:1rem;font-size:0.75rem;opacity:.55;">CVV masqué sur ce visuel</div>
+          </div>
+        </div>
+        <div class="pay-summary">
+          <h2>Récapitulatif</h2>
+          <img class="pay-formation-thumb" src="{{ asset('assets/front/images/logo.png') }}" alt="" />
+          <div class="line"><span>{{ formation.title|e }}</span></div>
+          <div class="line"><span>Prix TTC (réf.)</span><strong id="pay-summary-base-ttc">{{ ttc|number_format(3, ',', ' ') }} TND</strong></div>
+          <div class="line pay-line-discount" id="pay-line-discount-wrap" style="display:none;"><span>Réduction promo</span><strong id="pay-summary-discount-pct"></strong></div>
+          <div class="line"><span>Montant HT</span><strong id="pay-summary-ht">{{ ht|number_format(3, ',', ' ') }} TND</strong></div>
+          <div class="line"><span>TVA ({{ vat_rate_percent }}%)</span><strong id="pay-summary-tva">{{ tva|number_format(3, ',', ' ') }} TND</strong></div>
+          <div class="line total"><span>Total à payer</span><span id="pay-summary-total">{{ ttc|number_format(3, ',', ' ') }} TND</span></div>
+          <p class="small text-muted mt-2 mb-0">Codes personnels après un paiement (email) ou démo <code>BIZHUB10</code> (−10%).</p>
+        </div>
+      </div>
+      <div class="col-lg-7">
+        <div class="pay-form-card">
+          <form method="post" action="{{ path('app_payment_process', { id: participation.id_candidature }) }}" id="payment-checkout-form" novalidate
+            data-validate-promo-url="{{ path('app_payment_validate_promo', { id: participation.id_candidature }) }}"
+            data-base-ttc="{{ ttc }}"
+            data-vat-rate="{{ vat_rate }}"
+            data-vat-rate-percent="{{ vat_rate_percent }}"
+            data-promo-csrf="{{ csrf_token('payment_validate_promo_' ~ participation.id_candidature) }}"
+          >
+            <input type="hidden" name="_token" value="{{ csrf_token('payment_process_' ~ participation.id_candidature) }}" />
+            <div class="mb-3 pay-input-icon">
+              <label class="form-label" for="card_number">Numéro de carte</label>
+              <i class="fa-regular fa-credit-card"></i>
+              <input type="text" class="form-control" id="card_number" name="card_number" inputmode="numeric" autocomplete="cc-number" placeholder="4242 4242 4242 4242" maxlength="19" required />
+              <div class="invalid-feedback">Entre 13 et 19 chiffres (simulation sans contrôle Luhn).</div>
+            </div>
+            <div class="mb-3 pay-input-icon">
+              <label class="form-label" for="card_holder">Nom du titulaire</label>
+              <i class="fa-regular fa-user"></i>
+              <input type="text" class="form-control" id="card_holder" name="card_holder" autocomplete="cc-name" placeholder="Lettres uniquement" required />
+              <div class="invalid-feedback">Lettres uniquement.</div>
+            </div>
+            <div class="row g-2 mb-3">
+              <div class="col-4">
+                <label class="form-label" for="exp_month">Mois</label>
+                <select class="form-select" id="exp_month" name="exp_month" required>
+                  {% set cm = 'now'|date('n') %}
+                  {% for m in 1..12 %}
+                    <option value="{{ m }}"{% if m == cm %} selected{% endif %}>{% if m < 10 %}0{% endif %}{{ m }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-4">
+                <label class="form-label" for="exp_year">Année</label>
+                <select class="form-select" id="exp_year" name="exp_year" required>
+                  {% for yy in exp_years %}
+                    <option value="{{ yy }}"{% if loop.first %} selected{% endif %}>{{ yy }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-4">
+                <label class="form-label" for="cvv">CVV</label>
+                {# type="text" + style masqué : évite les bugs de validation navigateur sur type="password" #}
+                <input type="text" class="form-control js-cvv-field" id="cvv" name="cvv" inputmode="numeric" maxlength="4" placeholder="123" autocomplete="cc-csc" required spellcheck="false" autocorrect="off" style="-webkit-text-security: disc; text-security: disc;" />
+                <div class="invalid-feedback">Saisissez 3 ou 4 chiffres.</div>
+              </div>
+            </div>
+            <div class="mb-4">
+              <label class="form-label" for="promo_code">Code promo <span class="text-muted fw-normal">(optionnel)</span></label>
+              <div class="pay-promo-row">
+                <div class="pay-input-icon flex-grow-1" style="min-width:0;">
+                  <i class="fa-solid fa-tag"></i>
+                  <input type="text" class="form-control" id="promo_code" name="promo_code" placeholder="Votre code NEXT… ou BIZHUB10" maxlength="32" autocomplete="off" />
+                </div>
+                <button type="button" class="pay-promo-apply" id="promo-apply-btn">Appliquer</button>
+              </div>
+              <div id="promo-feedback" aria-live="polite"></div>
+            </div>
+            <button type="submit" class="pay-btn-submit" id="pay-submit-btn" data-base-label="Confirmer le paiement">
+              <i class="fa-solid fa-lock me-2"></i>Confirmer le paiement ({{ ttc|number_format(3, ',', ' ') }} TND)
+            </button>
+            <div class="pay-ssl"><i class="fa-solid fa-circle-check me-1"></i>Transactions chiffrées SSL/TLS — environnement sécurisé</div>
+          </form>
+        </div>
+        <div class="text-center mt-3">
+          <a href="{{ path('app_payment_cancel', { id: participation.id_candidature }) }}" class="text-muted small" data-confirm="Annuler cette inscription en cours ?" data-confirm-title="Annuler" data-confirm-label="Oui, annuler">Annuler le paiement</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+  {{ parent() }}
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <script src="{{ asset('js/payment-checkout.js') }}"></script>
+{% endblock %}

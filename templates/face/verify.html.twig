@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Face Verification - BizHub{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Face Authentication Verification</h4>
+                </div>
+                <div class="card-body">
+                    <p>Please look at the camera for verification:</p>
+                    
+                    <video id="video" autoplay playsinline style="width: 100%; max-width: 320px;"></video>
+                    <canvas id="canvas" style="display: none;"></canvas>
+                    
+                    <div class="mt-3">
+                        <img id="preview" style="width: 100%; max-width: 320px; display: none;" alt="Preview">
+                    </div>
+                    
+                    <button id="captureBtn" class="btn btn-primary w-100 mt-3" disabled>Capture Photo</button>
+                    
+                    <form id="verifyForm" method="post" action="{{ path('app_face_verify') }}" style="display: none;">
+                        <input type="hidden" name="image" id="capturedImage">
+                        <button type="submit" class="btn btn-success w-100 mt-3">Verify</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const preview = document.getElementById('preview');
+const captureBtn = document.getElementById('captureBtn');
+const capturedImage = document.getElementById('capturedImage');
+const verifyForm = document.getElementById('verifyForm');
+
+navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
+    .then(stream => {
+        video.srcObject = stream;
+        captureBtn.disabled = false;
+    })
+    .catch(err => {
+        alert('Could not access camera: ' + err.message);
+    });
+
+captureBtn.addEventListener('click', () => {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+    preview.src = dataUrl;
+    preview.style.display = 'block';
+    capturedImage.value = dataUrl;
+    verifyForm.style.display = 'block';
+});
+</script>
+{% endblock %}

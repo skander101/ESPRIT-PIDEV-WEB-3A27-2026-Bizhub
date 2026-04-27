@@ -1,0 +1,292 @@
+{% extends 'front/Marketplace/base_marketplace.html.twig' %}
+
+{% block title %}Suivi — Commande #{{ commande.idCommande }}{% endblock %}
+{% block hero_eyebrow %}Suivi commande{% endblock %}
+{% block hero_title %}Commande <span>#{{ commande.idCommande }}</span>{% endblock %}
+{% block breadcrumb_extra %}
+  <i class="fa fa-chevron-right" style="font-size:.55rem"></i>
+  <a href="{{ path('tracking_index') }}">Suivi</a>
+  <i class="fa fa-chevron-right" style="font-size:.55rem"></i>
+  #{{ commande.idCommande }}
+{% endblock %}
+
+{% block body %}
+<div style="max-width:1100px; margin:0 auto; padding:60px 5%;">
+
+  {# ── Couleurs selon workflow commande (payee/en_cours_paiement = confirmee) ──── #}
+  {% set sl = commande.effectiveStatut %}
+  {% set sl_display = sl in ['en_cours_paiement', 'payee'] ? 'confirmee' : sl %}
+  {% set s_bg    = sl_display == 'en_attente'      ? 'rgba(255,193,7,0.12)'
+    : (sl_display == 'confirmee'      ? 'rgba(34,197,94,0.12)'
+    : (sl_display == 'en_preparation' ? 'rgba(245,158,11,0.12)'
+    : (sl_display == 'livree'         ? 'rgba(13,110,253,0.12)'
+    : 'rgba(220,53,69,0.12)'))) %}
+  {% set s_color = sl_display == 'en_attente'      ? '#92400e'
+    : (sl_display == 'confirmee'      ? '#15803d'
+    : (sl_display == 'en_preparation' ? '#78350f'
+    : (sl_display == 'livree'         ? '#084298'
+    : '#991b1b'))) %}
+  {% set s_icon  = sl_display == 'en_attente'      ? 'clock'
+    : (sl_display == 'confirmee'      ? 'check-circle'
+    : (sl_display == 'en_preparation' ? 'box-open'
+    : (sl_display == 'livree'         ? 'truck'
+    : (sl_display == 'annulee'        ? 'ban'
+    : 'circle-question')))) %}
+  {% set s_label = sl_display|replace({'_': ' '})|title %}
+
+  {# ── HEADER — statut + montant + action payer ───────────────────────── #}
+  <div style="background:var(--white); border-radius:14px; border:1.5px solid var(--border); padding:24px 28px; margin-bottom:2rem; box-shadow:0 4px 20px rgba(0,0,0,0.07); display:flex; align-items:center; flex-wrap:wrap; gap:1.5rem;">
+
+    {# Icône statut #}
+    <div style="width:56px; height:56px; border-radius:14px; background:{{ s_bg }}; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+      <i class="fa fa-{{ s_icon }}" style="font-size:1.4rem; color:{{ s_color }};"></i>
+    </div>
+
+    {# Info principale #}
+    <div style="flex:1; min-width:200px;">
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:0.65rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;">Statut actuel</div>
+      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <span style="display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:8px; background:{{ s_bg }}; color:{{ s_color }}; font-family:'Josefin Sans',sans-serif; font-size:0.85rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em;">
+          <i class="fa fa-{{ s_icon }}"></i>
+          {{ s_label }}
+        </span>
+        {% if commande.estPayee %}
+        <span style="display:inline-flex; align-items:center; gap:4px; padding:6px 12px; border-radius:8px; background:rgba(16,185,129,0.1); color:#065f46; font-family:'Josefin Sans',sans-serif; font-size:0.72rem; font-weight:700; text-transform:uppercase;">
+          <i class="fa fa-coins"></i> Payée
+        </span>
+        {% endif %}
+      </div>
+      <div style="margin-top:8px; font-size:0.82rem; color:var(--muted);">
+        <i class="fa fa-calendar" style="margin-right:5px;"></i>
+        Commande du {{ commande.dateCommande ? commande.dateCommande|date('d/m/Y à H:i') : '-' }}
+      </div>
+    </div>
+
+    {# Montant #}
+    <div style="text-align:right;">
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:0.65rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;">Montant TTC</div>
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:1.5rem; font-weight:800; color:var(--primary);">
+        {{ commande.totalTtc }} <span style="font-size:0.8rem; color:var(--muted);">TND</span>
+      </div>
+      <div style="font-size:0.78rem; color:var(--muted);">HT: {{ commande.totalHt }} · TVA: {{ commande.totalTva }}</div>
+    </div>
+
+    {# Bouton PAYER — si confirmée et non payée #}
+    {% if commande.effectiveStatut == 'confirmee' and not commande.estPayee %}
+    <form method="post" action="{{ path('payment_initier', {id: commande.idCommande}) }}"
+          data-confirm="Procéder au paiement sécurisé de {{ commande.totalTtc }} TND via Stripe ?"
+          data-confirm-type="info">
+      <input type="hidden" name="_token" value="{{ csrf_token('payer_' ~ commande.idCommande) }}">
+      <button type="submit"
+        style="background:#6366f1; color:white; border:none; padding:13px 24px; border-radius:10px; cursor:pointer; font-family:'Josefin Sans',sans-serif; font-weight:700; font-size:0.82rem; text-transform:uppercase; letter-spacing:0.08em; display:inline-flex; align-items:center; gap:8px; transition:background 0.2s; box-shadow:0 4px 14px rgba(99,102,241,0.35);"
+        onmouseover="this.style.background='#4f46e5'" onmouseout="this.style.background='#6366f1'">
+        <i class="fa fa-credit-card"></i> Payer {{ commande.totalTtc }} TND
+      </button>
+    </form>
+    <div style="font-size:0.72rem; color:var(--muted); display:flex; align-items:center; gap:4px; margin-top:6px;">
+      <i class="fa fa-lock" style="color:#6366f1;"></i> Paiement sécurisé Stripe
+    </div>
+    {% endif %}
+
+    {# Reprendre si paiement en cours #}
+    {% if commande.effectiveStatut == 'en_cours_paiement' and commande.paymentUrl %}
+    <a href="{{ commande.paymentUrl }}"
+       style="background:#6366f1; color:white; padding:13px 24px; border-radius:10px; font-family:'Josefin Sans',sans-serif; font-weight:700; font-size:0.82rem; text-transform:uppercase; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+      <i class="fa fa-redo"></i> Reprendre le paiement
+    </a>
+    {% endif %}
+
+    {# Déjà payée #}
+    {% if commande.estPayee %}
+    <div style="display:flex; align-items:center; gap:8px; padding:12px 18px; background:rgba(16,185,129,0.08); border-radius:10px; border:1px solid rgba(16,185,129,0.25);">
+      <i class="fa fa-check-circle" style="color:#10b981; font-size:1.2rem;"></i>
+      <div>
+        <div style="font-family:'Josefin Sans',sans-serif; font-weight:700; font-size:0.78rem; color:#065f46; text-transform:uppercase;">Commande payée</div>
+        {% if commande.paidAt %}<div style="font-size:0.75rem; color:var(--muted);">Le {{ commande.paidAt|date('d/m/Y') }}</div>{% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+
+  {# ── TIMELINE DE PROGRESSION ────────────────────────────────────────── #}
+  {% if commande.effectiveStatut != 'annulee' and etapes|length > 0 %}
+  <div style="background:var(--white); border-radius:14px; border:1.5px solid var(--border); padding:28px 32px; margin-bottom:2rem; box-shadow:0 4px 20px rgba(0,0,0,0.06);">
+    <div style="font-family:'Josefin Sans',sans-serif; font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-bottom:6px;">Progression</div>
+    <div style="font-family:'Lora',serif; font-size:1.05rem; font-weight:700; color:var(--dark); margin-bottom:24px;">Étapes de votre commande</div>
+
+    <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:1rem; position:relative;">
+
+      {% for etape in etapes %}
+        <div style="display:flex; flex-direction:column; align-items:center; flex:1; min-width:80px; text-align:center; position:relative;">
+
+          {# Cercle de l'étape #}
+          <div style="width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-bottom:10px; font-size:1rem; flex-shrink:0;
+            background:{{ etape.completed ? '#22c55e' : (etape.active ? 'var(--primary)' : 'var(--light-bg)') }};
+            color:{{ etape.completed ? 'white' : (etape.active ? 'var(--dark)' : 'var(--muted)') }};
+            border:2px solid {{ etape.completed ? '#22c55e' : (etape.active ? 'var(--primary)' : 'var(--border)') }};
+            box-shadow:{{ etape.active ? '0 0 0 4px rgba(255,190,51,0.25)' : 'none' }};">
+            <i class="fa fa-{{ etape.icone }}"></i>
+          </div>
+
+          {# Label #}
+          <div style="font-family:'Josefin Sans',sans-serif; font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em;
+            color:{{ etape.completed ? '#16a34a' : (etape.active ? 'var(--dark)' : 'var(--muted)') }};">
+            {{ etape.label }}
+          </div>
+
+          {# Trait de connexion (sauf dernier) #}
+          {% if not loop.last %}
+          <div style="position:absolute; top:23px; left:calc(50% + 23px); right:calc(-50% + 23px); height:2px;
+            background:{{ etape.completed ? '#22c55e' : 'var(--border)' }}; z-index:0;"></div>
+          {% endif %}
+
+        </div>
+      {% endfor %}
+
+    </div>
+  </div>
+  {% endif %}
+
+  {# ── ANNULÉE — message #}
+  {% if commande.effectiveStatut == 'annulee' %}
+  <div style="background:rgba(220,53,69,0.05); border-radius:14px; border:1.5px solid rgba(220,53,69,0.2); padding:24px 28px; margin-bottom:2rem; display:flex; align-items:center; gap:16px;">
+    <i class="fa fa-times-circle" style="font-size:2rem; color:#dc3545;"></i>
+    <div>
+      <div style="font-family:'Josefin Sans',sans-serif; font-weight:700; color:#991b1b; text-transform:uppercase; font-size:0.85rem; margin-bottom:4px;">Commande annulée</div>
+      <div style="font-size:0.85rem; color:var(--muted);">Cette commande a été annulée. Vous pouvez en passer une nouvelle depuis le marketplace.</div>
+    </div>
+    <a href="{{ path('produit_index') }}" class="btn-yellow" style="margin-left:auto; flex-shrink:0; justify-content:center;">
+      <i class="fa fa-store"></i> Marketplace
+    </a>
+  </div>
+  {% endif %}
+
+  {# ── GRILLE : Articles + Historique ────────────────────────────────── #}
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;">
+
+    {# ── Articles commandés ─── #}
+    <div style="background:var(--white); border-radius:14px; border:1.5px solid var(--border); overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.07);">
+      <div style="padding:20px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px;">
+        <i class="fa fa-shopping-basket" style="color:var(--primary);"></i>
+        <span style="font-family:'Lora',serif; font-size:1rem; font-weight:700; color:var(--dark);">Articles commandés</span>
+      </div>
+
+      <table style="width:100%; border-collapse:collapse;">
+        <thead>
+          <tr style="background:var(--light-bg);">
+            <th style="padding:12px 16px; text-align:left; font-family:'Josefin Sans',sans-serif; font-size:0.68rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em;">Produit</th>
+            <th style="padding:12px 8px; text-align:center; font-family:'Josefin Sans',sans-serif; font-size:0.68rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em;">Qté</th>
+            <th style="padding:12px 8px; text-align:right; font-family:'Josefin Sans',sans-serif; font-size:0.68rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em;">Prix HT</th>
+            <th style="padding:12px 16px; text-align:right; font-family:'Josefin Sans',sans-serif; font-size:0.68rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em;">Total TTC</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for detail in lignes_detail %}
+          <tr style="border-top:1px solid var(--border);">
+            <td style="padding:14px 16px; font-weight:600; font-size:0.88rem;">
+              {% if detail.produit %}
+                {{ detail.produit.nom }}
+                {% if detail.produit.categorie %}
+                  <div style="font-size:0.75rem; color:var(--muted); font-weight:400;">{{ detail.produit.categorie }}</div>
+                {% endif %}
+              {% else %}
+                <span style="color:var(--muted); font-style:italic;">Produit #{{ detail.ligne.idProduit }}</span>
+              {% endif %}
+            </td>
+            <td style="padding:14px 8px; text-align:center; font-family:'Josefin Sans',sans-serif; font-weight:700;">{{ detail.ligne.quantite }}</td>
+            <td style="padding:14px 8px; text-align:right; font-size:0.88rem;">{{ detail.ligne.prixHtUnitaire }} TND</td>
+            <td style="padding:14px 16px; text-align:right; font-family:'Josefin Sans',sans-serif; font-weight:800; color:var(--dark);">{{ detail.ligne.totalTtc }} TND</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr style="background:var(--light-bg); border-top:2px solid var(--border);">
+            <td colspan="3" style="padding:14px 16px; text-align:right; font-family:'Josefin Sans',sans-serif; font-weight:700; font-size:0.8rem; color:var(--muted); text-transform:uppercase;">Total TTC</td>
+            <td style="padding:14px 16px; text-align:right; font-family:'Josefin Sans',sans-serif; font-size:1.05rem; font-weight:800; color:var(--primary);">{{ commande.totalTtc }} TND</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    {# ── Historique des statuts ─── #}
+    <div style="background:var(--white); border-radius:14px; border:1.5px solid var(--border); overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.07);">
+      <div style="padding:20px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px;">
+        <i class="fa fa-history" style="color:var(--primary);"></i>
+        <span style="font-family:'Lora',serif; font-size:1rem; font-weight:700; color:var(--dark);">Historique</span>
+      </div>
+
+      {% if historique is empty %}
+        <div style="padding:40px 24px; text-align:center;">
+          <i class="fa fa-history" style="font-size:2rem; color:rgba(255,190,51,0.2); display:block; margin-bottom:12px;"></i>
+          <div style="color:var(--muted); font-size:0.88rem;">Aucun historique disponible pour cette commande.</div>
+        </div>
+      {% else %}
+        <div style="padding:0;">
+          {% for h in historique %}
+
+            {% set h_sl = h.statutNouveau %}
+            {% set h_bg    = h_sl == 'confirmee'         ? 'rgba(34,197,94,0.12)'
+              : (h_sl == 'en_cours_paiement' ? 'rgba(99,102,241,0.12)'
+              : (h_sl == 'payee'             ? 'rgba(16,185,129,0.12)'
+              : (h_sl == 'livree'            ? 'rgba(13,110,253,0.12)'
+              : (h_sl == 'annulee'           ? 'rgba(220,53,69,0.12)'
+              : 'rgba(255,193,7,0.12)')))) %}
+            {% set h_color = h_sl == 'confirmee'         ? '#15803d'
+              : (h_sl == 'en_cours_paiement' ? '#3730a3'
+              : (h_sl == 'payee'             ? '#065f46'
+              : (h_sl == 'livree'            ? '#084298'
+              : (h_sl == 'annulee'           ? '#991b1b'
+              : '#92400e')))) %}
+
+            <div style="padding:16px 24px; border-bottom:1px solid var(--border); display:flex; align-items:flex-start; gap:14px;"
+                 {% if not loop.last %}{% endif %}>
+
+              {# Point timeline #}
+              <div style="width:10px; height:10px; border-radius:50%; background:{{ h_color }}; flex-shrink:0; margin-top:5px;"></div>
+
+              <div style="flex:1;">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
+                  <span style="display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:6px; background:{{ h_bg }}; color:{{ h_color }}; font-family:'Josefin Sans',sans-serif; font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em;">
+                    {{ h_sl|replace({'_': ' '}) }}
+                  </span>
+                  <span style="font-size:0.75rem; color:var(--muted);">{{ h.changedAt|date('d/m/Y H:i') }}</span>
+                </div>
+                {% if h.note %}
+                  <div style="font-size:0.8rem; color:var(--muted); margin-top:4px;">{{ h.note }}</div>
+                {% endif %}
+              </div>
+
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+
+  {# ── ACTIONS BAS DE PAGE ─────────────────────────────────────────────── #}
+  <div style="display:flex; gap:1rem; margin-top:2rem; flex-wrap:wrap; align-items:center;">
+    <a href="{{ path('tracking_index') }}" class="btn-outline">
+      <i class="fa fa-arrow-left"></i> Retour au suivi
+    </a>
+    <a href="{{ path('commande_show', {id: commande.idCommande}) }}" class="btn-ghost">
+      <i class="fa fa-file-invoice"></i> Voir le détail complet
+    </a>
+    {% if commande.effectiveStatut in ['livree', 'annulee'] %}
+    <form method="post" action="{{ path('commande_reorder', {id: commande.idCommande}) }}"
+          data-confirm="Recréer une nouvelle commande identique ?"
+          data-confirm-type="info"
+          style="display:inline;">
+      <input type="hidden" name="_token" value="{{ csrf_token('reorder_' ~ commande.idCommande) }}">
+      <button type="submit"
+        style="background:#6f42c1; color:white; border:none; padding:11px 22px; border-radius:8px; cursor:pointer; font-family:'Josefin Sans',sans-serif; font-weight:700; font-size:0.82rem; text-transform:uppercase; letter-spacing:0.08em; display:inline-flex; align-items:center; gap:8px; transition:background 0.2s;"
+        onmouseover="this.style.background='#59359a'" onmouseout="this.style.background='#6f42c1'">
+        <i class="fa fa-redo"></i> Reorder
+      </button>
+    </form>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

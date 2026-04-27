@@ -1,0 +1,130 @@
+{% extends 'front/base.html.twig' %}
+{% block title %}{{ produit.name }} — Marketplace BizHub{% endblock %}
+
+{% block extra_styles %}
+.show-body { max-width:1100px; margin:0 auto; padding:36px 5%; display:grid; grid-template-columns:1fr 340px; gap:2rem; align-items:start; }
+.show-img-box { border-radius:16px; overflow:hidden; border:1.5px solid var(--border); background:#f3f4f6; height:320px; display:flex; align-items:center; justify-content:center; font-size:6rem; color:#d1d5db; }
+.show-img-box img { width:100%; height:320px; object-fit:cover; }
+.show-info { background:#fff; border-radius:16px; border:1.5px solid var(--border); padding:28px; box-shadow:0 4px 20px rgba(0,0,0,.06); position:sticky; top:90px; }
+.show-cat { font-size:.66rem; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:var(--primary); font-family:'Josefin Sans',sans-serif; margin-bottom:.5rem; }
+.show-name { font-size:1.6rem; font-weight:700; color:var(--dark); font-family:'Josefin Sans',sans-serif; line-height:1.2; margin-bottom:.8rem; }
+.show-price { font-size:2rem; font-weight:700; color:var(--dark); font-family:'Josefin Sans',sans-serif; margin-bottom:1.2rem; }
+.show-price span { font-size:.9rem; color:var(--text-muted); font-weight:400; }
+.show-seller { font-size:.82rem; color:var(--text-muted); margin-bottom:1.5rem; }
+.show-desc { font-size:.88rem; color:var(--text-muted); line-height:1.7; margin-bottom:1.5rem; }
+.qty-row { display:flex; align-items:center; gap:.8rem; margin-bottom:1.2rem; }
+.qty-row label { font-size:.82rem; font-weight:600; color:var(--dark); }
+.qty-input { width:70px; padding:8px 12px; border:1.5px solid var(--border); border-radius:8px; font-size:.9rem; text-align:center; }
+.btn-cart { display:flex; align-items:center; gap:8px; justify-content:center; width:100%; padding:13px; background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%); border:none; border-radius:10px; font-weight:700; font-size:.95rem; font-family:'Josefin Sans',sans-serif; cursor:pointer; box-shadow:0 4px 14px rgba(255,190,51,.3); transition:transform .15s; }
+.btn-cart:hover { transform:translateY(-1px); }
+.stock-badge { display:inline-flex; align-items:center; gap:5px; font-size:.72rem; font-weight:600; padding:4px 10px; border-radius:100px; margin-bottom:1rem; }
+.stock-ok   { background:rgba(16,185,129,.1); color:#059669; }
+.stock-low  { background:rgba(234,179,8,.1);  color:#ca8a04; }
+.stock-out  { background:rgba(239,68,68,.1);  color:#dc2626; }
+.info-row { display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px solid var(--border); font-size:.82rem; }
+.info-row:last-child { border-bottom:none; }
+.similaires { max-width:1100px; margin:0 auto; padding:0 5% 60px; }
+.similaires h3 { font-family:'Josefin Sans',sans-serif; font-size:.8rem; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:var(--text-muted); margin-bottom:1.2rem; }
+.sim-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; }
+@media(max-width:800px) { .show-body { grid-template-columns:1fr; } .sim-grid { grid-template-columns:repeat(2,1fr); } }
+{% endblock %}
+
+{% block content %}
+<div style="max-width:1100px;margin:0 auto;padding:24px 5% 0;">
+  <a href="{{ path('app_marketplace_index') }}" style="font-size:.78rem;color:var(--text-muted);text-decoration:none;display:inline-flex;align-items:center;gap:5px;">
+    <i class="fa fa-arrow-left"></i> Retour à la Marketplace
+  </a>
+</div>
+
+<div class="show-body">
+
+  {# ── Left : image + description ── #}
+  <div>
+    <div class="show-img-box">
+      {% if produit.imageUrl %}
+        <img src="{{ produit.imageUrl }}" alt="{{ produit.name }}">
+      {% else %}
+        <i class="fa fa-box"></i>
+      {% endif %}
+    </div>
+
+    {% if produit.description %}
+      <div style="background:#fff;border-radius:14px;border:1.5px solid var(--border);padding:22px;margin-top:1.4rem;">
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:.8rem;font-family:'Josefin Sans',sans-serif;">Description</div>
+        <p class="show-desc">{{ produit.description|nl2br }}</p>
+      </div>
+    {% endif %}
+  </div>
+
+  {# ── Right : info + add-to-cart ── #}
+  <div class="show-info">
+    {% if produit.category %}<div class="show-cat">{{ produit.category }}</div>{% endif %}
+    <div class="show-name">{{ produit.name }}</div>
+    <div class="show-price">{{ produit.price|number_format(2,',',' ') }} <span>TND</span></div>
+
+    {% if produit.stock > 5 %}
+      <span class="stock-badge stock-ok"><i class="fa fa-check-circle"></i> En stock ({{ produit.stock }})</span>
+    {% elseif produit.stock > 0 %}
+      <span class="stock-badge stock-low"><i class="fa fa-exclamation-circle"></i> Stock limité ({{ produit.stock }})</span>
+    {% else %}
+      <span class="stock-badge stock-out"><i class="fa fa-times-circle"></i> Rupture de stock</span>
+    {% endif %}
+
+    {% if produit.seller %}
+      <div class="show-seller">
+        <i class="fa fa-store" style="color:var(--primary);margin-right:4px;"></i>
+        Vendu par <strong>{{ produit.seller.fullName }}</strong>
+        {% if produit.seller.companyName %} — {{ produit.seller.companyName }}{% endif %}
+      </div>
+    {% endif %}
+
+    <div class="info-row"><span style="color:var(--text-muted);">Catégorie</span><strong>{{ produit.category ?? '—' }}</strong></div>
+    <div class="info-row"><span style="color:var(--text-muted);">Publié le</span><strong>{{ produit.createdAt|date('d/m/Y') }}</strong></div>
+
+    {% if is_granted('IS_AUTHENTICATED_FULLY') and produit.isInStock() %}
+      <form method="post" action="{{ path('app_marketplace_panier_add', {id: produit.productId}) }}" style="margin-top:1.4rem;">
+        <input type="hidden" name="_token" value="{{ csrf_token('add_panier_' ~ produit.productId) }}">
+        <div class="qty-row">
+          <label for="qty">Quantité</label>
+          <input id="qty" class="qty-input" type="number" name="quantite" value="1" min="1" max="{{ produit.stock }}">
+        </div>
+        <button type="submit" class="btn-cart"><i class="fa fa-cart-plus"></i> Ajouter au panier</button>
+      </form>
+    {% elseif not is_granted('IS_AUTHENTICATED_FULLY') %}
+      <a href="{{ path('app_login') }}" class="btn-cart" style="display:flex;text-decoration:none;margin-top:1.4rem;">
+        <i class="fa fa-lock"></i> Connectez-vous pour acheter
+      </a>
+    {% else %}
+      <div style="text-align:center;padding:14px;background:rgba(239,68,68,.07);border-radius:10px;color:#dc2626;font-weight:600;margin-top:1.4rem;">
+        Produit indisponible
+      </div>
+    {% endif %}
+
+    <a href="{{ path('app_marketplace_panier') }}" class="btn-ghost" style="width:100%;display:flex;justify-content:center;align-items:center;gap:6px;margin-top:.8rem;font-size:.82rem;">
+      <i class="fa fa-shopping-cart"></i> Voir mon panier
+    </a>
+  </div>
+
+</div>
+
+{# ── Similar products ── #}
+{% if similaires is not empty %}
+  <div class="similaires">
+    <h3>Produits similaires</h3>
+    <div class="sim-grid">
+      {% for p in similaires %}
+        <a href="{{ path('app_marketplace_show', {id: p.productId}) }}" style="background:#fff;border-radius:12px;border:1.5px solid var(--border);overflow:hidden;text-decoration:none;display:block;transition:transform .2s;">
+          <div style="height:120px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:#d1d5db;">
+            {% if p.imageUrl %}<img src="{{ p.imageUrl }}" style="width:100%;height:120px;object-fit:cover;" alt="{{ p.name }}">
+            {% else %}<i class="fa fa-box"></i>{% endif %}
+          </div>
+          <div style="padding:12px;">
+            <div style="font-size:.82rem;font-weight:700;color:var(--dark);margin-bottom:4px;">{{ p.name|slice(0,40) }}{% if p.name|length > 40 %}…{% endif %}</div>
+            <div style="font-family:'Josefin Sans',sans-serif;font-weight:700;color:var(--dark);">{{ p.price|number_format(2,',',' ') }} TND</div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

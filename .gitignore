@@ -1,0 +1,35 @@
+###> symfony/framework-bundle ###
+/.symfony.local.yaml
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+/.env
+/env.txt
+###< symfony/framework-bundle ###
+
+###> phpunit/phpunit ###
+/phpunit.xml
+/.phpunit.cache/
+###< phpunit/phpunit ###
+
+###> symfony/asset-mapper ###
+/assets/vendor/
+###< symfony/asset-mapper ###
+
+.env
+.env.dev
+.env.test
+
+# Python recommender (local venv + secrets)
+/recommender/.venv/
+/recommender/.env
+**/__pycache__/
+*.pyc
+
+# Données locales / doublon de workspace
+/public/uploads/
+/formation-participation-platform/

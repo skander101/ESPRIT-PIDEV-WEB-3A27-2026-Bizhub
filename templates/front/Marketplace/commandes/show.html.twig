@@ -1,0 +1,401 @@
+{% extends 'front/Marketplace/base_marketplace.html.twig' %}
+
+{% block title %}Commande #{{ commande.idCommande }}{% endblock %}
+{% block hero_eyebrow %}Détails{% endblock %}
+{% block hero_title %}Commande <span>#{{ commande.idCommande }}</span>{% endblock %}
+{% block breadcrumb_extra %}
+  <i class="fa fa-chevron-right" style="font-size:.55rem"></i> Détails
+{% endblock %}
+
+{% block body %}
+<div style="max-width:1000px; margin:0 auto; padding:60px 5%;">
+
+  {# HEADER #}
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:2rem; flex-wrap:wrap; gap:1rem;">
+    <div>
+      <h2 style="font-family:'Lora',serif; font-weight:700; font-size:1.5rem; margin-bottom:0.5rem;">Commande #{{ commande.idCommande }}</h2>
+      <div style="display:flex; gap:2rem; font-size:0.9rem; color:var(--muted);">
+        <span><i class="fa fa-calendar"></i> {{ commande.dateCommande|date('d/m/Y H:i') }}</span>
+        <span><i class="fa fa-package"></i> {{ commande.lignes|length }} article{{ commande.lignes|length != 1 ? 's' : '' }}</span>
+      </div>
+    </div>
+    <a href="{{ app.user.userType == 'investisseur' ? path('commande_investisseur_recues') : path('commande_index') }}" class="btn-outline">
+      <i class="fa fa-arrow-left"></i> Retour
+    </a>
+  </div>
+
+  {# INFO COMMANDE #}
+  <div style="background:var(--white); border-radius:14px; border:1.5px solid var(--border); overflow:hidden; margin-bottom:2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.07);">
+    <div style="padding:24px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.5rem; border-bottom:1px solid var(--border);">
+      <div>
+        <div style="font-family:'Josefin Sans',sans-serif; font-size:0.7rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:8px; letter-spacing:0.1em;">Statut</div>
+        {# Badge statut workflow — payee/en_cours_paiement = confirmee #}
+        {% set sl = commande.effectiveStatut|trim|lower %}
+        {% set sl_d = sl in ['en_cours_paiement', 'payee'] ? 'confirmee' : sl %}
+        {% set show_bg =
+          sl_d == 'en_attente'      ? 'rgba(255,193,7,0.12)' :
+          (sl_d == 'confirmee'      ? 'rgba(34,197,94,0.12)' :
+          (sl_d == 'en_preparation' ? 'rgba(245,158,11,0.12)' :
+          (sl_d == 'livree'         ? 'rgba(13,110,253,0.12)' :
+          'rgba(220,53,69,0.12)')))
+        %}
+        {% set show_color =
+          sl_d == 'en_attente'      ? '#92400e' :
+          (sl_d == 'confirmee'      ? '#15803d' :
+          (sl_d == 'en_preparation' ? '#78350f' :
+          (sl_d == 'livree'         ? '#084298' :
+          '#991b1b')))
+        %}
+        {% set show_icon =
+          sl_d == 'en_attente'      ? 'clock' :
+          (sl_d == 'confirmee'      ? 'check-circle' :
+          (sl_d == 'en_preparation' ? 'box-open' :
+          (sl_d == 'livree'         ? 'truck' :
+          (sl_d == 'annulee'        ? 'ban' :
+          'circle-question'))))
+        %}
+        <span style="display:inline-flex; align-items:center; gap:4px; padding:8px 12px; border-radius:6px; background:{{ show_bg }}; color:{{ show_color }}; font-size:0.85rem; font-weight:700; text-transform:uppercase;">
+          <i class="fa fa-{{ show_icon }}"></i>
+          {{ sl_d|replace({'_': ' '})|title }}
+        </span>
+      </div>
+      <div>
+        <div style="font-family:'Josefin Sans',sans-serif; font-size:0.7rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:8px; letter-spacing:0.1em;">Paiement</div>
+        <span style="display:inline-flex; align-items:center; gap:4px; padding:8px 12px; border-radius:6px; background:{{ commande.estPayee ? 'rgba(34,197,94,0.12)' : 'rgba(255,193,7,0.12)' }}; color:{{ commande.estPayee ? '#15803d' : '#92400e' }}; font-size:0.85rem; font-weight:700; text-transform:uppercase;">
+          <i class="fa fa-{{ commande.estPayee ? 'check-circle' : 'hourglass' }}"></i>
+          {{ commande.estPayee ? 'Payée' : 'En attente' }}
+        </span>
+      </div>
+      <div>
+        <div style="font-family:'Josefin Sans',sans-serif; font-size:0.7rem; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:8px; letter-spacing:0.1em;">Montant Total</div>
+        <div style="font-family:'Josefin Sans',sans-serif; font-size:1.3rem; font-weight:800; color:var(--primary);">
+          {{ commande.totalTtc }} <span style="font-size:0.8rem; color:var(--muted);">TND</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:20px; background:var(--light-bg);">
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; font-size:0.9rem;">
+        <div>
+          <span style="color:var(--muted); font-family:'Josefin Sans',sans-serif;">Total HT:</span>
+          <span style="font-weight:700; margin-left:0.5rem;">{{ commande.totalHt }} TND</span>
+        </div>
+        <div>
+          <span style="color:var(--muted); font-family:'Josefin Sans',sans-serif;">TVA (19%):</span>
+          <span style="font-weight:700; margin-left:0.5rem;">{{ commande.totalTva }} TND</span>
+        </div>
+        <div>
+          <span style="color:var(--muted); font-family:'Josefin Sans',sans-serif;">TTC:</span>
+          <span style="font-weight:700; margin-left:0.5rem; color:var(--primary);">{{ commande.totalTtc }} TND</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# ARTICLES #}
+  <div style="background:var(--white); border-radius:14px; border:1.5px solid var(--border); overflow:hidden; margin-bottom:2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.07);">
+    <div style="padding:24px; border-bottom:1px solid var(--border);">
+      <h3 style="font-family:'Lora',serif; font-size:1.1rem; font-weight:700; margin-bottom:1.5rem;">Articles commandés</h3>
+
+      <table style="width:100%; border-collapse:collapse;">
+        <thead>
+          <tr style="background:var(--light-bg); border-bottom:1px solid var(--border);">
+            <th style="padding:12px; text-align:left; font-family:'Josefin Sans',sans-serif; font-size:0.7rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em;">Produit</th>
+            <th style="padding:12px; text-align:center; font-family:'Josefin Sans',sans-serif; font-size:0.7rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em;">Quantité</th>
+            <th style="padding:12px; text-align:center; font-family:'Josefin Sans',sans-serif; font-size:0.7rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em;">Prix Unit. HT</th>
+            <th style="padding:12px; text-align:right; font-family:'Josefin Sans',sans-serif; font-size:0.7rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em;">Total HT</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for detail in lignes_detail %}
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:16px; font-weight:600;">
+                {% if detail.produit %}
+                  <div style="font-weight:700;">{{ detail.produit.nom }}</div>
+                  {% if detail.produit.categorie %}<div style="font-size:0.8rem; color:var(--muted);">{{ detail.produit.categorie }}</div>{% endif %}
+                {% else %}
+                  <div style="color:#999; font-style:italic;">Produit supprimé</div>
+                {% endif %}
+              </td>
+              <td style="padding:16px; text-align:center; font-family:'Josefin Sans',sans-serif; font-weight:700;">{{ detail.ligne.quantite }}</td>
+              <td style="padding:16px; text-align:center;">{{ detail.ligne.prixHtUnitaire }} TND</td>
+              <td style="padding:16px; text-align:right; font-family:'Josefin Sans',sans-serif; font-weight:800;">{{ (detail.ligne.prixHtUnitaire|number_format(3, '.', '') * detail.ligne.quantite)|number_format(3, '.', '') }} TND</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {# ACTIONS #}
+  <div style="display:flex; gap:1rem; flex-wrap:wrap; align-items:center;">
+
+    {# ── INVESTISSEUR ──────────────────────────────────────────────── #}
+    {% if app.user.userType == 'investisseur' %}
+
+      {% if commande.effectiveStatut == 'en_attente' %}
+        <form method="POST" action="{{ path('commande_confirmer', {id: commande.idCommande}) }}"
+              data-confirm="Confirmer la commande #{{ commande.idCommande }} ? Le stock des produits sera décrémenté automatiquement."
+              data-confirm-type="success">
+          <input type="hidden" name="_token" value="{{ csrf_token('confirmer_' ~ commande.idCommande) }}">
+          <button type="submit" class="btn-yellow" style="justify-content:center;">
+            <i class="fa fa-check-circle"></i> Confirmer la commande
+          </button>
+        </form>
+        <form method="POST" action="{{ path('commande_refuser', {id: commande.idCommande}) }}"
+              data-confirm="Refuser la commande #{{ commande.idCommande }} ? Elle sera marquée comme annulée."
+              data-confirm-type="danger">
+          <input type="hidden" name="_token" value="{{ csrf_token('refuser_' ~ commande.idCommande) }}">
+          <button type="submit" class="btn-danger" style="justify-content:center;">
+            <i class="fa fa-times-circle"></i> Refuser la commande
+          </button>
+        </form>
+
+      {% elseif commande.effectiveStatut in ['confirmee', 'en_cours_paiement'] %}
+        {# La startup n'a pas encore payé — Livrer BLOQUÉ #}
+        <div style="padding:12px 24px; background:rgba(99,102,241,0.08); border-radius:8px; border:1px solid rgba(99,102,241,0.25); color:#3730a3; font-weight:700; display:inline-flex; align-items:center; gap:8px;">
+          <i class="fa fa-hourglass-half"></i> En attente du paiement startup
+        </div>
+        <div style="display:inline-flex; align-items:center; gap:8px; padding:12px 20px; background:#f3f4f6; border-radius:8px; border:1.5px dashed #d1d5db; cursor:not-allowed;" title="Livraison disponible après paiement de la startup">
+          <i class="fa fa-lock" style="color:#9ca3af;"></i>
+          <span style="font-family:'Josefin Sans',sans-serif; font-weight:700; font-size:0.82rem; text-transform:uppercase; color:#9ca3af; letter-spacing:0.08em;">Livrer (paiement requis)</span>
+        </div>
+        <p style="font-size:0.78rem; color:var(--muted); margin:0; display:flex; align-items:center; gap:5px;">
+          <i class="fa fa-info-circle" style="color:#6366f1;"></i>
+          La livraison sera possible dès réception du paiement Stripe.
+        </p>
+
+      {% elseif commande.effectiveStatut in ['payee', 'en_preparation'] %}
+        {# Commande payée → investisseur peut la marquer livrée #}
+        {% if commande.effectiveStatut == 'payee' %}
+          <div style="padding:12px 24px; background:rgba(16,185,129,0.08); border-radius:8px; border:1px solid rgba(16,185,129,0.25); color:#065f46; font-weight:700; display:inline-flex; align-items:center; gap:8px;">
+            <i class="fa fa-coins"></i> Paiement reçu — préparer la commande
+          </div>
+        {% endif %}
+        <form method="POST" action="{{ path('commande_livrer', {id: commande.idCommande}) }}"
+              data-confirm="Marquer la commande #{{ commande.idCommande }} comme livrée ?"
+              data-confirm-type="info">
+          <input type="hidden" name="_token" value="{{ csrf_token('livrer_' ~ commande.idCommande) }}">
+          <button type="submit" style="background:#0d6efd; color:white; border:none; padding:12px 24px; border-radius:8px; cursor:pointer; font-weight:700; font-family:'Josefin Sans',sans-serif; font-size:0.82rem; text-transform:uppercase; letter-spacing:0.08em; display:inline-flex; align-items:center; gap:8px; transition:background 0.2s;">
+            <i class="fa fa-truck"></i> Marquer comme livrée
+          </button>
+        </form>
+
+      {% else %}
+        <div style="padding:12px 24px; background:var(--light-bg); border-radius:8px; color:var(--muted); font-weight:700;">
+          <i class="fa fa-info-circle"></i> Commande traitée — aucune action possible
+        </div>
+      {% endif %}
+
+    {# ── STARTUP ────────────────────────────────────────────────────── #}
+    {% elseif app.user.userType == 'startup' %}
+
+      {# Annuler si encore en attente #}
+      {% if commande.effectiveStatut == 'en_attente' %}
+        <form method="POST" action="{{ path('commande_annuler', {id: commande.idCommande}) }}"
+              data-confirm="Annuler la commande #{{ commande.idCommande }} ? Cette action est irréversible."
+              data-confirm-type="warning">
+          <input type="hidden" name="_token" value="{{ csrf_token('annuler_' ~ commande.idCommande) }}">
+          <button type="submit" class="btn-danger" style="justify-content:center;">
+            <i class="fa fa-times-circle"></i> Annuler la commande
+          </button>
+        </form>
+      {% endif %}
+
+      {# Payer — visible si confirmée et pas encore payée #}
+      {% if commande.effectiveStatut == 'confirmee' and not commande.estPayee %}
+        <form method="POST" action="{{ path('payment_initier', {id: commande.idCommande}) }}"
+              data-confirm="Procéder au paiement sécurisé de {{ commande.totalTtc }} TND via Stripe ?"
+              data-confirm-type="info">
+          <input type="hidden" name="_token" value="{{ csrf_token('payer_' ~ commande.idCommande) }}">
+          <button type="submit" class="btn-pay" style="justify-content:center; padding:12px 28px; font-size:0.85rem;">
+            <i class="fa fa-credit-card"></i> Payer {{ commande.totalTtc }} TND
+          </button>
+        </form>
+        <div style="font-size:0.78rem; color:var(--muted); display:flex; align-items:center; gap:6px;">
+          <i class="fa fa-lock" style="color:#6366f1;"></i> Paiement sécurisé par Stripe
+        </div>
+      {% endif %}
+
+      {# Paiement en cours #}
+      {% if commande.effectiveStatut == 'en_cours_paiement' %}
+        <div style="padding:12px 24px; background:rgba(99,102,241,0.08); border-radius:8px; border:1px solid rgba(99,102,241,0.25); color:#3730a3; font-weight:700; display:inline-flex; align-items:center; gap:8px;">
+          <i class="fa fa-spinner fa-spin"></i> Paiement en cours de traitement…
+        </div>
+        {% if commande.paymentUrl %}
+          <a href="{{ commande.paymentUrl }}" class="btn-pay" style="justify-content:center;">
+            <i class="fa fa-redo"></i> Reprendre le paiement
+          </a>
+        {% endif %}
+      {% endif %}
+
+      {# Déjà payée #}
+      {% if commande.estPayee %}
+        <div style="padding:12px 24px; background:rgba(16,185,129,0.08); border-radius:8px; border:1px solid rgba(16,185,129,0.25); color:#065f46; font-weight:700; display:inline-flex; align-items:center; gap:8px;">
+          <i class="fa fa-check-circle"></i> Commande payée le {{ commande.paidAt ? commande.paidAt|date('d/m/Y') : '' }}
+        </div>
+        <a href="{{ path('facture_show', {id: commande.idCommande}) }}"
+           style="background:linear-gradient(135deg,#1e293b,#334155); color:white; padding:12px 24px; border-radius:8px; font-family:'Josefin Sans',sans-serif; font-weight:700; font-size:0.82rem; text-transform:uppercase; letter-spacing:0.08em; text-decoration:none; display:inline-flex; align-items:center; gap:8px; transition:opacity 0.2s;"
+           onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+          <i class="fa fa-file-invoice"></i> Voir la facture
+        </a>
+        <a href="{{ path('facture_download_pdf', {id: commande.idCommande}) }}"
+           style="background:linear-gradient(135deg,#dc2626,#b91c1c); color:white; padding:12px 24px; border-radius:8px; font-family:'Josefin Sans',sans-serif; font-weight:700; font-size:0.82rem; text-transform:uppercase; letter-spacing:0.08em; text-decoration:none; display:inline-flex; align-items:center; gap:8px; transition:opacity 0.2s;"
+           onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+          <i class="fa fa-file-pdf"></i> Télécharger PDF
+        </a>
+      {% endif %}
+
+      {# Suivi de la commande (toujours visible pour la startup) #}
+      <a href="{{ path('tracking_show', {id: commande.idCommande}) }}" class="btn-outline" style="justify-content:center;">
+        <i class="fa fa-map-marker-alt"></i> Suivre la commande
+      </a>
+
+      {# Reorder si commande terminée #}
+      {% if commande.effectiveStatut in ['livree', 'annulee'] %}
+        <form method="POST" action="{{ path('commande_reorder', {id: commande.idCommande}) }}"
+              data-confirm="Recréer une nouvelle commande identique ?"
+              data-confirm-type="info">
+          <input type="hidden" name="_token" value="{{ csrf_token('reorder_' ~ commande.idCommande) }}">
+          <button type="submit" style="background:#6f42c1; color:white; border:none; padding:12px 24px; border-radius:8px; cursor:pointer; font-weight:700; font-family:'Josefin Sans',sans-serif; font-size:0.82rem; text-transform:uppercase; letter-spacing:0.08em; display:inline-flex; align-items:center; gap:8px; transition:background 0.2s;">
+            <i class="fa fa-redo"></i> Reorder
+          </button>
+        </form>
+      {% endif %}
+
+    {% endif %}
+  </div>
+
+  {# ══════════════════════════════════════════════════════════════════════
+     BLOC IA — Score, décision, critères, recommandation Grok
+     Visible pour l'investisseur et la startup
+  ══════════════════════════════════════════════════════════════════════ #}
+  {% if ai_data is not null %}
+  <div style="margin-top:2rem; background:var(--white); border-radius:14px; border:1.5px solid var(--border); overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.07);">
+
+    {# Header IA #}
+    <div style="padding:20px 28px; border-bottom:1px solid var(--border); background:linear-gradient(135deg, rgba(99,102,241,0.06) 0%, rgba(255,190,51,0.06) 100%); display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+      <div style="width:40px; height:40px; border-radius:10px; background:linear-gradient(135deg,#6366f1,#8b5cf6); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+        <i class="fa fa-brain" style="color:white; font-size:1rem;"></i>
+      </div>
+      <div style="flex:1;">
+        <div style="font-family:'Josefin Sans',sans-serif; font-size:0.65rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em;">Analyse intelligente</div>
+        <div style="font-family:'Lora',serif; font-size:1.05rem; font-weight:700; color:var(--dark);">Décision IA — Commande #{{ commande.idCommande }}</div>
+      </div>
+      {# Badge source Grok #}
+      {% if ai_data.grok.source == 'groq' %}
+        <span style="padding:5px 12px; border-radius:20px; background:linear-gradient(135deg,#6366f1,#8b5cf6); color:white; font-family:'Josefin Sans',sans-serif; font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em;">
+          <i class="fa fa-bolt"></i> Propulsé par Grok
+        </span>
+      {% else %}
+        <span style="padding:5px 12px; border-radius:20px; background:var(--light-bg); color:var(--muted); font-family:'Josefin Sans',sans-serif; font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em;">
+          <i class="fa fa-robot"></i> Analyse locale
+        </span>
+      {% endif %}
+    </div>
+
+    <div style="padding:28px;">
+
+      {# Ligne supérieure : Score + Décision + Priorité #}
+      <div style="display:grid; grid-template-columns:auto 1fr auto; gap:2rem; align-items:center; margin-bottom:28px; flex-wrap:wrap;">
+
+        {# Jauge circulaire (SVG) #}
+        {% set s = ai_data.score %}
+        {% set s_color = s >= 70 ? '#10b981' : (s >= 40 ? '#f59e0b' : '#ef4444') %}
+        {% set s_pct   = (s / 100 * 251.2)|round(1) %}
+        <div style="text-align:center; flex-shrink:0;">
+          <div style="position:relative; width:96px; height:96px; margin:0 auto;">
+            <svg viewBox="0 0 100 100" style="width:96px; height:96px; transform:rotate(-90deg);">
+              <circle cx="50" cy="50" r="40" fill="none" stroke="var(--border)" stroke-width="8"/>
+              <circle cx="50" cy="50" r="40" fill="none" stroke="{{ s_color }}" stroke-width="8"
+                stroke-dasharray="{{ s_pct }} 251.2" stroke-linecap="round"/>
+            </svg>
+            <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center;">
+              <div style="font-family:'Josefin Sans',sans-serif; font-size:1.4rem; font-weight:800; color:{{ s_color }};">{{ s }}</div>
+              <div style="font-family:'Josefin Sans',sans-serif; font-size:0.6rem; font-weight:700; color:var(--muted); text-transform:uppercase;">/100</div>
+            </div>
+          </div>
+          <div style="font-family:'Josefin Sans',sans-serif; font-size:0.65rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; margin-top:6px;">Score IA</div>
+        </div>
+
+        {# Décision + recommandation Grok #}
+        <div>
+          {# Badge décision #}
+          {% set d = ai_data.decision %}
+          {% set d_bg    = d == 'auto_confirm' ? 'rgba(16,185,129,0.12)' : (d == 'auto_reject' ? 'rgba(239,68,68,0.12)' : 'rgba(245,158,11,0.12)') %}
+          {% set d_color = d == 'auto_confirm' ? '#065f46' : (d == 'auto_reject' ? '#991b1b' : '#78350f') %}
+          {% set d_icon  = d == 'auto_confirm' ? 'check-circle' : (d == 'auto_reject' ? 'times-circle' : 'exclamation-circle') %}
+          {% set d_label = d == 'auto_confirm' ? 'Confirmation recommandée' : (d == 'auto_reject' ? 'Rejet recommandé' : 'Validation manuelle') %}
+          <span style="display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:8px; background:{{ d_bg }}; color:{{ d_color }}; font-family:'Josefin Sans',sans-serif; font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:12px;">
+            <i class="fa fa-{{ d_icon }}"></i> {{ d_label }}
+          </span>
+
+          {# Texte Grok #}
+          {% if ai_data.grok.text is defined %}
+            <p style="font-size:0.88rem; color:var(--dark); line-height:1.65; margin:0; padding:14px 18px; background:rgba(99,102,241,0.04); border-left:3px solid #6366f1; border-radius:0 8px 8px 0;">
+              <i class="fa fa-quote-left" style="color:#6366f1; margin-right:6px; font-size:0.7rem;"></i>{{ ai_data.grok.text }}
+            </p>
+          {% endif %}
+        </div>
+
+        {# Niveau de priorité #}
+        {% set p = ai_data.grok.priority ?? (s >= 70 ? 'Élevé' : (s >= 40 ? 'Modéré' : 'Faible')) %}
+        {% set p_color = p == 'Élevé' ? '#065f46' : (p == 'Modéré' ? '#78350f' : '#991b1b') %}
+        {% set p_bg    = p == 'Élevé' ? 'rgba(16,185,129,0.1)' : (p == 'Modéré' ? 'rgba(245,158,11,0.1)' : 'rgba(239,68,68,0.1)') %}
+        <div style="text-align:center; flex-shrink:0;">
+          <div style="font-family:'Josefin Sans',sans-serif; font-size:0.62rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;">Priorité</div>
+          <div style="width:70px; height:70px; border-radius:50%; background:{{ p_bg }}; border:2px solid {{ p_color }}; display:flex; align-items:center; justify-content:center; margin:0 auto;">
+            <span style="font-family:'Josefin Sans',sans-serif; font-size:0.72rem; font-weight:800; color:{{ p_color }}; text-transform:uppercase;">{{ p }}</span>
+          </div>
+        </div>
+
+      </div>
+
+      {# Séparateur #}
+      <div style="border-top:1px solid var(--border); margin-bottom:24px;"></div>
+
+      {# Décomposition des critères #}
+      <div style="font-family:'Josefin Sans',sans-serif; font-size:0.65rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:16px;">
+        <i class="fa fa-sliders-h" style="margin-right:5px;"></i>Décomposition des critères
+      </div>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        {% for crit in ai_data.criteria %}
+          {% set pct = crit.max > 0 ? ((crit.score / crit.max) * 100)|round : 0 %}
+          {% set c_color = pct >= 80 ? '#10b981' : (pct >= 50 ? '#f59e0b' : '#ef4444') %}
+          <div style="display:grid; grid-template-columns:1.6rem 180px 1fr 3rem; align-items:center; gap:10px;">
+            <i class="fa fa-{{ crit.icone }}" style="color:{{ c_color }}; font-size:0.9rem; text-align:center;"></i>
+            <div>
+              <div style="font-family:'Josefin Sans',sans-serif; font-size:0.72rem; font-weight:700; color:var(--dark);">{{ crit.nom }}</div>
+              <div style="font-size:0.68rem; color:var(--muted); margin-top:1px;">{{ crit.description }}</div>
+            </div>
+            <div>
+              <div style="height:6px; background:var(--border); border-radius:3px; overflow:hidden;">
+                <div style="height:100%; width:{{ pct }}%; background:{{ c_color }}; border-radius:3px; transition:width 0.5s;"></div>
+              </div>
+            </div>
+            <div style="font-family:'Josefin Sans',sans-serif; font-size:0.75rem; font-weight:800; color:{{ c_color }}; text-align:right;">{{ crit.score }}/{{ crit.max }}</div>
+          </div>
+        {% endfor %}
+      </div>
+
+      {# Lien analyse de marché #}
+      {% if first_produit is not null %}
+      <div style="margin-top:24px; padding-top:20px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.8rem;">
+        <div style="font-size:0.85rem; color:var(--muted);">
+          <i class="fa fa-chart-line" style="color:#6366f1; margin-right:5px;"></i>
+          Obtenez une analyse de marché détaillée pour <strong>{{ first_produit.nom }}</strong>
+        </div>
+        <a href="{{ path('market_analysis_commande', {id: commande.idCommande}) }}"
+           style="background:linear-gradient(135deg,#6366f1,#8b5cf6); color:white; padding:10px 20px; border-radius:8px; font-family:'Josefin Sans',sans-serif; font-weight:700; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.06em; text-decoration:none; display:inline-flex; align-items:center; gap:7px; transition:opacity 0.2s;"
+           onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+          <i class="fa fa-chart-bar"></i> Analyse de marché IA
+        </a>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

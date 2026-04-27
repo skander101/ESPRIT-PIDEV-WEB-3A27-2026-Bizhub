@@ -1,0 +1,356 @@
+{% extends 'auth_base.html.twig' %}
+
+{% block title %}Inscription - BizHub{% endblock %}
+
+{% block auth_page_styles %}
+.phone-row {
+    display: flex;
+    gap: 12px;
+}
+
+.phone-row .prefix-wrap {
+    flex: 0 0 44%;
+}
+
+.phone-row .number-wrap {
+    flex: 1;
+}
+
+.password-meter {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.password-meter span {
+    height: 6px;
+    border-radius: 999px;
+    background: #e9ecef;
+    transition: background 0.2s ease;
+}
+
+.terms-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 6px 0 16px;
+}
+
+.terms-row input[type="checkbox"] {
+    margin-top: 2px;
+    width: 18px;
+    height: 18px;
+}
+
+.terms-row label {
+    margin: 0;
+    font-size: 14px;
+    color: #606770;
+    line-height: 1.4;
+}
+
+@media (max-width: 767px) {
+    .phone-row {
+        flex-direction: column;
+    }
+
+    .phone-row .prefix-wrap {
+        flex-basis: auto;
+    }
+}
+{% endblock %}
+
+{% block auth_content %}
+    {% for message in app.flashes('error') %}
+        <div style="margin-bottom:12px;padding:11px 12px;border:1px solid #f3c4c4;background:#ffebee;color:#b71c1c;border-radius:8px;font-size:14px;">{{ message }}</div>
+    {% endfor %}
+
+    <h1 class="auth-heading">Creez votre compte</h1>
+    <p class="auth-subtext">Rejoignez la communaute BizHub.</p>
+
+    {{ form_start(form, {'attr': {'id': 'registerForm', 'novalidate': 'novalidate'}}) }}
+
+        {% if form.vars.submitted and form.vars.errors|length %}
+            <div style="margin-bottom:12px;padding:11px 12px;border:1px solid #f3c4c4;background:#ffebee;color:#b71c1c;border-radius:8px;font-size:14px;">
+                {% for error in form.vars.errors %}
+                    <div>{{ error.message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="two-col">
+            <div class="field-group">
+                <label class="field-label" for="{{ form.first_name.vars.id }}">Prenom</label>
+                {{ form_widget(form.first_name, {'attr': {'class': 'input-field', 'placeholder': 'Prenom'}}) }}
+                {% if form.first_name.vars.errors|length %}
+                    <div class="field-error">{% for error in form.first_name.vars.errors %}{{ error.message }}{% endfor %}</div>
+                {% else %}
+                    <div id="first_name_error" class="field-error" style="display:none;"></div>
+                {% endif %}
+            </div>
+
+            <div class="field-group">
+                <label class="field-label" for="{{ form.last_name.vars.id }}">Nom</label>
+                {{ form_widget(form.last_name, {'attr': {'class': 'input-field', 'placeholder': 'Nom'}}) }}
+                {% if form.last_name.vars.errors|length %}
+                    <div class="field-error">{% for error in form.last_name.vars.errors %}{{ error.message }}{% endfor %}</div>
+                {% else %}
+                    <div id="last_name_error" class="field-error" style="display:none;"></div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="field-group">
+            <label class="field-label" for="{{ form.email.vars.id }}">Adresse email</label>
+            {{ form_widget(form.email, {'attr': {'class': 'input-field', 'placeholder': 'Adresse email'}}) }}
+            {% if form.email.vars.errors|length %}
+                <div class="field-error">{% for error in form.email.vars.errors %}{{ error.message }}{% endfor %}</div>
+            {% else %}
+                <div id="register_email_error" class="field-error" style="display:none;"></div>
+            {% endif %}
+        </div>
+
+        <div class="field-group">
+            <label class="field-label" for="{{ form.user_type.vars.id }}">Type de profil</label>
+            {{ form_widget(form.user_type, {'attr': {'class': 'select-field'}}) }}
+            {% if form.user_type.vars.errors|length %}
+                <div class="field-error">{% for error in form.user_type.vars.errors %}{{ error.message }}{% endfor %}</div>
+            {% endif %}
+        </div>
+
+        <div class="field-group">
+            <label class="field-label" for="{{ form.password.first.vars.id }}">Mot de passe</label>
+            <div class="field-with-icon">
+                {{ form_widget(form.password.first, {'attr': {'class': 'input-field', 'placeholder': 'Mot de passe'}}) }}
+                <button class="password-toggle" id="toggleRegisterPassword" type="button" aria-label="Afficher ou masquer le mot de passe">&#128065;</button>
+            </div>
+            <div class="password-meter" id="passwordMeter">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            {% if form.password.first.vars.errors|length %}
+                <div class="field-error">{% for error in form.password.first.vars.errors %}{{ error.message }}{% endfor %}</div>
+            {% else %}
+                <div id="register_password_error" class="field-error" style="display:none;"></div>
+            {% endif %}
+        </div>
+
+        <div class="field-group">
+            <label class="field-label" for="{{ form.password.second.vars.id }}">Confirmer le mot de passe</label>
+            <div class="field-with-icon">
+                {{ form_widget(form.password.second, {'attr': {'class': 'input-field', 'placeholder': 'Confirmer le mot de passe'}}) }}
+                <button class="password-toggle" id="toggleRegisterConfirmPassword" type="button" aria-label="Afficher ou masquer la confirmation du mot de passe">&#128065;</button>
+            </div>
+            {% if form.password.second.vars.errors|length %}
+                <div class="field-error">{% for error in form.password.second.vars.errors %}{{ error.message }}{% endfor %}</div>
+            {% else %}
+                <div id="register_confirm_password_error" class="field-error" style="display:none;"></div>
+            {% endif %}
+        </div>
+
+        <div class="field-group">
+            <label class="field-label">Telephone (optionnel)</label>
+            <div class="phone-row">
+                <div class="prefix-wrap">
+                    {{ form_widget(form.phone_country_code, {'attr': {'class': 'select-field'}}) }}
+                </div>
+                <div class="number-wrap">
+                    {{ form_widget(form.phone, {'attr': {'class': 'input-field', 'placeholder': '12 345 678'}}) }}
+                </div>
+            </div>
+            {% if form.phone.vars.errors|length %}
+                <div class="field-error">{% for error in form.phone.vars.errors %}{{ error.message }}{% endfor %}</div>
+            {% endif %}
+        </div>
+
+        <div class="terms-row">
+            {{ form_widget(form.terms_accepted, {'attr': {'id': 'terms_accepted'}}) }}
+            <label for="terms_accepted">
+                J'accepte les <a class="link-brand" href="#">Conditions d'utilisation</a> et la
+                <a class="link-brand" href="#">Politique de confidentialite</a>
+            </label>
+        </div>
+        {% if form.terms_accepted.vars.errors|length %}
+            <div class="field-error" style="margin-top:-10px;margin-bottom:10px;">{% for error in form.terms_accepted.vars.errors %}{{ error.message }}{% endfor %}</div>
+        {% else %}
+            <div id="terms_error" class="field-error" style="display:none;margin-top:-10px;margin-bottom:10px;"></div>
+        {% endif %}
+
+        {{ form_widget(form.full_name) }}
+
+        <button class="btn-primary" type="submit" style="margin-top:4px;">Creer mon compte</button>
+
+        <div class="divider-text">ou</div>
+
+        <div class="social-stack" style="margin-bottom:14px;">
+            <a class="btn-secondary" href="{{ path('app_google_oauth_connect') }}">
+                <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="#EA4335" d="M12 10.2v3.9h5.5c-.2 1.3-1.5 3.8-5.5 3.8-3.3 0-6-2.7-6-6.1s2.7-6.1 6-6.1c1.9 0 3.1.8 3.9 1.5l2.7-2.6C17 3.1 14.7 2.2 12 2.2 6.9 2.2 2.8 6.4 2.8 11.6S6.9 21 12 21c6.9 0 9.1-4.9 9.1-7.4 0-.5 0-.9-.1-1.2H12z"/>
+                </svg>
+                S'inscrire avec Google
+            </a>
+            <button class="btn-secondary" type="button" id="linkedinRegisterBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="#0A66C2" d="M4.98 3.5A2.49 2.49 0 0 0 2.5 6a2.48 2.48 0 0 0 2.48 2.5A2.49 2.49 0 0 0 7.5 6 2.5 2.5 0 0 0 4.98 3.5zM2.8 8.9h4.4V21H2.8V8.9zM9.4 8.9h4.2v1.7h.1c.6-1.1 2-2.2 4.2-2.2 4.5 0 5.3 3 5.3 6.8V21h-4.4v-5.2c0-1.2 0-2.9-1.8-2.9s-2.1 1.4-2.1 2.8V21H9.4V8.9z"/>
+                </svg>
+                S'inscrire avec LinkedIn
+            </button>
+        </div>
+
+        <p class="muted-center">
+            Deja un compte ?
+            <a class="link-brand" href="{{ path('app_login') }}">Se connecter</a>
+        </p>
+
+        {{ form_widget(form._token) }}
+    {{ form_end(form, {'render_rest': false}) }}
+{% endblock %}
+
+{% block auth_scripts %}
+<script>
+(function () {
+    const form = document.getElementById('registerForm');
+    if (!form) {
+        return;
+    }
+
+    const firstNameInput = document.getElementById('{{ form.first_name.vars.id }}');
+    const lastNameInput = document.getElementById('{{ form.last_name.vars.id }}');
+    const emailInput = document.getElementById('{{ form.email.vars.id }}');
+    const passwordInput = document.getElementById('{{ form.password.first.vars.id }}');
+    const confirmPasswordInput = document.getElementById('{{ form.password.second.vars.id }}');
+    const termsInput = document.getElementById('terms_accepted');
+
+    const firstNameError = document.getElementById('first_name_error');
+    const lastNameError = document.getElementById('last_name_error');
+    const emailError = document.getElementById('register_email_error');
+    const passwordError = document.getElementById('register_password_error');
+    const confirmPasswordError = document.getElementById('register_confirm_password_error');
+    const termsError = document.getElementById('terms_error');
+
+    const togglePassword = document.getElementById('toggleRegisterPassword');
+    const toggleConfirm = document.getElementById('toggleRegisterConfirmPassword');
+    const meterBars = Array.from(document.querySelectorAll('#passwordMeter span'));
+    const linkedinButton = document.getElementById('linkedinRegisterBtn');
+
+    function setError(input, errorEl, message) {
+        if (input) {
+            input.classList.add('input-error');
+        }
+        if (errorEl) {
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+        }
+    }
+
+    function clearError(input, errorEl) {
+        if (input) {
+            input.classList.remove('input-error');
+        }
+        if (errorEl) {
+            errorEl.textContent = '';
+            errorEl.style.display = 'none';
+        }
+    }
+
+    function evaluateStrength(password) {
+        let score = 0;
+        if (password.length >= 8) score += 1;
+        if (/[A-Z]/.test(password)) score += 1;
+        if (/\d/.test(password)) score += 1;
+        if (/[^A-Za-z0-9]/.test(password) || password.length >= 12) score += 1;
+        return score;
+    }
+
+    function paintStrength(score) {
+        const colors = ['#e53935', '#fb8c00', '#fbc02d', '#43a047'];
+        meterBars.forEach(function (bar, index) {
+            bar.style.background = index < score ? colors[Math.min(score - 1, colors.length - 1)] : '#e9ecef';
+        });
+    }
+
+    function toggleVisibility(targetInput) {
+        const currentType = targetInput.getAttribute('type');
+        targetInput.setAttribute('type', currentType === 'password' ? 'text' : 'password');
+    }
+
+    if (togglePassword) {
+        togglePassword.addEventListener('click', function () {
+            toggleVisibility(passwordInput);
+        });
+    }
+
+    if (toggleConfirm) {
+        toggleConfirm.addEventListener('click', function () {
+            toggleVisibility(confirmPasswordInput);
+        });
+    }
+
+    if (linkedinButton) {
+        linkedinButton.addEventListener('click', function () {
+            alert('Inscription LinkedIn bientot disponible.');
+        });
+    }
+
+    passwordInput.addEventListener('input', function () {
+        paintStrength(evaluateStrength(passwordInput.value));
+    });
+
+    form.addEventListener('submit', function (event) {
+        let valid = true;
+
+        clearError(firstNameInput, firstNameError);
+        clearError(lastNameInput, lastNameError);
+        clearError(emailInput, emailError);
+        clearError(passwordInput, passwordError);
+        clearError(confirmPasswordInput, confirmPasswordError);
+        clearError(termsInput, termsError);
+
+        const firstName = firstNameInput.value.trim();
+        const lastName = lastNameInput.value.trim();
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+
+        if (firstName === '') {
+            setError(firstNameInput, firstNameError, 'Le prenom est requis.');
+            valid = false;
+        }
+
+        if (lastName === '') {
+            setError(lastNameInput, lastNameError, 'Le nom est requis.');
+            valid = false;
+        }
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            setError(emailInput, emailError, 'Veuillez saisir une adresse email valide.');
+            valid = false;
+        }
+
+        if (password.length < 8 || !/[A-Z]/.test(password) || !/\d/.test(password)) {
+            setError(passwordInput, passwordError, '8 caracteres minimum, avec au moins 1 majuscule et 1 chiffre.');
+            valid = false;
+        }
+
+        if (confirmPassword !== password) {
+            setError(confirmPasswordInput, confirmPasswordError, 'Les mots de passe ne correspondent pas.');
+            valid = false;
+        }
+
+        if (!termsInput.checked) {
+            setError(termsInput, termsError, 'Vous devez accepter les conditions pour continuer.');
+            valid = false;
+        }
+
+        if (!valid) {
+            event.preventDefault();
+        }
+    });
+
+    paintStrength(evaluateStrength(passwordInput.value));
+})();
+</script>
+{% endblock %}

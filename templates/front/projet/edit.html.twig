@@ -1,0 +1,30 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Modifier — {{ projet.title }} — BizHub{% endblock %}
+
+{% block extra_styles %}
+.page-header { background: linear-gradient(135deg, var(--dark) 0%, var(--dark2) 100%); padding: 60px 5% 40px; }
+.page-header h1 { font-size: 1.8rem; color: var(--white); font-family: 'Josefin Sans', sans-serif; font-weight: 700; }
+.page-header p { color: rgba(255,255,255,0.55); margin-top: 0.4rem; font-size: 0.9rem; }
+.page-body { max-width: 700px; margin: 0 auto; padding: 40px 5%; }
+.back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--text-muted); text-decoration: none; font-size: 0.85rem; margin-bottom: 1.5rem; transition: color 0.2s; font-family: 'Josefin Sans', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+.back-link:hover { color: var(--primary); }
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div style="max-width:700px;margin:0 auto;">
+        <h1><i class="fa fa-pen" style="color:var(--primary);margin-right:0.5rem;"></i>Modifier le projet</h1>
+        <p>{{ projet.title }}</p>
+    </div>
+</div>
+
+<div class="page-body">
+    <a href="{{ path('app_front_projet_show', {'id': projet.project_id}) }}" class="back-link"><i class="fa fa-arrow-left"></i> Retour au projet</a>
+    {% include 'front/projet/_form.html.twig' with {
+        'form': form,
+        'submitIcon': 'save',
+        'submitLabel': 'Enregistrer les modifications'
+    } %}
+</div>
+{% endblock %}

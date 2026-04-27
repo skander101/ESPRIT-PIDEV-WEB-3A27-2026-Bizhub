@@ -1,0 +1,59 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Codes promo e-learning — Admin{% endblock %}
+{% block breadcrumb %}E-Learning / Codes promo{% endblock %}
+
+{% block content %}
+<div style="padding:2rem;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+    <h2 style="font-size:1.5rem;color:var(--pg-text);margin:0;">Codes promo (récompense post-paiement)</h2>
+    <a href="{{ path('app_admin_elearning_participations_index') }}" class="btn btn-outline-secondary">← Participations</a>
+  </div>
+
+  <div class="dash-panel" style="border:1px solid var(--pg-border);border-radius:16px;overflow:hidden;">
+    {% if promo_codes|length > 0 %}
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Utilisateur</th>
+              <th>%</th>
+              <th>Utilisé</th>
+              <th>Actif</th>
+              <th>Création</th>
+              <th>Expiration</th>
+              <th>Utilisé le</th>
+              <th>Source participation</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for pc in promo_codes %}
+              <tr>
+                <td><code style="font-size:0.85rem;">{{ pc.code }}</code></td>
+                <td>
+                  {% if pc.user %}
+                    {{ pc.user.fullName|default('—') }}<br/>
+                    <small class="text-muted">{{ pc.user.email }}</small>
+                  {% else %}
+                    —
+                  {% endif %}
+                </td>
+                <td><span class="badge bg-info text-dark">{{ pc.discountPercent }}%</span></td>
+                <td>{{ pc.isUsed ? 'Oui' : 'Non' }}</td>
+                <td>{{ pc.isActive ? 'Oui' : 'Non' }}</td>
+                <td><small>{{ pc.createdAt ? pc.createdAt|date('d/m/Y H:i') : '—' }}</small></td>
+                <td><small>{{ pc.expiresAt ? pc.expiresAt|date('d/m/Y') : '—' }}</small></td>
+                <td><small>{{ pc.usedAt ? pc.usedAt|date('d/m/Y H:i') : '—' }}</small></td>
+                <td><small class="text-muted">#{{ pc.participationSource ? pc.participationSource.id_candidature : '—' }}</small></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-muted p-4 mb-0">Aucun code promo enregistré pour le moment.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,162 @@
+{# Role-specific fields partial - included dynamically based on user type #}
+
+<div id="roleSection" style="background:rgba(255,190,51,0.05);border:1px solid rgba(255,190,51,0.15);border-radius:12px;padding:1.5rem;margin-top:1.5rem;display:none;">
+    <h3 style="font-size:0.9rem;font-weight:600;color:var(--primary-dark);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:1.5rem;display:flex;align-items:center;gap:8px;">
+        <i class="fa fa-briefcase"></i> Role-Specific Information
+    </h3>
+
+    <!-- STARTUP & FOURNISSEUR: Company Information -->
+    <div class="role-field" data-role="startup,fournisseur" style="display:none;">
+        <div class="form-group" style="margin-bottom:1.5rem;">
+            {{ form_label(form.company_name, 'Company Name') }}
+            {{ form_widget(form.company_name, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;'}}) }}
+        </div>
+    </div>
+
+    <div class="role-field" data-role="startup,fournisseur" style="display:none;">
+        <div class="form-group" style="margin-bottom:1.5rem;">
+            {{ form_label(form.sector, 'Sector') }}
+            {{ form_widget(form.sector, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;'}}) }}
+        </div>
+    </div>
+
+    <div class="role-field" data-role="startup,fournisseur" style="display:none;">
+        <div class="form-group" style="margin-bottom:1.5rem;">
+            {{ form_label(form.company_description, 'Company Description') }}
+            {{ form_widget(form.company_description, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;min-height:100px;'}}) }}
+        </div>
+    </div>
+
+    <!-- STARTUP only -->
+    <div class="role-field" data-role="startup" style="display:none;">
+        <div class="form-group" style="margin-bottom:1.5rem;">
+            {{ form_label(form.website, 'Website') }}
+            {{ form_widget(form.website, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;'}}) }}
+        </div>
+    </div>
+
+    <div class="role-field" data-role="startup" style="display:none;">
+        <div class="form-group" style="margin-bottom:1.5rem;">
+            {{ form_label(form.founding_date, 'Founding Date') }}
+            {{ form_widget(form.founding_date, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;'}}) }}
+        </div>
+    </div>
+
+    <div class="role-field" data-role="startup" style="display:none;">
+        <div class="form-group" style="margin-bottom:1.5rem;">
+            {{ form_label(form.business_type, 'Business Type') }}
+            {{ form_widget(form.business_type, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;'}}) }}
+        </div>
+    </div>
+
+    <!-- FOURNISSEUR only -->
+    <div class="role-field" data-role="fournisseur" style="display:none;">
+        <div class="form-group" style="margin-bottom:1.5rem;">
+            {{ form_label(form.delivery_zones, 'Delivery Zones') }}
+            {{ form_widget(form.delivery_zones, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;min-height:100px;'}}) }}
+        </div>
+    </div>
+
+    <div class="role-field" data-role="fournisseur" style="display:none;">
+        <div class="form-group" style="margin-bottom:1.5rem;">
+            {{ form_label(form.payment_methods, 'Payment Methods') }}
+            {{ form_widget(form.payment_methods, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;'}}) }}
+        </div>
+    </div>
+
+    <div class="role-field" data-role="fournisseur" style="display:none;">
+        <div class="form-group" style="margin-bottom:1.5rem;">
+            {{ form_label(form.return_policy, 'Return Policy') }}
+            {{ form_widget(form.return_policy, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;min-height:100px;'}}) }}
+        </div>
+    </div>
+
+    <!-- FORMATEUR only -->
+    <div class="role-field" data-role="formateur" style="display:none;">
+        <div class="form-group" style="margin-bottom:1.5rem;">
+            {{ form_label(form.specialty, 'Specialty') }}
+            {{ form_widget(form.specialty, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;'}}) }}
+        </div>
+    </div>
+
+    <div class="role-field" data-role="formateur,investisseur" style="display:none;">
+        <div class="form-group" style="margin-bottom:1.5rem;">
+            {{ form_label(form.years_experience, 'Years of Experience') }}
+            {{ form_widget(form.years_experience, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;'}}) }}
+        </div>
+    </div>
+
+    <div class="role-field" data-role="formateur" style="display:none;">
+        <div class="form-group" style="margin-bottom:1.5rem;">
+            {{ form_label(form.hourly_rate, 'Hourly Rate (€)') }}
+            {{ form_widget(form.hourly_rate, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;'}}) }}
+        </div>
+    </div>
+
+    <div class="role-field" data-role="formateur" style="display:none;">
+        <div class="form-group" style="margin-bottom:1.5rem;">
+            {{ form_label(form.availability, 'Availability') }}
+            {{ form_widget(form.availability, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;min-height:100px;'}}) }}
+        </div>
+    </div>
+
+    <div class="role-field" data-role="formateur" style="display:none;">
+        <div class="form-group" style="margin-bottom:1.5rem;">
+            {{ form_label(form.cv_url, 'CV URL') }}
+            {{ form_widget(form.cv_url, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;'}}) }}
+        </div>
+    </div>
+
+    <!-- INVESTISSEUR only -->
+    <div class="role-field" data-role="investisseur" style="display:none;">
+        <div class="form-group" style="margin-bottom:1.5rem;">
+            {{ form_label(form.represented_company, 'Represented Company') }}
+            {{ form_widget(form.represented_company, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;'}}) }}
+        </div>
+    </div>
+
+    <div class="role-field" data-role="investisseur" style="display:none;">
+        <div class="form-group" style="margin-bottom:1.5rem;">
+            {{ form_label(form.investment_sector, 'Investment Sector') }}
+            {{ form_widget(form.investment_sector, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;'}}) }}
+        </div>
+    </div>
+
+    <div class="role-field" data-role="investisseur" style="display:none;">
+        <div class="form-group" style="margin-bottom:1.5rem;">
+            {{ form_label(form.max_budget, 'Maximum Budget (€)') }}
+            {{ form_widget(form.max_budget, {'attr': {'style': 'width:100%;padding:0.8rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;'}}) }}
+        </div>
+    </div>
+</div>
+
+<script>
+    // Handle dynamic role-specific fields in profile edit
+    const userTypeSelect = document.querySelector('[name="user_form[user_type]"]');
+    const roleSection = document.getElementById('roleSection');
+    const roleFields = document.querySelectorAll('.role-field');
+
+    function updateRoleFields() {
+        const selectedRole = userTypeSelect?.value;
+        if (!selectedRole) {
+            roleSection.style.display = 'none';
+            return;
+        }
+
+        roleSection.style.display = 'block';
+
+        roleFields.forEach(field => {
+            const roles = field.dataset.role.split(',');
+            if (roles.includes(selectedRole)) {
+                field.style.display = 'block';
+            } else {
+                field.style.display = 'none';
+            }
+        });
+    }
+
+    if (userTypeSelect) {
+        userTypeSelect.addEventListener('change', updateRoleFields);
+        updateRoleFields(); // Initial state
+    }
+</script>

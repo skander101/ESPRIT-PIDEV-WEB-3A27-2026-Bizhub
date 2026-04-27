@@ -1,0 +1,73 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Review Details{% endblock %}
+{% block breadcrumb %}Review Details{% endblock %}
+
+{% block content %}
+<div style="padding:2rem;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;">
+        <h2 style="font-size:1.5rem;color:var(--pg-text);">Review Details</h2>
+        <div style="display:flex;gap:0.8rem;">
+            {% if not avi.isRemoved %}
+                <a href="{{ path('app_admin_avis_edit', {'id': avi.avisId}) }}" style="background:#8b5cf6;color:white;padding:0.7rem 1.5rem;border-radius:6px;text-decoration:none;font-weight:700;">
+                    {{ avi.isVerified ? 'Mark as Pending' : 'Verify Review' }}
+                </a>
+                <form method="POST" action="{{ path('app_admin_avis_remove', {'id': avi.avisId}) }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to remove this comment?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('remove_avis') }}">
+                    <button type="submit" style="background:#da3c3c;color:white;padding:0.7rem 1.5rem;border-radius:6px;text-decoration:none;font-weight:700;border:none;cursor:pointer;">Soft Ban</button>
+                </form>
+            {% else %}
+                <form method="POST" action="{{ path('app_admin_avis_restore', {'id': avi.avisId}) }}" style="display:inline;" onsubmit="return confirm('Restore this comment?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('restore_avis') }}">
+                    <button type="submit" style="background:#06d6a0;color:white;padding:0.7rem 1.5rem;border-radius:6px;text-decoration:none;font-weight:700;border:none;cursor:pointer;">Restore Comment</button>
+                </form>
+            {% endif %}
+            <a href="{{ path('app_admin_avis_index') }}" style="background:var(--pg-surface);color:var(--pg-text);padding:0.7rem 1.5rem;border-radius:6px;text-decoration:none;font-weight:700;border:1px solid var(--pg-border);">Back</a>
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;margin-bottom:2rem;">
+        <div class="dash-panel">
+            <h5>Review Content</h5>
+            <div style="display:grid;gap:1.5rem;">
+                <div>
+                    <div style="font-size:0.75rem;color:var(--pg-muted);margin-bottom:0.5rem;text-transform:uppercase;font-weight:700;">Rating</div>
+                    <div style="color:#ffbe33;font-size:1.2rem;">
+                        {% for i in 1..avi.rating %}<i class="fas fa-star"></i>{% endfor %}
+                    </div>
+                </div>
+                <div>
+                    <div style="font-size:0.75rem;color:var(--pg-muted);margin-bottom:0.5rem;text-transform:uppercase;font-weight:700;">Comment</div>
+                    <div style="color:{{ avi.isRemoved ? '#9ca3af' : 'var(--pg-text)' }};font-style:{{ avi.isRemoved ? 'italic' : 'normal' }};padding:1rem;background:var(--pg-surface);border-radius:6px;line-height:1.6;">
+                        {{ avi.displayComment|raw|nl2br }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dash-panel">
+            <h5>Metadata</h5>
+            <div style="display:flex;flex-direction:column;gap:1rem;">
+                <div>
+                    <div style="font-size:0.75rem;color:var(--pg-muted);margin-bottom:0.5rem;text-transform:uppercase;font-weight:700;">Author</div>
+                    <div style="color:var(--pg-text);font-weight:500;">
+                        <a href="{{ path('app_admin_user_show', {'id': avi.user.userId}) }}" style="color:#5b6ef5;text-decoration:none;">
+                            {{ avi.user.fullName }}
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <div style="font-size:0.75rem;color:var(--pg-muted);margin-bottom:0.5rem;text-transform:uppercase;font-weight:700;">Status</div>
+                    <div style="display:inline-block;background:{{ avi.isRemoved ? 'rgba(200,0,0,0.15)' : (avi.isVerified ? 'rgba(6,214,160,0.15)' : 'rgba(200,0,0,0.15)') }};color:{{ avi.isRemoved ? '#c80000' : (avi.isVerified ? '#06d6a0' : '#c80000') }};padding:0.3rem 0.8rem;border-radius:4px;font-size:0.85rem;font-weight:700;">
+                        {% if avi.isRemoved %}Removed{% else %}{{ avi.isVerified ? 'Verified' : 'Pending' }}{% endif %}
+                    </div>
+                </div>
+                <div>
+                    <div style="font-size:0.75rem;color:var(--pg-muted);margin-bottom:0.5rem;text-transform:uppercase;font-weight:700;">Created</div>
+                    <div style="color:var(--pg-text);font-weight:500;">{{ avi.createdAt|date('M d, Y H:i') }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

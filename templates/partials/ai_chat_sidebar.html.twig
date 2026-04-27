@@ -1,0 +1,591 @@
+{% set aiChatAuthenticated = app.user and is_granted('IS_AUTHENTICATED_FULLY') %}
+
+<style>
+  .bizhub-ai-launcher {
+    position: fixed;
+    right: 22px;
+    bottom: 22px;
+    width: 58px;
+    height: 58px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 1600;
+    color: #1e2533;
+    background: linear-gradient(145deg, #ffcf66 0%, #ffbe33 100%);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    animation: bizhub-ai-float 2.6s ease-in-out infinite;
+  }
+
+  .bizhub-ai-launcher:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.28);
+  }
+
+  .bizhub-ai-launcher i {
+    font-size: 1.35rem;
+  }
+
+  .bizhub-ai-bee {
+    font-size: 1.45rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .bizhub-ai-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 17, 23, 0.42);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 1605;
+  }
+
+  .bizhub-ai-overlay.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .bizhub-ai-sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: min(92vw, 390px);
+    height: 100vh;
+    background: #ffffff;
+    box-shadow: -12px 0 36px rgba(0, 0, 0, 0.2);
+    transform: translateX(104%);
+    transition: transform 0.24s ease;
+    z-index: 1610;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .bizhub-ai-sidebar.is-open {
+    transform: translateX(0);
+  }
+
+  .bizhub-ai-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 1rem 1rem 0.9rem;
+    border-bottom: 1px solid #e5e7eb;
+    background: #1e2533;
+    color: #ffffff;
+  }
+
+  .bizhub-ai-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-width: 0;
+  }
+
+  .bizhub-ai-badge {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #ffbe33;
+    color: #1e2533;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .bizhub-ai-title-wrap {
+    min-width: 0;
+  }
+
+  .bizhub-ai-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0;
+  }
+
+  .bizhub-ai-subtitle {
+    font-size: 0.76rem;
+    opacity: 0.78;
+    margin: 0.1rem 0 0;
+    line-height: 1.3;
+  }
+
+  .bizhub-ai-close {
+    width: 32px;
+    height: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    background: transparent;
+    color: #ffffff;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, border-color 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  .bizhub-ai-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.35);
+  }
+
+  .bizhub-ai-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.65rem 0.9rem;
+    border-bottom: 1px solid #f0f2f5;
+    background: #fbfcfe;
+  }
+
+  .bizhub-ai-clear {
+    border: 1px solid #d7dbe3;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    background: #ffffff;
+    color: #374151;
+    cursor: pointer;
+  }
+
+  .bizhub-ai-clear:hover {
+    border-color: #9ca3af;
+  }
+
+  .bizhub-ai-messages {
+    flex: 1;
+    overflow-y: auto;
+    background: linear-gradient(180deg, #f9fafc 0%, #f3f6fb 100%);
+    padding: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .bizhub-ai-msg-row {
+    display: flex;
+  }
+
+  .bizhub-ai-msg-row.user {
+    justify-content: flex-end;
+  }
+
+  .bizhub-ai-msg-row.assistant {
+    justify-content: flex-start;
+  }
+
+  .bizhub-ai-msg {
+    max-width: 82%;
+    border-radius: 10px;
+    padding: 0.62rem 0.72rem;
+    font-size: 0.84rem;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    word-break: break-word;
+    border: 1px solid transparent;
+  }
+
+  .bizhub-ai-msg.user {
+    background: linear-gradient(145deg, #2a8cff 0%, #1877f2 100%);
+    color: #ffffff;
+    border-color: rgba(24, 119, 242, 0.45);
+  }
+
+  .bizhub-ai-msg.assistant {
+    background: linear-gradient(145deg, #ffd978 0%, #ffbe33 100%);
+    color: #1e2533;
+    border-color: rgba(224, 168, 32, 0.45);
+  }
+
+  .bizhub-ai-msg.typing {
+    background: linear-gradient(145deg, #ffd978 0%, #ffbe33 100%);
+    color: #5d4306;
+    border-color: rgba(224, 168, 32, 0.45);
+  }
+
+  .bizhub-ai-msg-link {
+    margin-top: 0.45rem;
+    display: inline-block;
+    font-size: 0.72rem;
+    text-decoration: none;
+    color: #1f4ea8;
+    font-weight: 600;
+  }
+
+  .bizhub-ai-form {
+    display: flex;
+    gap: 0.55rem;
+    padding: 0.75rem;
+    border-top: 1px solid #e5e7eb;
+    background: #ffffff;
+  }
+
+  .bizhub-ai-input {
+    flex: 1;
+    min-height: 40px;
+    max-height: 100px;
+    resize: vertical;
+    border: 1px solid #d7dbe3;
+    border-radius: 9px;
+    padding: 0.56rem 0.65rem;
+    font-family: inherit;
+    font-size: 0.82rem;
+    outline: none;
+  }
+
+  .bizhub-ai-input:focus {
+    border-color: #ffbe33;
+    box-shadow: 0 0 0 2px rgba(255, 190, 51, 0.22);
+  }
+
+  .bizhub-ai-send {
+    border: none;
+    border-radius: 9px;
+    width: 44px;
+    min-width: 44px;
+    background: #ffbe33;
+    color: #1e2533;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    transition: background 0.2s ease;
+  }
+
+  .bizhub-ai-send:hover {
+    background: #e0a820;
+  }
+
+  .bizhub-ai-auth-note {
+    margin: 1rem;
+    padding: 1rem;
+    border: 1px solid #f3d28f;
+    border-radius: 12px;
+    background: #fff6df;
+    color: #6b4d08;
+    font-size: 0.86rem;
+    line-height: 1.5;
+  }
+
+  .bizhub-ai-auth-note a {
+    color: #8b5a00;
+    font-weight: 700;
+    text-decoration: underline;
+  }
+
+  body.bizhub-ai-open {
+    overflow: hidden;
+  }
+
+  @keyframes bizhub-ai-float {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+    100% { transform: translateY(0); }
+  }
+
+  @media (max-width: 768px) {
+    .bizhub-ai-launcher {
+      width: 52px;
+      height: 52px;
+      right: 14px;
+      bottom: 14px;
+    }
+
+    .bizhub-ai-sidebar {
+      width: 100vw;
+    }
+  }
+</style>
+
+<div
+  id="bizhub-ai-widget-root"
+  data-authenticated="{{ aiChatAuthenticated ? '1' : '0' }}"
+  data-message-endpoint="{{ path('app_ai_chat_message') }}"
+  data-clear-endpoint="{{ path('app_ai_chat_clear') }}"
+  data-csrf-message-token="{{ csrf_token('ai_chat_message') }}"
+  data-csrf-clear-token="{{ csrf_token('ai_chat_clear') }}"
+  data-login-url="{{ path('app_login') }}"
+  data-welcome="Welcome to BizHub AI assistant! Ask me to navigate or query your data."
+>
+  <button type="button" class="bizhub-ai-launcher" id="bizhubAiLauncher" aria-label="Open AI assistant">
+    <span class="bizhub-ai-bee" aria-hidden="true">🐝</span>
+  </button>
+
+  <div class="bizhub-ai-overlay" id="bizhubAiOverlay"></div>
+
+  <aside class="bizhub-ai-sidebar" id="bizhubAiSidebar" aria-hidden="true" aria-label="AI Assistant Sidebar">
+    <div class="bizhub-ai-header">
+      <div class="bizhub-ai-header-left">
+        <div class="bizhub-ai-badge"><span class="bizhub-ai-bee" aria-hidden="true">🐝</span></div>
+        <div class="bizhub-ai-title-wrap">
+          <p class="bizhub-ai-title">BizHub AI Assistant</p>
+          <p class="bizhub-ai-subtitle">Chat without leaving the page</p>
+        </div>
+      </div>
+      <button type="button" class="bizhub-ai-close" id="bizhubAiClose" aria-label="Close AI assistant">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    {% if aiChatAuthenticated %}
+      <div class="bizhub-ai-toolbar">
+        <button type="button" class="bizhub-ai-clear" id="bizhubAiClear">Clear chat</button>
+      </div>
+      <div class="bizhub-ai-messages" id="bizhubAiMessages"></div>
+      <form class="bizhub-ai-form" id="bizhubAiForm" novalidate>
+        <textarea class="bizhub-ai-input" id="bizhubAiInput" maxlength="1200" placeholder="Ask me anything about your BizHub data..."></textarea>
+        <button class="bizhub-ai-send" id="bizhubAiSend" type="submit" aria-label="Send">
+          <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+        </button>
+      </form>
+    {% else %}
+      <div class="bizhub-ai-auth-note">
+        Please sign in to use the AI assistant.
+        <br>
+        <a href="{{ path('app_login') }}">Go to login</a>
+      </div>
+    {% endif %}
+  </aside>
+</div>
+
+<script>
+  (function () {
+    const root = document.getElementById('bizhub-ai-widget-root');
+    if (!root) {
+      return;
+    }
+
+    const launcher = document.getElementById('bizhubAiLauncher');
+    const overlay = document.getElementById('bizhubAiOverlay');
+    const sidebar = document.getElementById('bizhubAiSidebar');
+    const closeBtn = document.getElementById('bizhubAiClose');
+    const isAuthenticated = root.dataset.authenticated === '1';
+
+    const openSidebar = function () {
+      sidebar.classList.add('is-open');
+      overlay.classList.add('is-open');
+      sidebar.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('bizhub-ai-open');
+    };
+
+    const closeSidebar = function () {
+      sidebar.classList.remove('is-open');
+      overlay.classList.remove('is-open');
+      sidebar.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('bizhub-ai-open');
+    };
+
+    launcher.addEventListener('click', openSidebar);
+    closeBtn.addEventListener('click', closeSidebar);
+    overlay.addEventListener('click', closeSidebar);
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && sidebar.classList.contains('is-open')) {
+        closeSidebar();
+      }
+    });
+
+    if (!isAuthenticated) {
+      return;
+    }
+
+    const messagesContainer = document.getElementById('bizhubAiMessages');
+    const chatForm = document.getElementById('bizhubAiForm');
+    const chatInput = document.getElementById('bizhubAiInput');
+    const sendButton = document.getElementById('bizhubAiSend');
+    const clearButton = document.getElementById('bizhubAiClear');
+
+    if (!messagesContainer || !chatForm || !chatInput || !sendButton || !clearButton) {
+      return;
+    }
+
+    const storageKey = 'bizhub_ai_sidebar_chat_messages_v1';
+    const welcome = root.dataset.welcome || 'Welcome to BizHub AI assistant!';
+
+    const createMessage = function (role, text, options) {
+      const safeOptions = options || {};
+      return {
+        role: role,
+        text: text,
+        isLoading: safeOptions.isLoading === true,
+        navigateUrl: safeOptions.navigateUrl || null
+      };
+    };
+
+    const trimMessages = function (messages) {
+      if (messages.length <= 60) {
+        return messages;
+      }
+
+      const first = messages[0];
+      return [first].concat(messages.slice(-(60 - 1)));
+    };
+
+    const saveMessages = function (messages) {
+      sessionStorage.setItem(storageKey, JSON.stringify(trimMessages(messages)));
+    };
+
+    const loadMessages = function () {
+      try {
+        const raw = sessionStorage.getItem(storageKey);
+        if (!raw) {
+          return [createMessage('assistant', welcome)];
+        }
+
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed) || parsed.length === 0) {
+          return [createMessage('assistant', welcome)];
+        }
+
+        parsed[0] = createMessage('assistant', welcome);
+        return trimMessages(parsed);
+      } catch (error) {
+        return [createMessage('assistant', welcome)];
+      }
+    };
+
+    let visibleMessages = loadMessages();
+
+    const renderSingle = function (message) {
+      const row = document.createElement('div');
+      row.className = 'bizhub-ai-msg-row ' + (message.role === 'user' ? 'user' : 'assistant');
+
+      const bubble = document.createElement('div');
+      let bubbleClass = 'bizhub-ai-msg ' + (message.role === 'user' ? 'user' : 'assistant');
+
+      if (message.isLoading) {
+        bubbleClass += ' typing';
+        bubble.textContent = 'Bzz... thinking...';
+      } else {
+        bubble.textContent = message.text;
+
+        if (message.navigateUrl) {
+          const link = document.createElement('a');
+          link.href = message.navigateUrl;
+          link.textContent = 'Open page';
+          link.className = 'bizhub-ai-msg-link';
+          bubble.appendChild(document.createElement('br'));
+          bubble.appendChild(link);
+        }
+      }
+
+      bubble.className = bubbleClass;
+      row.appendChild(bubble);
+      messagesContainer.appendChild(row);
+    };
+
+    const refresh = function () {
+      messagesContainer.innerHTML = '';
+      visibleMessages.forEach(renderSingle);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      saveMessages(visibleMessages);
+    };
+
+    const pushMessage = function (message) {
+      visibleMessages = trimMessages(visibleMessages.concat([message]));
+      refresh();
+    };
+
+    const removeLastLoading = function () {
+      const reverseIndex = visibleMessages.slice().reverse().findIndex(function (item) {
+        return item.isLoading === true;
+      });
+
+      if (reverseIndex === -1) {
+        return;
+      }
+
+      const absoluteIndex = visibleMessages.length - reverseIndex - 1;
+      visibleMessages.splice(absoluteIndex, 1);
+    };
+
+    chatInput.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        chatForm.requestSubmit();
+      }
+    });
+
+    chatForm.addEventListener('submit', async function (event) {
+      event.preventDefault();
+
+      const text = chatInput.value.trim();
+      if (text === '') {
+        return;
+      }
+
+      pushMessage(createMessage('user', text));
+      pushMessage(createMessage('assistant', '', { isLoading: true }));
+      chatInput.value = '';
+      sendButton.disabled = true;
+
+      const payload = new URLSearchParams();
+      payload.set('message', text);
+      payload.set('_token', root.dataset.csrfMessageToken || '');
+
+      try {
+        const response = await fetch(root.dataset.messageEndpoint || '', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: payload.toString()
+        });
+
+        const data = await response.json();
+        removeLastLoading();
+
+        if (!response.ok || !data.success) {
+          pushMessage(createMessage('assistant', data.message || 'The hive is busy right now. Please try again.'));
+        } else {
+          pushMessage(createMessage('assistant', data.reply || '', { navigateUrl: data.navigateUrl || null }));
+        }
+      } catch (error) {
+        removeLastLoading();
+        pushMessage(createMessage('assistant', 'Network error. Please try again.'));
+      } finally {
+        sendButton.disabled = false;
+        refresh();
+      }
+    });
+
+    clearButton.addEventListener('click', async function () {
+      const payload = new URLSearchParams();
+      payload.set('_token', root.dataset.csrfClearToken || '');
+
+      try {
+        await fetch(root.dataset.clearEndpoint || '', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: payload.toString()
+        });
+      } catch (error) {
+        // Ignore and still reset local chat state.
+      }
+
+      visibleMessages = [createMessage('assistant', welcome)];
+      refresh();
+    });
+
+    refresh();
+  })();
+</script>

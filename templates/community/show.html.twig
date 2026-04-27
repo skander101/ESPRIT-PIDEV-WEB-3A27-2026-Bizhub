@@ -1,0 +1,486 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Post - BizHub{% endblock %}
+
+{% block flash_messages %}
+  <div class="community-wrap" style="margin-top: 16px; margin-bottom: 0;">
+    {% for message in app.flashes('error') %}
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+    {% for message in app.flashes('success') %}
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}
+
+{% block extra_styles %}
+  .community-wrap{
+    max-width: 860px;
+    margin: 24px auto;
+    padding: 0 16px;
+    font-size: 15px;
+  }
+  .mb-2{ margin-bottom: 0.6rem; }
+  .mb-3{ margin-bottom: 1rem; }
+  .mb-4{ margin-bottom: 1.5rem; }
+  .mt-2{ margin-top: 0.5rem; }
+  .mt-4{ margin-top: 1.5rem; }
+  .shadow-sm{ box-shadow: var(--shadow-sm); }
+  .divider{ height: 1px; background: var(--border); margin: 12px 0; }
+
+  .card{ background: var(--white); border-radius: var(--radius-lg); border: 1.5px solid var(--border); overflow:hidden; }
+  .card-body{ padding: 16px; }
+  .card-title{ font-size: 1.25rem; font-family:'Josefin Sans', sans-serif; font-weight: 800; margin: 10px 0 6px; }
+  .card-text{ font-size: 1rem; white-space: pre-wrap; }
+
+  .text-muted{ color: var(--text-muted); }
+  .me-2{ margin-right: 0.5rem; }
+  .ms-2{ margin-left: 0.5rem; }
+  .rounded-circle{ border-radius: 50%; }
+
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding: 10px 14px;
+    border-radius: var(--radius-md);
+    border: 1.5px solid transparent;
+    cursor:pointer;
+    text-decoration:none;
+    font-family:'Josefin Sans', sans-serif;
+    font-weight:800;
+    letter-spacing:0.07em;
+    text-transform:uppercase;
+    font-size:0.75rem;
+    transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+  }
+  .btn:hover{ transform: translateY(-1px); }
+  .btn:active{ transform: translateY(0); }
+  .btn-primary{ background: var(--primary); color: var(--dark); }
+  .btn-primary:hover{ background: var(--primary-dark); }
+  .btn-secondary{ background:#fff; color: var(--text-muted); border-color: var(--border); }
+  .btn-secondary:hover{ border-color:#cbd5e1; color: var(--text); }
+  .btn-danger{ background: rgba(239,68,68,0.10); color: #b91c1c; border-color: rgba(239,68,68,0.25); }
+  .btn-danger:hover{ background: rgba(239,68,68,0.14); }
+  .btn-link{ background: transparent; border-color: transparent; padding: 0; text-transform: none; letter-spacing: normal; font-family: 'Inter', sans-serif; font-weight: 700; }
+  .btn-link:hover{ transform:none; opacity: 0.85; }
+
+  .form-control{
+    width: 100%;
+    background: var(--light-bg);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 11px 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.92rem;
+    color: var(--text);
+    outline: none;
+  }
+  .form-control:focus{ border-color: var(--primary); background: #fff; box-shadow: var(--shadow-glow); }
+  textarea.form-control{ resize: vertical; line-height: 1.6; }
+
+  .alert{
+    border-radius: var(--radius-lg);
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    background: var(--white);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 10px;
+    position: relative;
+  }
+  .alert.alert-danger{ background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.22); color: #7f1d1d; }
+  .alert.alert-success{ background: rgba(16,185,129,0.10); border-color: rgba(16,185,129,0.22); color: #065f46; }
+  .btn-close{
+    position:absolute; top:10px; right:10px;
+    width:28px; height:28px;
+    border:none; background: rgba(255,255,255,0.6);
+    border-radius: 10px; cursor:pointer; color: inherit;
+  }
+  .btn-close::before{ content:'×'; font-size:18px; font-weight:900; line-height:28px; display:block; text-align:center; opacity:0.75; }
+  .btn-close:hover::before{ opacity:1; }
+
+  .post-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap: 12px;
+  }
+  .author{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    min-width: 0;
+  }
+  .author-name{
+    font-weight: 800;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .meta-line{
+    display:flex;
+    align-items:center;
+    gap: 8px;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    flex-wrap: wrap;
+  }
+  .comment-text{ font-size: 0.95rem; white-space: pre-wrap; }
+  .comment-actions{ display:flex; align-items:center; gap: 10px; flex-wrap: wrap; justify-content:flex-end; }
+
+  /* Reactions (same behavior as feed) */
+  .react-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top: 10px; }
+  .react-wrap{ position: relative; display: inline-flex; align-items:center; gap:10px; }
+  .react-btn{
+    display:inline-flex; align-items:center; gap:8px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    background: var(--light-bg2);
+    border: 1.5px solid var(--border);
+    color: var(--text);
+    font-weight: 800;
+    font-family: 'Josefin Sans', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 0.72rem;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  }
+  .react-btn:hover{ border-color: rgba(255,190,51,0.45); background: rgba(255,190,51,0.10); transform: translateY(-1px); }
+  .react-btn.active{ border-color: rgba(255,190,51,0.75); background: rgba(255,190,51,0.16); }
+  .react-emoji{ font-size: 1rem; line-height: 1; }
+  .react-picker{
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 10px);
+    display:flex;
+    gap: 6px;
+    padding: 8px 10px;
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(6px);
+    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+    pointer-events: none;
+    z-index: 50;
+  }
+  .react-picker.visible{
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: all;
+  }
+  .react-opt{
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border: 1px solid transparent;
+    background: transparent;
+    cursor: pointer;
+    font-size: 1.05rem;
+    transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  }
+  .react-opt:hover{ transform: scale(1.3); background: rgba(255,190,51,0.12); border-color: rgba(255,190,51,0.28); }
+  .react-counts{ display:flex; align-items:center; gap:10px; flex-wrap: wrap; justify-content:flex-end; }
+  .react-pill{
+    display:inline-flex; align-items:center; gap:6px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-weight: 800;
+    font-family: 'Josefin Sans', sans-serif;
+    letter-spacing: 0.02em;
+  }
+{% endblock %}
+
+{% block content %}
+<div class="community-wrap">
+    <div class="card mb-4 shadow-sm">
+      <div class="card-body">
+        <div class="post-head">
+          <div class="author">
+            <img src="{{ post.avatar_url ? asset(post.avatar_url) : asset('assets/front/images/logo.png') }}"
+                 class="rounded-circle me-2"
+                 width="40"
+                 height="40"
+                 style="object-fit:cover;border:1px solid var(--border);background:var(--light-bg);"
+                 alt="avatar">
+            <div style="min-width:0;">
+              <div class="author-name">{{ post.author_name ?? 'Utilisateur' }}</div>
+              <div class="meta-line">
+                <span>{{ post.created_at ? (post.created_at|date('d/m/Y H:i')) : '' }}</span>
+                {% if post.category %}<span class="badge badge-pending">{{ post.category }}</span>{% endif %}
+                {% if post.location %}
+                  <a class="text-muted" href="https://www.openstreetmap.org/?mlat={{ post.location_lat }}&mlon={{ post.location_lon }}" target="_blank" rel="noopener noreferrer">
+                    📍 {{ post.location }}
+                  </a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          {% if app.user and (app.user.userId == post.user_id or is_granted('ROLE_ADMIN')) %}
+            <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+              <a href="{{ path('community_edit', {id: post.post_id}) }}" class="btn btn-secondary"><i class="fa fa-pen"></i> Modifier</a>
+              <form method="post" action="{{ path('community_delete', {id: post.post_id}) }}" data-confirm="Supprimer ce post ?">
+                <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i> Supprimer</button>
+              </form>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="card-title">{{ post.title }}</div>
+        <div class="card-text">{{ post.content }}</div>
+
+        <div class="react-row" data-react-post="{{ post.post_id }}">
+          <div class="react-wrap">
+            <button class="react-btn {{ post.user_reaction ? 'active' : '' }}"
+                    type="button"
+                    data-react-button
+                    data-react-token="{{ csrf_token('community_react_' ~ post.post_id) }}"
+                    data-react-active="{{ post.user_reaction ?? '' }}">
+              <span class="react-emoji" data-react-emoji>{{ post.user_reaction_emoji ?? '👍' }}</span>
+              <span data-react-label>{{ post.user_reaction_label ?? 'Like' }}</span>
+            </button>
+            <div class="react-picker" role="menu" aria-label="Réactions">
+              <button class="react-opt" type="button" data-react-type="LIKE" title="Like">👍</button>
+              <button class="react-opt" type="button" data-react-type="LOVE" title="Love">❤️</button>
+              <button class="react-opt" type="button" data-react-type="CELEBRATE" title="Celebrate">🎉</button>
+              <button class="react-opt" type="button" data-react-type="SUPPORT" title="Support">🤝</button>
+              <button class="react-opt" type="button" data-react-type="INSIGHTFUL" title="Insightful">💡</button>
+              <button class="react-opt" type="button" data-react-type="CURIOUS" title="Curious">🔥</button>
+            </div>
+          </div>
+
+          <div class="react-counts" data-react-counts>
+            {% for t, c in (post.reaction_counts ?? {}) %}
+              {% if c > 0 %}
+                <span class="react-pill" data-react-pill="{{ t }}">
+                  <span>{{ post.reaction_emojis[t] ?? '👍' }}</span>
+                  <span data-react-count="{{ t }}">{{ c }}</span>
+                </span>
+              {% endif %}
+            {% endfor %}
+            {% if (post.reaction_total ?? 0) == 0 %}
+              <span class="react-pill" style="opacity:0.65;">
+                <span>👍</span><span>0</span>
+              </span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="meta-line" style="margin-bottom:10px;">
+      <strong style="font-family:'Josefin Sans',sans-serif;letter-spacing:0.06em;text-transform:uppercase;font-size:0.78rem;">Commentaires</strong>
+      <span class="text-muted">({{ comments|length }})</span>
+    </div>
+    {% for comment in comments %}
+      <div class="card mb-2 shadow-sm">
+        <div class="card-body">
+          <div class="post-head" style="align-items:flex-start;">
+            <div class="author">
+              <img src="{{ comment.avatar_url ? asset(comment.avatar_url) : asset('assets/front/images/logo.png') }}"
+                   class="rounded-circle me-2"
+                   width="36"
+                   height="36"
+                   style="object-fit:cover;border:1px solid var(--border);background:var(--light-bg);"
+                   alt="avatar">
+              <div style="min-width:0;">
+                <div class="author-name" style="font-size:0.95rem;">{{ comment.author_name ?? 'Utilisateur' }}</div>
+                <div class="meta-line">
+                  <span>{{ comment.created_at ? (comment.created_at|date('d/m/Y H:i')) : '' }}</span>
+                </div>
+              </div>
+            </div>
+
+            {% if app.user and (app.user.userId == comment.user_id or is_granted('ROLE_ADMIN')) %}
+              <div class="comment-actions">
+                <button class="btn btn-link" type="button" onclick="editComment({{ comment.comment_id }})">Modifier</button>
+                <form method="post" action="{{ path('community_comment_delete', {id: comment.comment_id}) }}" data-confirm="Supprimer ce commentaire ?">
+                  <button type="submit" class="btn btn-link" style="color:#b91c1c;">Supprimer</button>
+                </form>
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="divider"></div>
+
+          <div id="comment-content-{{ comment.comment_id }}" class="comment-text">{{ comment.content }}</div>
+          <div id="comment-edit-{{ comment.comment_id }}" style="display:none; margin-top:10px;">
+            <form method="post" action="{{ path('community_comment_edit', {id: comment.comment_id}) }}">
+              <textarea name="content" class="form-control comment-text" rows="3">{{ comment.content }}</textarea>
+              <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
+                <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Enregistrer</button>
+                <button type="button" class="btn btn-secondary" onclick="cancelEdit({{ comment.comment_id }})">Annuler</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <div class="card shadow-sm">
+        <div class="card-body text-muted">
+          Aucun commentaire pour le moment.
+        </div>
+      </div>
+    {% endfor %}
+
+    {% if app.user %}
+      <div class="card mt-4 shadow-sm">
+        <div class="card-body">
+          <span class="section-label">Ajouter un commentaire</span>
+          <form method="post" action="{{ path('community_comment_new', {postId: post.post_id}) }}">
+            <textarea name="content" class="form-control comment-text" rows="3" placeholder="Écrire un commentaire…"></textarea>
+            <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
+              <button type="submit" class="btn btn-primary"><i class="fa fa-paper-plane"></i> Publier</button>
+              <a href="{{ path('community_index') }}" class="btn btn-secondary"><i class="fa fa-arrow-left"></i> Retour au feed</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    {% endif %}
+</div>
+
+<script>
+function editComment(id) {
+    document.getElementById('comment-content-' + id).style.display = 'none';
+    document.getElementById('comment-edit-' + id).style.display = 'block';
+}
+function cancelEdit(id) {
+    document.getElementById('comment-content-' + id).style.display = 'block';
+    document.getElementById('comment-edit-' + id).style.display = 'none';
+}
+
+// Dismiss alerts + confirm fallback (si Bootstrap JS absent)
+document.querySelectorAll('.alert .btn-close').forEach(btn => {
+  btn.addEventListener('click', () => btn.closest('.alert')?.remove());
+});
+document.querySelectorAll('form[data-confirm]').forEach(form => {
+  form.addEventListener('submit', (e) => {
+    if (!confirm(form.getAttribute('data-confirm') || 'Confirmer ?')) {
+      e.preventDefault();
+    }
+  });
+});
+
+// Reactions on show page
+(function(){
+  const EMOJI = { LIKE:'👍', LOVE:'❤️', CELEBRATE:'🎉', SUPPORT:'🤝', INSIGHTFUL:'💡', CURIOUS:'🔥' };
+  const LABEL = { LIKE:'Like', LOVE:'Love', CELEBRATE:'Celebrate', SUPPORT:'Support', INSIGHTFUL:'Insightful', CURIOUS:'Curious' };
+
+  function setButtonState(root, userReaction){
+    const btn = root.querySelector('[data-react-button]');
+    const emojiEl = root.querySelector('[data-react-emoji]');
+    const labelEl = root.querySelector('[data-react-label]');
+    btn.dataset.reactActive = userReaction || '';
+    if(userReaction){
+      btn.classList.add('active');
+      emojiEl.textContent = EMOJI[userReaction] || '👍';
+      labelEl.textContent = LABEL[userReaction] || userReaction;
+    }else{
+      btn.classList.remove('active');
+      emojiEl.textContent = '👍';
+      labelEl.textContent = 'Like';
+    }
+  }
+
+  function renderCounts(root, counts){
+    const wrap = root.querySelector('[data-react-counts]');
+    wrap.innerHTML = '';
+    const types = Object.keys(EMOJI).filter(t => (counts[t] || 0) > 0);
+    if(types.length === 0){
+      const pill = document.createElement('span');
+      pill.className = 'react-pill';
+      pill.style.opacity = '0.65';
+      pill.innerHTML = '<span>👍</span><span>0</span>';
+      wrap.appendChild(pill);
+      return;
+    }
+    types.forEach(t => {
+      const pill = document.createElement('span');
+      pill.className = 'react-pill';
+      pill.dataset.reactPill = t;
+      pill.innerHTML = `<span>${EMOJI[t]}</span><span data-react-count="${t}">${counts[t] || 0}</span>`;
+      wrap.appendChild(pill);
+    });
+  }
+
+  async function react(postId, type, token){
+    const res = await fetch(`/community/${postId}/react`, {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'X-Requested-With':'XMLHttpRequest' },
+      body: JSON.stringify({ type, _token: token })
+    });
+    if(!res.ok) throw new Error(await res.text());
+    return await res.json();
+  }
+
+  document.querySelectorAll('[data-react-post]').forEach(root => {
+    const postId = root.getAttribute('data-react-post');
+    const btn = root.querySelector('[data-react-button]');
+    const token = btn.getAttribute('data-react-token');
+    const picker = root.querySelector('.react-picker');
+
+    let showTimer = null;
+    let hideTimer = null;
+
+    function scheduleShow(){
+      clearTimeout(hideTimer);
+      hideTimer = null;
+      if (picker.classList.contains('visible')) return;
+      clearTimeout(showTimer);
+      showTimer = setTimeout(() => picker.classList.add('visible'), 420);
+    }
+    function scheduleHide(){
+      clearTimeout(showTimer);
+      showTimer = null;
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(() => {
+        if (!picker.matches(':hover') && !btn.matches(':hover')) {
+          picker.classList.remove('visible');
+        }
+      }, 320);
+    }
+
+    btn.addEventListener('mouseenter', scheduleShow);
+    btn.addEventListener('mouseleave', scheduleHide);
+    picker.addEventListener('mouseenter', () => {
+      clearTimeout(hideTimer);
+      hideTimer = null;
+      picker.classList.add('visible');
+    });
+    picker.addEventListener('mouseleave', scheduleHide);
+
+    root.querySelectorAll('[data-react-type]').forEach(opt => {
+      opt.addEventListener('click', async () => {
+        const type = opt.getAttribute('data-react-type');
+        try{
+          const data = await react(postId, type, token);
+          setButtonState(root, data.userReaction);
+          renderCounts(root, data.counts || {});
+          picker.classList.remove('visible');
+        }catch(e){
+          console.error(e);
+          alert('Impossible de réagir pour le moment.');
+        }
+      });
+    });
+  });
+})();
+</script>
+{% endblock %}

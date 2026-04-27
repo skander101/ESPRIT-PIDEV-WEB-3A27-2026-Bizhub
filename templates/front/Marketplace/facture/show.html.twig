@@ -1,0 +1,512 @@
+{% extends 'front/Marketplace/base_marketplace.html.twig' %}
+
+{% block title %}Facture {{ facture.numeroFacture }}{% endblock %}
+{% block hero_eyebrow %}Espace commandes{% endblock %}
+{% block hero_title %}Facture <span>{{ facture.numeroFacture }}</span>{% endblock %}
+{% block breadcrumb_extra %}
+  <i class="fa fa-chevron-right" style="font-size:.55rem"></i>
+  <a href="{{ path('commande_show', {id: commande.idCommande}) }}">Commande #{{ commande.idCommande }}</a>
+  <i class="fa fa-chevron-right" style="font-size:.55rem"></i>
+  Facture
+{% endblock %}
+
+{% block body %}
+<style>
+  /* ── Print styles ─────────────────────────────────────────────────── */
+  @media print {
+    /* Masquer tout sauf la facture */
+    body > *:not(#print-area) { display: none !important; }
+    #print-area {
+      display: block !important;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: #fff;
+      padding: 0;
+      margin: 0;
+    }
+    .no-print { display: none !important; }
+
+    /* Reset page */
+    @page {
+      size: A4 portrait;
+      margin: 12mm 14mm;
+    }
+
+    /* Éviter coupures dans les blocs importants */
+    .facture-articles tbody tr { page-break-inside: avoid; }
+    .facture-totaux            { page-break-inside: avoid; }
+    .facture-footer            { page-break-inside: avoid; }
+  }
+
+  /* ── Shared invoice card styles ───────────────────────────────────── */
+  .inv-card {
+    background: #fff;
+    border-radius: 14px;
+    border: 1.5px solid #ebebeb;
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.1);
+    font-family: 'Lora', serif;
+    color: #222831;
+  }
+
+  /* Header dégradé */
+  .inv-header {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    padding: 36px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+
+  /* Logo zone */
+  .inv-logo-mark {
+    width: 48px; height: 48px;
+    background: #ffbe33;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 1.25rem; font-weight: 900;
+    color: #1e293b;
+    flex-shrink: 0;
+  }
+  .inv-brand-name {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 1.9rem; font-weight: 900;
+    color: #ffbe33;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+  .inv-brand-sub {
+    font-family: 'Lora', serif;
+    font-style: italic;
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.55);
+    margin-top: 5px;
+  }
+  .inv-brand-tagline {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 0.6rem;
+    color: rgba(255,255,255,0.35);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-top: 3px;
+  }
+
+  /* Numéro / date côté droit */
+  .inv-num-label {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 0.6rem; font-weight: 700;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 6px;
+  }
+  .inv-num {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 1.5rem; font-weight: 800;
+    color: #fff;
+  }
+  .inv-date {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.65);
+    margin-top: 6px;
+  }
+  .inv-badge-paid {
+    margin-top: 10px;
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 5px 14px;
+    background: rgba(16,185,129,0.2);
+    border: 1px solid rgba(16,185,129,0.4);
+    border-radius: 20px;
+    color: #6ee7b7;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 0.65rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+
+  /* ── Separator line ── */
+  .inv-sep { border: none; border-top: 1.5px solid #ebebeb; margin: 0; }
+
+  /* ── Parties ── */
+  .inv-parties {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid #ebebeb;
+  }
+  .inv-party {
+    padding: 28px 32px;
+  }
+  .inv-party + .inv-party {
+    border-left: 1px solid #ebebeb;
+  }
+  .inv-section-label {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 0.6rem; font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    margin-bottom: 12px;
+  }
+  .inv-party-name {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 700; font-size: 0.92rem;
+    color: #1e293b; margin-bottom: 6px;
+  }
+  .inv-party-info {
+    font-size: 0.82rem; color: #64748b;
+    margin-top: 3px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .inv-ref-row {
+    display: flex; justify-content: space-between;
+    font-size: 0.82rem; margin-bottom: 6px;
+  }
+  .inv-ref-label { color: #64748b; }
+  .inv-ref-value {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 700; color: #1e293b;
+  }
+
+  /* ── Articles table ── */
+  .facture-articles {
+    width: 100%; border-collapse: collapse;
+  }
+  .facture-articles thead tr {
+    background: #f8fafc;
+  }
+  .facture-articles th {
+    padding: 13px 16px;
+    text-align: left;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 0.62rem; font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    border-bottom: 1.5px solid #e2e8f0;
+  }
+  .facture-articles th.right { text-align: right; }
+  .facture-articles th.center { text-align: center; }
+  .facture-articles th:first-child { padding-left: 32px; }
+  .facture-articles th:last-child  { padding-right: 32px; }
+
+  .facture-articles td {
+    padding: 15px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.88rem; color: #1e293b;
+  }
+  .facture-articles td.right  { text-align: right; }
+  .facture-articles td.center { text-align: center; font-family: 'Josefin Sans', sans-serif; font-weight: 700; }
+  .facture-articles td.bold   { font-weight: 700; }
+  .facture-articles td .sub   { font-size: 0.75rem; color: #94a3b8; margin-top: 3px; }
+  .facture-articles td:first-child { padding-left: 32px; }
+  .facture-articles td:last-child  { padding-right: 32px; font-family: 'Josefin Sans', sans-serif; font-weight: 800; }
+
+  /* ── Totaux ── */
+  .facture-totaux {
+    padding: 24px 32px;
+    background: #f8fafc;
+    border-top: 2px solid #e2e8f0;
+  }
+  .totaux-inner {
+    max-width: 320px; margin-left: auto;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .totaux-row {
+    display: flex; justify-content: space-between;
+    font-size: 0.88rem;
+  }
+  .totaux-row .lbl { color: #64748b; }
+  .totaux-row .val { font-weight: 600; color: #1e293b; }
+  .totaux-grand {
+    border-top: 2px solid #e2e8f0;
+    padding-top: 12px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .totaux-grand .lbl {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 700; font-size: 0.82rem;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: #1e293b;
+  }
+  .totaux-grand .val {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 1.5rem; font-weight: 900;
+    color: #ffbe33;
+  }
+  .totaux-grand .cur {
+    font-size: 0.8rem; color: #94a3b8;
+    font-family: 'Lora', serif; font-weight: 400;
+  }
+
+  /* ── Footer facture ── */
+  .facture-footer {
+    padding: 20px 32px;
+    border-top: 1px solid #ebebeb;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 1rem;
+  }
+  .facture-footer-note {
+    font-size: 0.75rem; color: #94a3b8; font-style: italic;
+  }
+  .stripe-seal {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 5px 14px;
+    background: rgba(16,185,129,0.08);
+    border-radius: 20px;
+    color: #10b981;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 0.65rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+
+  /* ── Watermark ── */
+  .inv-watermark {
+    position: relative;
+    overflow: hidden;
+  }
+  .inv-watermark::after {
+    content: 'PAYÉE';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) rotate(-30deg);
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 6rem; font-weight: 900;
+    color: rgba(16,185,129,0.06);
+    pointer-events: none;
+    letter-spacing: 0.2em;
+    white-space: nowrap;
+  }
+
+  /* Print overrides for colors that browsers may strip */
+  @media print {
+    .inv-header          { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .facture-articles thead tr { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .facture-totaux      { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .totaux-grand .val   { color: #c9950a !important; }   /* gold lisible à l'impression */
+    .inv-badge-paid      { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .stripe-seal         { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .inv-watermark::after { color: rgba(16,185,129,0.08) !important; }
+  }
+</style>
+
+<div style="max-width:880px; margin:0 auto; padding:60px 5%;">
+
+  {# ── BARRE D'ACTIONS ───────────────────────────────────────────────── #}
+  <div class="no-print" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:2rem;">
+
+    <a href="{{ path('commande_show', {id: commande.idCommande}) }}" class="btn-outline">
+      <i class="fa fa-arrow-left"></i> Retour à la commande
+    </a>
+
+    <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+      {# Imprimer #}
+      <button onclick="window.print()"
+              style="background:linear-gradient(135deg,#6366f1,#8b5cf6); color:white; border:none; padding:12px 24px; border-radius:10px; font-family:'Josefin Sans',sans-serif; font-weight:700; font-size:0.82rem; text-transform:uppercase; letter-spacing:0.08em; cursor:pointer; display:inline-flex; align-items:center; gap:8px; transition:opacity 0.2s;"
+              onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+        <i class="fa fa-print"></i> Imprimer
+      </button>
+
+      {# Télécharger PDF #}
+      <a href="{{ path('facture_download_pdf', {id: commande.idCommande}) }}"
+         style="background:linear-gradient(135deg,#dc2626,#b91c1c); color:white; padding:12px 24px; border-radius:10px; font-family:'Josefin Sans',sans-serif; font-weight:700; font-size:0.82rem; text-transform:uppercase; letter-spacing:0.08em; text-decoration:none; display:inline-flex; align-items:center; gap:8px; transition:opacity 0.2s;"
+         onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+        <i class="fa fa-file-pdf"></i> Télécharger PDF
+      </a>
+    </div>
+  </div>
+
+  {# ══════════════════════════════════════════════════════════════════════
+     CORPS DE LA FACTURE — affiché à l'écran ET imprimé
+  ══════════════════════════════════════════════════════════════════════ #}
+  <div id="print-area" class="inv-card inv-watermark">
+
+    {# ── HEADER ── #}
+    <div class="inv-header">
+      {# Logo + marque #}
+      <div style="display:flex; align-items:flex-start; gap:14px;">
+        <div class="inv-logo-mark">B</div>
+        <div>
+          <div class="inv-brand-name">BizHub</div>
+          <div class="inv-brand-sub">Plateforme B2B Startups &amp; Investisseurs</div>
+          <div class="inv-brand-tagline">Connect · Invest · Grow</div>
+        </div>
+      </div>
+
+      {# Numéro + statut #}
+      <div style="text-align:right;">
+        <div class="inv-num-label">FACTURE</div>
+        <div class="inv-num">{{ facture.numeroFacture }}</div>
+        <div class="inv-date">
+          <i class="fa fa-calendar" style="margin-right:5px; opacity:0.6;"></i>
+          Émise le {{ facture.dateFacture|date('d/m/Y') }}
+        </div>
+        <div class="inv-badge-paid">
+          <i class="fa fa-check-circle"></i> PAYÉE
+        </div>
+      </div>
+    </div>
+
+    {# ── INFORMATIONS PARTIES ── #}
+    <div class="inv-parties">
+
+      {# Émetteur / Émise à #}
+      <div class="inv-party">
+        <div class="inv-section-label">ÉMISE À</div>
+        <div class="inv-party-name">
+          <i class="fa fa-building" style="color:#ffbe33; margin-right:6px;"></i>
+          Startup — Client #{{ commande.idClient }}
+        </div>
+        <div class="inv-party-info">
+          <i class="fa fa-file-invoice" style="color:#94a3b8;"></i>
+          Commande #{{ commande.idCommande }}
+        </div>
+        <div class="inv-party-info">
+          <i class="fa fa-calendar" style="color:#94a3b8;"></i>
+          Passée le {{ commande.dateCommande|date('d/m/Y') }}
+        </div>
+        {% if commande.paidAt %}
+        <div class="inv-party-info">
+          <i class="fa fa-credit-card" style="color:#10b981;"></i>
+          <span style="color:#065f46; font-weight:700;">Payée le {{ commande.paidAt|date('d/m/Y') }}</span>
+        </div>
+        {% endif %}
+      </div>
+
+      {# Références #}
+      <div class="inv-party">
+        <div class="inv-section-label">RÉFÉRENCES</div>
+        <div class="inv-ref-row">
+          <span class="inv-ref-label">N° Facture</span>
+          <span class="inv-ref-value">{{ facture.numeroFacture }}</span>
+        </div>
+        <div class="inv-ref-row">
+          <span class="inv-ref-label">Date paiement</span>
+          <span class="inv-ref-value">{{ commande.paidAt ? commande.paidAt|date('d/m/Y') : facture.dateFacture|date('d/m/Y') }}</span>
+        </div>
+        <div class="inv-ref-row">
+          <span class="inv-ref-label">Statut</span>
+          <span class="inv-ref-value" style="color:#10b981;">Payée</span>
+        </div>
+        {% if commande.paymentRef %}
+        <div class="inv-ref-row" style="border-top:1px dashed #ebebeb; padding-top:8px; margin-top:4px;">
+          <span class="inv-ref-label">Session Stripe</span>
+          <code style="font-size:0.68rem; background:#f8fafc; padding:2px 8px; border-radius:4px; color:#1e293b; max-width:170px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:inline-block;">{{ commande.paymentRef|slice(0, 24) }}…</code>
+        </div>
+        {% endif %}
+        {% if facture.stripeRef %}
+        <div class="inv-ref-row">
+          <span class="inv-ref-label">Réf. Stripe</span>
+          <code style="font-size:0.68rem; background:#f8fafc; padding:2px 8px; border-radius:4px; color:#1e293b; max-width:170px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:inline-block;">{{ facture.stripeRef|slice(0, 24) }}…</code>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    {# ── ARTICLES ── #}
+    <table class="facture-articles">
+      <thead>
+        <tr>
+          <th style="width:42%;">Désignation</th>
+          <th class="center" style="width:8%;">Qté</th>
+          <th class="right"  style="width:16%;">PU HT</th>
+          <th class="right"  style="width:10%;">TVA</th>
+          <th class="right"  style="width:16%;">Total HT</th>
+          <th class="right"  style="width:14%;">Total TTC</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for detail in lignes_detail %}
+          {% set ligne = detail.ligne %}
+          <tr>
+            <td class="bold">
+              {{ detail.nom }}
+              {% if detail.produit is defined and detail.produit and detail.produit.categorie is defined and detail.produit.categorie %}
+                <div class="sub">
+                  <i class="fa fa-tag" style="margin-right:3px;"></i>{{ detail.produit.categorie }}
+                </div>
+              {% endif %}
+            </td>
+            <td class="center">{{ ligne ? ligne.quantite : 1 }}</td>
+            <td class="right">{{ ligne ? ligne.prixHtUnitaire|number_format(3, '.', ' ') : facture.totalHt }} TND</td>
+            <td class="right" style="color:#64748b;">{{ ligne ? ligne.tvaRate : '19.00' }}%</td>
+            <td class="right" style="color:#64748b;">
+              {% if ligne %}
+                {{ (ligne.prixHtUnitaire * ligne.quantite)|number_format(3, '.', ' ') }}
+              {% else %}
+                {{ facture.totalHt }}
+              {% endif %}
+              TND
+            </td>
+            <td class="right">{{ ligne ? ligne.totalTtc|number_format(3, '.', ' ') : facture.totalTtc }} TND</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {# ── TOTAUX ── #}
+    <div class="facture-totaux">
+      <div class="totaux-inner">
+        <div class="totaux-row">
+          <span class="lbl">Sous-total HT</span>
+          <span class="val">{{ facture.totalHt }} TND</span>
+        </div>
+        <div class="totaux-row">
+          <span class="lbl">TVA (19%)</span>
+          <span class="val">{{ facture.totalTva }} TND</span>
+        </div>
+        <div class="totaux-grand">
+          <span class="lbl">Total TTC</span>
+          <span class="val">{{ facture.totalTtc }} <span class="cur">TND</span></span>
+        </div>
+      </div>
+    </div>
+
+    {# ── FOOTER FACTURE ── #}
+    <div class="facture-footer">
+      <div>
+        <div class="facture-footer-note">
+          Document généré automatiquement par BizHub.<br>
+          Non contractuel sans signature originale.
+        </div>
+        <div style="margin-top:8px; font-size:0.72rem; color:#cbd5e1;">
+          BizHub · Plateforme B2B Startups &amp; Investisseurs · ESPRIT, Tunis
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+        <div class="stripe-seal">
+          <i class="fa fa-shield-alt"></i> Paiement sécurisé Stripe
+        </div>
+        <div style="font-size:0.68rem; color:#94a3b8; font-family:'Josefin Sans',sans-serif; letter-spacing:0.04em;">
+          Imprimé le {{ "now"|date('d/m/Y à H:i') }}
+        </div>
+      </div>
+    </div>
+
+  </div>{# /print-area #}
+
+  {# ── BOUTONS BAS DE PAGE ─────────────────────────────────────────────── #}
+  <div class="no-print" style="display:flex; gap:1rem; margin-top:2rem; flex-wrap:wrap;">
+    <a href="{{ path('commande_show', {id: commande.idCommande}) }}" class="btn-outline">
+      <i class="fa fa-arrow-left"></i> Retour commande
+    </a>
+    <button onclick="window.print()"
+            style="background:linear-gradient(135deg,#6366f1,#8b5cf6); color:white; border:none; padding:11px 22px; border-radius:8px; font-family:'Josefin Sans',sans-serif; font-weight:700; font-size:0.82rem; text-transform:uppercase; letter-spacing:0.08em; cursor:pointer; display:inline-flex; align-items:center; gap:8px; transition:opacity 0.2s;"
+            onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+      <i class="fa fa-print"></i> Imprimer
+    </button>
+    <a href="{{ path('facture_download_pdf', {id: commande.idCommande}) }}"
+       style="background:#dc2626; color:white; padding:11px 22px; border-radius:8px; font-family:'Josefin Sans',sans-serif; font-weight:700; font-size:0.82rem; text-transform:uppercase; letter-spacing:0.08em; text-decoration:none; display:inline-flex; align-items:center; gap:8px; transition:background 0.2s;"
+       onmouseover="this.style.background='#b91c1c'" onmouseout="this.style.background='#dc2626'">
+      <i class="fa fa-file-pdf"></i> Télécharger PDF
+    </a>
+    {% if app.user.userType == 'startup' %}
+      <a href="{{ path('tracking_show', {id: commande.idCommande}) }}" class="btn-ghost">
+        <i class="fa fa-map-marker-alt"></i> Suivi commande
+      </a>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

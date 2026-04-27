@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Fiche Projet — {{ projet.title }}</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "DejaVu Sans", Arial, sans-serif;
+    font-size: 11px;
+    color: #1a1a2e;
+    padding: 30px 40px;
+    line-height: 1.5;
+  }
+
+  /* ── Header ─────────────────────────────────────────── */
+  .header {
+    border-bottom: 3px solid #ffbe33;
+    padding-bottom: 18px;
+    margin-bottom: 24px;
+  }
+  .header-top {
+    display: table;
+    width: 100%;
+  }
+  .header-brand {
+    display: table-cell;
+    vertical-align: middle;
+  }
+  .brand-name {
+    font-size: 20px;
+    font-weight: bold;
+    color: #1a1a2e;
+    letter-spacing: 0.05em;
+  }
+  .brand-sub {
+    font-size: 9px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 2px;
+  }
+  .header-meta {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: right;
+    font-size: 9px;
+    color: #aaa;
+  }
+  .doc-title {
+    margin-top: 14px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #1a1a2e;
+    letter-spacing: 0.03em;
+  }
+  .doc-subtitle {
+    font-size: 10px;
+    color: #666;
+    margin-top: 3px;
+  }
+
+  /* ── Status badge ────────────────────────────────────── */
+  .status-badge {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 12px;
+    font-size: 9px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-left: 10px;
+    vertical-align: middle;
+  }
+  .status-pending    { background: #e5e7eb; color: #6b7280; }
+  .status-in_progress{ background: #ede9fe; color: #6d28d9; }
+  .status-funded     { background: #d1fae5; color: #065f46; }
+  .status-completed  { background: #fee2e2; color: #991b1b; }
+
+  /* ── Sections ────────────────────────────────────────── */
+  .section {
+    margin-bottom: 20px;
+  }
+  .section-title {
+    font-size: 9px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #ffbe33;
+    border-bottom: 1.5px solid #f0f0f0;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+  }
+
+  /* ── KPI grid ────────────────────────────────────────── */
+  .kpi-grid {
+    display: table;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 8px 0;
+  }
+  .kpi-cell {
+    display: table-cell;
+    width: 25%;
+    background: #fafafa;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px 12px;
+    text-align: center;
+    vertical-align: middle;
+  }
+  .kpi-value {
+    font-size: 16px;
+    font-weight: bold;
+    color: #1a1a2e;
+  }
+  .kpi-label {
+    font-size: 8px;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 3px;
+  }
+  .kpi-accent { color: #ffbe33; }
+
+  /* ── Progress bar ────────────────────────────────────── */
+  .progress-wrap {
+    background: #e5e7eb;
+    border-radius: 4px;
+    height: 8px;
+    overflow: hidden;
+    margin: 6px 0 4px;
+  }
+  .progress-fill {
+    height: 8px;
+    border-radius: 4px;
+    background: #ffbe33;
+  }
+  .progress-labels {
+    display: table;
+    width: 100%;
+    font-size: 9px;
+    color: #9ca3af;
+  }
+  .progress-left  { display: table-cell; text-align: left; }
+  .progress-right { display: table-cell; text-align: right; }
+
+  /* ── Info rows ───────────────────────────────────────── */
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .info-table td {
+    padding: 5px 0;
+    vertical-align: top;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 10.5px;
+  }
+  .info-table tr:last-child td { border-bottom: none; }
+  .info-label {
+    width: 170px;
+    font-weight: bold;
+    color: #6b7280;
+    padding-right: 12px;
+  }
+  .info-value { color: #1a1a2e; }
+
+  /* ── Two-column layout ───────────────────────────────── */
+  .two-col {
+    display: table;
+    width: 100%;
+  }
+  .col-left {
+    display: table-cell;
+    width: 48%;
+    vertical-align: top;
+    padding-right: 12px;
+  }
+  .col-right {
+    display: table-cell;
+    width: 48%;
+    vertical-align: top;
+    padding-left: 12px;
+  }
+
+  /* ── Text block ──────────────────────────────────────── */
+  .text-block {
+    background: #fafafa;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 10px;
+    color: #374151;
+    line-height: 1.6;
+  }
+
+  /* ── Investment table ────────────────────────────────── */
+  .inv-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10px;
+  }
+  .inv-table th {
+    background: #1a1a2e;
+    color: #fff;
+    padding: 6px 8px;
+    text-align: left;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .inv-table td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #f3f4f6;
+    color: #374151;
+  }
+  .inv-table tr:nth-child(even) td { background: #fafafa; }
+  .inv-amount-cell { font-weight: bold; color: #ffbe33; text-align: right; }
+  .inv-status-cell { text-align: center; }
+
+  /* ── Footer ──────────────────────────────────────────── */
+  .footer {
+    margin-top: 30px;
+    padding-top: 10px;
+    border-top: 1px solid #e5e7eb;
+    font-size: 8.5px;
+    color: #aaa;
+    text-align: center;
+  }
+
+  /* ── Divider ─────────────────────────────────────────── */
+  .divider {
+    height: 1px;
+    background: #f0f0f0;
+    margin: 16px 0;
+  }
+</style>
+</head>
+<body>
+
+{# ── HEADER ────────────────────────────────────────────── #}
+<div class="header">
+  <div class="header-top">
+    <div class="header-brand">
+      <div class="brand-name">BizHub</div>
+      <div class="brand-sub">Plateforme d'investissement</div>
+    </div>
+    <div class="header-meta">
+      Exporté le {{ date_export|date('d/m/Y à H:i') }}<br>
+      Réf. projet : PRJ-{{ projet.project_id }}
+    </div>
+  </div>
+  <div class="doc-title">
+    FICHE PROJET
+    {% set statusLabels = {
+      'pending':     'En attente',
+      'in_progress': 'En cours',
+      'funded':      'Financé',
+      'completed':   'Terminé'
+    } %}
+    <span class="status-badge status-{{ projet.status }}">
+      {{ statusLabels[projet.status] ?? projet.status }}
+    </span>
+  </div>
+  <div class="doc-subtitle">{{ projet.title }}</div>
+</div>
+
+{# ── KPIs ──────────────────────────────────────────────── #}
+<div class="section">
+  <div class="kpi-grid">
+    <div class="kpi-cell">
+      <div class="kpi-value"><span class="kpi-accent">{{ projet.requiredBudget|number_format(0, ',', ' ') }}</span></div>
+      <div class="kpi-label">Budget requis (TND)</div>
+    </div>
+    <div class="kpi-cell">
+      <div class="kpi-value"><span class="kpi-accent">{{ total_investi|number_format(0, ',', ' ') }}</span></div>
+      <div class="kpi-label">Déjà investi (TND)</div>
+    </div>
+    <div class="kpi-cell">
+      <div class="kpi-value"><span class="kpi-accent">{{ pourcentage }}</span>%</div>
+      <div class="kpi-label">Progression</div>
+    </div>
+    <div class="kpi-cell">
+      <div class="kpi-value"><span class="kpi-accent">{{ investissements|length }}</span></div>
+      <div class="kpi-label">Investisseurs</div>
+    </div>
+  </div>
+
+  <div style="margin-top:10px;">
+    <div class="progress-wrap">
+      <div class="progress-fill" style="width:{{ pourcentage }}%;"></div>
+    </div>
+    <div class="progress-labels">
+      <span class="progress-left">{{ total_investi|number_format(0, ',', ' ') }} TND collectés</span>
+      <span class="progress-right">Objectif : {{ projet.requiredBudget|number_format(0, ',', ' ') }} TND</span>
+    </div>
+  </div>
+</div>
+
+{# ── INFORMATIONS GÉNÉRALES ────────────────────────────── #}
+<div class="section">
+  <div class="section-title">Informations générales</div>
+  {% set secteurLabels = {
+    'tech':         'Technologie',
+    'fintech':      'FinTech',
+    'sante':        'Santé',
+    'agriculture':  'Agriculture',
+    'education':    'Éducation',
+    'commerce':     'Commerce',
+    'energie':      'Énergie',
+    'immobilier':   'Immobilier',
+    'transport':    'Transport',
+    'autre':        'Autre'
+  } %}
+  {% set stadeLabels = {
+    'idee':           'Idée / Concept',
+    'prototype':      'Prototype / MVP',
+    'developpement':  'En développement',
+    'lance':          'Lancé (bêta / early)',
+    'commercialise':  'Commercialisé'
+  } %}
+  {% set marcheLabels = {
+    'local':         'Local (ville / région)',
+    'national':      'National (Tunisie)',
+    'regional':      'Régional (Maghreb / Afrique)',
+    'international': 'International'
+  } %}
+  {% set modelLabels = {
+    'abonnement':  'Abonnement (SaaS / mensuel)',
+    'commission':  'Commission / marketplace',
+    'vente':       'Vente directe',
+    'publicite':   'Publicité / données',
+    'freemium':    'Freemium',
+    'licence':     'Licence B2B',
+    'prestation':  'Prestation de services',
+    'autre':       'Autre'
+  } %}
+
+  <table class="info-table">
+    <tr>
+      <td class="info-label">Titre du projet</td>
+      <td class="info-value"><strong>{{ projet.title }}</strong></td>
+    </tr>
+    <tr>
+      <td class="info-label">Porteur du projet</td>
+      <td class="info-value">{{ projet.user ? projet.user.fullName : '—' }}</td>
+    </tr>
+    <tr>
+      <td class="info-label">Date de création</td>
+      <td class="info-value">{{ projet.createdAt ? projet.createdAt|date('d/m/Y') : '—' }}</td>
+    </tr>
+    <tr>
+      <td class="info-label">Secteur d'activité</td>
+      <td class="info-value">{{ secteurLabels[projet.secteur] ?? projet.secteur ?? '—' }}</td>
+    </tr>
+    {% if projet.projectStage %}
+    <tr>
+      <td class="info-label">Stade du projet</td>
+      <td class="info-value">{{ stadeLabels[projet.projectStage] ?? projet.projectStage }}</td>
+    </tr>
+    {% endif %}
+    {% if projet.marketScope %}
+    <tr>
+      <td class="info-label">Marché cible</td>
+      <td class="info-value">{{ marcheLabels[projet.marketScope] ?? projet.marketScope }}</td>
+    </tr>
+    {% endif %}
+    {% if projet.businessModel %}
+    <tr>
+      <td class="info-label">Modèle économique</td>
+      <td class="info-value">{{ modelLabels[projet.businessModel] ?? projet.businessModel }}</td>
+    </tr>
+    {% endif %}
+    {% if projet.teamDescription %}
+    <tr>
+      <td class="info-label">Équipe</td>
+      <td class="info-value">{{ projet.teamDescription }}</td>
+    </tr>
+    {% endif %}
+  </table>
+</div>
+
+{# ── DESCRIPTION ────────────────────────────────────────── #}
+{% if projet.description %}
+<div class="section">
+  <div class="section-title">Description du projet</div>
+  <div class="text-block">{{ projet.description }}</div>
+</div>
+{% endif %}
+
+{# ── PROBLÈME & SOLUTION ─────────────────────────────────── #}
+{% if projet.problemDescription or projet.solutionDescription %}
+<div class="section">
+  <div class="two-col">
+    {% if projet.problemDescription %}
+    <div class="col-left">
+      <div class="section-title">Problème identifié</div>
+      <div class="text-block">{{ projet.problemDescription }}</div>
+    </div>
+    {% endif %}
+    {% if projet.solutionDescription %}
+    <div class="col-right">
+      <div class="section-title">Solution proposée</div>
+      <div class="text-block">{{ projet.solutionDescription }}</div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
+{# ── AUDIENCE & AVANTAGE ─────────────────────────────────── #}
+{% if projet.targetAudience or projet.competitiveAdvantage %}
+<div class="section">
+  <div class="two-col">
+    {% if projet.targetAudience %}
+    <div class="col-left">
+      <div class="section-title">Public cible</div>
+      <div class="text-block">{{ projet.targetAudience }}</div>
+    </div>
+    {% endif %}
+    {% if projet.competitiveAdvantage %}
+    <div class="col-right">
+      <div class="section-title">Avantage concurrentiel</div>
+      <div class="text-block">{{ projet.competitiveAdvantage }}</div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
+{# ── FINANCEMENT ────────────────────────────────────────── #}
+{% if projet.fundingUsage or projet.financialForecast %}
+<div class="section">
+  <div class="two-col">
+    {% if projet.fundingUsage %}
+    <div class="col-left">
+      <div class="section-title">Utilisation du financement</div>
+      <div class="text-block">{{ projet.fundingUsage }}</div>
+    </div>
+    {% endif %}
+    {% if projet.financialForecast %}
+    <div class="col-right">
+      <div class="section-title">Prévisions financières</div>
+      <div class="text-block">{{ projet.financialForecast }}</div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
+{# ── INVESTISSEMENTS ─────────────────────────────────────── #}
+{% if investissements|length > 0 %}
+<div class="section">
+  <div class="section-title">Investissements liés au projet ({{ investissements|length }})</div>
+  <table class="inv-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Investisseur</th>
+        <th>Date</th>
+        <th>Type</th>
+        <th style="text-align:right;">Montant (TND)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% set typeLabels = {
+        'prise_participation': 'Prise de participation',
+        'pret_convertible':    'Prêt convertible',
+        'pret_simple':         'Prêt simple',
+        'don':                 'Don'
+      } %}
+      {% for inv in investissements %}
+      <tr>
+        <td style="color:#9ca3af;">{{ loop.index }}</td>
+        <td>{{ inv.user ? inv.user.fullName : 'Anonyme' }}</td>
+        <td>{{ inv.investmentDate ? inv.investmentDate|date('d/m/Y') : (inv.createdAt ? inv.createdAt|date('d/m/Y') : '—') }}</td>
+        <td>{{ typeLabels[inv.typeInvestissement] ?? inv.typeInvestissement ?? '—' }}</td>
+        <td class="inv-amount-cell">{{ inv.amount|number_format(0, ',', ' ') }}</td>
+      </tr>
+      {% endfor %}
+      <tr>
+        <td colspan="4" style="text-align:right;font-weight:bold;color:#374151;padding-top:8px;border-top:2px solid #1a1a2e;">
+          Total investi :
+        </td>
+        <td class="inv-amount-cell" style="border-top:2px solid #1a1a2e;padding-top:8px;">
+          {{ total_investi|number_format(0, ',', ' ') }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{# ── FOOTER ─────────────────────────────────────────────── #}
+<div class="footer">
+  Document généré automatiquement par <strong>BizHub</strong> le {{ date_export|date('d/m/Y à H:i') }}.
+  Ce document est fourni à titre informatif et ne constitue pas un contrat d'investissement.
+  Réf. : PRJ-{{ projet.project_id }} — {{ projet.title }}
+</div>
+
+</body>
+</html>

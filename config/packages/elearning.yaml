@@ -1,0 +1,4 @@
+parameters:
+    app.elearning.vat_rate: 0.19
+    app.elearning.certificates_dir: '%kernel.project_dir%/public/uploads/certificates'
+    app.elearning.certificates_public_path: '/uploads/certificates'

@@ -1,0 +1,121 @@
+{% extends 'auth_base.html.twig' %}
+
+{% block title %}Connexion faciale - BizHub{% endblock %}
+
+{% block auth_page_styles %}
+.face-frame {
+    width: 100%;
+    margin-bottom: 12px;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #dbe6ff;
+    background: #0f1724;
+    box-shadow: 0 10px 30px rgba(15, 23, 36, 0.25);
+}
+
+.face-frame video,
+.face-frame img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+}
+
+.face-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+{% endblock %}
+
+{% block auth_content %}
+    {% for message in app.flashes('success') %}
+        <div style="margin-bottom:12px;padding:11px 12px;border:1px solid #b7e1c1;background:#e8f5e9;color:#2e7d32;border-radius:8px;font-size:14px;">{{ message }}</div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div style="margin-bottom:12px;padding:11px 12px;border:1px solid #f3c4c4;background:#ffebee;color:#b71c1c;border-radius:8px;font-size:14px;">{{ message }}</div>
+    {% endfor %}
+
+    <h1 class="auth-heading">Connexion par reconnaissance faciale</h1>
+    <p class="auth-subtext">Capturez votre visage puis confirmez pour lancer la verification.</p>
+
+    <div id="camera_error" class="field-error" style="display:none;margin-bottom:12px;text-align:center;"></div>
+
+    <div class="face-frame">
+        <video id="video" autoplay playsinline></video>
+        <canvas id="canvas" style="display:none;"></canvas>
+        <img id="preview" alt="Apercu de capture" style="display:none;" />
+    </div>
+
+    <div class="face-actions">
+        <button id="captureBtn" class="btn-primary" type="button" disabled>Capturer mon visage</button>
+    </div>
+
+    <form id="faceLoginForm" method="post" action="{{ path('app_login_face') }}" style="display:none;margin-top:12px;">
+        <input type="hidden" name="image" id="capturedImage" />
+
+        <div class="face-actions">
+            <button type="submit" class="btn-primary">Se connecter avec cette image</button>
+            <a href="{{ path('app_login') }}" class="btn-secondary">Retour a la connexion</a>
+        </div>
+    </form>
+
+    <hr class="section-separator" />
+
+    <p class="muted-center">
+        <a class="link-brand" href="{{ path('app_login') }}">Retour a la connexion classique</a>
+    </p>
+{% endblock %}
+
+{% block auth_scripts %}
+<script>
+(function () {
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const preview = document.getElementById('preview');
+    const captureBtn = document.getElementById('captureBtn');
+    const capturedImage = document.getElementById('capturedImage');
+    const faceLoginForm = document.getElementById('faceLoginForm');
+    const cameraError = document.getElementById('camera_error');
+
+    function showCameraError(message) {
+        cameraError.textContent = message;
+        cameraError.style.display = 'block';
+    }
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showCameraError('Votre navigateur ne prend pas en charge l\'acces a la camera.');
+        return;
+    }
+
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
+        .then(function (stream) {
+            video.srcObject = stream;
+            captureBtn.disabled = false;
+        })
+        .catch(function (err) {
+            showCameraError('Impossible d\'acceder a la camera : ' + err.message);
+        });
+
+    captureBtn.addEventListener('click', function () {
+        if (!video.videoWidth || !video.videoHeight) {
+            showCameraError('La camera n\'est pas encore prete. Veuillez reessayer dans un instant.');
+            return;
+        }
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+        preview.src = dataUrl;
+        preview.style.display = 'block';
+        video.style.display = 'none';
+        capturedImage.value = dataUrl;
+        faceLoginForm.style.display = 'block';
+    });
+})();
+</script>
+{% endblock %}

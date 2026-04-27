@@ -1,0 +1,162 @@
+{% extends 'auth_base.html.twig' %}
+
+{% block title %}Connexion - BizHub{% endblock %}
+
+{% block auth_content %}
+    {% for message in app.flashes('success') %}
+        <div style="margin-bottom:12px;padding:11px 12px;border:1px solid #b7e1c1;background:#e8f5e9;color:#2e7d32;border-radius:8px;font-size:14px;">{{ message }}</div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div style="margin-bottom:12px;padding:11px 12px;border:1px solid #f3c4c4;background:#ffebee;color:#b71c1c;border-radius:8px;font-size:14px;">{{ message }}</div>
+    {% endfor %}
+
+    {% if last_username is not empty %}
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:16px;">
+            <div style="width:80px;height:80px;border-radius:50%;background:#eef3fe;color:#1877F2;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;">
+                {{ last_username|slice(0, 1)|upper }}
+            </div>
+            <div style="font-weight:700;font-size:16px;color:#1c1e21;word-break:break-word;text-align:center;">{{ last_username }}</div>
+        </div>
+    {% endif %}
+
+    <h1 class="auth-heading">Connectez-vous a BizHub</h1>
+    <p class="auth-subtext">Accedez a votre espace professionnel.</p>
+
+    <div class="social-stack" style="margin-bottom:14px;">
+        <a class="btn-secondary" href="{{ path('app_login_totp') }}">Connexion via Authenticator (TOTP)</a>
+        <a class="btn-secondary" href="{{ path('app_login_face') }}">Connexion par reconnaissance faciale</a>
+    </div>
+
+    <p class="muted-center" style="margin:-4px 0 12px;">Ou continuez avec votre email et mot de passe</p>
+
+    <form id="loginForm" method="POST" action="{{ path('app_login') }}" novalidate>
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+        <div class="field-group">
+            <label class="field-label" for="login_email">Email ou nom d'utilisateur</label>
+            <input class="input-field" type="text" id="login_email" name="email" value="{{ last_username }}" placeholder="Email ou nom d'utilisateur" autocomplete="email" />
+            <div id="login_email_error" class="field-error" style="display:none;"></div>
+        </div>
+
+        <div class="field-group">
+            <label class="field-label" for="login_password">Mot de passe</label>
+            <div class="field-with-icon">
+                <input class="input-field" type="password" id="login_password" name="password" placeholder="Mot de passe" autocomplete="current-password" />
+                <button class="password-toggle" id="toggleLoginPassword" type="button" aria-label="Afficher ou masquer le mot de passe">&#128065;</button>
+            </div>
+            <div id="login_password_error" class="field-error" style="display:none;"></div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;margin:-4px 0 12px;">
+            <a class="link-brand" href="{{ path('app_forgot_password') }}">Mot de passe oublie ?</a>
+        </div>
+
+        {% if error %}
+            <div style="margin-bottom:12px;padding:11px 12px;border:1px solid #f3c4c4;background:#ffebee;color:#b71c1c;border-radius:8px;font-size:14px;">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+        {% endif %}
+
+        <button class="btn-primary" type="submit">Se connecter</button>
+
+        <div class="divider-text">ou</div>
+
+        <div class="social-stack">
+            <a class="btn-secondary" href="{{ path('app_google_oauth_connect') }}">
+                <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="#EA4335" d="M12 10.2v3.9h5.5c-.2 1.3-1.5 3.8-5.5 3.8-3.3 0-6-2.7-6-6.1s2.7-6.1 6-6.1c1.9 0 3.1.8 3.9 1.5l2.7-2.6C17 3.1 14.7 2.2 12 2.2 6.9 2.2 2.8 6.4 2.8 11.6S6.9 21 12 21c6.9 0 9.1-4.9 9.1-7.4 0-.5 0-.9-.1-1.2H12z"/>
+                </svg>
+                Continuer avec Google
+            </a>
+            <button class="btn-secondary" type="button" id="linkedinLoginBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="#0A66C2" d="M4.98 3.5A2.49 2.49 0 0 0 2.5 6a2.48 2.48 0 0 0 2.48 2.5A2.49 2.49 0 0 0 7.5 6 2.5 2.5 0 0 0 4.98 3.5zM2.8 8.9h4.4V21H2.8V8.9zM9.4 8.9h4.2v1.7h.1c.6-1.1 2-2.2 4.2-2.2 4.5 0 5.3 3 5.3 6.8V21h-4.4v-5.2c0-1.2 0-2.9-1.8-2.9s-2.1 1.4-2.1 2.8V21H9.4V8.9z"/>
+                </svg>
+                Continuer avec LinkedIn
+            </button>
+        </div>
+
+        <hr class="section-separator" />
+
+        <p class="muted-center">
+            Pas encore de compte ?
+            <a class="link-brand" href="{{ path('app_register') }}">Creer un compte</a>
+        </p>
+    </form>
+{% endblock %}
+
+{% block auth_scripts %}
+<script>
+(function () {
+    const loginForm = document.getElementById('loginForm');
+    const emailInput = document.getElementById('login_email');
+    const passwordInput = document.getElementById('login_password');
+    const emailError = document.getElementById('login_email_error');
+    const passwordError = document.getElementById('login_password_error');
+    const togglePasswordBtn = document.getElementById('toggleLoginPassword');
+    const linkedinBtn = document.getElementById('linkedinLoginBtn');
+
+    function showError(input, errorEl, message) {
+        input.classList.add('input-error');
+        errorEl.textContent = message;
+        errorEl.style.display = 'block';
+    }
+
+    function clearError(input, errorEl) {
+        input.classList.remove('input-error');
+        errorEl.textContent = '';
+        errorEl.style.display = 'none';
+    }
+
+    function isEmail(value) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    }
+
+    if (togglePasswordBtn) {
+        togglePasswordBtn.addEventListener('click', function () {
+            const currentType = passwordInput.getAttribute('type');
+            passwordInput.setAttribute('type', currentType === 'password' ? 'text' : 'password');
+        });
+    }
+
+    if (linkedinBtn) {
+        linkedinBtn.addEventListener('click', function () {
+            alert('Connexion LinkedIn bientot disponible.');
+        });
+    }
+
+    if (!loginForm) {
+        return;
+    }
+
+    loginForm.addEventListener('submit', function (event) {
+        let valid = true;
+
+        clearError(emailInput, emailError);
+        clearError(passwordInput, passwordError);
+
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+
+        if (email === '') {
+            showError(emailInput, emailError, 'L\'email est requis.');
+            valid = false;
+        } else if (!isEmail(email)) {
+            showError(emailInput, emailError, 'Veuillez saisir un email valide.');
+            valid = false;
+        }
+
+        if (password.trim() === '') {
+            showError(passwordInput, passwordError, 'Le mot de passe est requis.');
+            valid = false;
+        } else if (password.length < 6) {
+            showError(passwordInput, passwordError, 'Le mot de passe doit contenir au moins 6 caracteres.');
+            valid = false;
+        }
+
+        if (!valid) {
+            event.preventDefault();
+        }
+    });
+})();
+</script>
+{% endblock %}

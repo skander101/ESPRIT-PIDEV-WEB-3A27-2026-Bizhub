@@ -1,0 +1,65 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Toutes les participations — Admin{% endblock %}
+{% block breadcrumb %}E-Learning / Participations{% endblock %}
+
+{% block content %}
+<div style="padding:2rem;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+    <h2 style="font-size:1.5rem;color:var(--pg-text);margin:0;">Participations (toutes formations)</h2>
+    <a href="{{ path('app_admin_formation_index') }}" class="btn btn-outline-secondary">← Formations</a>
+  </div>
+
+  {% for label, messages in app.flashes %}
+    {% for message in messages %}
+      <div class="alert alert-{{ label == 'error' ? 'danger' : label }} mb-3" role="alert">{{ message }}</div>
+    {% endfor %}
+  {% endfor %}
+
+  <div class="dash-panel" style="border:1px solid var(--pg-border);border-radius:16px;overflow:hidden;">
+    {% if participations|length > 0 %}
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Formation</th>
+              <th>Participant</th>
+              <th>Montant</th>
+              <th>Paiement</th>
+              <th>Statut</th>
+              <th>Transaction</th>
+              <th class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in participations %}
+              <tr>
+                <td>{{ p.formation ? p.formation.title : '—' }}</td>
+                <td>{{ p.user ? p.user.fullName : '—' }}<br/><small class="text-muted">{{ p.user ? p.user.email : '' }}</small></td>
+                <td>{{ p.amount }} TND</td>
+                <td><span class="badge bg-secondary">{{ (p.paymentStatus ?? '')|upper }}</span></td>
+                <td><span class="badge bg-info text-dark">{{ p.status|upper }}</span></td>
+                <td><small class="text-muted">{{ p.transactionId|default('—') }}</small></td>
+                <td class="text-center">
+                  {% if p.certificatePath %}
+                    <a class="btn btn-sm btn-outline-primary" href="{{ path('app_admin_participation_certificate', { id_candidature: p.id_candidature }) }}">PDF</a>
+                  {% endif %}
+                  {% if p.isPaidEnrollment and p.certificatePath %}
+                    <form method="post" action="{{ path('app_admin_participation_resend_email', { id_candidature: p.id_candidature }) }}" class="d-inline">
+                      <input type="hidden" name="_token" value="{{ csrf_token('resend_participation_email_' ~ p.id_candidature) }}">
+                      <button type="submit" class="btn btn-sm btn-outline-success">Renvoyer email</button>
+                    </form>
+                  {% endif %}
+                  <a class="btn btn-sm btn-outline-secondary" href="{{ path('app_admin_participation_edit', { id_candidature: p.id_candidature }) }}">Modifier</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-muted text-center py-5 mb-0">Aucune participation.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

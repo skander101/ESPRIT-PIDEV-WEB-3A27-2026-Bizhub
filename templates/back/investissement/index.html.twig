@@ -1,0 +1,88 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Gestion des Investissements{% endblock %}
+{% block breadcrumb %}Investissement / Investissements{% endblock %}
+
+{% block content %}
+{% set statutColor = {
+  'en_attente':    '#f97316',
+  'en_negociation':'#3b82f6',
+  'accepte':       '#10b981',
+  'refuse':        '#ef4444',
+  'contrat_genere':'#8b5cf6',
+  'signe':         '#06b6d4',
+  'termine':       '#6b7280'
+} %}
+{% set statutLabel = {
+  'en_attente':    'En attente',
+  'en_negociation':'En négociation',
+  'accepte':       'Accepté',
+  'refuse':        'Refusé',
+  'contrat_genere':'Contrat généré',
+  'signe':         'Signé',
+  'termine':       'Terminé'
+} %}
+
+<div style="padding:2rem;">
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+    <h2 style="font-size:1.4rem;color:var(--pg-text);margin:0;">Investissements</h2>
+  </div>
+
+  {# ── Flash messages ── #}
+  {% for type, messages in app.flashes %}
+    {% for msg in messages %}
+      <div style="padding:0.8rem 1.2rem;border-radius:6px;margin-bottom:1rem;background:{{ type == 'success' ? 'rgba(6,214,160,0.15)' : 'rgba(239,68,68,0.15)' }};color:{{ type == 'success' ? '#06d6a0' : '#f87171' }};border:1px solid {{ type == 'success' ? 'rgba(6,214,160,0.3)' : 'rgba(239,68,68,0.3)' }};">
+        {{ msg }}
+      </div>
+    {% endfor %}
+  {% endfor %}
+
+  <div class="dash-panel" style="overflow-x:auto;">
+    <table style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr style="border-bottom:1px solid var(--pg-border);">
+          <th style="padding:0.8rem 1rem;text-align:left;font-size:0.75rem;color:var(--pg-muted);text-transform:uppercase;font-weight:700;">#</th>
+          <th style="padding:0.8rem 1rem;text-align:left;font-size:0.75rem;color:var(--pg-muted);text-transform:uppercase;font-weight:700;">Projet</th>
+          <th style="padding:0.8rem 1rem;text-align:left;font-size:0.75rem;color:var(--pg-muted);text-transform:uppercase;font-weight:700;">Investisseur</th>
+          <th style="padding:0.8rem 1rem;text-align:left;font-size:0.75rem;color:var(--pg-muted);text-transform:uppercase;font-weight:700;">Montant</th>
+          <th style="padding:0.8rem 1rem;text-align:left;font-size:0.75rem;color:var(--pg-muted);text-transform:uppercase;font-weight:700;">Type</th>
+          <th style="padding:0.8rem 1rem;text-align:left;font-size:0.75rem;color:var(--pg-muted);text-transform:uppercase;font-weight:700;">Statut</th>
+          <th style="padding:0.8rem 1rem;text-align:left;font-size:0.75rem;color:var(--pg-muted);text-transform:uppercase;font-weight:700;">Date</th>
+          <th style="padding:0.8rem 1rem;text-align:left;font-size:0.75rem;color:var(--pg-muted);text-transform:uppercase;font-weight:700;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for inv in investments %}
+          <tr style="border-bottom:1px solid var(--pg-border);transition:background .15s;" onmouseover="this.style.background='var(--pg-surface2)'" onmouseout="this.style.background=''">
+            <td style="padding:0.9rem 1rem;color:var(--pg-muted);font-size:0.85rem;">{{ inv.investment_id }}</td>
+            <td style="padding:0.9rem 1rem;">
+              {% if inv.project %}
+                <a href="{{ path('app_admin_projet_show', {id: inv.project.project_id}) }}" style="color:var(--pg-text);font-weight:600;text-decoration:none;">
+                  {{ inv.project.title|length > 35 ? inv.project.title|slice(0, 35) ~ '…' : inv.project.title }}
+                </a>
+              {% else %}—{% endif %}
+            </td>
+            <td style="padding:0.9rem 1rem;color:var(--pg-muted);font-size:0.9rem;">{{ inv.user ? inv.user.fullName : '—' }}</td>
+            <td style="padding:0.9rem 1rem;color:var(--pg-text);font-weight:600;font-size:0.9rem;">{{ inv.amount|number_format(0, ',', ' ') }} TND</td>
+            <td style="padding:0.9rem 1rem;color:var(--pg-muted);font-size:0.85rem;text-transform:capitalize;">{{ inv.typeInvestissement ?? '—' }}</td>
+            <td style="padding:0.9rem 1rem;">
+              <span style="display:inline-block;padding:0.25rem 0.7rem;border-radius:4px;font-size:0.78rem;font-weight:700;background:{{ statutColor[inv.statut] ?? '#6b7280' }}22;color:{{ statutColor[inv.statut] ?? '#6b7280' }};">
+                {{ statutLabel[inv.statut] ?? inv.statut }}
+              </span>
+            </td>
+            <td style="padding:0.9rem 1rem;color:var(--pg-muted);font-size:0.85rem;">{{ inv.createdAt|date('d/m/Y') }}</td>
+            <td style="padding:0.9rem 1rem;">
+              <a href="{{ path('app_admin_investment_show', {id: inv.investment_id}) }}" style="background:var(--nb-accent);color:#fff;padding:0.35rem 0.8rem;border-radius:5px;font-size:0.8rem;text-decoration:none;font-weight:600;">Voir</a>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="8" style="padding:2rem;text-align:center;color:var(--pg-muted);">Aucun investissement trouvé.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

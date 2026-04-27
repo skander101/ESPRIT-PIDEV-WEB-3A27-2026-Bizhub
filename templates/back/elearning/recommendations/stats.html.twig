@@ -1,0 +1,77 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Stats recommandations — Admin{% endblock %}
+{% block breadcrumb %}E-Learning / Recommandations{% endblock %}
+
+{% block content %}
+<div style="padding:2rem;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+    <h2 style="font-size:1.5rem;color:var(--pg-text);margin:0;">Recommandations formations</h2>
+    <a href="{{ path('app_admin_elearning_promo_codes_index') }}" class="btn btn-outline-secondary">Codes promo</a>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="p-3 rounded" style="background:var(--pg-surface2);border:1px solid var(--pg-border);">
+        <div class="text-muted small">Impressions (rails)</div>
+        <div class="fs-4 fw-bold" style="color:var(--pg-text);">{{ totals.impressions }}</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="p-3 rounded" style="background:var(--pg-surface2);border:1px solid var(--pg-border);">
+        <div class="text-muted small">Clics fiche</div>
+        <div class="fs-4 fw-bold" style="color:var(--pg-text);">{{ totals.clicks }}</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="p-3 rounded" style="background:var(--pg-surface2);border:1px solid var(--pg-border);">
+        <div class="text-muted small">Inscriptions (tracking reco)</div>
+        <div class="fs-4 fw-bold" style="color:var(--pg-text);">{{ totals.enrolls }}</div>
+      </div>
+    </div>
+  </div>
+
+  <p class="text-muted small mb-3">
+    CTR global (clics / impressions) : <strong>{{ global_ctr_percent }} %</strong> —
+    Conversion inscription / clic : <strong>{{ conversion_click_to_enroll_percent }} %</strong>
+  </p>
+
+  <div class="dash-panel" style="border:1px solid var(--pg-border);border-radius:16px;overflow:hidden;">
+    {% if rows|length > 0 %}
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Formation</th>
+              <th class="text-end">Impressions</th>
+              <th class="text-end">Clics</th>
+              <th class="text-end">Inscriptions</th>
+              <th class="text-end">CTR</th>
+              <th class="text-end">Conv. clic→inscr.</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in rows %}
+              {% set imp = r.impressions|default(0) %}
+              {% set clk = r.clicks|default(0) %}
+              {% set enr = r.enrolls|default(0) %}
+              {% set ctr = imp > 0 ? (100 * clk / imp)|round(2) : 0 %}
+              {% set conv = clk > 0 ? (100 * enr / clk)|round(2) : 0 %}
+              <tr>
+                <td><strong>{{ r.title|default('—') }}</strong><br/><small class="text-muted">#{{ r.formation_id }}</small></td>
+                <td class="text-end">{{ imp }}</td>
+                <td class="text-end">{{ clk }}</td>
+                <td class="text-end">{{ enr }}</td>
+                <td class="text-end">{{ ctr }} %</td>
+                <td class="text-end">{{ conv }} %</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-muted p-4 mb-0">Aucune donnée de tracking pour le moment.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

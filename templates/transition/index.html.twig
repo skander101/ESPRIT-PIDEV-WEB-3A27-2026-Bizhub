@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Loading...</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+        }
+        #preloader-video {
+            width: 100vw;
+            height: 100vh;
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body>
+    <video autoplay muted playsinline preload="auto" id="preloader-video">
+        <source src="{{ asset('assets/front/images/transition.mp4') }}" type="video/mp4">
+    </video>
+
+    <script>
+        var video = document.getElementById('preloader-video');
+
+        function redirect() {
+            window.location.href = "{{ path('app_index') }}";
+        }
+
+        video.addEventListener('ended', redirect);
+        setTimeout(redirect, 5000); // Failsafe in case video events don't fire
+    </script>
+</body>
+</html>

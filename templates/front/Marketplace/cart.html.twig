@@ -1,0 +1,100 @@
+{% extends 'front/base.html.twig' %}
+{% block title %}Mon panier — BizHub{% endblock %}
+
+{% block extra_styles %}
+.cart-body { max-width:900px; margin:0 auto; padding:36px 5%; display:grid; grid-template-columns:1fr 280px; gap:2rem; align-items:start; }
+.cart-card { background:#fff; border-radius:16px; border:1.5px solid var(--border); padding:24px; box-shadow:0 2px 12px rgba(0,0,0,.05); }
+.cart-item { display:flex; gap:1rem; align-items:center; padding:14px 0; border-bottom:1px solid var(--border); }
+.cart-item:last-child { border-bottom:none; }
+.cart-item-img { width:70px; height:70px; border-radius:10px; background:#f3f4f6; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:1.8rem; color:#d1d5db; overflow:hidden; }
+.cart-item-img img { width:100%; height:100%; object-fit:cover; }
+.cart-item-info { flex:1; }
+.cart-item-name { font-weight:700; font-size:.9rem; color:var(--dark); }
+.cart-item-price { font-size:.8rem; color:var(--text-muted); margin-top:3px; }
+.cart-item-sub { font-family:'Josefin Sans',sans-serif; font-weight:700; color:var(--dark); white-space:nowrap; }
+.qty-mini { width:60px; padding:5px 8px; border:1.5px solid var(--border); border-radius:7px; font-size:.85rem; text-align:center; }
+.summary-card { background:#fff; border-radius:16px; border:1.5px solid var(--border); padding:22px; box-shadow:0 2px 12px rgba(0,0,0,.05); position:sticky; top:90px; }
+.sum-row { display:flex; justify-content:space-between; padding:7px 0; font-size:.85rem; }
+.sum-total { font-family:'Josefin Sans',sans-serif; font-size:1.3rem; font-weight:700; border-top:2px solid var(--border); padding-top:12px; margin-top:6px; display:flex; justify-content:space-between; }
+.btn-checkout { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:13px; background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%); border:none; border-radius:10px; font-weight:700; font-size:.95rem; font-family:'Josefin Sans',sans-serif; cursor:pointer; margin-top:1.2rem; box-shadow:0 4px 14px rgba(255,190,51,.3); transition:transform .15s; }
+.btn-checkout:hover { transform:translateY(-1px); }
+@media(max-width:700px) { .cart-body { grid-template-columns:1fr; } }
+{% endblock %}
+
+{% block content %}
+<div style="max-width:900px;margin:0 auto;padding:24px 5% 0;">
+  <a href="{{ path('app_marketplace_index') }}" style="font-size:.78rem;color:var(--text-muted);text-decoration:none;display:inline-flex;align-items:center;gap:5px;">
+    <i class="fa fa-arrow-left"></i> Continuer mes achats
+  </a>
+  <h1 style="font-family:'Josefin Sans',sans-serif;font-size:1.6rem;font-weight:700;color:var(--dark);margin:16px 0 0;">Mon panier</h1>
+</div>
+
+<div class="cart-body">
+
+  <div class="cart-card">
+    {% if items is empty %}
+      <div style="text-align:center;padding:40px;color:var(--text-muted);">
+        <i class="fa fa-shopping-cart" style="font-size:3rem;display:block;margin-bottom:1rem;"></i>
+        <p>Votre panier est vide.</p>
+        <a href="{{ path('app_marketplace_index') }}" class="btn-yellow" style="display:inline-block;margin-top:1rem;">Explorer la marketplace</a>
+      </div>
+    {% else %}
+      {% for item in items %}
+        <div class="cart-item">
+          <div class="cart-item-img">
+            {% if item.product.imageUrl %}<img src="{{ item.product.imageUrl }}" alt="{{ item.product.name }}">
+            {% else %}<i class="fa fa-box"></i>{% endif %}
+          </div>
+          <div class="cart-item-info">
+            <div class="cart-item-name">{{ item.product.name }}</div>
+            <div class="cart-item-price">{{ item.product.price|number_format(2,',',' ') }} TND / unité</div>
+          </div>
+
+          {# Quantity update #}
+          <form method="post" action="{{ path('app_marketplace_panier_update', {id: item.idPanier}) }}" style="display:flex;align-items:center;gap:6px;">
+            <input class="qty-mini" type="number" name="quantite" value="{{ item.quantite }}" min="1" max="{{ item.product.stock }}" onchange="this.form.submit()">
+          </form>
+
+          <div class="cart-item-sub">{{ item.subtotal|number_format(2,',',' ') }} TND</div>
+
+          {# Remove #}
+          <form method="post" action="{{ path('app_marketplace_panier_remove', {id: item.idPanier}) }}" style="margin:0;">
+            <input type="hidden" name="_token" value="{{ csrf_token('remove_panier_' ~ item.idPanier) }}">
+            <button type="submit" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:1rem;padding:4px;" title="Retirer">
+              <i class="fa fa-trash-alt"></i>
+            </button>
+          </form>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  {# Summary #}
+  {% if items is not empty %}
+  <div class="summary-card">
+    <div style="font-family:'Josefin Sans',sans-serif;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:1rem;">Récapitulatif</div>
+
+    {% for item in items %}
+      <div class="sum-row">
+        <span style="color:var(--text-muted);">{{ item.product.name|slice(0,22) }}{% if item.product.name|length > 22 %}…{% endif %} ×{{ item.quantite }}</span>
+        <span>{{ item.subtotal|number_format(2,',',' ') }}</span>
+      </div>
+    {% endfor %}
+
+    <div class="sum-total">
+      <span>Total</span>
+      <span>{{ total|number_format(2,',',' ') }} TND</span>
+    </div>
+
+    <a href="{{ path('app_marketplace_checkout') }}" class="btn-checkout" style="text-decoration:none;">
+      <i class="fa fa-credit-card"></i> Passer la commande
+    </a>
+
+    <a href="{{ path('app_marketplace_index') }}" class="btn-ghost" style="display:flex;justify-content:center;margin-top:.7rem;font-size:.82rem;">
+      Continuer mes achats
+    </a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

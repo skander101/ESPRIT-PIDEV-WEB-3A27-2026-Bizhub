@@ -1,0 +1,59 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Dashboard - BizHub{% endblock %}
+
+{% block content %}
+<div style="max-width:1100px;margin:0 auto;padding:40px 5%;">
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;margin-bottom:2rem;">
+        <div class="dash-panel">
+            <h5>Welcome Back, {{ app.user.fullName }}!</h5>
+            <div style="display:flex;gap:1rem;margin-bottom:1.5rem;">
+                <div style="flex:1;">
+                    <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.3rem;">User Type</div>
+                    <div style="font-weight:700;color:var(--primary);text-transform:capitalize;">{{ app.user.userType }}</div>
+                </div>
+                <div style="flex:1;">
+                    <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.3rem;">Joined</div>
+                    <div style="font-weight:700;color:var(--dark);">{{ app.user.createdAt|date('d/m/Y') }}</div>
+                </div>
+                <div style="flex:1;">
+                    <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.3rem;">Status</div>
+                    <div style="font-weight:700;color:{{ app.user.isActive ? 'var(--primary)' : '#999' }};">
+                        {{ app.user.isActive ? 'Active' : 'Inactive' }}
+                    </div>
+                </div>
+            </div>
+            <p style="font-size:0.9rem;color:var(--text-muted);line-height:1.6;margin-bottom:1.5rem;">
+                {% if app.user.userType == 'startup' %}
+                    You're registered as a Startup. Connect with investors, join formations, and list your products on our marketplace.
+                {% elseif app.user.userType == 'fournisseur' %}
+                    You're registered as a Supplier. Publish your products and services on our marketplace.
+                {% elseif app.user.userType == 'formateur' %}
+                    You're registered as a Trainer. Create and publish training courses for our community.
+                {% elseif app.user.userType == 'investisseur' %}
+                    You're registered as an Investor. Invest in startups and help them grow.
+                {% endif %}
+            </p>
+            <div style="display:flex;gap:0.8rem;">
+                <a href="{{ path('app_user_profile') }}" class="btn-yellow">View Profile</a>
+                <a href="{{ path('app_user_edit') }}" class="btn-outline-dark">Edit Profile</a>
+            </div>
+        </div>
+        <div class="dash-panel">
+            <h5>Quick Actions</h5>
+            <a href="{{ path('app_avis_new') }}" class="quick-link">
+                <div class="quick-link-icon"><i class="fa fa-star"></i></div> Write a Review
+            </a>
+            <a href="{{ path('app_avis_list') }}" class="quick-link">
+                <div class="quick-link-icon"><i class="fa fa-list"></i></div> My Reviews
+            </a>
+            <a href="{{ path('app_user_profile') }}" class="quick-link">
+                <div class="quick-link-icon"><i class="fa fa-user"></i></div> View Profile
+            </a>
+            <a href="{{ path('app_logout') }}" class="quick-link">
+                <div class="quick-link-icon"><i class="fa fa-sign-out"></i></div> Logout
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
