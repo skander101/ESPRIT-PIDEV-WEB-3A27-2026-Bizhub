@@ -11,6 +11,11 @@ use App\Repository\Community\ReactionRepository;
 #[ORM\Table(name: 'reaction')]
 class Reaction
 {
+    public function __construct()
+    {
+        $this->created_at = new \DateTime();
+    }
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
@@ -27,22 +32,11 @@ class Reaction
         return $this;
     }
 
-    #[ORM\Column(type: 'integer', nullable: false)]
-    private ?int $post_id = null;
-
-    public function getPost_id(): ?int
-    {
-        return $this->post_id;
-    }
-
-    public function setPost_id(int $post_id): self
-    {
-        $this->post_id = $post_id;
-        return $this;
-    }
+#[ORM\Column(type: 'integer', nullable: false)]
+    private int $post_id;
 
     #[ORM\Column(type: 'integer', nullable: false)]
-    private ?int $user_id = null;
+    private int $user_id;
 
     public function getUser_id(): ?int
     {
@@ -56,7 +50,7 @@ class Reaction
     }
 
     #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $type = null;
+    private string $type = '';
 
     public function getType(): ?string
     {
@@ -69,15 +63,15 @@ class Reaction
         return $this;
     }
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?\DateTimeInterface $created_at = null;
+    #[ORM\Column(type: 'datetime', nullable: false)]
+    private \DateTimeInterface $created_at;
 
-    public function getCreated_at(): ?\DateTimeInterface
+    public function getCreated_at(): \DateTimeInterface
     {
         return $this->created_at;
     }
 
-    public function setCreated_at(?\DateTimeInterface $created_at): self
+    protected function setCreated_at(\DateTimeInterface $created_at): self
     {
         $this->created_at = $created_at;
         return $this;

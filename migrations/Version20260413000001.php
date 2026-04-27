@@ -46,7 +46,7 @@ final class Version20260413000001 extends AbstractMigration
                 PRIMARY KEY (id),
                 INDEX IDX_history_commande (commande_id),
                 CONSTRAINT FK_commande_history FOREIGN KEY (commande_id)
-                    REFERENCES commande (id_commande) ON DELETE CASCADE
+                    REFERENCES commande (commande_id) ON DELETE CASCADE
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB
         ");
     }

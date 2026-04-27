@@ -17,7 +17,7 @@ class AutoConfirmNotification
     #[ORM\Column]
     private int $investisseurId;
 
-    #[ORM\Column]
+    #[ORM\Column(name: 'commande_id')]
     private int $commandeId;
 
     #[ORM\Column(length: 50)]

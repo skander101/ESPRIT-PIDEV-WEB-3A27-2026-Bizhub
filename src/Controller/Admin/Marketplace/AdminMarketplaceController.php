@@ -40,8 +40,8 @@ class AdminMarketplaceController extends AbstractController
                 'total_produits'  => count($produitRepo->findAll()),
                 'produits_dispo'  => count($produitRepo->findDisponibles()),
                 'total_commandes' => count($toutesCommandes),
-                'en_attente'      => count(array_filter($toutesCommandes, fn($c) => $c->getStatut() === Commande::STATUT_ATTENTE)),
-                'confirmees'      => count(array_filter($toutesCommandes, fn($c) => $c->getStatut() === Commande::STATUT_CONFIRMEE)),
+                'en_attente'      => count(array_filter($toutesCommandes, fn(Commande $c) => $c->getStatut() === Commande::STATUT_ATTENTE)),
+                'confirmees'      => count(array_filter($toutesCommandes, fn(Commande $c) => $c->getStatut() === Commande::STATUT_CONFIRMEE)),
                 'paniers_actifs'  => count($panierRepo->findAll()),
             ],
             'statuts'              => $commandeRepo->countByStatut(),
@@ -60,7 +60,7 @@ class AdminMarketplaceController extends AbstractController
     #[Route('/produits', name: 'produits_index', methods: ['GET'])]
     public function produitsIndex(ProduitServiceRepository $repo, Request $request): Response
     {
-        $cat = $request->query->get('categorie');
+        $cat = $request->query->get('categorie', '', 'string');
         return $this->render('back/marketplace/produits/index.html.twig', [
             'produits'   => $cat ? $repo->findByCategorie($cat) : $repo->findAll(),
             'categories' => $repo->findAllCategories(),
@@ -129,6 +129,7 @@ class AdminMarketplaceController extends AbstractController
         }
 
         // Nombre de commandes par client (indexed by idClient)
+        /** @var Commande[] $allCommandes */
         $allCommandes     = $commandeRepo->findAll();
         $commandesParClient = [];
         foreach ($allCommandes as $cmd) {

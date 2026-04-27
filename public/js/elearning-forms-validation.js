@@ -37,6 +37,10 @@
     var end = form.querySelector('[data-validate-field="end_date"]');
     var cost = form.querySelector('[data-validate-field="cost"]');
     var lieu = form.querySelector('[data-validate-field="lieu"]');
+    var typeSelect = form.querySelector('[data-validate-field="formation_type"]');
+    var latH = form.querySelector('[data-validate-field="latitude"]');
+    var lngH = form.querySelector('[data-validate-field="longitude"]');
+    var isOnline = typeSelect && (typeSelect.value === '1' || typeSelect.value === 'true');
 
     if (title) {
       var tv = (title.value || '').trim();
@@ -55,10 +59,22 @@
         errors.push('La date de fin doit être postérieure ou égale à la date de début.');
       }
     }
-    if (lieu) {
-      var lv = (lieu.value || '').trim();
-      if (!lv) errors.push('Le lieu est obligatoire.');
-      else if (lv.length > 300) errors.push('Le lieu ne doit pas dépasser 300 caractères.');
+    if (!isOnline) {
+      if (lieu) {
+        var lv = (lieu.value || '').trim();
+        if (!lv) errors.push('Pour une formation présentielle, sélectionnez un lieu sur la carte (adresse).');
+        else if (lv.length > 500) errors.push('Le lieu ne doit pas dépasser 500 caractères.');
+      }
+      var latv = latH ? (latH.value || '').trim() : '';
+      var lngv = lngH ? (lngH.value || '').trim() : '';
+      if (!latv || !lngv) {
+        errors.push('Pour une formation présentielle, cliquez sur la carte pour enregistrer la position.');
+      } else {
+        var la = parseNum(latv);
+        var lo = parseNum(lngv);
+        if (isNaN(la) || la < -90 || la > 90) errors.push('Latitude invalide.');
+        if (isNaN(lo) || lo < -180 || lo > 180) errors.push('Longitude invalide.');
+      }
     }
     if (cost && (cost.value || '').trim() !== '') {
       var n = parseNum(cost.value);

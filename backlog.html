@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backlog — Sprint Tasks</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            padding: 24px;
+            min-height: 100vh;
+        }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-right: auto;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: #fff;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            border-color: #999;
+            color: #333;
+        }
+
+        .btn.active {
+            background: #333;
+            border-color: #333;
+            color: #fff;
+        }
+
+        .btn-export {
+            background: #0066cc;
+            border-color: #0066cc;
+            color: #fff;
+        }
+
+        .btn-export:hover {
+            background: #0052a3;
+            border-color: #0052a3;
+        }
+
+        .btn-export:disabled {
+            background: #999;
+            border-color: #999;
+            cursor: not-allowed;
+        }
+
+        .container {
+            background: #fff;
+            border: 1px solid #ddd;
+        }
+
+        table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f9f9f9;
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: bold;
+            color: #333;
+            font-size: 14px;
+            border: 1px solid #ddd;
+        }
+
+        td {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+            vertical-align: top;
+        }
+
+        .col-us { width: 200px; }
+        .col-task { width: 160px; }
+        .col-detail { width: auto; }
+
+        .chip {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            padding: 2px 6px;
+            display: inline-block;
+        }
+
+        .chip-controller {
+            color: #0066cc;
+        }
+
+        .chip-service {
+            color: #22863a;
+        }
+
+        .chip-twig {
+            background: #fff8e1;
+            border-color: #ffe082;
+            color: #b7791f;
+        }
+
+        .chip-env {
+            background: #f0f0f0;
+            font-style: italic;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .row-controller .detail-cell { border-left: 3px solid #0066cc; }
+        .row-service .detail-cell { border-left: 3px solid #22863a; }
+        .row-twig .detail-cell { border-left: 3px solid #b7791f; }
+
+        .layer-label {
+            font-weight: bold;
+            color: #555;
+            font-size: 12px;
+        }
+
+        .us-content {
+            white-space: normal;
+            line-height: 1.4;
+        }
+
+        .us-id {
+            font-family: monospace;
+            font-size: 11px;
+            color: #1565c0;
+            background: #e3f2fd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-right: 6px;
+        }
+
+        .sprint-badge {
+            font-size: 11px;
+            background: #333;
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-right: 6px;
+        }
+
+        .module-badge {
+            font-size: 10px;
+            background: #666;
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .task-id {
+            font-family: monospace;
+            font-size: 10px;
+            color: #7b1fa2;
+            background: #f3e5f5;
+            padding: 1px 4px;
+            border-radius: 2px;
+            margin-right: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="toolbar">
+        <h1 class="title">Backlog — Sprint Tasks</h1>
+        <div class="filter-buttons" id="filters"></div>
+        <button class="btn btn-export" id="exportBtn" onclick="exportPNG()">Exporter PNG</button>
+    </div>
+
+    <div class="container" id="capture">
+        <table>
+            <thead>
+                <tr>
+                    <th class="col-us">User Story</th>
+                    <th class="col-task">Tâche</th>
+                    <th class="col-detail">Détail technique</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        const data = [
+            {
+                id: "US-001",
+                module: "User",
+                sprint: "1",
+                us: "En tant qu'utilisateur, je veux m'authentifier et gérer mon compte avec l'IA pour sécuriser mon accès",
+                tasks: [
+                    { id: "US-001-T01", desc: "Créer le formulaire de connexion", paths: ["LoginController::showLoginForm"] },
+                    { id: "US-001-T02", desc: "Gérer l'authentification JWT", paths: ["LoginController::login", ".env: JWT_SECRET"] },
+                    { id: "US-001-T03", desc: "Créer le formulaire d'inscription", paths: ["SignupController::showSignupForm"] },
+                    { id: "US-001-T04", desc: "Gérer l'inscription utilisateur", paths: ["SignupController::signup"] },
+                    { id: "US-001-T05", desc: "Mot de passe oublié", paths: ["ForgotPasswordController::forgotPassword"] },
+                    { id: "US-001-T06", desc: "Réinitialiser le mot de passe", paths: ["ForgotPasswordController::resetPassword", ".env: TOTP_SECRET"] },
+                    { id: "US-001-T07", desc: "FacePlusPlus auth", paths: ["FacePlusPlusService.detect", ".env: FACE_PLUS_KEY"] },
+                    { id: "US-001-T08", desc: "Auth0 authentication", paths: ["Auth0Service.authenticate", ".env: AUTH0_DOMAIN"] },
+                    { id: "US-001-T09", desc: "AI database assistant", paths: ["AiDatabaseAssistantService.query", ".env: OPENAI_KEY"] },
+                    { id: "US-001-T10", desc: "Navigation Bot AI", paths: ["AiNavigationBotService.navigate", ".env: OPENAI_KEY"] }
+                ]
+            },
+            {
+                id: "US-002",
+                module: "User",
+                sprint: "1",
+                us: "En tant qu'utilisateur, je veux gérer mon profil pour mettre à jour mes informations",
+                tasks: [
+                    { id: "US-002-T01", desc: "Afficher le profil utilisateur", paths: ["UserProfileController::showProfile"] },
+                    { id: "US-002-T02", desc: "Modifier le profil utilisateur", paths: ["UserProfileController::updateProfile"] },
+                    { id: "US-002-T03", desc: "Gérer les utilisateurs (Admin)", paths: ["UserManagementController::list"] },
+                    { id: "US-002-T04", desc: "Créer/modifier utilisateur", paths: ["UserFormController::save"] },
+                    { id: "US-002-T05", desc: "Tableau de bord admin", paths: ["AdminDashboardController::index"] },
+                    { id: "US-002-T06", desc: "Vérification utilisateur", paths: ["VerificationController::verify", ".env: VERIFICATION_ENABLED"] },
+                    { id: "US-002-T07", desc: "Notification email", paths: ["EmailService.send", ".env: SMTP_HOST"] }
+                ]
+            },
+            {
+                id: "US-003",
+                module: "Investissement",
+                sprint: "1",
+                us: "En tant qu'utilisateur, je veux gérer les investissements pour suivre les opportunités",
+                tasks: [
+                    { id: "US-003-T01", desc: "Lister les investissements", paths: ["InvestmentsListController::index"] },
+                    { id: "US-003-T02", desc: "Ajouter un investissement", paths: ["AddInvestmentController::create", ".env: STRIPE_KEY"] },
+                    { id: "US-003-T03", desc: "Lister les projets", paths: ["ProjectsListController::index"] },
+                    { id: "US-003-T04", desc: "Ajouter un projet", paths: ["AddProjectController::create"] },
+                    { id: "US-003-T05", desc: "Dashboard analytique", paths: ["AnalyticsDashboardController::index"] },
+                    { id: "US-003-T06", desc: "Gestion des paiements", paths: ["AddPaymentController::process", ".env: STRIPE_SECRET"] },
+                    { id: "US-003-T07", desc: "Pipeline des deals", paths: ["DealPipelineController::index"] },
+                    { id: "US-003-T08", desc: "Négociations", paths: ["NegotiationController::manage"] },
+                    { id: "US-003-T09", desc: "Liste des négociations", paths: ["NegotiationListController::list"] },
+                    { id: "US-003-T10", desc: "AI insights investissement", paths: ["AiInsightsService.analyze", ".env: OPENAI_KEY"] },
+                    { id: "US-003-T11", desc: "Contract AI review", paths: ["ContractReviewService.review", ".env: OPENROUTER_KEY"] }
+                ]
+            },
+            {
+                id: "US-004",
+                module: "Investissement",
+                sprint: "1",
+                us: "En tant qu'investisseur, je veux des recommandations de portfolio basées sur l'IA",
+                tasks: [
+                    { id: "US-004-T01", desc: "Advisor AI recommendations", paths: ["PortfolioAdvisorController::recommend", ".env: OPENAI_KEY"] },
+                    { id: "US-004-T02", desc: "Smart search startups", paths: ["SmartSearchController::search", ".env: ALPHA_VANTAGE_KEY"] },
+                    { id: "US-004-T03", desc: "Enrichissement données IA", paths: ["AIDemoController::enrich"] },
+                    { id: "US-004-T04", desc: "Analyse de marché", paths: ["AnalyticsDashboardController::marketAnalysis", ".env: COINGECKO_KEY"] }
+                ]
+            },
+            {
+                id: "US-005",
+                module: "Marketplace",
+                sprint: "1",
+                us: "En tant qu'utilisateur, je veux accéder au marketplace pour acheter/vendre",
+                tasks: [
+                    { id: "US-005-T01", desc: "Lister les produits/services", paths: ["ProduitServiceController::list"] },
+                    { id: "US-005-T02", desc: "Gestion du panier", paths: ["PanierController::manage"] },
+                    { id: "US-005-T03", desc: "Passer une commande", paths: ["CommandeController::passer"] },
+                    { id: "US-005-T04", desc: "Suivre une commande", paths: ["CommandeTrackingController::track"] },
+                    { id: "US-005-T05", desc: "Service paiement marketplace", paths: ["PaymentController::init", ".env: STRIPE_WEBHOOK"] },
+                    { id: "US-005-T06", desc: "Infobip notifications", paths: ["InfobipService.notify", ".env: INFOBIP_KEY"] },
+                    { id: "US-005-T07", desc: "Notification SMS", paths: ["TwilioSmsService.send", ".env: TWILIO_SID"] }
+                ]
+            },
+            {
+                id: "US-006",
+                module: "Marketplace",
+                sprint: "1",
+                us: "En tant qu'utilisateur, je veux évaluer et noter les services",
+                tasks: [
+                    { id: "US-006-T01", desc: "Créer un avis", paths: ["ReviewFormController::create"] },
+                    { id: "US-006-T02", desc: "Gestion des avis", paths: ["ReviewManagementController::manage"] },
+                    { id: "US-006-T03", desc: "Afficher les statistiques", paths: ["AdminDashboardController::stats"] }
+                ]
+            },
+            {
+                id: "US-009",
+                module: "Marketplace",
+                sprint: "2",
+                us: "En tant qu'utilisateur, je veux des recommendations IA pour mes achats",
+                tasks: [
+                    { id: "US-009-T01", desc: "Analyse des préférences utilisateur", paths: ["PreferenceAnalysisController::analyze", ".env: OPENAI_KEY"] },
+                    { id: "US-009-T02", desc: "Recommendations personnalisées", paths: ["RecommendationEngineController::get", ".env: OPENAI_KEY"] },
+                    { id: "US-009-T03", desc: "Search AI intelligent", paths: ["AISearchController::search", ".env: OPENAI_KEY"] },
+                    { id: "US-009-T04", desc: "Analyse des tendances", paths: ["TrendAnalysisController::analyze", ".env: COINGECKO_KEY"] },
+                    { id: "US-009-T05", desc: "Chat assistant IA", paths: ["AIAssistantController::chat", ".env: GEMINI_KEY"] }
+                ]
+            },
+            {
+                id: "US-007",
+                module: "Elearning",
+                sprint: "1",
+                us: "En tant qu'utilisateur, je veux suivre des formations elearning",
+                tasks: [
+                    { id: "US-007-T01", desc: "Lister les formations", paths: ["FormationManagementController::list"] },
+                    { id: "US-007-T02", desc: "Détails formation", paths: ["FormationDetailsController::show"] },
+                    { id: "US-007-T03", desc: "Formulaire inscription", paths: ["FormationFormController::register"] },
+                    { id: "US-007-T04", desc: "Gestion des participations", paths: ["ParticipationManagementController::manage"] },
+                    { id: "US-007-T05", desc: "Formulaire participation", paths: ["ParticipationFormController::submit"] },
+                    { id: "US-007-T06", desc: "Paiement formation", paths: ["PaymentController::pay", ".env: STRIPE_KEY"] },
+                    { id: "US-007-T07", desc: "Formation emailService", paths: ["FormationEmailService.send", ".env: SMTP_HOST"] },
+                    { id: "US-007-T08", desc: "Google Meet", paths: ["GoogleMeetService.create", ".env: GMEET_CLIENT_ID"] }
+                ]
+            },
+            {
+                id: "US-008",
+                module: "Community",
+                sprint: "1",
+                us: "En tant qu'utilisateur, je veux interagir avec la communauté",
+                tasks: [
+                    { id: "US-008-T01", desc: "Afficher les postes", paths: ["ShowPostsController::index"] },
+                    { id: "US-008-T02", desc: "Service réactions", paths: ["ReactionService.react"] },
+                    { id: "US-008-T03", desc: "Service commentaires", paths: ["CommentService.add"] },
+                    { id: "US-008-T04", desc: "Service posts", paths: ["PostService.create"] },
+                    { id: "US-008-T05", desc: "Géolocalisation", paths: ["GeoLocationService.locate", ".env: GOOGLE_MAPS_KEY"] },
+                    { id: "US-008-T06", desc: "Chat AI assistant", paths: ["AiChatController::chat", ".env: GEMINI_KEY"] }
+                ]
+            }
+        ];
+
+        let currentFilter = 'Tous';
+
+        function init() {
+            renderFilters();
+            render();
+        }
+
+        function renderFilters() {
+            const filters = document.getElementById('filters');
+            const sprints = ['Tous', '1', '2'];
+            filters.innerHTML = sprints.map(s => 
+                `<button class="btn ${s === currentFilter ? 'active' : ''}" data-filter="${s}">${s === 'Tous' ? 'Tous' : 'Sprint ' + s}</button>`
+            ).join('');
+
+            filters.querySelectorAll('.btn').forEach(btn => {
+                btn.addEventListener('click', () => filter(btn.dataset.filter));
+            });
+        }
+
+        function filter(sprint) {
+            currentFilter = sprint;
+            renderFilters();
+            render();
+        }
+
+        function parseController(path) {
+            if (!path.includes('Controller::')) return null;
+            const parts = path.split('::');
+            const controllerFull = parts[0];
+            const method = parts[1];
+            const controllerName = controllerFull.replace('Controller', '') + 'Controller';
+            return { controllerName, method, file: controllerName + '.php' };
+        }
+
+        function parseService(path) {
+            if (path.includes('Service.') || (path.includes('Service') && !path.includes('Controller'))) {
+                const match = path.match(/(\w+)Service\.(\w+)/);
+                if (match) {
+                    return { method: match[2], className: match[1] + 'Service', file: match[1] + 'Service.php' };
+                }
+            }
+            return null;
+        }
+
+        function inferService(controllerPath) {
+            if (!controllerPath) return null;
+            const match = controllerPath.match(/(\w+)Controller/);
+            if (match) {
+                return { method: null, className: match[1] + 'Service', file: match[1] + 'Service.php' };
+            }
+            return null;
+        }
+
+        function inferTwig(controllerPath) {
+            if (!controllerPath) return null;
+            const match = controllerPath.match(/(\w+)Controller::(\w+)/);
+            if (match) {
+                const controllerName = match[1];
+                const method = match[2];
+                const controllerFolder = controllerName.charAt(0).toLowerCase() + controllerName.slice(1).replace(/([A-Z])/g, '-$1').toLowerCase();
+                const methodSnake = method.replace(/([A-Z])/g, '_$1').toLowerCase();
+                return { file: controllerFolder + '/' + methodSnake + '.html.twig' };
+            }
+            return null;
+        }
+
+        function extractEnv(paths) {
+            return paths.filter(p => p.startsWith('.env:')).map(p => p.replace('.env: ', '').replace('.env:', ''));
+        }
+
+        function render() {
+            const tbody = document.getElementById('tableBody');
+            
+            const filtered = currentFilter === 'Tous' 
+                ? data 
+                : data.filter(item => item.sprint === currentFilter);
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="padding:40px;text-align:center;color:#999;">Aucune tâche trouvée</td></tr>';
+                return;
+            }
+
+            let html = '';
+
+            filtered.forEach(us => {
+                us.tasks.forEach(task => {
+                    const paths = task.paths;
+                    const envVars = extractEnv(paths);
+                    
+                    const controllerInfo = parseController(paths.find(p => p.includes('Controller::')) || '');
+                    const servicePath = paths.find(p => !p.includes('Controller::') && p.includes('Service') && p.includes('.'));
+                    const serviceInfo = servicePath ? parseService(servicePath) : null;
+                    const inferredService = !serviceInfo ? inferService(paths.find(p => p.includes('Controller::')) || '') : null;
+                    const twigInfo = inferTwig(paths.find(p => p.includes('Controller::')) || '');
+
+                    html += `<tr class="row-controller">
+                        <td class="col-us">
+                            <span class="us-content">
+                                <span class="us-id">${us.id}</span>
+                                <span class="sprint-badge">S${us.sprint}</span>
+                                <span class="module-badge">${us.module}</span><br>
+                                ${us.us}
+                            </span>
+                        </td>
+                        <td class="col-task">
+                            <span class="task-id">${task.id}</span>${task.desc}
+                        </td>
+                        <td class="col-detail">
+                            ${controllerInfo ? `<span class="chip chip-controller">${controllerInfo.method}() – ${controllerInfo.file}</span>` : '—'}
+                            ${envVars.map(e => `<span class="chip chip-env">.env: ${e}</span>`).join(' ')}
+                        </td>
+                    </tr>`;
+
+                    html += `<tr class="row-service">
+                        <td class="col-us"></td>
+                        <td class="col-task"><span class="layer-label">Service</span></td>
+                        <td class="col-detail">
+                            ${serviceInfo ? `<span class="chip chip-service">${serviceInfo.method}() – ${serviceInfo.file}</span>` : ''}
+                            ${inferredService && !serviceInfo ? `<span class="chip chip-service">— – ${inferredService.file}</span>` : ''}
+                            ${!serviceInfo && !inferredService ? `<span class="chip chip-service">—</span>` : ''}
+                        </td>
+                    </tr>`;
+
+                    html += `<tr class="row-twig">
+                        <td class="col-us"></td>
+                        <td class="col-task"><span class="layer-label">Twig</span></td>
+                        <td class="col-detail">
+                            ${twigInfo ? `<span class="chip chip-twig">${twigInfo.file}</span>` : '<span class="chip chip-twig">—</span>'}
+                        </td>
+                    </tr>`;
+                });
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        async function exportPNG() {
+            const btn = document.getElementById('exportBtn');
+            const originalText = btn.textContent;
+            btn.textContent = 'Export en cours...';
+            btn.disabled = true;
+
+            try {
+                const element = document.getElementById('capture');
+                const canvas = await html2canvas(element, {
+                    backgroundColor: '#ffffff',
+                    scale: 2,
+                    logging: false,
+                    useCORS: true
+                });
+
+                const link = document.createElement('a');
+                link.download = 'backlog-final.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } catch (error) {
+                console.error('Export failed:', error);
+                alert('Erreur lors de l\'export. Veuillez réessayer.');
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

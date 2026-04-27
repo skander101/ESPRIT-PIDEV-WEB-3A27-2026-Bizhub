@@ -46,7 +46,7 @@ class ProductService
         match: false,
         message: 'Le nom ne peut pas être uniquement des chiffres.'
     )]
-    private ?string $name = null;
+    private string $name;
 
     #[ORM\Column(type: 'text', nullable: true)]
     #[Assert\Length(
@@ -55,12 +55,12 @@ class ProductService
     )]
     private ?string $description = null;
 
-    #[ORM\Column(type: 'decimal', precision: 10, scale: 2)]
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: false)]
     #[Assert\NotBlank(message: 'Le prix est obligatoire.')]
     #[Assert\Type(type: 'numeric', message: 'Le prix doit être numérique.')]
     #[Assert\Positive(message: 'Le prix doit être > 0.')]
     #[Assert\LessThanOrEqual(value: 9999999.999, message: 'Le prix dépasse la valeur maximale autorisée.')]
-    private ?float $price = null;
+    private string $price = '0.00';
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
     #[Assert\Length(
@@ -110,8 +110,8 @@ class ProductService
     public function getDescription(): ?string { return $this->description; }
     public function setDescription(?string $description): self { $this->description = $description; return $this; }
 
-    public function getPrice(): ?float { return $this->price; }
-    public function setPrice(float $price): self { $this->price = $price; return $this; }
+    public function getPrice(): ?string { return $this->price; }
+    public function setPrice(string $price): self { $this->price = $price; return $this; }
 
     public function getCategory(): ?string { return $this->category; }
     public function setCategory(?string $category): self { $this->category = $category; return $this; }

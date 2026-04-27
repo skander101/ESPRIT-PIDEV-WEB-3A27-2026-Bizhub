@@ -59,7 +59,10 @@
 <div class="formation-page" style="padding:2rem;">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;">
     <h2 style="font-size:1.5rem;color:var(--pg-text);margin:0;">Formations</h2>
-    <a href="{{ path('app_admin_formation_new') }}" class="btn btn-primary">+ Nouvelle formation</a>
+    <div class="d-flex flex-wrap gap-2">
+      <a href="{{ path('app_admin_elearning_participations_index') }}" class="btn btn-outline-info">Toutes les participations</a>
+      <a href="{{ path('app_admin_formation_new') }}" class="btn btn-primary">+ Nouvelle formation</a>
+    </div>
   </div>
 
   {% for label, messages in app.flashes %}
@@ -93,9 +96,9 @@
                 <td>{{ f.start_date ? f.start_date|date('d/m/Y') : '—' }}</td>
                 <td>{{ f.end_date ? f.end_date|date('d/m/Y') : '—' }}</td>
                 <td><span class="tag tag-money">{{ f.cost ?? '0.00' }} DT</span></td>
-                <td><span class="tag tag-location">{{ f.lieu ?: 'N/A' }}</span></td>
+                <td><span class="tag tag-location">{% if f.enLigne %}—{% else %}{{ f.lieu ?: 'N/A' }}{% endif %}</span></td>
                 <td>
-                  <span class="tag {{ f.enLigne ? 'tag-online' : 'tag-offline' }}">{{ f.enLigne ? 'En ligne' : 'Présentiel' }}</span>
+                  <span class="tag {{ f.enLigne ? 'tag-online' : 'tag-offline' }}">{{ f.enLigne ? 'En ligne' : 'Présentielle' }}</span>
                 </td>
                 <td><span class="tag tag-trainers">{{ f.maxFormateurs }}</span></td>
                 <td class="text-center">

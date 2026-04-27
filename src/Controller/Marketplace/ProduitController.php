@@ -3,6 +3,7 @@
 namespace App\Controller\Marketplace;
 
 use App\Entity\Marketplace\ProduitService;
+use App\Entity\UsersAvis\User;
 use App\Form\Marketplace\ProduitType;
 use App\Repository\Marketplace\ProduitServiceRepository;
 use App\Service\Marketplace\RecommendationService;
@@ -25,7 +26,7 @@ class ProduitController extends AbstractController
         if (!$user) {
             return $this->redirectToRoute('app_login');
         }
-        if ($user->getUserType() !== 'investisseur') {
+        if (($user instanceof User ? $user->getUserType() : null) !== 'investisseur') {
             $this->addFlash('error', '❌ Seuls les investisseurs peuvent créer et gérer des produits.');
             return $this->redirectToRoute('produit_index');
         }
@@ -36,7 +37,7 @@ class ProduitController extends AbstractController
     private function getUserId(): int
     {
         $user = $this->getUser();
-        return $user ? (int) $user->getUserId() : 0;
+        return $user ? (int) ($user instanceof User ? $user->getUserId() : null) : 0;
     }
 
     // ════════════════════════════════════════════════════════════════════
@@ -48,7 +49,7 @@ class ProduitController extends AbstractController
     {
         // Investors cannot browse the public catalog - redirect to their products
         $user = $this->getUser();
-        if ($user && $user->getUserType() === 'investisseur') {
+        if ($user && ($user instanceof User ? $user->getUserType() : null) === 'investisseur') {
             return $this->redirectToRoute('produit_mes');
         }
 
@@ -77,7 +78,8 @@ class ProduitController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
         // Investors cannot view product details (only startups can)
-        if ($this->getUser()->getUserType() === 'investisseur') {
+        $user = $this->getUser();
+        if ($user && ($user instanceof User ? $user->getUserType() : null) === 'investisseur') {
             return $this->redirectToRoute('produit_mes');
         }
         return $this->render('front/Marketplace/produits/show.html.twig', [

@@ -3,6 +3,7 @@
 namespace App\Controller\Marketplace;
 
 use App\Entity\Marketplace\Commande;
+use App\Entity\UsersAvis\User;
 use App\Entity\Marketplace\CommandeStatusHistory;
 use App\Repository\Marketplace\CommandeRepository;
 use App\Service\Marketplace\FactureService;
@@ -35,7 +36,7 @@ class PaymentController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        if ($commande->getIdClient() !== (int) $user->getUserId()) {
+        if ($commande->getIdClient() !== (int) ($user instanceof User ? $user->getUserId() : null)) {
             throw $this->createAccessDeniedException();
         }
 
@@ -67,7 +68,7 @@ class PaymentController extends AbstractController
                 ->setCommande($commande)
                 ->setStatutPrecedent(Commande::STATUT_CONFIRMEE)
                 ->setStatutNouveau(Commande::STATUT_EN_COURS_PAIEMENT)
-                ->setChangedByUserId((int) $user->getUserId())
+                ->setChangedByUserId((int) ($user instanceof User ? $user->getUserId() : null))
                 ->setNote('Session Stripe créée : ' . $session->id);
 
             $em->persist($history);

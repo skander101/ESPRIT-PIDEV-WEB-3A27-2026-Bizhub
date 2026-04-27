@@ -4,6 +4,7 @@
 {% block breadcrumb %}E-Learning / Formations / Modifier{% endblock %}
 
 {% block extra_stylesheets %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
     .formation-form-page .heading {
       display: flex;
@@ -50,5 +51,7 @@
 
 {% block javascripts %}
   {{ parent() }}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="{{ asset('js/formation-admin-map.js') }}"></script>
   <script src="{{ asset('js/elearning-forms-validation.js') }}"></script>
 {% endblock %}

@@ -1,0 +1,4 @@
+parameters:
+    # Default empty = Symfony uses PHP fallback recommender only.
+    # Example: RECOMMENDATIONS_API_URL=http://127.0.0.1:8765
+    env(RECOMMENDATIONS_API_URL): ''

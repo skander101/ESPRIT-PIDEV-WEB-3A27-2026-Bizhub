@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Front;
 
 use App\Entity\Elearning\Formation;
@@ -12,9 +14,14 @@ use App\Repository\Elearning\FormationRepository;
 use App\Repository\Elearning\ParticipationRepository;
 use App\Repository\TrainingRequestRepository;
 use App\Repository\UsersAvis\AvisRepository;
+use App\Entity\Elearning\FormationRecommendationEvent;
+use App\Service\Elearning\FormationAiBestPickService;
+use App\Service\Elearning\FormationLocationPresentationService;
+use App\Service\Elearning\FormationRecommendationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -30,6 +37,9 @@ class FormationController extends AbstractController
         private readonly ParticipationRepository $participationRepository,
         private readonly TrainingRequestRepository $trainingRequestRepository,
         private readonly AvisRepository $avisRepository,
+        private readonly FormationLocationPresentationService $formationLocationPresentationService,
+        private readonly FormationRecommendationService $formationRecommendationService,
+        private readonly FormationAiBestPickService $formationAiBestPickService,
     ) {
     }
 
@@ -46,7 +56,7 @@ class FormationController extends AbstractController
         $isFormateur = $user->getUserType() === 'formateur';
         $reviewsByFormation = $this->avisRepository->findVisibleGroupedByFormations($formations);
         $already = [];
-        $forms = [];
+        $awaitingPayment = [];
         $userReviews = [];
         $trainerRequests = [];
         $approvedFormateursByFormation = [];
@@ -56,35 +66,81 @@ class FormationController extends AbstractController
 
             if ($isFormateur) {
                 $already[$formationId] = false;
+                $awaitingPayment[$formationId] = null;
                 $userReviews[$formationId] = null;
                 $trainerRequests[$formationId] = $this->trainingRequestRepository->findOneByUserAndFormation($user, $f);
                 continue;
             }
 
-            $p = $this->participationRepository->findOneByUserAndFormation($user, $f);
-            $already[$formationId] = $p !== null;
+            $paid = $this->participationRepository->findPaidByUserAndFormation($user, $f);
+            $await = $this->participationRepository->findAwaitingPaymentByUserAndFormation($user, $f);
+            $already[$formationId] = $paid !== null;
+            $awaitingPayment[$formationId] = $await?->getId_candidature();
             $userReview = $this->avisRepository->findOneByUserAndFormation($user, $f);
             $userReviews[$formationId] = $userReview;
-            if ($p === null) {
-                $participation = new Participation();
-                $participation->setUser($user);
-                $participation->setFormation($f);
-                $forms[$formationId] = $this->createForm(ParticipationType::class, $participation, [
-                    'admin_mode' => false,
-                ])->createView();
-            }
         }
 
         return $this->render('front/elearning/formations/index.html.twig', [
             'formations' => $formations,
             'already_participating' => $already,
-            'forms' => $forms,
+            'awaiting_payment_participation' => $awaitingPayment,
             'search_query' => $search,
             'reviews_by_formation' => $reviewsByFormation,
             'user_reviews' => $userReviews,
             'is_formateur' => $isFormateur,
             'trainer_requests' => $trainerRequests,
             'approved_formateurs_by_formation' => $approvedFormateursByFormation,
+            'reco' => $this->formationRecommendationService->getFormationsIndexBlocksForUser($user),
+        ]);
+    }
+
+    #[Route('/ai-meilleure-formation', name: 'app_front_formation_ai_best_pick', methods: ['POST'])]
+    public function aiMeilleureFormation(Request $request): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            return $this->json(['ok' => false, 'message' => 'Non authentifié.'], 401);
+        }
+
+        $payload = json_decode($request->getContent(), true);
+        if (!is_array($payload)) {
+            $payload = [];
+        }
+
+        $token = $payload['_token'] ?? $request->headers->get('X-CSRF-TOKEN') ?? '';
+        if (!$this->isCsrfTokenValid('formation_ai_best_pick', (string) $token)) {
+            return $this->json(['ok' => false, 'message' => 'Session expirée. Rechargez la page.'], 403);
+        }
+
+        $notes = isset($payload['notes']) && is_string($payload['notes']) ? $payload['notes'] : '';
+        $result = $this->formationAiBestPickService->suggestForUser($user, $notes);
+
+        if (!($result['ok'] ?? false)) {
+            return $this->json($result);
+        }
+
+        $fid = (int) ($result['formation_id'] ?? 0);
+        if ($fid <= 0) {
+            return $this->json(['ok' => false, 'message' => 'Réponse invalide.'], 500);
+        }
+
+        $result['url'] = $this->generateUrl('app_front_formation_show', ['formation_id' => $fid]);
+
+        return $this->json($result);
+    }
+
+    #[Route('/{formation_id}/location-qr.svg', name: 'app_front_formation_location_qr_svg', methods: ['GET'], requirements: ['formation_id' => '\d+'])]
+    public function locationQrSvg(
+        #[MapEntity(mapping: ['formation_id' => 'formation_id'])] Formation $formation,
+    ): Response {
+        $svg = $this->formationLocationPresentationService->locationQrSvgStringForFormation($formation);
+        if ($svg === null) {
+            throw $this->createNotFoundException();
+        }
+
+        return new Response($svg, Response::HTTP_OK, [
+            'Content-Type' => 'image/svg+xml; charset=utf-8',
+            'Cache-Control' => 'public, max-age=3600',
         ]);
     }
 
@@ -159,8 +215,8 @@ class FormationController extends AbstractController
             return $this->redirectToFormationsIndex($request);
         }
 
-        if ($this->participationRepository->findOneByUserAndFormation($user, $formation) === null) {
-            $this->addFlash('warning', 'Vous devez participer à cette formation avant de laisser un avis.');
+        if ($this->participationRepository->findPaidByUserAndFormation($user, $formation) === null) {
+            $this->addFlash('warning', 'Vous devez participer (paiement validé) à cette formation avant de laisser un avis.');
 
             return $this->redirectToFormationsIndex($request);
         }
@@ -225,16 +281,25 @@ class FormationController extends AbstractController
 
             return $this->redirectToFormationsIndex($request);
         }
-        if ($this->participationRepository->findOneByUserAndFormation($user, $formation) !== null) {
-            $this->addFlash('warning', 'Vous participez déjà à cette formation.');
 
-            return $this->redirectToFormationsIndex($request);
+        if ($this->participationRepository->findPaidByUserAndFormation($user, $formation) !== null) {
+            $this->addFlash('warning', 'Vous êtes déjà inscrit (payé) à cette formation.');
+
+            return $this->redirectToFormationShow($formation);
+        }
+
+        $awaiting = $this->participationRepository->findAwaitingPaymentByUserAndFormation($user, $formation);
+        if ($awaiting !== null) {
+            $this->addFlash('info', 'Finalisez votre paiement pour confirmer votre inscription.');
+
+            return $this->redirectToRoute('app_payment_checkout', ['id' => $awaiting->getId_candidature()]);
         }
 
         $participation = new Participation();
         $participation->setUser($user);
         $participation->setFormation($formation);
-        $participation->setPayment_status('PENDING');
+        $participation->setStatus(Participation::STATUS_AWAITING_PAYMENT);
+        $participation->setPaymentStatus('PENDING');
         $cost = $formation->getCost();
         $participation->setAmount($cost !== null && $cost !== '' ? (string) $cost : '0.00');
 
@@ -244,16 +309,65 @@ class FormationController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->entityManager->persist($participation);
             $this->entityManager->flush();
-            $this->addFlash('success', 'Votre demande de participation a été enregistrée.');
 
-            return $this->redirectToFormationsIndex($request);
+            $recoSection = $request->request->getString('reco_section');
+            $allowedReco = [
+                FormationRecommendationEvent::SECTION_PERSONALIZED,
+                FormationRecommendationEvent::SECTION_TRENDING,
+                FormationRecommendationEvent::SECTION_POPULAR,
+                FormationRecommendationEvent::SECTION_NEW,
+            ];
+            if ($recoSection !== '' && in_array($recoSection, $allowedReco, true)) {
+                $ev = new FormationRecommendationEvent();
+                $ev->setUser($user);
+                $ev->setFormation($formation);
+                $ev->setSection($recoSection);
+                $ev->setEventType(FormationRecommendationEvent::EVENT_ENROLL);
+                $ev->setCreatedAt(new \DateTimeImmutable());
+                $this->entityManager->persist($ev);
+                $this->entityManager->flush();
+            }
+
+            $this->addFlash('success', 'Inscription créée — procédez au paiement sécurisé.');
+
+            return $this->redirectToRoute('app_payment_checkout', ['id' => (int) $participation->getId_candidature()]);
         }
 
         foreach ($form->getErrors(true) as $error) {
             $this->addFlash('danger', $error->getMessage());
         }
 
-        return $this->redirectToFormationsIndex($request);
+        return $this->redirectToFormationShow($formation);
+    }
+
+    #[Route('/{formation_id}', name: 'app_front_formation_show', methods: ['GET'], requirements: ['formation_id' => '\d+'])]
+    public function show(
+        #[MapEntity(mapping: ['formation_id' => 'formation_id'])] Formation $formation,
+    ): Response {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $isFormateur = $user->getUserType() === 'formateur';
+        $paid = $this->participationRepository->findPaidByUserAndFormation($user, $formation);
+        $await = $this->participationRepository->findAwaitingPaymentByUserAndFormation($user, $formation);
+
+        $participationFormView = null;
+        if (!$isFormateur && $paid === null && $await === null) {
+            $p = new Participation();
+            $p->setUser($user);
+            $p->setFormation($formation);
+            $participationFormView = $this->createForm(ParticipationType::class, $p, ['admin_mode' => false])->createView();
+        }
+
+        return $this->render('front/elearning/formations/show.html.twig', [
+            'formation' => $formation,
+            'is_formateur' => $isFormateur,
+            'already_paid' => $paid !== null,
+            'awaiting_participation_id' => $await?->getId_candidature(),
+            'participation_form' => $participationFormView,
+        ]);
     }
 
     /**
@@ -277,6 +391,15 @@ class FormationController extends AbstractController
         return $this->redirectToRoute(
             'app_front_formations_index',
             $this->formationsIndexQueryParams($request),
+            Response::HTTP_SEE_OTHER
+        );
+    }
+
+    private function redirectToFormationShow(Formation $formation): Response
+    {
+        return $this->redirectToRoute(
+            'app_front_formation_show',
+            ['formation_id' => $formation->getFormation_id()],
             Response::HTTP_SEE_OTHER
         );
     }

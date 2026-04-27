@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backlog — Sprint Tasks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --bg:          #f0f2f7;
+            --surface:     #ffffff;
+            --surface2:    #f7f8fc;
+            --border:      #dde0eb;
+            --border-soft: #eaecf4;
+            --text:        #1a1d2e;
+            --text-muted:  #6b7080;
+            --text-dim:    #b0b5c8;
+
+            --ctrl:        #1a6fdb;
+            --ctrl-bg:     rgba(26,111,219,.07);
+            --ctrl-border: rgba(26,111,219,.22);
+
+            --svc:         #0f9a6a;
+            --svc-bg:      rgba(15,154,106,.07);
+            --svc-border:  rgba(15,154,106,.22);
+
+            --twig:        #c47a00;
+            --twig-bg:     rgba(196,122,0,.07);
+            --twig-border: rgba(196,122,0,.22);
+
+            --env:         #7c3aed;
+            --env-bg:      rgba(124,58,237,.07);
+
+            --accent:      #1a6fdb;
+            --radius:      6px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Syne', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 32px 28px;
+            min-height: 100vh;
+        }
+
+        /* ── Toolbar ── */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+
+        .title {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -.3px;
+            color: var(--text);
+            margin-right: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .title::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        .filter-buttons { display: flex; gap: 6px; }
+
+        .btn {
+            padding: 7px 16px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            border-radius: var(--radius);
+            font-family: 'Syne', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            letter-spacing: .3px;
+            transition: all 0.18s ease;
+        }
+
+        .btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(77,158,255,.06);
+        }
+
+        .btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #0e0f13;
+        }
+
+        .btn-export {
+            background: transparent;
+            border: 1px solid var(--ctrl-border);
+            color: var(--ctrl);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-export::before {
+            content: '↓';
+            font-size: 14px;
+        }
+
+        .btn-export:hover {
+            background: var(--ctrl-bg);
+            border-color: var(--ctrl);
+            color: var(--ctrl);
+        }
+
+        .btn-export:disabled {
+            opacity: .4;
+            cursor: not-allowed;
+        }
+
+        /* ── Table container ── */
+        .container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+        }
+
+        /* ── Header ── */
+        thead tr {
+            background: var(--surface2);
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            padding: 13px 16px;
+            text-align: left;
+            font-family: 'Syne', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            border-right: 1px solid var(--border-soft);
+        }
+
+        th:last-child { border-right: none; }
+
+        .col-us     { width: 220px; }
+        .col-task   { width: 350px; }
+        .col-detail { width: auto; }
+
+        /* ── Cells ── */
+        td {
+            padding: 9px 16px;
+            border-right: 1px solid var(--border-soft);
+            font-size: 13px;
+            vertical-align: top;
+            transition: background .12s;
+        }
+
+        td:last-child { border-right: none; }
+
+        /* Row separators — only between US groups, handled via JS; baseline: */
+        tr { border-bottom: 1px solid transparent; }
+
+        .badge-ai {
+            display: inline-block;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+            background: rgba(124,58,237,.12);
+            border: 1px solid rgba(124,58,237,.3);
+            color: var(--env);
+            padding: 2px 7px;
+            border-radius: 4px;
+            margin-left: 4px;
+        }
+
+        /* Rowspan US cell */
+        td[rowspan="3"] {
+            border-right: 2px solid var(--border);
+            border-bottom: 2px solid var(--border);
+            background: var(--surface2);
+        }
+
+        /* Controller row */
+        .row-controller td {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border-soft);
+        }
+
+        .row-controller td.detail-cell {
+            border-left: 2px solid var(--ctrl);
+        }
+
+        /* Service row */
+        .row-service td {
+            background: rgba(0,0,0,.012);
+            border-bottom: 1px solid var(--border-soft);
+        }
+
+        .row-service td.detail-cell {
+            border-left: 2px solid var(--svc);
+        }
+
+        /* Twig row */
+        .row-twig td {
+            background: rgba(0,0,0,.018);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .row-twig td.detail-cell {
+            border-left: 2px solid var(--twig);
+        }
+
+        /* ── Badges ── */
+        .us-id {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--ctrl);
+            background: var(--ctrl-bg);
+            border: 1px solid var(--ctrl-border);
+            padding: 2px 7px;
+            border-radius: 4px;
+            margin-right: 5px;
+            letter-spacing: .3px;
+        }
+
+        .sprint-badge {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 5px;
+            letter-spacing: .3px;
+        }
+
+        .module-badge {
+            font-family: 'Syne', sans-serif;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 2px 7px;
+            border-radius: 4px;
+        }
+
+        .task-id {
+            font-family: 'DM Mono', monospace;
+            font-size: 9px;
+            color: var(--env);
+            background: var(--env-bg);
+            border: 1px solid rgba(201,126,255,.18);
+            padding: 1px 5px;
+            border-radius: 3px;
+            margin-right: 5px;
+            letter-spacing: .2px;
+        }
+
+        .us-content {
+            white-space: normal;
+            line-height: 1.5;
+        }
+
+        .us-text {
+            display: block;
+            margin-top: 5px;
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 400;
+            line-height: 1.45;
+        }
+
+        /* ── Layer label ── */
+        .layer-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: .6px;
+            text-transform: uppercase;
+        }
+
+        .row-controller .layer-label { color: var(--ctrl); }
+        .row-service    .layer-label { color: var(--svc); }
+        .row-twig       .layer-label { color: var(--twig); }
+
+        /* ── Chips ── */
+        .chip {
+            font-family: 'DM Mono', monospace;
+            font-size: 11.5px;
+            border-radius: 4px;
+            padding: 3px 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            border: 1px solid transparent;
+            line-height: 1.4;
+            transition: opacity .15s;
+        }
+
+        .chip-controller {
+            color: var(--ctrl);
+            background: var(--ctrl-bg);
+            border-color: var(--ctrl-border);
+        }
+
+        .chip-service {
+            color: var(--svc);
+            background: var(--svc-bg);
+            border-color: var(--svc-border);
+        }
+
+        .chip-twig {
+            color: var(--twig);
+            background: var(--twig-bg);
+            border-color: var(--twig-border);
+        }
+
+        .chip-env {
+            font-style: normal;
+            font-size: 10.5px;
+            color: var(--env);
+            background: var(--env-bg);
+            border-color: rgba(201,126,255,.18);
+            margin-left: 4px;
+        }
+
+        .chip-env::before { content: '⬡ '; font-style: normal; }
+
+        /* ── Empty us cell (service/twig rows) ── */
+        .row-service td:first-child,
+        .row-twig    td:first-child,
+        .row-service td:nth-child(2),
+        .row-twig    td:nth-child(2) {
+            background: transparent;
+        }
+
+        /* ── Zebra group ── */
+        tbody tr:hover td {
+            background: rgba(26,111,219,.035) !important;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+    </style>
+</head>
+<body>
+    <div class="toolbar">
+        <h1 class="title">Backlog — Sprint Tasks</h1>
+        <div class="filter-buttons" id="filters"></div>
+        <button class="btn btn-export" id="exportBtn" onclick="exportPNG()">Exporter PNG</button>
+    </div>
+
+    <div class="container" id="capture">
+        <table>
+            <thead>
+                <tr>
+                    <th class="col-us">User Story</th>
+                    <th class="col-task">Tâche</th>
+                    <th class="col-detail">Détail technique</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        const data = [
+            // ── USER ─────────────────────────────────────────────────────
+            {
+                id: "US-001",
+                module: "User",
+                sprint: "1",
+                us: "En tant qu'utilisateur, je veux m'authentifier et gérer mon compte pour sécuriser mon accès",
+                tasks: [
+                    { id: "US-001-T01", desc: "Créer le formulaire de connexion",  paths: ["LoginController::showLoginForm"] },
+                    { id: "US-001-T02", desc: "Gérer l'authentification JWT",       paths: ["LoginController::login", ".env: JWT_SECRET"] },
+                    { id: "US-001-T03", desc: "Créer le formulaire d'inscription",  paths: ["SignupController::showSignupForm"] },
+                    { id: "US-001-T04", desc: "Gérer l'inscription utilisateur",    paths: ["SignupController::signup"] },
+                    { id: "US-001-T05", desc: "Mot de passe oublié",                paths: ["ForgotPasswordController::forgotPassword"] },
+                    { id: "US-001-T06", desc: "Réinitialiser le mot de passe",      paths: ["ForgotPasswordController::resetPassword", ".env: TOTP_SECRET"] }
+                ]
+            },
+            {
+                id: "US-002-AI",
+                module: "User",
+                sprint: "1",
+                us: "En tant qu'utilisateur, je veux utiliser les services IA pour l'authentification et la navigation",
+                tasks: [
+                    { id: "US-002-AI-T07", desc: "FacePlusPlus auth",        paths: ["FacePlusPlusController::detect",        "FacePlusPlusService.detect",        ".env: FACE_PLUS_KEY"] },
+                    { id: "US-002-AI-T08", desc: "Auth0 authentication",     paths: ["Auth0Controller::authenticate",         "Auth0Service.authenticate",         ".env: AUTH0_DOMAIN"] },
+                    { id: "US-002-AI-T09", desc: "AI database assistant",    paths: ["AiDatabaseAssistantController::query",  "AiDatabaseAssistantService.query",  ".env: OPENAI_KEY"] },
+                    { id: "US-002-AI-T10", desc: "Navigation Bot AI",        paths: ["AiNavigationBotController::navigate",   "AiNavigationBotService.navigate",   ".env: OPENAI_KEY"] }
+                ]
+            },
+            {
+                id: "US-003",
+                module: "User",
+                sprint: "1",
+                us: "En tant qu'utilisateur, je veux gérer mon profil pour mettre à jour mes informations",
+                tasks: [
+                    { id: "US-003-T01", desc: "Afficher le profil utilisateur",    paths: ["UserProfileController::showProfile"] },
+                    { id: "US-003-T02", desc: "Modifier le profil utilisateur",    paths: ["UserProfileController::updateProfile"] },
+                    { id: "US-003-T03", desc: "Gérer les utilisateurs (Admin)",    paths: ["UserManagementController::list"] },
+                    { id: "US-003-T04", desc: "Créer/modifier utilisateur",        paths: ["UserFormController::save"] },
+                    { id: "US-003-T05", desc: "Tableau de bord admin",             paths: ["AdminDashboardController::index"] },
+                    { id: "US-003-T06", desc: "Vérification utilisateur",          paths: ["VerificationController::verify", ".env: VERIFICATION_ENABLED"] },
+                    { id: "US-003-T07", desc: "Notification email",                paths: ["EmailController::send", "EmailService.send", ".env: SMTP_HOST"] }
+                ]
+            },
+            // ── INVESTISSEMENT ───────────────────────────────────────────
+            {
+                id: "US-004",
+                module: "Investissement",
+                sprint: "1",
+                us: "En tant qu'utilisateur, je veux gérer les investissements pour suivre les opportunités",
+                tasks: [
+                    { id: "US-004-T01", desc: "Lister les investissements",  paths: ["InvestmentsListController::index"] },
+                    { id: "US-004-T02", desc: "Ajouter un investissement",   paths: ["AddInvestmentController::create", ".env: STRIPE_KEY"] },
+                    { id: "US-004-T03", desc: "Lister les projets",          paths: ["ProjectsListController::index"] },
+                    { id: "US-004-T04", desc: "Ajouter un projet",           paths: ["AddProjectController::create"] },
+                    { id: "US-004-T05", desc: "Dashboard analytique",        paths: ["AnalyticsDashboardController::index"] },
+                    { id: "US-004-T06", desc: "Gestion des paiements",       paths: ["AddPaymentController::process", ".env: STRIPE_SECRET"] },
+                    { id: "US-004-T07", desc: "Pipeline des deals",          paths: ["DealPipelineController::index"] },
+                    { id: "US-004-T08", desc: "Négociations",                paths: ["NegotiationController::manage"] },
+                    { id: "US-004-T09", desc: "Liste des négociations",      paths: ["NegotiationListController::list"] }
+                ]
+            },
+            {
+                id: "US-005-AI",
+                module: "Investissement",
+                sprint: "1",
+                us: "En tant qu'investisseur, je veux utiliser l'IA pour analyser et optimiser mes investissements",
+                tasks: [
+                    { id: "US-005-T10", desc: "AI insights investissement",     paths: ["AiInsightsController::analyze",       "AiInsightsService.analyze",       ".env: OPENAI_KEY"] },
+                    { id: "US-005-T11", desc: "Contract AI review",             paths: ["ContractReviewController::review",     "ContractReviewService.review",     ".env: OPENROUTER_KEY"] },
+                    { id: "US-005-T01", desc: "Advisor AI recommendations",     paths: ["PortfolioAdvisorController::recommend",                                   ".env: OPENAI_KEY"] },
+                    { id: "US-005-T02", desc: "Smart search startups",          paths: ["SmartSearchController::search",                                            ".env: ALPHA_VANTAGE_KEY"] },
+                    { id: "US-005-T03", desc: "Enrichissement données IA",      paths: ["AIDemoController::enrich"] },
+                    { id: "US-005-T04", desc: "Analyse de marché",              paths: ["AnalyticsDashboardController::marketAnalysis",                             ".env: COINGECKO_KEY"] }
+                ]
+            },
+            // ── MARKETPLACE ──────────────────────────────────────────────
+            {
+                id: "US-006",
+                module: "Marketplace",
+                sprint: "1",
+                us: "En tant qu'utilisateur, je veux accéder au marketplace pour acheter/vendre",
+                tasks: [
+                    { id: "US-006-T01", desc: "Lister les produits/services",       paths: ["ProduitServiceController::list"] },
+                    { id: "US-006-T02", desc: "Gestion du panier",                  paths: ["PanierController::manage"] },
+                    { id: "US-006-T03", desc: "Passer une commande",                paths: ["CommandeController::passer"] },
+                    { id: "US-006-T04", desc: "Suivre une commande",                paths: ["CommandeTrackingController::track"] },
+                    { id: "US-006-T05", desc: "Service paiement marketplace",       paths: ["PaymentController::init", ".env: STRIPE_WEBHOOK"] }
+                ]
+            },
+            {
+                id: "US-007",
+                module: "Marketplace",
+                sprint: "1",
+                us: "En tant qu'utilisateur, je veux recevoir des notifications via les APIs externes",
+                tasks: [
+                    { id: "US-007-AI-T06", desc: "Infobip notifications",  paths: ["InfobipController::notify",   "InfobipService.notify",   ".env: INFOBIP_KEY"] },
+                    { id: "US-007-AI-T07", desc: "Notification SMS",       paths: ["TwilioSmsController::send",   "TwilioSmsService.send",   ".env: TWILIO_SID"] }
+                ]
+            },
+            {
+    id: "US-007-AI",
+    module: "Marketplace",
+    sprint: "2",
+    us: "En tant qu'utilisateur, je veux des recommandations IA pour mes achats",
+    tasks: [
+        { 
+            id: "US-007-AI-T01",
+            desc: "Analyse des préférences utilisateur",
+            paths: [
+                "PreferenceAnalysisController::analyze",
+                "PreferenceAnalysisService.analyze",
+                ".env: OPENAI_KEY"
+            ]
+        },
+        { 
+            id: "US-007-AI-T02",
+            desc: "Recommandations personnalisées",
+            paths: [
+                "RecommendationEngineController::get",
+                "RecommendationEngineService.get",
+                ".env: OPENAI_KEY"
+            ]
+        },
+        { 
+            id: "US-007-AI-T03",
+            desc: "Recherche intelligente IA",
+            paths: [
+                "AISearchController::search",
+                "AISearchService.search",
+                ".env: OPENAI_KEY"
+            ]
+        },
+        { 
+            id: "US-007-AI-T04",
+            desc: "Analyse des tendances",
+            paths: [
+                "TrendAnalysisController::analyze",
+                "TrendAnalysisService.analyze",
+                ".env: COINGECKO_KEY"
+            ]
+        },
+        { 
+            id: "US-007-AI-T05",
+            desc: "Chat assistant IA",
+            paths: [
+                "AIAssistantController::chat",
+                "AIAssistantService.chat",
+                ".env: GEMINI_KEY"
+            ]
+        }
+    ]
+},
+            
+            // ── ELEARNING ────────────────────────────────────────────────
+            {
+                id: "US-008",
+                module: "Elearning",
+                sprint: "1",
+                us: "En tant qu'utilisateur, je veux suivre des formations elearning",
+                tasks: [
+                    { id: "US-008-T01", desc: "Lister les formations",          paths: ["FormationManagementController::list"] },
+                    { id: "US-008-T02", desc: "Détails formation",              paths: ["FormationDetailsController::show"] },
+                    { id: "US-008-T03", desc: "Formulaire inscription",         paths: ["FormationFormController::register"] },
+                    { id: "US-008-T04", desc: "Gestion des participations",     paths: ["ParticipationManagementController::manage"] },
+                    { id: "US-008-T05", desc: "Formulaire participation",       paths: ["ParticipationFormController::submit"] },
+                    { id: "US-008-T06", desc: "Paiement formation",             paths: ["PaymentController::pay", ".env: STRIPE_KEY"] }
+                ]
+            },
+            {
+                id: "US-009-AI",
+                module: "Elearning",
+                sprint: "1",
+                us: "En tant qu'utilisateur, je veux utiliser les APIs externes pour les formations",
+                tasks: [
+                    { id: "US-009-AI-T07", desc: "Formation emailService",  paths: ["FormationEmailController::send",  "FormationEmailService.send",  ".env: SMTP_HOST"] },
+                    { id: "US-009-AI-T08", desc: "Google Meet",             paths: ["GoogleMeetController::create",    "GoogleMeetService.create",    ".env: GMEET_CLIENT_ID"] }
+                ]
+            },
+            // ── COMMUNITY ────────────────────────────────────────────────
+            {
+                id: "US-0010",
+                module: "Community",
+                sprint: "1",
+                us: "En tant qu'utilisateur, je veux interagir avec la communauté",
+                tasks: [
+                    { id: "US-0010-T01", desc: "Afficher les postes",      paths: ["ShowPostsController::index"] },
+                    { id: "US-0010-T02", desc: "Service réactions",        paths: ["ReactionController::react",    "ReactionService.react"] },
+                    { id: "US-0010-T03", desc: "Service commentaires",     paths: ["CommentController::add",       "CommentService.add"] },
+                    { id: "US-0010-T04", desc: "Service posts",            paths: ["PostController::create",       "PostService.create"] }
+                ]
+            },
+            {
+                id: "US-011-AI",
+                module: "Community",
+                sprint: "1",
+                us: "En tant qu'utilisateur, je veux utiliser les APIs IA et géolocalisation dans la communauté",
+                tasks: [
+                    { id: "US-011-AI-T05", desc: "Géolocalisation",       paths: ["GeoLocationController::locate",  "GeoLocationService.locate",  ".env: GOOGLE_MAPS_KEY"] },
+                    { id: "US-011-AI-T06", desc: "Chat AI assistant",     paths: ["AiChatController::chat",                                       ".env: GEMINI_KEY"] }
+                ]
+            }
+        ];
+
+        let currentFilter = 'Tous';
+
+        function init() {
+            renderFilters();
+            render();
+        }
+
+        function renderFilters() {
+            const filters = document.getElementById('filters');
+            const sprints = ['Tous', '1'];
+            filters.innerHTML = sprints.map(s => 
+                `<button class="btn ${s === currentFilter ? 'active' : ''}" data-filter="${s}">${s === 'Tous' ? 'Tous' : 'Sprint ' + s}</button>`
+            ).join('');
+
+            filters.querySelectorAll('.btn').forEach(btn => {
+                btn.addEventListener('click', () => filter(btn.dataset.filter));
+            });
+        }
+
+        function filter(sprint) {
+            currentFilter = sprint;
+            renderFilters();
+            render();
+        }
+
+        function parseController(path) {
+            if (!path.includes('Controller::')) return null;
+            const parts = path.split('::');
+            const controllerFull = parts[0];
+            const method = parts[1];
+            const controllerName = controllerFull.replace('Controller', '') + 'Controller';
+            return { controllerName, method, file: controllerName + '.php' };
+        }
+
+        function parseService(path) {
+            if (path.includes('Service.') || (path.includes('Service') && !path.includes('Controller'))) {
+                const match = path.match(/(\w+)Service\.(\w+)/);
+                if (match) {
+                    return { method: match[2], className: match[1] + 'Service', file: match[1] + 'Service.php' };
+                }
+            }
+            return null;
+        }
+
+        function inferService(controllerPath) {
+            if (!controllerPath) return null;
+            const match = controllerPath.match(/(\w+)Controller/);
+            if (match) {
+                return { method: null, className: match[1] + 'Service', file: match[1] + 'Service.php' };
+            }
+            return null;
+        }
+
+        function serviceDesc(desc) {
+            const map = [
+                [/connexion|login/i,               "Vérifier les identifiants"],
+                [/authentif|JWT|Auth0/i,            "Valider le token & session"],
+                [/inscription|signup/i,             "Enregistrer l'utilisateur"],
+                [/mot de passe oublié/i,            "Générer le lien de reset"],
+                [/réinitialiser.*mot de passe/i,    "Mettre à jour le mot de passe"],
+                [/FacePlusPlus/i,                   "Analyser la biométrie faciale"],
+                [/navigation bot/i,                 "Orchestrer la navigation IA"],
+                [/database assistant/i,             "Interroger la base de données"],
+                [/profil.*affich|affich.*profil/i,  "Récupérer les données profil"],
+                [/profil.*modif|modif.*profil/i,    "Persister les modifications"],
+                [/utilisateur.*admin|gérer.*util/i, "Lister & filtrer les comptes"],
+                [/créer.*utilisateur|formulaire.*util/i, "Valider & sauvegarder"],
+                [/tableau de bord|dashboard/i,      "Agréger les statistiques"],
+                [/vérification/i,                   "Envoyer le code de vérif."],
+                [/notification.*email|email/i,      "Composer & envoyer l'email"],
+                [/investissement.*list|lister.*invest/i, "Récupérer les investissements"],
+                [/ajouter.*invest/i,                "Persister l'investissement"],
+                [/projets.*list|lister.*projet/i,   "Récupérer les projets"],
+                [/ajouter.*projet/i,                "Créer le projet en base"],
+                [/analytique|analyse de marché/i,   "Calculer les indicateurs"],
+                [/paiement|payment/i,               "Traiter la transaction"],
+                [/pipeline|deal/i,                  "Gérer l'état du pipeline"],
+                [/négociation.*liste/i,             "Lister les négociations"],
+                [/négociation/i,                    "Mettre à jour la négociation"],
+                [/AI insights|contract.*review/i,   "Analyser via l'IA"],
+                [/smart search|enrichissement/i,    "Enrichir les données"],
+                [/produit|service.*list/i,          "Récupérer le catalogue"],
+                [/panier/i,                         "Calculer le panier"],
+                [/commande.*pass/i,                 "Créer la commande"],
+                [/commande.*suiv/i,                 "Mettre à jour le statut"],
+                [/infobip/i,                        "Envoyer la notification push"],
+                [/SMS|twilio/i,                     "Envoyer le SMS"],
+                [/avis.*créer/i,                    "Enregistrer l'avis"],
+                [/avis.*gestion/i,                  "Modérer les avis"],
+                [/statistique/i,                    "Calculer les moyennes"],
+                [/formations.*list/i,               "Récupérer les formations"],
+                [/formation.*détail/i,              "Charger le détail formation"],
+                [/inscription.*form/i,              "Valider l'inscription"],
+                [/participation.*gestion/i,         "Gérer les participations"],
+                [/participation.*form/i,            "Enregistrer la participation"],
+                [/formation.*email/i,               "Envoyer la confirmation"],
+                [/google meet/i,                    "Créer le lien de réunion"],
+                [/posts.*affich/i,                  "Récupérer les posts"],
+                [/réaction/i,                       "Persister la réaction"],
+                [/commentaire/i,                    "Persister le commentaire"],
+                [/posts.*service/i,                 "Créer & diffuser le post"],
+                [/géolocalisation/i,                "Résoudre les coordonnées"],
+                [/chat.*AI|AI.*chat/i,              "Appeler l'API IA"],
+            ];
+            for (const [pattern, label] of map) {
+                if (pattern.test(desc)) return label;
+            }
+            return "Logique métier – " + desc.charAt(0).toLowerCase() + desc.slice(1);
+        }
+
+        function inferTwig(controllerPath) {
+            if (!controllerPath) return null;
+            const match = controllerPath.match(/(\w+)Controller::(\w+)/);
+            if (match) {
+                const controllerName = match[1];
+                const method = match[2];
+                const controllerFolder = controllerName.charAt(0).toLowerCase() + controllerName.slice(1).replace(/([A-Z])/g, '-$1').toLowerCase();
+                const methodSnake = method.replace(/([A-Z])/g, '_$1').toLowerCase();
+                return { file: controllerFolder + '/' + methodSnake + '.html.twig' };
+            }
+            return null;
+        }
+
+        function extractEnv(paths) {
+            return paths.filter(p => p.startsWith('.env:')).map(p => p.replace('.env: ', '').replace('.env:', ''));
+        }
+
+        function taskChip(cls, content) {
+            return `<span class="chip ${cls}">${content}</span>`;
+        }
+
+        function render() {
+            const tbody = document.getElementById('tableBody');
+            
+            const filtered = currentFilter === 'Tous' 
+                ? data 
+                : data.filter(item => item.sprint === currentFilter);
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="padding:40px;text-align:center;color:#999;">Aucune tâche trouvée</td></tr>';
+                return;
+            }
+
+            let html = '';
+
+            filtered.forEach(us => {
+                // Collect all chips for each layer across all tasks of this US
+                const ctrlChips   = [];
+                const svcChips    = [];
+                const twigChips   = [];
+                const ctrlTasks   = [];
+                const svcTasks    = [];
+
+                us.tasks.forEach(task => {
+                    const paths    = task.paths;
+                    const envVars  = extractEnv(paths);
+
+                    const controllerInfo  = parseController(paths.find(p => p.includes('Controller::')) || '');
+                    const servicePath     = paths.find(p => !p.includes('Controller::') && p.includes('Service') && p.includes('.'));
+                    const serviceInfo     = servicePath ? parseService(servicePath) : null;
+                    const inferredService = !serviceInfo ? inferService(paths.find(p => p.includes('Controller::')) || '') : null;
+                    const twigInfo        = inferTwig(paths.find(p => p.includes('Controller::')) || '');
+
+                    // Controller layer
+                    if (controllerInfo) {
+                        ctrlChips.push(taskChip('chip-controller', `${controllerInfo.method}() – ${controllerInfo.file}`));
+                    }
+                    envVars.forEach(e => ctrlChips.push(taskChip('chip-env', `.env: ${e}`)));
+                    ctrlTasks.push(`<span class="task-id">${task.id}</span>${task.desc}`);
+
+                    // Service layer
+                    if (serviceInfo) {
+                        svcChips.push(taskChip('chip-service', `${serviceInfo.method}() – ${serviceInfo.file}`));
+                    } else if (inferredService) {
+                        svcChips.push(taskChip('chip-service', `— – ${inferredService.file}`));
+                    }
+                    svcTasks.push(`<span class="task-id">${task.id}</span>${serviceDesc(task.desc)}`);
+
+                    // Twig layer
+                    if (twigInfo) {
+                        twigChips.push(taskChip('chip-twig', twigInfo.file));
+                    }
+                });
+
+                const isAI = us.id.includes('-AI');                const usCell = `
+                    <span class="us-content">
+                        <span class="us-id">${us.id}</span>
+                        <span class="sprint-badge">S${us.sprint}</span>
+                        <span class="module-badge">${us.module}</span>${isAI ? '<span class="badge-ai">⚡ IA</span>' : ''}
+                        <span class="us-text">${us.us}</span>
+                    </span>`;
+
+                const taskList = items => items.map(t =>
+                    `<span style="display:block;margin-top:5px;font-size:12px;color:var(--text);font-family:'DM Mono',monospace;line-height:1.6">${t}</span>`
+                ).join('');
+
+                html += `<tr class="row-controller">
+                    <td class="col-us" rowspan="3">${usCell}</td>
+                    <td class="col-task">
+                        <span class="layer-label">Controller</span>
+                        ${taskList(ctrlTasks)}
+                    </td>
+                    <td class="col-detail detail-cell">
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:flex-start">
+                            ${ctrlChips.length ? ctrlChips.join('') : '<span style="color:var(--text-dim);font-family:\'DM Mono\',monospace;font-size:12px">—</span>'}
+                        </div>
+                    </td>
+                </tr>`;
+
+                html += `<tr class="row-service">
+                    <td class="col-task">
+                        <span class="layer-label">Service</span>
+                        ${taskList(svcTasks)}
+                    </td>
+                    <td class="col-detail detail-cell">
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:flex-start">
+                            ${svcChips.length ? svcChips.join('') : '<span class="chip chip-service">—</span>'}
+                        </div>
+                    </td>
+                </tr>`;
+
+                html += `<tr class="row-twig">
+                    <td class="col-task">
+                        <span class="layer-label">Twig</span>
+                        <span style="display:block;margin-top:5px;font-size:12px;color:var(--text);font-family:'DM Mono',monospace">Interface HTML</span>
+                    </td>
+                    <td class="col-detail detail-cell">
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:flex-start">
+                            ${twigChips.length ? twigChips.join('') : '<span class="chip chip-twig">—</span>'}
+                        </div>
+                    </td>
+                </tr>`;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        async function exportPNG() {
+            const btn = document.getElementById('exportBtn');
+            const originalText = btn.textContent;
+            btn.textContent = 'Export en cours...';
+            btn.disabled = true;
+
+            try {
+                const element = document.getElementById('capture');
+                const canvas = await html2canvas(element, {
+                    backgroundColor: '#ffffff',
+                    scale: 2,
+                    logging: false,
+                    useCORS: true
+                });
+
+                const link = document.createElement('a');
+                link.download = 'backlog-final.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } catch (error) {
+                console.error('Export failed:', error);
+                alert('Erreur lors de l\'export. Veuillez réessayer.');
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

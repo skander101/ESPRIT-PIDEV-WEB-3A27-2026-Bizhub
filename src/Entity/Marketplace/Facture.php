@@ -19,7 +19,7 @@ class Facture
      * OneToOne vers Commande — une commande = une facture maximum.
      */
     #[ORM\OneToOne(targetEntity: Commande::class)]
-    #[ORM\JoinColumn(name: 'commande_id', referencedColumnName: 'id_commande', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(name: 'commande_id', referencedColumnName: 'commande_id', nullable: false, onDelete: 'CASCADE')]
     private ?Commande $commande = null;
 
     /**
@@ -29,16 +29,16 @@ class Facture
     private string $numeroFacture = '';
 
     #[ORM\Column(name: 'date_facture', type: 'datetime', nullable: false)]
-    private ?\DateTimeInterface $dateFacture = null;
+    private \DateTimeInterface $dateFacture;
 
-    #[ORM\Column(name: 'total_ht', type: 'decimal', precision: 10, scale: 3, nullable: false)]
-    private string $totalHt = '0.000';
+    #[ORM\Column(name: 'total_ht', type: 'decimal', precision: 10, scale: 2, nullable: false)]
+    private string $totalHt = '0.00';
 
-    #[ORM\Column(name: 'total_tva', type: 'decimal', precision: 10, scale: 3, nullable: false)]
-    private string $totalTva = '0.000';
+    #[ORM\Column(name: 'total_tva', type: 'decimal', precision: 10, scale: 2, nullable: false)]
+    private string $totalTva = '0.00';
 
-    #[ORM\Column(name: 'total_ttc', type: 'decimal', precision: 10, scale: 3, nullable: false)]
-    private string $totalTtc = '0.000';
+    #[ORM\Column(name: 'total_ttc', type: 'decimal', precision: 10, scale: 2, nullable: false)]
+    private string $totalTtc = '0.00';
 
     /**
      * Référence Stripe (session ID ou payment_intent ID).
@@ -47,7 +47,7 @@ class Facture
     private ?string $stripeRef = null;
 
     #[ORM\Column(name: 'created_at', type: 'datetime', nullable: false)]
-    private ?\DateTimeInterface $createdAt = null;
+    private \DateTimeInterface $createdAt;
 
     #[ORM\PrePersist]
     public function onPrePersist(): void
@@ -70,23 +70,11 @@ class Facture
     public function getNumeroFacture(): string { return $this->numeroFacture; }
     public function setNumeroFacture(string $v): self { $this->numeroFacture = $v; return $this; }
 
-    public function getDateFacture(): ?\DateTimeInterface { return $this->dateFacture; }
-    public function setDateFacture(?\DateTimeInterface $v): self { $this->dateFacture = $v; return $this; }
+public function getDateFacture(): \DateTimeInterface { return $this->dateFacture; }
+    protected function setDateFacture(\DateTimeInterface $v): self { $this->dateFacture = $v; return $this; }
 
-    public function getTotalHt(): string { return $this->totalHt; }
-    public function setTotalHt(string $v): self { $this->totalHt = $v; return $this; }
-
-    public function getTotalTva(): string { return $this->totalTva; }
-    public function setTotalTva(string $v): self { $this->totalTva = $v; return $this; }
-
-    public function getTotalTtc(): string { return $this->totalTtc; }
-    public function setTotalTtc(string $v): self { $this->totalTtc = $v; return $this; }
-
-    public function getStripeRef(): ?string { return $this->stripeRef; }
-    public function setStripeRef(?string $v): self { $this->stripeRef = $v; return $this; }
-
-    public function getCreatedAt(): ?\DateTimeInterface { return $this->createdAt; }
-    public function setCreatedAt(?\DateTimeInterface $v): self { $this->createdAt = $v; return $this; }
+    public function getCreatedAt(): \DateTimeInterface { return $this->createdAt; }
+    protected function setCreatedAt(\DateTimeInterface $v): self { $this->createdAt = $v; return $this; }
 
     public function __toString(): string { return $this->numeroFacture; }
 }

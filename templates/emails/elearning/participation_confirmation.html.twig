@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Confirmation BizHub</title>
+</head>
+<body style="margin:0;padding:0;background:#eef2f7;font-family:Inter,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+  {% set logo = absolute_url(asset('assets/front/images/logo.png')) %}
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#eef2f7;padding:24px 12px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 12px 40px rgba(15,23,42,0.12);">
+          <tr>
+            <td style="background:linear-gradient(135deg,#0f172a 0%,#0369a1 55%,#0ea5e9 100%);padding:28px 28px 22px;text-align:center;">
+              <img src="{{ logo }}" alt="BizHub" width="120" style="display:block;margin:0 auto 12px;border:0;" />
+              <div style="color:#e0f2fe;font-size:13px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;">Participation confirmée</div>
+              <h1 style="margin:10px 0 0;color:#ffffff;font-size:22px;line-height:1.25;font-weight:800;">Merci {{ user.fullName|default(user.email)|e }}</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:28px 28px 8px;color:#0f172a;font-size:15px;line-height:1.65;">
+              <p style="margin:0 0 16px;">Votre paiement a été <strong>validé</strong> et votre place pour la formation suivante est <strong>confirmée</strong>.</p>
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;margin:0 0 20px;">
+                <tr><td style="padding:16px 18px;">
+                  <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#64748b;font-weight:700;">Formation</div>
+                  <div style="font-size:17px;font-weight:800;color:#0f172a;margin:4px 0 12px;">{{ formation.title|e }}</div>
+                  <div style="font-size:13px;color:#475569;line-height:1.55;">
+                    <strong>Dates :</strong> {{ formation.startDate|date('d/m/Y') }} → {{ formation.endDate|date('d/m/Y') }}<br/>
+                    <strong>Modalité :</strong> {{ formation.enLigne ? 'En ligne' : 'Présentielle' }}<br/>
+                    {% if not formation.enLigne %}
+                      <strong>Lieu :</strong> {{ formation.lieu|default('—')|e }}<br/>
+                    {% endif %}
+                    <strong>Formateur :</strong> {{ formation.user ? formation.user.fullName|e : '—' }}<br/>
+                    <strong>Réf. transaction :</strong> {{ transaction_id|default('—')|e }}
+                  </div>
+                </td></tr>
+              </table>
+              {% if gift_promo is defined and gift_promo %}
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 22px;border-radius:16px;overflow:hidden;border:1px solid rgba(14,165,233,0.35);box-shadow:0 14px 40px rgba(3,105,161,0.18);">
+                  <tr>
+                    <td style="background:linear-gradient(135deg,#0c4a6e 0%,#0369a1 45%,#0ea5e9 100%);padding:22px 22px 18px;text-align:center;">
+                      <div style="display:inline-block;padding:6px 14px;border-radius:999px;background:rgba(255,255,255,0.15);color:#e0f2fe;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;">Premium</div>
+                      <h2 style="margin:12px 0 6px;color:#ffffff;font-size:20px;font-weight:800;line-height:1.25;">🎁 Cadeau exclusif pour vous</h2>
+                      <p style="margin:0;color:#bae6fd;font-size:14px;line-height:1.55;">Merci pour votre participation !</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="background:linear-gradient(180deg,#f0f9ff 0%,#ffffff 55%);padding:22px 22px 24px;text-align:center;">
+                      <p style="margin:0 0 10px;font-size:13px;color:#475569;">Votre code promo personnel :</p>
+                      <div style="display:inline-block;padding:12px 22px;border-radius:12px;background:#ffffff;border:2px dashed #38bdf8;font-family:ui-monospace,Consolas,monospace;font-size:20px;font-weight:900;color:#0c4a6e;letter-spacing:.08em;">{{ gift_promo.code|e }}</div>
+                      <table role="presentation" cellspacing="0" cellpadding="0" align="center" style="margin:18px auto 0;">
+                        <tr>
+                          <td style="background:linear-gradient(135deg,#22d3ee,#0369a1);border-radius:999px;padding:10px 22px;color:#ffffff;font-size:15px;font-weight:900;">-{{ gift_promo.discountPercent }}%<span style="font-weight:700;opacity:.9;font-size:12px;"> sur votre prochaine formation</span></td>
+                        </tr>
+                      </table>
+                      <p style="margin:16px 0 6px;font-size:13px;color:#64748b;">Valable jusqu’au <strong style="color:#0f172a;">{{ gift_promo.expiresAt|date('d/m/Y') }}</strong></p>
+                      <p style="margin:0;font-size:12px;color:#94a3b8;">Utilisable <strong>une seule fois</strong> sur votre prochaine inscription.</p>
+                      <div style="text-align:center;margin:22px 0 0;">
+                        <a href="{{ formations_url }}" style="display:inline-block;padding:14px 28px;border-radius:999px;background:linear-gradient(135deg,#0ea5e9,#0369a1);color:#ffffff;text-decoration:none;font-weight:800;font-size:14px;letter-spacing:.03em;">Participer à une autre formation</a>
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              {% endif %}
+              <p style="margin:0 0 18px;">Votre <strong>attestation PDF</strong> est jointe à cet email.</p>
+              <div style="text-align:center;margin:24px 0 8px;">
+                <a href="{{ formations_url }}" style="display:inline-block;padding:14px 26px;border-radius:999px;background:linear-gradient(135deg,#0ea5e9,#0369a1);color:#ffffff;text-decoration:none;font-weight:800;font-size:14px;letter-spacing:.04em;">Voir les formations</a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:0 28px 22px;text-align:center;">
+              <div style="height:1px;background:#e2e8f0;margin:8px 0 18px;"></div>
+              <div style="font-size:13px;color:#64748b;">
+                <a href="#" style="color:#0369a1;text-decoration:none;margin:0 8px;">LinkedIn</a>
+                <a href="#" style="color:#0369a1;text-decoration:none;margin:0 8px;">Twitter</a>
+                <a href="#" style="color:#0369a1;text-decoration:none;margin:0 8px;">Site</a>
+              </div>
+              <p style="margin:14px 0 0;font-size:11px;color:#94a3b8;">© {{ 'now'|date('Y') }} BizHub — E-learning &amp; innovation.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

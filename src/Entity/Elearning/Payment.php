@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
-use App\Repository\PaymentRepository;
+use App\Repository\Elearning\PaymentRepository;
 
 #[ORM\Entity(repositoryClass: PaymentRepository::class)]
 #[ORM\Table(name: 'payment')]
@@ -29,49 +29,35 @@ class Payment
     }
 
     #[ORM\Column(type: 'integer', nullable: false)]
-    private ?int $investment_id = null;
+    private int $investment_id;
 
-    public function getInvestment_id(): ?int
+    public function getInvestment_id(): int
     {
         return $this->investment_id;
     }
 
-    public function setInvestment_id(int $investment_id): self
+public function setInvestment_id(int $investment_id): self
     {
         $this->investment_id = $investment_id;
         return $this;
     }
 
-    #[ORM\Column(type: 'decimal', nullable: false)]
-    private ?float $amount = null;
-
-    public function getAmount(): ?float
-    {
-        return $this->amount;
-    }
-
-    public function setAmount(float $amount): self
-    {
-        $this->amount = $amount;
-        return $this;
-    }
-
     #[ORM\Column(type: 'datetime', nullable: false)]
-    private ?\DateTimeInterface $payment_date = null;
+    private \DateTimeInterface $payment_date;
 
-    public function getPayment_date(): ?\DateTimeInterface
+    public function getPayment_date(): \DateTimeInterface
     {
         return $this->payment_date;
     }
 
-    public function setPayment_date(\DateTimeInterface $payment_date): self
+    protected function setPayment_date(\DateTimeInterface $payment_date): self
     {
         $this->payment_date = $payment_date;
         return $this;
     }
 
     #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $payment_method = null;
+    private string $payment_method;
 
     public function getPayment_method(): ?string
     {
@@ -85,7 +71,7 @@ class Payment
     }
 
     #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $payment_status = null;
+    private string $payment_status;
 
     public function getPayment_status(): ?string
     {
@@ -99,7 +85,7 @@ class Payment
     }
 
     #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $transaction_reference = null;
+    private string $transaction_reference;
 
     public function getTransaction_reference(): ?string
     {
@@ -113,7 +99,7 @@ class Payment
     }
 
     #[ORM\Column(type: 'text', nullable: false)]
-    private ?string $notes = null;
+    private string $notes;
 
     public function getNotes(): ?string
     {

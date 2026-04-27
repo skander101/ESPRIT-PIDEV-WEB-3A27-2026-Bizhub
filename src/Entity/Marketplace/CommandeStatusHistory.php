@@ -16,7 +16,7 @@ class CommandeStatusHistory
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Commande::class)]
-    #[ORM\JoinColumn(name: 'commande_id', referencedColumnName: 'id_commande', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(name: 'commande_id', referencedColumnName: 'commande_id', nullable: false, onDelete: 'CASCADE')]
     private Commande $commande;
 
     #[ORM\Column(name: 'statut_precedent', type: 'string', length: 50, nullable: true)]

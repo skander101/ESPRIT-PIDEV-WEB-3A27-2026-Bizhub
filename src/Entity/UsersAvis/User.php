@@ -11,6 +11,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping\UniqueConstraint;
+use Symfony\Component\Serializer\Annotation\Ignore;
+use Symfony\Component\Security\core\util\SensitiveParameter;
 
 use App\Repository\UsersAvis\UserRepository;
 
@@ -30,6 +32,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     public function __construct()
     {
         $this->avis = new ArrayCollection();
+        $this->created_at = new \DateTime();
     }
 
     #[ORM\Id]
@@ -40,18 +43,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[ORM\Column(type: 'string', nullable: false)]
     #[Assert\NotBlank(message: 'Email is required')]
     #[Assert\Email(message: 'Please enter a valid email')]
-    private ?string $email = null;
+    private string $email;
 
     #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $password_hash = null;
+    private string $password_hash;
 
     #[ORM\Column(type: 'string', nullable: false)]
     #[Assert\NotBlank(message: 'Please select a user type')]
     #[Assert\Choice(choices: ['startup', 'fournisseur', 'formateur', 'investisseur'], message: 'Invalid user type')]
-    private ?string $user_type = null;
+    private string $user_type;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?\DateTimeInterface $created_at = null;
+    #[ORM\Column(type: 'datetime', nullable: false)]
+    private \DateTimeInterface $created_at;
 
     #[ORM\Column(type: 'boolean', nullable: true)]
     private ?bool $is_active = null;
@@ -59,7 +62,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[ORM\Column(type: 'string', nullable: false)]
     #[Assert\NotBlank(message: 'Full name is required')]
     #[Assert\Length(min: 2, max: 255, minMessage: 'Name must be at least 2 characters', maxMessage: 'Name must not exceed 255 characters')]
-    private ?string $full_name = null;
+    private string $full_name;
 
     #[ORM\Column(type: 'string', nullable: true)]
     #[Assert\Regex(
@@ -121,10 +124,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[Assert\Length(max: 255, maxMessage: 'Investment sector must not exceed 255 characters')]
     private ?string $investment_sector = null;
 
-    #[ORM\Column(type: 'decimal', nullable: true)]
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
     #[Assert\PositiveOrZero(message: 'Maximum budget must be a positive number.')]
     #[Assert\LessThanOrEqual(value: 1000000000, message: 'Maximum budget is too high.')]
-    private ?float $max_budget = null;
+    private ?string $max_budget = null;
 
     #[ORM\Column(type: 'integer', nullable: true)]
     #[Assert\Range(min: 0, max: 80, notInRangeMessage: 'Years of experience must be between {{ min }} and {{ max }}.')]
@@ -138,10 +141,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[Assert\Length(max: 255, maxMessage: 'Specialty must not exceed 255 characters')]
     private ?string $specialty = null;
 
-    #[ORM\Column(type: 'decimal', nullable: true)]
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
     #[Assert\PositiveOrZero(message: 'Hourly rate must be a positive number.')]
     #[Assert\LessThanOrEqual(value: 10000, message: 'Hourly rate is too high.')]
-    private ?float $hourly_rate = null;
+    private ?string $hourly_rate = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
     #[Assert\Length(max: 1000, maxMessage: 'Availability must not exceed 1000 characters')]
@@ -153,9 +156,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     private ?string $cv_url = null;
 
     #[ORM\Column(type: 'string', nullable: true)]
+    #[Ignore]
     private ?string $totp_secret = null;
 
     #[ORM\Column(type: 'string', nullable: true)]
+    #[Ignore]
     private ?string $face_token = null;
 
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
@@ -184,10 +189,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     public function setUserType(string $user_type): self { $this->user_type = $user_type; return $this; }
     public function setUser_type(string $user_type): self { $this->user_type = $user_type; return $this; }
 
-    public function getCreatedAt(): ?\DateTimeInterface { return $this->created_at; }
-    public function getCreated_at(): ?\DateTimeInterface { return $this->created_at; }
-    public function setCreatedAt(?\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
-    public function setCreated_at(?\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
+    public function getCreatedAt(): \DateTimeInterface { return $this->created_at; }
+    public function getCreated_at(): \DateTimeInterface { return $this->created_at; }
+    protected function setCreatedAt(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
+    protected function setCreated_at(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
 
     public function getIsActive(): ?bool { return $this->is_active; }
     public function is_active(): ?bool { return $this->is_active; }
@@ -265,10 +270,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     public function getInvestmentSector(): ?string { return $this->investment_sector; }
     public function setInvestmentSector(?string $investment_sector): self { $this->investment_sector = $investment_sector; return $this; }
 
-    public function getMax_budget(): ?float { return $this->max_budget; }
-    public function setMax_budget(?float $max_budget): self { $this->max_budget = $max_budget; return $this; }
-    public function getMaxBudget(): ?float { return $this->max_budget; }
-    public function setMaxBudget(?float $max_budget): self { $this->max_budget = $max_budget; return $this; }
+    public function getMax_budget(): ?string { return $this->max_budget; }
+    public function setMax_budget(?string $max_budget): self { $this->max_budget = $max_budget; return $this; }
+    public function getMaxBudget(): ?string { return $this->max_budget; }
+    public function setMaxBudget(?string $max_budget): self { $this->max_budget = $max_budget; return $this; }
 
     public function getYears_experience(): ?int { return $this->years_experience; }
     public function setYears_experience(?int $years_experience): self { $this->years_experience = $years_experience; return $this; }
@@ -283,10 +288,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     public function getSpecialty(): ?string { return $this->specialty; }
     public function setSpecialty(?string $specialty): self { $this->specialty = $specialty; return $this; }
 
-    public function getHourly_rate(): ?float { return $this->hourly_rate; }
-    public function setHourly_rate(?float $hourly_rate): self { $this->hourly_rate = $hourly_rate; return $this; }
-    public function getHourlyRate(): ?float { return $this->hourly_rate; }
-    public function setHourlyRate(?float $hourly_rate): self { $this->hourly_rate = $hourly_rate; return $this; }
+    public function getHourly_rate(): ?string { return $this->hourly_rate; }
+    public function setHourly_rate(?string $hourly_rate): self { $this->hourly_rate = $hourly_rate; return $this; }
+    public function getHourlyRate(): ?string { return $this->hourly_rate; }
+    public function setHourlyRate(?string $hourly_rate): self { $this->hourly_rate = $hourly_rate; return $this; }
 
     public function getAvailability(): ?string { return $this->availability; }
     public function setAvailability(?string $availability): self { $this->availability = $availability; return $this; }
@@ -297,11 +302,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     public function setCvUrl(?string $cv_url): self { $this->cv_url = $cv_url; return $this; }
 
     public function getTotp_secret(): ?string { return $this->totp_secret; }
-    public function setTotp_secret(?string $totp_secret): self { $this->totp_secret = $totp_secret; return $this; }
+    public function setTotp_secret(#[SensitiveParameter] ?string $totp_secret): self { $this->totp_secret = $totp_secret; return $this; }
     public function getTotpSecret(): ?string { return $this->totp_secret; }
 
     public function getFace_token(): ?string { return $this->face_token; }
-    public function setFace_token(?string $face_token): self { $this->face_token = $face_token; return $this; }
+    public function setFace_token(#[SensitiveParameter] ?string $face_token): self { $this->face_token = $face_token; return $this; }
     public function getFaceToken(): ?string { return $this->face_token; }
 
     public function getFaceEnrolledAt(): ?\DateTimeImmutable { return $this->face_enrolled_at; }

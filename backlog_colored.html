@@ -1,0 +1,406 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Arial,sans-serif;background:#f8fafc;padding:1rem;}
+.toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;}
+.filters{display:flex;gap:6px;flex-wrap:wrap;}
+.filter-btn{font-size:13px;padding:4px 12px;border-radius:20px;border:1px solid #ccc;background:#fff;color:#555;cursor:pointer;transition:all .15s;}
+.filter-btn.active{background:#1a1a1a;color:#fff;border-color:#1a1a1a;}
+.export-btn{font-size:13px;padding:5px 16px;border-radius:6px;border:none;background:#1a1a1a;color:#fff;cursor:pointer;display:flex;align-items:center;gap:6px;}
+.export-btn:hover{opacity:.8;}
+#capture{background:#fff;border:1px solid #ddd;border-radius:6px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07);}
+table{table-layout:fixed;width:100%;border-collapse:collapse;font-size:13px;background:#fff;}
+thead th{background:#1e293b;color:#f1f5f9;font-weight:700;font-size:12px;padding:9px 10px;border:1px solid #0f172a;text-align:left;letter-spacing:.3px;}
+td{border:1px solid #e2e8f0;padding:6px 9px;vertical-align:middle;font-size:12px;line-height:1.4;color:#1e293b;}
+
+/* Sprint bands */
+.s1{background:#eff6ff;}
+.s2{background:#f0fdf4;}
+.s3{background:#fefce8;}
+.s4{background:#fff1f2;}
+
+/* US group top border */
+tr.us-first td{border-top:2px solid #94a3b8!important;}
+
+/* Sprint cell */
+.cell-sprint{text-align:center;font-weight:800;font-size:11px;letter-spacing:.6px;text-transform:uppercase;width:50px;border-right:2px solid rgba(0,0,0,.12);}
+.s1 .cell-sprint{color:#1d4ed8;}
+.s2 .cell-sprint{color:#15803d;}
+.s3 .cell-sprint{color:#854d0e;}
+.s4 .cell-sprint{color:#be123c;}
+
+/* US ID */
+.cell-us-id{text-align:center;width:44px;border-right:2px solid rgba(0,0,0,.1);}
+.us-badge{display:inline-block;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:700;color:#fff;white-space:nowrap;}
+.s1 .us-badge{background:#2563eb;}
+.s2 .us-badge{background:#16a34a;}
+.s3 .us-badge{background:#ca8a04;}
+.s4 .us-badge{background:#e11d48;}
+
+/* Task ID */
+.cell-task-id{text-align:center;width:40px;border-right:1px solid rgba(0,0,0,.08);}
+.t-badge{display:inline-block;padding:1px 5px;border-radius:8px;font-size:10px;font-weight:700;color:#fff;white-space:nowrap;}
+.s1 .t-badge{background:#93c5fd;color:#1e3a8a;}
+.s2 .t-badge{background:#86efac;color:#14532d;}
+.s3 .t-badge{background:#fde047;color:#713f12;}
+.s4 .t-badge{background:#fda4af;color:#881337;}
+
+/* Layer label */
+.cell-layer{width:76px;font-size:10px;font-weight:700;text-align:center;border-right:1px solid rgba(0,0,0,.08);letter-spacing:.2px;text-transform:uppercase;}
+.lbl-ctrl{color:#1d4ed8;}
+.lbl-svc{color:#15803d;}
+.lbl-twig{color:#b45309;}
+
+.cell-us{font-style:italic;font-size:12px;width:175px;color:#334155;}
+.cell-task{width:150px;font-size:12px;color:#1e293b;}
+.cell-detail{width:auto;}
+
+/* chips */
+.chip{font-family:'Courier New',monospace;font-size:11px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:3px;padding:2px 6px;display:inline-block;margin-right:3px;}
+.chip .method{font-weight:700;color:#0f172a;}
+.chip .sep{margin:0 3px;color:#94a3b8;}
+.chip .file{font-weight:600;color:#475569;}
+.chip-twig{background:#fffbeb;border-color:#fcd34d;}
+.chip-twig .tpl{font-weight:700;color:#92400e;}
+.chip-env{background:#f1f5f9;border-color:#cbd5e1;font-style:italic;}
+.chip-env .env-key{color:#64748b;font-size:10px;}
+.chip-na{background:#f8fafc;border-color:#e2e8f0;color:#94a3b8;font-style:italic;}
+</style>
+
+<div class="toolbar">
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <span style="font-size:19px;font-weight:700;color:#1a1a1a;">Backlog — Sprint Tasks</span>
+    <div class="filters">
+      <button class="filter-btn active" data-sprint="all">Tous</button>
+      <button class="filter-btn" data-sprint="1">Sprint 1</button>
+      <button class="filter-btn" data-sprint="2">Sprint 2</button>
+      <button class="filter-btn" data-sprint="3">Sprint 3</button>
+      <button class="filter-btn" data-sprint="4">Sprint 4</button>
+    </div>
+  </div>
+  <button class="export-btn" onclick="exportPNG()">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 2v8M5 7l3 3 3-3M2 12v1a1 1 0 001 1h10a1 1 0 001-1v-1"/></svg>
+    Exporter PNG
+  </button>
+</div>
+
+<div id="capture">
+  <table>
+    <thead>
+      <tr>
+        <th style="width:50px;">Sprint</th>
+        <th style="width:44px;">US</th>
+        <th style="width:40px;">Tâche</th>
+        <th style="width:76px;">Couche</th>
+        <th style="width:175px;">User Story</th>
+        <th style="width:150px;">Description</th>
+        
+        <th style="width:auto;">Détail technique (Méthode / Contrôleur / Fichier)</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<script>
+const twigMap={
+  "UserController::login":"login.html.twig",
+  "UserController::loginWithTotp":"auth/totp_login.html.twig",
+  "UserController::loginWithFace":"auth/face_login.html.twig",
+  "UserController::register":"register.html.twig",
+  "AdminController::userIndex":"back/user/index.html.twig",
+  "AdminController::userDelete":null,
+  "AdminController::userEdit":"back/user/edit.html.twig",
+  "FormationController::new":"back/elearning/formation/new.html.twig",
+  "FormationController::index":"back/elearning/formation/index.html.twig",
+  "FormationController::delete":null,
+  "FormationController::approveRequest":null,
+  "ParticipationController::new":"back/elearning/participation/new.html.twig",
+  "Front/FormationController::apply":null,
+  "Front/FormationController::participate":null,
+  "Front/FormationController::review":null,
+  "AvisController::create":"front/avis/new.html.twig",
+  "AvisController::show":"front/avis/show.html.twig",
+  "ProduitController::index":"front/Marketplace/produits/index.html.twig",
+  "ProduitController::new":"front/Marketplace/produits/form.html.twig",
+  "CommandeController::passer":null,
+  "CommandeController::recues":"front/Marketplace/commandes/investisseur.html.twig",
+  "CommandeController::confirmer":null,
+  "PaymentController::initier":null,
+  "FactureController::show":"front/Marketplace/facture/show.html.twig",
+  "TrackingController::index":"front/Marketplace/tracking/index.html.twig",
+  "TrackingController::show":"front/Marketplace/tracking/show.html.twig",
+  "MarketAnalysisController::produit":"front/Marketplace/market_analysis/show.html.twig",
+  "MarketAnalysisController::commande":"front/Marketplace/market_analysis/show.html.twig",
+  "Front/ProjetFrontController::new":"front/projet/new.html.twig",
+  "Front/ProjetFrontController::index":"front/projet/index.html.twig",
+  "Front/ProjetFrontController::show":"front/projet/show.html.twig",
+  "FrontInvestissementController::investir":"front/investissement/invest.html.twig",
+  "InvestissementApiController::accepterInvestissement":null,
+  "NegociationController::creer":null,
+  "NegociationController::show":"front/negociation/show.html.twig",
+  "NegociationController::accepter":null,
+  "DealController::payer":null,
+  "DealController::show":"front/deal/show.html.twig",
+  "DealController::yousignSend":null,
+  "DashboardInvestisseurController::index":"front/dashboard/investisseur.html.twig",
+  "AiAssistantController::page":"front/ai/chat.html.twig",
+  "AiAssistantController::index":"front/ai/chat.html.twig",
+  "PostController::index":"front/community/index.html.twig",
+  "CommentaireController::add":"front/community/comment.html.twig",
+};
+
+function getTwig(ctrlFile,method){
+  const key=ctrlFile+"::"+method;
+  return twigMap[key]||null;
+}
+
+function buildLayers(paths){
+  const ps=paths.filter(p=>p.trim());
+  let ctrlPath="",ctrlMethod="",ctrlFile="";
+  let svcPath="",svcMethod="",svcFile="";
+  const envs=[];
+
+  ps.forEach(p=>{
+    if(p.startsWith(".env:")){
+      envs.push(p.replace(".env:",""));
+      return;
+    }
+    const arrowIdx=p.indexOf("→");
+    if(arrowIdx===-1)return;
+    const before=p.substring(0,arrowIdx).trim();
+    const after=p.substring(arrowIdx+2).trim();
+    const method=after.replace(/\(l\.\d+\)/,"").trim().replace(/\(\)$/,"");
+    if(method==="page")method="index";
+    const file=before.split("/").pop();
+
+    if(before.includes("/Controller/")){
+      ctrlPath=before;
+      ctrlMethod=method;
+      const parts=before.split("/");
+      ctrlFile=parts[parts.length-1].replace(".php","");
+    }else if(before.includes("/Service/")){
+      svcPath=before;
+      svcMethod=method;
+      svcFile=file;
+    }
+  });
+
+  if(!svcPath&&ctrlPath){
+    const parts=ctrlPath.split("/");
+    const ns=parts.slice(2,parts.length-1).join("/");
+    const ctrlFileRaw=parts[parts.length-1];
+    const svcNs=ns.replace("/Controller/","/Service/");
+    const svcClassRaw=ctrlFileRaw.replace("Controller.php","Service.php");
+    svcPath="src/"+svcNs+"/"+svcClassRaw;
+    svcMethod=ctrlMethod;
+    svcFile=svcClassRaw;
+  }
+
+  const twig=getTwig(ctrlFile,ctrlMethod);
+
+  return{
+    ctrl:{m:ctrlMethod,f:ctrlFile,twig:twig},
+    svc:{m:svcMethod,f:svcFile},
+    envs
+  };
+}
+
+const data=[
+{sprint:"1",us:"En tant qu'Utilisateur, je veux me connecter avec un mot de passe et un code TOTP, afin de sécuriser l'accès à mon compte.",tasks:[
+{desc:"Mettre en place le formulaire de login avec champ mot de passe",paths:["src/Controller/UsersAvis/UserController.php → login() (l.139)"]},
+{desc:"Implémenter la génération et vérification du code TOTP",paths:["src/Controller/UsersAvis/UserController.php → loginWithTotp() (l.162)"]},
+{desc:"Intégrer le service UserService pour l'authentification",paths:["src/Controller/UsersAvis/UserController.php → login() (l.139)"]},
+]},
+{sprint:"1",us:"En tant qu'Utilisateur, je veux me connecter via la reconnaissance faciale, afin de simplifier et sécuriser mon authentification.",tasks:[
+{desc:"Implémenter la capture et l'envoi de l'image faciale",paths:["src/Controller/UsersAvis/UserController.php → loginWithFace() (l.232)"]},
+{desc:"Intégrer la vérification faciale dans le contrôleur de login",paths:["src/Controller/UsersAvis/UserController.php → loginWithFace() (l.232)",".env: FACE_API_KEY, FACE_API_SECRET"]},
+{desc:"Brancher le service utilisateur pour valider la session",paths:["src/Controller/UsersAvis/UserController.php → loginWithFace() (l.232)"]},
+]},
+{sprint:"1",us:"En tant que Nouveau membre, je veux m'inscrire avec des champs propres à mon rôle, afin de créer un compte adapté à mon profil.",tasks:[
+{desc:"Créer le formulaire d'inscription avec champs dynamiques par rôle",paths:["src/Controller/UsersAvis/UserController.php → register() (l.59)"]},
+{desc:"Implémenter la méthode de création de compte",paths:["src/Controller/UsersAvis/UserController.php → register() (l.59)"]},
+]},
+{sprint:"1",us:"En tant qu'Administrateur, je veux gérer les comptes utilisateurs, afin de maintenir la qualité et la sécurité de la plateforme.",tasks:[
+{desc:"Créer l'interface de liste et de gestion des utilisateurs",paths:["src/Controller/Admin/AdminController.php → userIndex() (l.54)"]},
+{desc:"Implémenter les actions ban/unban/delete dans le contrôleur",paths:["src/Controller/Admin/AdminController.php → userDelete() (l.406)"]},
+{desc:"Brancher les méthodes de service pour la mise à jour des rôles",paths:["src/Controller/Admin/AdminController.php → userEdit() (l.430)"]},
+]},
+{sprint:"2",us:"En tant que Formateur, je veux créer et gérer des formations, afin de proposer du contenu pédagogique aux participants.",tasks:[
+{desc:"Créer le formulaire d'ajout et d'édition de formation",paths:["src/Controller/Admin/FormationController.php → new() (l.40)"]},
+{desc:"Implémenter la gestion des formations",paths:["src/Controller/Admin/FormationController.php → index() (l.32)"]},
+{desc:"Gérer la liste et suppression des formations",paths:["src/Controller/Admin/FormationController.php → delete() (l.144)"]},
+]},
+{sprint:"2",us:"En tant que Participant, je veux consulter une formation et m'y inscrire via un paiement, afin d'accéder aux formations qui m'intéressent.",tasks:[
+{desc:"Créer la page de détail d'une formation",paths:["src/Controller/Front/FormationController.php → apply() (l.92)"]},
+{desc:"Intégrer le tunnel de paiement pour l'inscription",paths:["src/Controller/Front/FormationController.php → participate() (l.214)",".env: STRIPE_SECRET_KEY"]},
+{desc:"Implémenter la méthode d'enregistrement de participation",paths:["src/Controller/Elearning/ParticipationController.php → new() (l.28)"]},
+]},
+{sprint:"2",us:"En tant qu'Administrateur, je veux gérer les participations aux formations, afin d'assurer le bon suivi des inscriptions.",tasks:[
+{desc:"Créer l'interface de liste des participations",paths:["src/Controller/Admin/ParticipationController.php → new() (l.28)"]},
+{desc:"Implémenter les actions d'approbation/suppression",paths:["src/Controller/Admin/FormationController.php → approveRequest() (l.93)"]},
+{desc:"Brancher les méthodes du ParticipationService",paths:["src/Controller/Elearning/ParticipationController.php → new() (l.28)"]},
+]},
+{sprint:"2",us:"En tant que Participant, je veux soumettre et modifier un avis sur une formation, afin de partager mon expérience.",tasks:[
+{desc:"Créer le formulaire de soumission d'avis",paths:["src/Controller/UsersAvis/AvisController.php → create() (l.44)"]},
+{desc:"Afficher les avis depuis la page détail de la formation",paths:["src/Controller/Front/FormationController.php → review() (l.147)"]},
+{desc:"Implémenter les méthodes CRUD dans AvisController",paths:["src/Controller/UsersAvis/AvisController.php → show() (l.97)"]},
+]},
+{sprint:"3",us:"En tant qu'Investisseur, je veux gérer les produits et services du marketplace, afin d'offrir une vitrine à mes offres.",tasks:[
+{desc:"Créer l'interface de listing des produits/services",paths:["src/Controller/Marketplace/ProduitController.php → index() (l.49)"]},
+{desc:"Implémenter l'ajout et la modification d'un produit/service",paths:["src/Controller/Marketplace/ProduitController.php → new() (l.167)",".env: STRIPE_PUBLIC_KEY, STRIPE_SECRET_KEY"]},
+{desc:"Brancher les méthodes CRUD de RecommendationService",paths:["src/Service/Marketplace/RecommendationService.php → getRecommendations()"]},
+]},
+{sprint:"3",us:"En tant que Startup, je veux passer des commandes sur le marketplace, afin de gérer mes achats auprès des investisseurs.",tasks:[
+{desc:"Créer l'interface de sélection de service et de quantité",paths:["src/Controller/Marketplace/CommandeController.php → passer() (l.141)"]},
+{desc:"Implémenter la soumission de commande dans le contrôleur",paths:["src/Controller/Marketplace/CommandeController.php → recues() (l.287)",".env: STRIPE_SECRET_KEY"]},
+{desc:"Brancher StripeService pour la persistance de la commande",paths:["src/Service/Marketplace/StripeService.php → createPaymentIntent()"]},
+]},
+{sprint:"3",us:"En tant qu'Investisseur, je veux confirmer ou annuler des commandes, afin de contrôler le traitement des demandes reçues.",tasks:[
+{desc:"Afficher les commandes en attente de validation",paths:["src/Controller/Marketplace/CommandeController.php → recues() (l.287)"]},
+{desc:"Implémenter les actions confirmer/annuler dans le contrôleur",paths:["src/Controller/Marketplace/CommandeController.php → confirmer() (l.541)"]},
+{desc:"Mettre à jour le statut de la commande via StripeService",paths:["src/Service/Marketplace/StripeService.php → handleRefund()"]},
+]},
+{sprint:"3",us:"En tant que Startup, je veux régler mes commandes et recevoir des factures, afin de finaliser mes achats.",tasks:[
+{desc:"Intégrer le paiement de commande",paths:["src/Controller/Marketplace/PaymentController.php → initier() (l.27)",".env: STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET"]},
+{desc:"Générer et afficher la facture après paiement",paths:["src/Controller/Marketplace/FactureController.php → show() (l.47)"]},
+{desc:"Implémenter les méthodes de paiement dans StripeService",paths:["src/Service/Marketplace/StripeService.php → createPaymentIntent()"]},
+]},
+{sprint:"3",us:"En tant que Startup, je veux suivre mes commandes avec une timeline et des KPIs, afin d'avoir une visibilité complète.",tasks:[
+{desc:"Créer la page de tracking avec timeline des statuts",paths:["src/Controller/Marketplace/TrackingController.php → index() (l.40)"]},
+{desc:"Afficher les KPIs de commandes (délai, montant, etc.)",paths:["src/Controller/Marketplace/TrackingController.php → show() (l.109)"]},
+{desc:"Brancher StatisticsService pour les données de suivi",paths:["src/Service/Marketplace/StatisticsService.php → getOrderStats()"]},
+]},
+{sprint:"3",us:"En tant que Startup, je veux utiliser la priorité et les analyses IA, afin d'optimiser mes décisions d'achat.",tasks:[
+{desc:"Implémenter le système de priorité des commandes",paths:["src/Controller/Marketplace/MarketAnalysisController.php → produit() (l.31)"]},
+{desc:"Intégrer les recommandations IA dans l'interface",paths:["src/Controller/Marketplace/MarketAnalysisController.php → commande() (l.64)",".env: GROQ_API_KEY, GROQ_MODEL"]},
+{desc:"Brancher le endpoint d'analyse IA dans le contrôleur",paths:["src/Service/Marketplace/GrokService.php → analyzeOrder()"]},
+]},
+{sprint:"4",us:"En tant que Startup, je veux créer et gérer des projets d'investissement, afin de présenter mes besoins de financement.",tasks:[
+{desc:"Créer le formulaire de dépôt d'un projet d'investissement",paths:["src/Controller/Front/ProjetFrontController.php → new() (l.55)",".env: GROQ_API_KEY (aiImproveDescription)"]},
+{desc:"Implémenter la liste et la gestion des projets",paths:["src/Controller/Front/ProjetFrontController.php → index() (l.32)"]},
+{desc:"Brancher les méthodes du service Projet + PDF",paths:["src/Service/Investissement/ProjetPdfService.php → generatePdf()"]},
+]},
+{sprint:"4",us:"En tant qu'Investisseur, je veux ajouter et gérer mes investissements, afin de suivre mon portefeuille.",tasks:[
+{desc:"Créer l'interface d'ajout d'un investissement à un projet",paths:["src/Controller/Investissement/FrontInvestissementController.php → investir() (l.62)",".env: GROQ_API_KEY"]},
+{desc:"Implémenter la gestion des investissements (API)",paths:["src/Controller/Investissement/InvestissementApiController.php → accepterInvestissement() (l.225)"]},
+{desc:"Afficher le portefeuille et les engagements",paths:["src/Controller/Investissement/DashboardInvestisseurController.php → index() (l.32)"]},
+]},
+{sprint:"4",us:"En tant que Startup, je veux conduire des workflows de négociation, afin de formaliser les échanges avec les investisseurs.",tasks:[
+{desc:"Créer l'interface de démarrage d'une négociation",paths:["src/Controller/Investissement/NegociationController.php → creer() (l.64)"]},
+{desc:"Implémenter les étapes de négociation",paths:["src/Controller/Investissement/NegociationController.php → accepter() (l.294)",".env: GROQ_API_KEY (analyser)"]},
+{desc:"Gérer les contre-offres et la clôture de négociation",paths:["src/Service/Investissement/AiNegotiationService.php → analyzeCounterOffer()"]},
+]},
+{sprint:"4",us:"En tant que Startup, je veux compléter le pipeline de deal (paiement, contrat, signature, e-mail), afin de finaliser un accord.",tasks:[
+{desc:"Implémenter l'étape paiement du deal pipeline",paths:["src/Controller/Investissement/DealController.php → payer() (l.78)",".env: STRIPE_SECRET_KEY"]},
+{desc:"Générer le contrat et intégrer la signature électronique",paths:["src/Controller/Investissement/DealController.php → yousignSend() (l.346)",".env: YOUSIGN_API_KEY, YOUSIGN_BASE_URL"]},
+{desc:"Envoyer l'e-mail de confirmation",paths:["src/Service/Investissement/SignatureEmailService.php → sendConfirmationEmail()",".env: MAILER_DSN"]},
+]},
+{sprint:"4",us:"En tant que Membre, je veux créer et modérer des posts et commentaires, afin d'animer les échanges entre membres.",tasks:[
+{desc:"Créer l'interface de publication et affichage des posts",paths:["src/Controller/Community/PostController.php → index()"]},
+{desc:"Implémenter l'ajout et la suppression de commentaires",paths:["src/Controller/Community/CommentaireController.php → add()"]},
+{desc:"Brancher les méthodes CRUD du PostService",paths:["src/Service/Community/PostService.php → create()"]},
+]},
+{sprint:"4",us:"En tant qu'Utilisateur, je veux utiliser le chat IA avec des réponses contextuelles, afin d'obtenir des informations précises.",tasks:[
+{desc:"Créer l'interface de chat IA",paths:["src/Controller/Ai/AiAssistantController.php → page()",".env: GROQ_API_KEY, GROQ_MODEL"]},
+{desc:"Implémenter la récupération du contexte depuis la base de données",paths:["src/Service/AI/AiDatabaseAssistantService.php → getContext()"]},
+{desc:"Brancher le modèle IA et retourner les réponses contextuelles",paths:["src/Service/AI/AiDatabaseAssistantService.php → ask()",".env: GROQ_MAX_TOKENS"]},
+]},
+];
+
+let active="all";
+
+function chip(m,f){return`<span class="chip"><span class="method">${m}</span><span class="sep">–</span><span class="file">${f}</span></span>`;}
+function chipTwig(t){return t?`<span class="chip chip-twig"><span class="tpl">${t}</span></span>`:`<span class="chip chip-na">— (no template)</span>`;}
+function chipEnv(v){return`<span class="chip chip-env"><span class="env-key">${v}</span></span>`;}
+
+function render(){
+  const tbody=document.getElementById("tbody");
+  tbody.innerHTML="";
+  const filtered=data.filter(r=>active==="all"||r.sprint===active);
+  let usCounter=0;
+  filtered.forEach(us=>{
+    usCounter++;
+    const bg="s"+us.sprint;
+    const usId="US-"+usCounter;
+    const tc=us.tasks.length;
+    const totalRows=tc*3;
+
+    us.tasks.forEach((t,ti)=>{
+      const layers=buildLayers(t.paths);
+      const taskId=usCounter+"."+(ti+1);
+      const isFirst=(ti===0);
+
+      // Row 1: Contrôleur
+      const tr0=document.createElement("tr");
+      if(isFirst) tr0.classList.add("us-first");
+
+      // Sprint cell — rowspans ALL rows of this US
+      const sprintCell=isFirst
+        ?`<td class="cell-sprint ${bg}" rowspan="${totalRows}">S${us.sprint}</td>`
+        :"";
+      // US badge cell — rowspans ALL rows of this US
+      const usIdCell=isFirst
+        ?`<td class="cell-us-id ${bg}" rowspan="${totalRows}"><span class="us-badge">${usId}</span></td>`
+        :"";
+      // Task ID cell — rowspans 3 (one per layer)
+      const taskIdCell=`<td class="cell-task-id ${bg}" rowspan="3"><span class="t-badge">${taskId}</span></td>`;
+      // User story text — rowspans ALL rows (shown once per US, first task first row)
+      const usCell=isFirst
+        ?`<td class="cell-us ${bg}" rowspan="${totalRows}">${us.us}</td>`
+        :"";
+      // Task description — rowspans 3
+      const descCell=`<td class="cell-task ${bg}" rowspan="3">${t.desc}</td>`;
+
+      tr0.innerHTML=
+        sprintCell+usIdCell+taskIdCell+
+        `<td class="cell-layer ${bg} lbl-ctrl">Contrôleur</td>`+
+        usCell+descCell+
+        `<td class="cell-detail ${bg}">${chip(layers.ctrl.m,layers.ctrl.f)}${layers.envs.length?" "+chipEnv(layers.envs.join(", ")):""}
+        </td>`;
+      tbody.appendChild(tr0);
+
+      // Row 2: Service
+      const tr1=document.createElement("tr");
+      tr1.innerHTML=
+        `<td class="cell-layer ${bg} lbl-svc">Service</td>`+
+        `<td class="cell-detail ${bg}">${chip(layers.svc.m,layers.svc.f)}</td>`;
+      tbody.appendChild(tr1);
+
+      // Row 3: Interface
+      const tr2=document.createElement("tr");
+      tr2.innerHTML=
+        `<td class="cell-layer ${bg} lbl-twig">Interface</td>`+
+        `<td class="cell-detail ${bg}">${chipTwig(layers.ctrl.twig)}</td>`;
+      tbody.appendChild(tr2);
+    });
+  });
+}
+
+function filter(btn){
+  document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  active=btn.dataset.sprint;
+  render();
+}
+
+document.querySelectorAll(".filter-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>filter(btn));
+});
+
+function exportPNG(){
+  const btn=document.querySelector(".export-btn");
+  btn.textContent="Export en cours…";
+  btn.disabled=true;
+  html2canvas(document.getElementById("capture"),{backgroundColor:"#ffffff",scale:2,useCORS:true,logging:false}).then(canvas=>{
+    const a=document.createElement("a");
+    a.download="backlog-final.png";
+    a.href=canvas.toDataURL("image/png");
+    a.click();
+    btn.innerHTML=`<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 2v8M5 7l3 3 3-3M2 12v1a1 1 0 001 1h10a1 1 0 001-1v-1"/></svg> Exporter PNG`;
+    btn.disabled=false;
+  });
+}
+
+render();
+</script>

@@ -3,6 +3,7 @@
 namespace App\Controller\Marketplace;
 
 use App\Entity\Marketplace\Commande;
+use App\Entity\UsersAvis\User;
 use App\Entity\Marketplace\CommandeLigne;
 use App\Entity\Marketplace\CommandeStatusHistory;
 use App\Event\CommandeConfirmeeEvent;
@@ -27,7 +28,7 @@ class CommandeController extends AbstractController
     private function getUserId(): int
     {
         $user = $this->getUser();
-        return $user ? (int) $user->getUserId() : 0;
+        return $user ? (int) ($user instanceof User ? $user->getUserId() : null) : 0;
     }
 
     private function requireLogin(): ?Response
@@ -44,7 +45,7 @@ class CommandeController extends AbstractController
         if (!$user) {
             return $this->redirectToRoute('app_login');
         }
-        if ($user->getUserType() !== 'startup') {
+        if (($user instanceof User ? $user->getUserType() : null) !== 'startup') {
             $this->addFlash('error', '❌ Seules les startups peuvent passer des commandes.');
             return $this->redirectToRoute('produit_index');
         }
@@ -57,7 +58,7 @@ class CommandeController extends AbstractController
         if (!$user) {
             return $this->redirectToRoute('app_login');
         }
-        if ($user->getUserType() !== 'investisseur') {
+        if (($user instanceof User ? $user->getUserType() : null) !== 'investisseur') {
             $this->addFlash('error', '❌ Seuls les investisseurs peuvent gérer les commandes reçues.');
             return $this->redirectToRoute('produit_index');
         }
@@ -385,13 +386,13 @@ class CommandeController extends AbstractController
         $user = $this->getUser();
 
         // Startup: voir ses propres commandes
-        if ($user->getUserType() === 'startup') {
+        if (($user instanceof User ? $user->getUserType() : null) === 'startup') {
             if ($commande->getIdClient() !== $this->getUserId()) {
                 throw $this->createAccessDeniedException();
             }
         }
         // Investisseur: voir les commandes reçues pour ses produits
-        elseif ($user->getUserType() === 'investisseur') {
+        elseif (($user instanceof User ? $user->getUserType() : null) === 'investisseur') {
             $hasAccess = false;
             foreach ($commande->getLignes() as $ligne) {
                 $produit = $produitRepo->find($ligne->getIdProduit());

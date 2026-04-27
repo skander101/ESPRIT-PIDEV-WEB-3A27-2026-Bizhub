@@ -70,14 +70,14 @@ class Investment
     #[Assert\NotNull(message: 'L\'investisseur est obligatoire.')]
     private ?User $user = null;
 
-    #[ORM\Column(type: 'float', nullable: false)]
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: false)]
     #[Assert\NotNull(message: 'Le montant est obligatoire.')]
     #[Assert\Positive(message: 'Le montant doit être positif.')]
-    private ?float $amount = null;
+    private string $amount = '0.00';
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
+    #[ORM\Column(type: 'datetime', nullable: false)]
     #[Assert\LessThanOrEqual(value: 'now', message: "La date d'investissement ne peut pas être dans le futur.")]
-    private ?\DateTimeInterface $investment_date = null;
+    private \DateTimeInterface $investment_date;
 
     #[ORM\Column(type: 'string', nullable: true)]
     #[Assert\Url(message: "L'URL du contrat n'est pas valide.")]
@@ -121,7 +121,7 @@ class Investment
     private ?string $conditions_particulieres = null;
 
     #[ORM\Column(type: 'datetime', nullable: false)]
-    private ?\DateTimeInterface $created_at = null;
+    private \DateTimeInterface $created_at;
 
     public function __construct()
     {
@@ -137,8 +137,8 @@ class Investment
     public function getUser(): ?User { return $this->user; }
     public function setUser(?User $user): self { $this->user = $user; return $this; }
 
-    public function getAmount(): ?float { return $this->amount; }
-    public function setAmount(float $amount): self { $this->amount = $amount; return $this; }
+    public function getAmount(): ?string { return $this->amount; }
+    public function setAmount(string $amount): self { $this->amount = $amount; return $this; }
 
     /**
      * Retourne le montant sous forme d'objet Money (précision garantie).
@@ -171,8 +171,8 @@ class Investment
 
     public function getInvestment_date(): ?\DateTimeInterface { return $this->investment_date; }
     public function getInvestmentDate(): ?\DateTimeInterface { return $this->investment_date; }
-    public function setInvestment_date(?\DateTimeInterface $investment_date): self { $this->investment_date = $investment_date; return $this; }
-    public function setInvestmentDate(?\DateTimeInterface $investment_date): self { $this->investment_date = $investment_date; return $this; }
+    protected function setInvestment_date(?\DateTimeInterface $investment_date): self { $this->investment_date = $investment_date; return $this; }
+    protected function setInvestmentDate(?\DateTimeInterface $investment_date): self { $this->investment_date = $investment_date; return $this; }
 
     public function getContract_url(): ?string { return $this->contract_url; }
     public function getContractUrl(): ?string { return $this->contract_url; }
@@ -199,6 +199,6 @@ class Investment
 
     public function getCreated_at(): ?\DateTimeInterface { return $this->created_at; }
     public function getCreatedAt(): ?\DateTimeInterface { return $this->created_at; }
-    public function setCreated_at(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
-    public function setCreatedAt(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
+    protected function setCreated_at(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
+    protected function setCreatedAt(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
 }

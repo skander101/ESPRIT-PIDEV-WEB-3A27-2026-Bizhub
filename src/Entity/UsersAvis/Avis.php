@@ -14,6 +14,11 @@ use App\Entity\Elearning\Formation;
 #[ORM\Table(name: 'avis')]
 class Avis
 {
+    public function __construct()
+    {
+        $this->created_at = new \DateTime();
+    }
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
@@ -37,8 +42,8 @@ class Avis
     #[Assert\Length(max: 1000, maxMessage: 'Comment must not exceed 1000 characters')]
     private ?string $comment = null;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?\DateTimeInterface $created_at = null;
+    #[ORM\Column(type: 'datetime', nullable: false)]
+    private \DateTimeInterface $created_at;
 
     #[ORM\Column(type: 'boolean', nullable: true)]
     private ?bool $is_verified = null;
@@ -66,10 +71,10 @@ class Avis
     public function getComment(): ?string { return $this->comment; }
     public function setComment(?string $comment): self { $this->comment = $comment; return $this; }
 
-    public function getCreatedAt(): ?\DateTimeInterface { return $this->created_at; }
-    public function getCreated_at(): ?\DateTimeInterface { return $this->created_at; }
-    public function setCreatedAt(?\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
-    public function setCreated_at(?\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
+    public function getCreatedAt(): \DateTimeInterface { return $this->created_at; }
+    public function getCreated_at(): \DateTimeInterface { return $this->created_at; }
+    protected function setCreatedAt(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
+    protected function setCreated_at(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
 
     public function getIsVerified(): ?bool { return $this->is_verified; }
     public function is_verified(): ?bool { return $this->is_verified; }

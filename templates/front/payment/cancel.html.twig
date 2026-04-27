@@ -1,0 +1,31 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Paiement annulé — BizHub{% endblock %}
+
+{% block extra_styles %}
+  .pay-cancel { min-height: 65vh; display: flex; align-items: center; justify-content: center; padding: 100px 5% 48px; background: #f8fafc; }
+  .pay-cancel-card {
+    max-width: 480px; text-align: center; background: #fff; border-radius: 20px; padding: 2.25rem 1.75rem;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.06); border: 1px solid #e2e8f0;
+  }
+  .pay-cancel h1 { font-family: 'Josefin Sans', sans-serif; color: #0f172a; font-size: 1.4rem; margin: 0 0 0.75rem; }
+  .pay-cancel p { color: #64748b; line-height: 1.55; }
+  .pay-cancel a { color: #0369a1; font-weight: 700; text-decoration: none; }
+{% endblock %}
+
+{% block content %}
+<div class="pay-cancel">
+  <div class="pay-cancel-card">
+    <h1>Paiement annulé</h1>
+    <p>
+      {% if formation %}
+        Aucun débit n’a été effectué pour <strong>{{ formation.title|e }}</strong>.
+      {% else %}
+        Aucun débit n’a été effectué.
+      {% endif %}
+      Vous pouvez vous réinscrire depuis la liste des formations.
+    </p>
+    <p><a href="{{ path('app_front_formations_index') }}">← Formations</a></p>
+  </div>
+</div>
+{% endblock %}

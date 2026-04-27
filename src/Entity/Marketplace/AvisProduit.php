@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
-use App\Repository\AvisProduitRepository;
+use App\Repository\Marketplace\AvisProduitRepository;
 use App\Entity\UsersAvis\User;
 use App\Entity\Marketplace\ProduitService;
 
@@ -14,6 +14,11 @@ use App\Entity\Marketplace\ProduitService;
 #[ORM\Table(name: 'avis_produit')]
 class AvisProduit
 {
+    public function __construct()
+    {
+        $this->created_at = new \DateTime();
+    }
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
@@ -88,15 +93,15 @@ class AvisProduit
         return $this;
     }
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?\DateTimeInterface $created_at = null;
+    #[ORM\Column(type: 'datetime', nullable: false)]
+    private \DateTimeInterface $created_at;
 
-    public function getCreated_at(): ?\DateTimeInterface
+    public function getCreated_at(): \DateTimeInterface
     {
         return $this->created_at;
     }
 
-    public function setCreated_at(?\DateTimeInterface $created_at): self
+    protected function setCreated_at(\DateTimeInterface $created_at): self
     {
         $this->created_at = $created_at;
         return $this;

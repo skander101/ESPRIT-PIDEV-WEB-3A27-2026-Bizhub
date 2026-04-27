@@ -11,6 +11,11 @@ use App\Repository\Community\PostRepository;
 #[ORM\Table(name: 'post')]
 class Post
 {
+    public function __construct()
+    {
+        $this->created_at = new \DateTime();
+    }
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
@@ -27,36 +32,14 @@ class Post
         return $this;
     }
 
-    #[ORM\Column(type: 'integer', nullable: false)]
-    private ?int $user_id = null;
-
-    public function getUser_id(): ?int
-    {
-        return $this->user_id;
-    }
-
-    public function setUser_id(int $user_id): self
-    {
-        $this->user_id = $user_id;
-        return $this;
-    }
+#[ORM\Column(type: 'integer', nullable: false)]
+    private int $user_id;
 
     #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $title = null;
-
-    public function getTitle(): ?string
-    {
-        return $this->title;
-    }
-
-    public function setTitle(string $title): self
-    {
-        $this->title = $title;
-        return $this;
-    }
+    private string $title;
 
     #[ORM\Column(type: 'text', nullable: false)]
-    private ?string $content = null;
+    private string $content;
 
     public function getContent(): ?string
     {
@@ -83,15 +66,15 @@ class Post
         return $this;
     }
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?\DateTimeInterface $created_at = null;
+    #[ORM\Column(type: 'datetime', nullable: false)]
+    private \DateTimeInterface $created_at;
 
-    public function getCreated_at(): ?\DateTimeInterface
+    public function getCreated_at(): \DateTimeInterface
     {
         return $this->created_at;
     }
 
-    public function setCreated_at(?\DateTimeInterface $created_at): self
+    protected function setCreated_at(\DateTimeInterface $created_at): self
     {
         $this->created_at = $created_at;
         return $this;
@@ -139,29 +122,29 @@ class Post
         return $this;
     }
 
-    #[ORM\Column(type: 'decimal', nullable: true)]
-    private ?float $location_lat = null;
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 7, nullable: true)]
+    private ?string $location_lat = null;
 
-    public function getLocation_lat(): ?float
+    public function getLocation_lat(): ?string
     {
         return $this->location_lat;
     }
 
-    public function setLocation_lat(?float $location_lat): self
+    public function setLocation_lat(?string $location_lat): self
     {
         $this->location_lat = $location_lat;
         return $this;
     }
 
-    #[ORM\Column(type: 'decimal', nullable: true)]
-    private ?float $location_lon = null;
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 7, nullable: true)]
+    private ?string $location_lon = null;
 
-    public function getLocation_lon(): ?float
+    public function getLocation_lon(): ?string
     {
         return $this->location_lon;
     }
 
-    public function setLocation_lon(?float $location_lon): self
+    public function setLocation_lon(?string $location_lon): self
     {
         $this->location_lon = $location_lon;
         return $this;

@@ -1,0 +1,2047 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Parameter \#1 \$search of method App\\Repository\\UsersAvis\\UserRepository\:\:findBySearchAndSort\(\) expects string\|null, bool\|float\|int\|string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Admin/AdminController.php
+
+		-
+			message: '#^Parameter \#2 \$sort of method App\\Repository\\UsersAvis\\UserRepository\:\:findBySearchAndSort\(\) expects string, bool\|float\|int\|string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Admin/AdminController.php
+
+		-
+			message: '#^Parameter \#2 \$token of method Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController\:\:isCsrfTokenValid\(\) expects string\|null, bool\|float\|int\|string\|null given\.$#'
+			identifier: argument.type
+			count: 5
+			path: src/Controller/Admin/AdminController.php
+
+		-
+			message: '#^Parameter \#3 \$direction of method App\\Repository\\UsersAvis\\UserRepository\:\:findBySearchAndSort\(\) expects string, bool\|float\|int\|string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Admin/AdminController.php
+
+		-
+			message: '#^Parameter \#2 \$token of method Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController\:\:isCsrfTokenValid\(\) expects string\|null, bool\|float\|int\|string\|null given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Controller/Admin/AdminInvestissementController.php
+
+		-
+			message: '#^Parameter \#2 \$token of method Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController\:\:isCsrfTokenValid\(\) expects string\|null, bool\|float\|int\|string\|null given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Controller/Admin/AdminProjetController.php
+
+		-
+			message: '#^Call to an undefined method object\:\:getIdClient\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Admin/Marketplace/AdminMarketplaceController.php
+
+		-
+			message: '#^Call to an undefined method object\:\:getStatut\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Controller/Admin/Marketplace/AdminMarketplaceController.php
+
+		-
+			message: '#^Parameter \#1 \$categorie of method App\\Repository\\Marketplace\\ProduitServiceRepository\:\:findByCategorie\(\) expects string, float\|int\<min, \-1\>\|int\<1, max\>\|string\|true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Admin/Marketplace/AdminMarketplaceController.php
+
+		-
+			message: '#^Parameter \#1 \$statut of method App\\Repository\\Marketplace\\CommandeRepository\:\:findByStatut\(\) expects string, float\|int\<min, \-1\>\|int\<1, max\>\|string\|true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Admin/Marketplace/AdminMarketplaceController.php
+
+		-
+			message: '#^Binary operation "\." between array\|bool\|float\|int\|string\|UnitEnum\|null and ''/public'' results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 2
+			path: src/Controller/Admin/ParticipationController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Repository\\Elearning\\ParticipationRepository\:\:findOneByUserAndFormation\(\) expects App\\Entity\\UsersAvis\\User, App\\Entity\\UsersAvis\\User\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Admin/ParticipationController.php
+
+		-
+			message: '#^Parameter \#2 \$formation of method App\\Repository\\Elearning\\ParticipationRepository\:\:findOneByUserAndFormation\(\) expects App\\Entity\\Elearning\\Formation, App\\Entity\\Elearning\\Formation\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Admin/ParticipationController.php
+
+		-
+			message: '#^Cannot call method getMessage\(\) on Symfony\\Component\\Validator\\ConstraintViolationInterface\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Controller/Ai/AiAssistantController.php
+
+		-
+			message: '#^Binary operation "\." between array\|bool\|float\|int\|string\|UnitEnum\|null and ''/var/face_images'' results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: src/Controller/FaceEnrollmentController.php
+
+		-
+			message: '#^Binary operation "\." between array\|bool\|float\|int\|string\|UnitEnum\|null and ''/var/face_images/'' results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: src/Controller/FaceEnrollmentController.php
+
+		-
+			message: '#^Binary operation "\." between array\|bool\|float\|int\|string\|UnitEnum\|null and ''/var/face_images'' results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: src/Controller/FaceVerificationController.php
+
+		-
+			message: '#^Parameter \#1 \$string of function base64_encode expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/FaceVerificationController.php
+
+		-
+			message: '#^Cannot cast array\|bool\|float\|int\|string\|UnitEnum\|null to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: src/Controller/Front/CertificateVerificationController.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Form\\FormError\|Symfony\\Component\\Form\\FormErrorIterator\:\:getMessage\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Front/FormationController.php
+
+		-
+			message: '#^Parameter \#1 \$formations of method App\\Repository\\UsersAvis\\AvisRepository\:\:findVisibleGroupedByFormations\(\) expects list\<App\\Entity\\Elearning\\Formation\>, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Front/FormationController.php
+
+		-
+			message: '#^Cannot cast array\|bool\|float\|int\|string\|UnitEnum\|null to float\.$#'
+			identifier: cast.double
+			count: 2
+			path: src/Controller/Front/PaymentController.php
+
+		-
+			message: '#^Cannot cast array\|bool\|float\|int\|string\|UnitEnum\|null to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: src/Controller/Front/PaymentController.php
+
+		-
+			message: '#^Parameter \#2 \$token of method Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController\:\:isCsrfTokenValid\(\) expects string\|null, bool\|float\|int\|string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Front/ProjetFrontController.php
+
+		-
+			message: '#^Method App\\Controller\\Investissement\\DashboardController\:\:dashboardInvestisseur\(\) has parameter \$user with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Controller/Investissement/DashboardController.php
+
+		-
+			message: '#^Method App\\Controller\\Investissement\\DashboardController\:\:dashboardStartup\(\) has parameter \$user with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Controller/Investissement/DashboardController.php
+
+		-
+			message: '#^Parameter \#1 \$category of method App\\Service\\NewsService\:\:getLatestWorldNews\(\) expects string, bool\|float\|int\|string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Investissement/DashboardController.php
+
+		-
+			message: '#^Parameter \#1 \$category of method App\\Service\\NewsService\:\:getLatestWorldNews\(\) expects string, bool\|float\|int\|string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Investissement/DashboardInvestisseurController.php
+
+		-
+			message: '#^Parameter \#2 \$token of method Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController\:\:isCsrfTokenValid\(\) expects string\|null, bool\|float\|int\|string\|null given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Controller/Investissement/DashboardInvestisseurController.php
+
+		-
+			message: '#^Binary operation "\." between array\|bool\|float\|int\|string\|UnitEnum\|null and ''/public'' results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: src/Controller/Investissement/DealController.php
+
+		-
+			message: '#^Parameter \#1 \$deal of method App\\Service\\Investissement\\DealWorkflowService\:\:markAsSignedFromYousign\(\) expects App\\Entity\\Investissement\\Deal, object given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Investissement/DealController.php
+
+		-
+			message: '#^Parameter \#1 \$id of static method Stripe\\Checkout\\Session\:\:retrieve\(\) expects array\|string, float\|int\<min, \-1\>\|int\<1, max\>\|string\|true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Investissement/DealController.php
+
+		-
+			message: '#^Parameter \#1 \$url of method Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController\:\:redirect\(\) expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Investissement/DealController.php
+
+		-
+			message: '#^Parameter \#2 \$deal of method App\\Service\\Investissement\\YousignService\:\:handleWebhook\(\) expects App\\Entity\\Investissement\\Deal, object given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Investissement/DealController.php
+
+		-
+			message: '#^Parameter \#2 \$sessionId of method App\\Service\\Investissement\\DealWorkflowService\:\:markAsPaid\(\) expects string, float\|int\<min, \-1\>\|int\<1, max\>\|string\|true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Investissement/DealController.php
+
+		-
+			message: '#^Parameter \#2 \$token of method Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController\:\:isCsrfTokenValid\(\) expects string\|null, bool\|float\|int\|string\|null given\.$#'
+			identifier: argument.type
+			count: 4
+			path: src/Controller/Investissement/DealController.php
+
+		-
+			message: '#^Parameter \#2 \$token of method Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController\:\:isCsrfTokenValid\(\) expects string\|null, bool\|float\|int\|string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Investissement/FrontInvestissementController.php
+
+		-
+			message: '#^Parameter \#1 \$string of function trim expects string, bool\|float\|int\|string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Investissement/FrontProjetController.php
+
+		-
+			message: '#^Parameter \#1 \$string of function trim expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Investissement/FrontProjetController.php
+
+		-
+			message: '#^Parameter \#2 \$token of method Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController\:\:isCsrfTokenValid\(\) expects string\|null, bool\|float\|int\|string\|null given\.$#'
+			identifier: argument.type
+			count: 4
+			path: src/Controller/Investissement/FrontProjetController.php
+
+		-
+			message: '#^Cannot call method getUserType\(\) on Symfony\\Component\\Security\\Core\\User\\UserInterface\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Controller/Investissement/InvestissementApiController.php
+
+		-
+			message: '#^Parameter \#2 \$token of method Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController\:\:isCsrfTokenValid\(\) expects string\|null, bool\|float\|int\|string\|null given\.$#'
+			identifier: argument.type
+			count: 5
+			path: src/Controller/Investissement/InvestissementApiController.php
+
+		-
+			message: '#^Parameter \#2 \$token of method Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController\:\:isCsrfTokenValid\(\) expects string\|null, bool\|float\|int\|string\|null given\.$#'
+			identifier: argument.type
+			count: 5
+			path: src/Controller/Investissement/NegociationController.php
+
+		-
+			message: '#^Call to an undefined method object\:\:getNom\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: src/Controller/Marketplace/CommandeController.php
+
+		-
+			message: '#^Call to an undefined method object\:\:getOwnerUserId\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Controller/Marketplace/CommandeController.php
+
+		-
+			message: '#^Call to an undefined method object\:\:getPrix\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: src/Controller/Marketplace/CommandeController.php
+
+		-
+			message: '#^Call to an undefined method object\:\:getQuantite\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: src/Controller/Marketplace/CommandeController.php
+
+		-
+			message: '#^Call to an undefined method object\:\:isDisponible\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: src/Controller/Marketplace/CommandeController.php
+
+		-
+			message: '#^Call to an undefined method object\:\:setDisponible\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Marketplace/CommandeController.php
+
+		-
+			message: '#^Call to an undefined method object\:\:setQuantite\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Marketplace/CommandeController.php
+
+		-
+			message: '#^Cannot call method getUserType\(\) on Symfony\\Component\\Security\\Core\\User\\UserInterface\|null\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: src/Controller/Marketplace/CommandeController.php
+
+		-
+			message: '#^Parameter \#1 \$clientId of method App\\Repository\\Marketplace\\CommandeRepository\:\:findByClient\(\) expects int, int\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Marketplace/CommandeController.php
+
+		-
+			message: '#^Parameter \#1 \$commandeId of method App\\Service\\Marketplace\\GrokService\:\:generateOrderRecommendation\(\) expects int, int\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Marketplace/CommandeController.php
+
+		-
+			message: '#^Parameter \#1 \$stream of function fclose expects resource, resource\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Marketplace/CommandeController.php
+
+		-
+			message: '#^Parameter \#1 \$stream of function fprintf expects resource, resource\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Marketplace/CommandeController.php
+
+		-
+			message: '#^Parameter \#1 \$stream of function fputcsv expects resource, resource\|false given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Controller/Marketplace/CommandeController.php
+
+		-
+			message: '#^Parameter \#2 \$statut of method App\\Repository\\Marketplace\\CommandeRepository\:\:findByInvestisseur\(\) expects string\|null, bool\|float\|int\|string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Marketplace/CommandeController.php
+
+		-
+			message: '#^Parameter \#2 \$token of method Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController\:\:isCsrfTokenValid\(\) expects string\|null, bool\|float\|int\|string\|null given\.$#'
+			identifier: argument.type
+			count: 6
+			path: src/Controller/Marketplace/CommandeController.php
+
+		-
+			message: '#^Cannot call method getUserId\(\) on Symfony\\Component\\Security\\Core\\User\\UserInterface\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Controller/Marketplace/FactureController.php
+
+		-
+			message: '#^Cannot call method getUserType\(\) on Symfony\\Component\\Security\\Core\\User\\UserInterface\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Controller/Marketplace/FactureController.php
+
+		-
+			message: '#^Call to an undefined method object\:\:getIdClient\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Marketplace/MarketAnalysisController.php
+
+		-
+			message: '#^Call to an undefined method object\:\:getLignes\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Marketplace/MarketAnalysisController.php
+
+		-
+			message: '#^Call to an undefined method object\:\:getNom\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Controller/Marketplace/MarketAnalysisController.php
+
+		-
+			message: '#^Call to an undefined method object\:\:getPrix\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Controller/Marketplace/MarketAnalysisController.php
+
+		-
+			message: '#^Cannot call method getUserId\(\) on Symfony\\Component\\Security\\Core\\User\\UserInterface\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Controller/Marketplace/MarketAnalysisController.php
+
+		-
+			message: '#^Cannot call method getUserType\(\) on Symfony\\Component\\Security\\Core\\User\\UserInterface\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Controller/Marketplace/MarketAnalysisController.php
+
+		-
+			message: '#^Call to an undefined method object\:\:getPrix\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Marketplace/PanierController.php
+
+		-
+			message: '#^Call to an undefined method object\:\:getQuantite\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Controller/Marketplace/PanierController.php
+
+		-
+			message: '#^Method App\\Controller\\Marketplace\\PanierController\:\:calculerTotaux\(\) has parameter \$items with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Controller/Marketplace/PanierController.php
+
+		-
+			message: '#^Method App\\Controller\\Marketplace\\PanierController\:\:calculerTotaux\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Controller/Marketplace/PanierController.php
+
+		-
+			message: '#^Parameter \#2 \$produitId of method App\\Repository\\Marketplace\\PanierRepository\:\:findItem\(\) expects int, int\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Marketplace/PanierController.php
+
+		-
+			message: '#^Parameter \#2 \$token of method Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController\:\:isCsrfTokenValid\(\) expects string\|null, bool\|float\|int\|string\|null given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Controller/Marketplace/PanierController.php
+
+		-
+			message: '#^Access to an undefined property object\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 4
+			path: src/Controller/Marketplace/PaymentController.php
+
+		-
+			message: '#^Access to an undefined property object\:\:\$payment_intent\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Controller/Marketplace/PaymentController.php
+
+		-
+			message: '#^Call to an undefined method object\:\:getIdCommande\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Marketplace/PaymentController.php
+
+		-
+			message: '#^Call to an undefined method object\:\:isEstPayee\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Controller/Marketplace/PaymentController.php
+
+		-
+			message: '#^Call to an undefined method object\:\:setPaymentStatus\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Marketplace/PaymentController.php
+
+		-
+			message: '#^Cannot access property \$id on string\|Stripe\\PaymentIntent\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: src/Controller/Marketplace/PaymentController.php
+
+		-
+			message: '#^Parameter \#1 \$commande of method App\\Controller\\Marketplace\\PaymentController\:\:applyPaymentSuccess\(\) expects App\\Entity\\Marketplace\\Commande, object given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Marketplace/PaymentController.php
+
+		-
+			message: '#^Parameter \#1 \$commande of method App\\Entity\\Marketplace\\CommandeStatusHistory\:\:setCommande\(\) expects App\\Entity\\Marketplace\\Commande, object given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Marketplace/PaymentController.php
+
+		-
+			message: '#^Parameter \#1 \$commande of method App\\Service\\Marketplace\\FactureService\:\:createFromCommande\(\) expects App\\Entity\\Marketplace\\Commande, object given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Controller/Marketplace/PaymentController.php
+
+		-
+			message: '#^Parameter \#1 \$url of method Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController\:\:redirect\(\) expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Marketplace/PaymentController.php
+
+		-
+			message: '#^Parameter \#2 \$sigHeader of method App\\Service\\Marketplace\\StripeService\:\:constructWebhookEvent\(\) expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Marketplace/PaymentController.php
+
+		-
+			message: '#^Parameter \#2 \$token of method Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController\:\:isCsrfTokenValid\(\) expects string\|null, bool\|float\|int\|string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Marketplace/PaymentController.php
+
+		-
+			message: '#^Parameter \#1 \$string of function trim expects string, bool\|float\|int\|string\|null given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Controller/Marketplace/ProduitController.php
+
+		-
+			message: '#^Parameter \#2 \$token of method Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController\:\:isCsrfTokenValid\(\) expects string\|null, bool\|float\|int\|string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Marketplace/ProduitController.php
+
+		-
+			message: '#^Call to an undefined method object\:\:getNom\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Marketplace/TrackingController.php
+
+		-
+			message: '#^Cannot call method getUserId\(\) on Symfony\\Component\\Security\\Core\\User\\UserInterface\|null\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: src/Controller/Marketplace/TrackingController.php
+
+		-
+			message: '#^Method App\\Controller\\Marketplace\\TrackingController\:\:buildStats\(\) has parameter \$toutes with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Controller/Marketplace/TrackingController.php
+
+		-
+			message: '#^Method App\\Controller\\Marketplace\\TrackingController\:\:buildStats\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Controller/Marketplace/TrackingController.php
+
+		-
+			message: '#^Method App\\Controller\\Marketplace\\TrackingController\:\:buildWorkflowEtapes\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Controller/Marketplace/TrackingController.php
+
+		-
+			message: '#^Method App\\Controller\\Marketplace\\TrackingController\:\:getAllStatuts\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Controller/Marketplace/TrackingController.php
+
+		-
+			message: '#^Parameter \#2 \$needle of function str_contains expects string, bool\|float\|int\|string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Marketplace/TrackingController.php
+
+		-
+			message: '#^Parameter \#1 \$string of function strlen expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/TwoFactorFormController.php
+
+		-
+			message: '#^Parameter \#2 \$code of method Scheb\\TwoFactorBundle\\Security\\TwoFactor\\Provider\\Totp\\TotpAuthenticator\:\:checkCode\(\) expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/TwoFactorFormController.php
+
+		-
+			message: '#^Parameter \#3 \$subject of function preg_replace expects array\<float\|int\|string\>\|string, bool\|float\|int\|string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/TwoFactorFormController.php
+
+		-
+			message: '#^Parameter \#2 \$token of method Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController\:\:isCsrfTokenValid\(\) expects string\|null, bool\|float\|int\|string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/UsersAvis/AvisController.php
+
+		-
+			message: '#^Binary operation "\." between array\|bool\|float\|int\|string\|UnitEnum\|null and ''/public'' results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 5
+			path: src/Controller/UsersAvis/UserController.php
+
+		-
+			message: '#^Binary operation "\." between array\|bool\|float\|int\|string\|UnitEnum\|null and ''/public/assets…'' results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 3
+			path: src/Controller/UsersAvis/UserController.php
+
+		-
+			message: '#^Binary operation "\." between array\|bool\|float\|int\|string\|UnitEnum\|null and ''/var/face_images'' results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: src/Controller/UsersAvis/UserController.php
+
+		-
+			message: '#^Cannot call method getMessage\(\) on Symfony\\Component\\Validator\\ConstraintViolationInterface\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Controller/UsersAvis/UserController.php
+
+		-
+			message: '#^Property App\\Entity\\Elearning\\Formation\:\:\$avis with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Entity/Elearning/Formation.php
+
+		-
+			message: '#^Property App\\Entity\\Elearning\\Formation\:\:\$trainingRequests with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Entity/Elearning/Formation.php
+
+		-
+			message: '#^Parameter \#1 \$code of class Money\\Currency constructor expects non\-empty\-string, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Entity/Investissement/Investment.php
+
+		-
+			message: '#^Property App\\Entity\\Investissement\\Negotiation\:\:\$negotiationMessages with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Entity/Investissement/Negotiation.php
+
+		-
+			message: '#^Method App\\Entity\\Investissement\\Project\:\:getAiAnalysis\(\) return type with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Entity/Investissement/Project.php
+
+		-
+			message: '#^Method App\\Entity\\Investissement\\Project\:\:getInvestments\(\) return type with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Entity/Investissement/Project.php
+
+		-
+			message: '#^Method App\\Entity\\Investissement\\Project\:\:getNegotiations\(\) return type with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Entity/Investissement/Project.php
+
+		-
+			message: '#^Property App\\Entity\\Investissement\\Project\:\:\$aiAnalysis with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Entity/Investissement/Project.php
+
+		-
+			message: '#^Property App\\Entity\\Investissement\\Project\:\:\$investments with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Entity/Investissement/Project.php
+
+		-
+			message: '#^Property App\\Entity\\Investissement\\Project\:\:\$negotiations with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Entity/Investissement/Project.php
+
+		-
+			message: '#^Method App\\Entity\\Marketplace\\Commande\:\:getLignes\(\) return type with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Entity/Marketplace/Commande.php
+
+		-
+			message: '#^Property App\\Entity\\Marketplace\\Commande\:\:\$lignes with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Entity/Marketplace/Commande.php
+
+		-
+			message: '#^Property App\\Entity\\UsersAvis\\User\:\:\$avis with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Entity/UsersAvis/User.php
+
+		-
+			message: '#^Call to an undefined method object\:\:getOwnerUserId\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/EventListener/CommandeConfirmeeListener.php
+
+		-
+			message: '#^Parameter \#1 \$v of method App\\Entity\\Marketplace\\AutoConfirmNotification\:\:setCommandeId\(\) expects int, int\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/EventListener/CommandeConfirmeeListener.php
+
+		-
+			message: '#^Parameter \#1 \$v of method App\\Entity\\Marketplace\\AutoConfirmNotification\:\:setMontantTtc\(\) expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/EventListener/CommandeConfirmeeListener.php
+
+		-
+			message: '#^Parameter \#1 \$v of method App\\Entity\\Marketplace\\AutoConfirmNotification\:\:setStartupName\(\) expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/EventListener/CommandeConfirmeeListener.php
+
+		-
+			message: '#^Class App\\Repository\\Community\\CommentaireRepository extends generic class Doctrine\\Bundle\\DoctrineBundle\\Repository\\ServiceEntityRepository but does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Repository/Community/CommentaireRepository.php
+
+		-
+			message: '#^Class App\\Repository\\Community\\PostRepository extends generic class Doctrine\\Bundle\\DoctrineBundle\\Repository\\ServiceEntityRepository but does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Repository/Community/PostRepository.php
+
+		-
+			message: '#^Class App\\Repository\\Community\\ReactionRepository extends generic class Doctrine\\Bundle\\DoctrineBundle\\Repository\\ServiceEntityRepository but does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Repository/Community/ReactionRepository.php
+
+		-
+			message: '#^Method App\\Repository\\DealRepository\:\:findByBuyerId\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/DealRepository.php
+
+		-
+			message: '#^Method App\\Repository\\DealRepository\:\:findByProjectId\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/DealRepository.php
+
+		-
+			message: '#^Method App\\Repository\\Elearning\\FormationRecommendationEventRepository\:\:aggregateStatsByFormation\(\) should return list\<array\{formation_id\: int, title\: string\|null, impressions\: int, clicks\: int, enrolls\: int\}\> but returns list\<array\<string, mixed\>\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Repository/Elearning/FormationRecommendationEventRepository.php
+
+		-
+			message: '#^Class App\\Repository\\Elearning\\FormationRepository extends generic class Doctrine\\Bundle\\DoctrineBundle\\Repository\\ServiceEntityRepository but does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Repository/Elearning/FormationRepository.php
+
+		-
+			message: '#^Method App\\Repository\\Elearning\\FormationRepository\:\:findAllOrderedByStartDate\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/Elearning/FormationRepository.php
+
+		-
+			message: '#^Method App\\Repository\\Elearning\\FormationRepository\:\:findNewestFormationIds\(\) should return list\<int\> but returns array\<int\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Repository/Elearning/FormationRepository.php
+
+		-
+			message: '#^Method App\\Repository\\Elearning\\FormationRepository\:\:findOrderedByStartDateWithSearch\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/Elearning/FormationRepository.php
+
+		-
+			message: '#^Method App\\Repository\\Elearning\\FormationRepository\:\:findPopularFormationIds\(\) should return list\<int\> but returns array\<int\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Repository/Elearning/FormationRepository.php
+
+		-
+			message: '#^Method App\\Repository\\Elearning\\FormationRepository\:\:findTrendingFormationIds\(\) should return list\<int\> but returns array\<int\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Repository/Elearning/FormationRepository.php
+
+		-
+			message: '#^Class App\\Repository\\Elearning\\ParticipationRepository extends generic class Doctrine\\Bundle\\DoctrineBundle\\Repository\\ServiceEntityRepository but does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Repository/Elearning/ParticipationRepository.php
+
+		-
+			message: '#^Method App\\Repository\\Elearning\\ParticipationRepository\:\:findByFormationOrdered\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/Elearning/ParticipationRepository.php
+
+		-
+			message: '#^Class App\\Repository\\Elearning\\PaymentRepository extends generic class Doctrine\\Bundle\\DoctrineBundle\\Repository\\ServiceEntityRepository but does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Repository/Elearning/PaymentRepository.php
+
+		-
+			message: '#^Class App\\Repository\\Investissement\\DealRepository extends generic class Doctrine\\Bundle\\DoctrineBundle\\Repository\\ServiceEntityRepository but does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Repository/Investissement/DealRepository.php
+
+		-
+			message: '#^Method App\\Repository\\Investissement\\DealRepository\:\:findByBuyerId\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/Investissement/DealRepository.php
+
+		-
+			message: '#^Class App\\Repository\\Investissement\\NegotiationRepository extends generic class Doctrine\\Bundle\\DoctrineBundle\\Repository\\ServiceEntityRepository but does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Repository/Investissement/NegotiationRepository.php
+
+		-
+			message: '#^Method App\\Repository\\InvestmentRepository\:\:countByStatutForUser\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/InvestmentRepository.php
+
+		-
+			message: '#^Method App\\Repository\\InvestmentRepository\:\:findAllByUser\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/InvestmentRepository.php
+
+		-
+			message: '#^Method App\\Repository\\InvestmentRepository\:\:findAllWithProject\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/InvestmentRepository.php
+
+		-
+			message: '#^Method App\\Repository\\InvestmentRepository\:\:findByProject\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/InvestmentRepository.php
+
+		-
+			message: '#^Method App\\Repository\\InvestmentRepository\:\:findLastByUser\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/InvestmentRepository.php
+
+		-
+			message: '#^Method App\\Repository\\InvestmentRepository\:\:findLastReceivedByProjects\(\) has parameter \$projects with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/InvestmentRepository.php
+
+		-
+			message: '#^Method App\\Repository\\InvestmentRepository\:\:findLastReceivedByProjects\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/InvestmentRepository.php
+
+		-
+			message: '#^Method App\\Repository\\InvestmentRepository\:\:getMonthlyTotalByUser\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/InvestmentRepository.php
+
+		-
+			message: '#^Method App\\Repository\\InvestmentRepository\:\:getTotalInvestedByProjects\(\) has parameter \$projects with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/InvestmentRepository.php
+
+		-
+			message: '#^Class App\\Repository\\Marketplace\\AutoConfirmNotificationRepository extends generic class Doctrine\\Bundle\\DoctrineBundle\\Repository\\ServiceEntityRepository but does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Repository/Marketplace/AutoConfirmNotificationRepository.php
+
+		-
+			message: '#^Method App\\Repository\\Marketplace\\AutoConfirmNotificationRepository\:\:findUnreadByInvestisseur\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/Marketplace/AutoConfirmNotificationRepository.php
+
+		-
+			message: '#^Class App\\Repository\\Marketplace\\AvisProduitRepository extends generic class Doctrine\\Bundle\\DoctrineBundle\\Repository\\ServiceEntityRepository but does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Repository/Marketplace/AvisProduitRepository.php
+
+		-
+			message: '#^Class App\\Repository\\Marketplace\\CommandeLigneRepository extends generic class Doctrine\\Bundle\\DoctrineBundle\\Repository\\ServiceEntityRepository but does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Repository/Marketplace/CommandeLigneRepository.php
+
+		-
+			message: '#^Class App\\Repository\\Marketplace\\CommandeRepository extends generic class Doctrine\\Bundle\\DoctrineBundle\\Repository\\ServiceEntityRepository but does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Repository/Marketplace/CommandeRepository.php
+
+		-
+			message: '#^Method App\\Repository\\Marketplace\\CommandeRepository\:\:countByStatut\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/Marketplace/CommandeRepository.php
+
+		-
+			message: '#^Method App\\Repository\\Marketplace\\CommandeRepository\:\:findByClient\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/Marketplace/CommandeRepository.php
+
+		-
+			message: '#^Method App\\Repository\\Marketplace\\CommandeRepository\:\:findByInvestisseur\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/Marketplace/CommandeRepository.php
+
+		-
+			message: '#^Method App\\Repository\\Marketplace\\CommandeRepository\:\:findByStatut\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/Marketplace/CommandeRepository.php
+
+		-
+			message: '#^Method App\\Repository\\Marketplace\\CommandeRepository\:\:findConfirmees\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/Marketplace/CommandeRepository.php
+
+		-
+			message: '#^Method App\\Repository\\Marketplace\\CommandeRepository\:\:findEnAttente\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/Marketplace/CommandeRepository.php
+
+		-
+			message: '#^Class App\\Repository\\Marketplace\\CommandeStatusHistoryRepository extends generic class Doctrine\\Bundle\\DoctrineBundle\\Repository\\ServiceEntityRepository but does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Repository/Marketplace/CommandeStatusHistoryRepository.php
+
+		-
+			message: '#^Method App\\Repository\\Marketplace\\CommandeStatusHistoryRepository\:\:findByCommande\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/Marketplace/CommandeStatusHistoryRepository.php
+
+		-
+			message: '#^Class App\\Repository\\Marketplace\\PanierRepository extends generic class Doctrine\\Bundle\\DoctrineBundle\\Repository\\ServiceEntityRepository but does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Repository/Marketplace/PanierRepository.php
+
+		-
+			message: '#^Method App\\Repository\\Marketplace\\PanierRepository\:\:findByClient\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/Marketplace/PanierRepository.php
+
+		-
+			message: '#^Method App\\Repository\\Marketplace\\ProduitRepository\:\:findActive\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/Marketplace/ProduitRepository.php
+
+		-
+			message: '#^Method App\\Repository\\Marketplace\\ProduitRepository\:\:findBySeller\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/Marketplace/ProduitRepository.php
+
+		-
+			message: '#^Method App\\Repository\\Marketplace\\ProduitRepository\:\:findLatest\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/Marketplace/ProduitRepository.php
+
+		-
+			message: '#^Class App\\Repository\\Marketplace\\ProduitServiceRepository extends generic class Doctrine\\Bundle\\DoctrineBundle\\Repository\\ServiceEntityRepository but does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Repository/Marketplace/ProduitServiceRepository.php
+
+		-
+			message: '#^Method App\\Repository\\Marketplace\\ProduitServiceRepository\:\:findAllCategories\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/Marketplace/ProduitServiceRepository.php
+
+		-
+			message: '#^Method App\\Repository\\Marketplace\\ProduitServiceRepository\:\:findByCategorie\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/Marketplace/ProduitServiceRepository.php
+
+		-
+			message: '#^Method App\\Repository\\Marketplace\\ProduitServiceRepository\:\:findByCategorieSauf\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/Marketplace/ProduitServiceRepository.php
+
+		-
+			message: '#^Method App\\Repository\\Marketplace\\ProduitServiceRepository\:\:findByCategoriesExcluant\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/Marketplace/ProduitServiceRepository.php
+
+		-
+			message: '#^Method App\\Repository\\Marketplace\\ProduitServiceRepository\:\:findByOwner\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/Marketplace/ProduitServiceRepository.php
+
+		-
+			message: '#^Method App\\Repository\\Marketplace\\ProduitServiceRepository\:\:findDisponibles\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/Marketplace/ProduitServiceRepository.php
+
+		-
+			message: '#^Method App\\Repository\\Marketplace\\ProduitServiceRepository\:\:findDisponiblesExcluant\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/Marketplace/ProduitServiceRepository.php
+
+		-
+			message: '#^Method App\\Repository\\Marketplace\\ProduitServiceRepository\:\:search\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/Marketplace/ProduitServiceRepository.php
+
+		-
+			message: '#^Method App\\Repository\\NegotiationMessageRepository\:\:findByNegotiation\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NegotiationMessageRepository.php
+
+		-
+			message: '#^Method App\\Repository\\NegotiationRepository\:\:findByInvestor\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NegotiationRepository.php
+
+		-
+			message: '#^Method App\\Repository\\NegotiationRepository\:\:findByProject\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NegotiationRepository.php
+
+		-
+			message: '#^Method App\\Repository\\NegotiationRepository\:\:findByStartup\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NegotiationRepository.php
+
+		-
+			message: '#^Method App\\Repository\\OrderRepository\:\:findByBuyer\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/OrderRepository.php
+
+		-
+			message: '#^Method App\\Repository\\ProjectRepository\:\:countBySecteur\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/ProjectRepository.php
+
+		-
+			message: '#^Method App\\Repository\\ProjectRepository\:\:countByStatusForUser\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/ProjectRepository.php
+
+		-
+			message: '#^Method App\\Repository\\ProjectRepository\:\:findAllWithInvestments\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/ProjectRepository.php
+
+		-
+			message: '#^Method App\\Repository\\ProjectRepository\:\:findByStatus\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/ProjectRepository.php
+
+		-
+			message: '#^Method App\\Repository\\ProjectRepository\:\:findByUser\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/ProjectRepository.php
+
+		-
+			message: '#^Method App\\Repository\\ProjectRepository\:\:findEnCours\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/ProjectRepository.php
+
+		-
+			message: '#^Method App\\Repository\\ProjectRepository\:\:findOpenForMatching\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/ProjectRepository.php
+
+		-
+			message: '#^Method App\\Repository\\ProjectRepository\:\:search\(\) has parameter \$filters with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/ProjectRepository.php
+
+		-
+			message: '#^Method App\\Repository\\ProjectRepository\:\:search\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/ProjectRepository.php
+
+		-
+			message: '#^Method App\\Repository\\UsersAvis\\AvisRepository\:\:findAllWithUser\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/UsersAvis/AvisRepository.php
+
+		-
+			message: '#^Method App\\Repository\\UsersAvis\\AvisRepository\:\:findByRating\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/UsersAvis/AvisRepository.php
+
+		-
+			message: '#^Method App\\Repository\\UsersAvis\\AvisRepository\:\:findByUser\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/UsersAvis/AvisRepository.php
+
+		-
+			message: '#^Method App\\Repository\\UsersAvis\\AvisRepository\:\:findRecent\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/UsersAvis/AvisRepository.php
+
+		-
+			message: '#^Method App\\Repository\\UsersAvis\\AvisRepository\:\:findVerified\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/UsersAvis/AvisRepository.php
+
+		-
+			message: '#^Method App\\Repository\\UsersAvis\\UserRepository\:\:findActive\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/UsersAvis/UserRepository.php
+
+		-
+			message: '#^Method App\\Repository\\UsersAvis\\UserRepository\:\:findAdmins\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/UsersAvis/UserRepository.php
+
+		-
+			message: '#^Method App\\Repository\\UsersAvis\\UserRepository\:\:findAllRecent\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/UsersAvis/UserRepository.php
+
+		-
+			message: '#^Method App\\Repository\\UsersAvis\\UserRepository\:\:findByRole\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/UsersAvis/UserRepository.php
+
+		-
+			message: '#^Method App\\Service\\Auth\\GoogleOAuthService\:\:exchangeCodeForTokens\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Auth/GoogleOAuthService.php
+
+		-
+			message: '#^Method App\\Service\\Auth\\GoogleOAuthService\:\:fetchUserInfo\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Auth/GoogleOAuthService.php
+
+		-
+			message: '#^Parameter \#1 \$length of function random_bytes expects int\<1, max\>, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Service/Auth/SecureTokenService.php
+
+		-
+			message: '#^Method App\\Service\\Elearning\\FormationAiBestPickService\:\:fallbackPayload\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Elearning/FormationAiBestPickService.php
+
+		-
+			message: '#^Method App\\Service\\Elearning\\FormationAiBestPickService\:\:fallbackPick\(\) should return array\{ok\: true, formation_id\: int, title\: string, reason\: string, en_ligne\: bool, source\: string\} but returns array\.$#'
+			identifier: return.type
+			count: 4
+			path: src/Service/Elearning/FormationAiBestPickService.php
+
+		-
+			message: '#^Parameter \#1 \$all of method App\\Service\\Elearning\\FormationAiBestPickService\:\:sliceCandidatesExcludingIds\(\) expects list\<App\\Entity\\Elearning\\Formation\>, non\-empty\-array given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Service/Elearning/FormationAiBestPickService.php
+
+		-
+			message: '#^Parameter \#1 \.\.\.\$arg1 of function max expects non\-empty\-array, array\<int, float\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Service/Elearning/LocalFormationRecommender.php
+
+		-
+			message: '#^Method App\\Service\\FacePlusPlus\\FaceRecognitionService\:\:detectFace\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/FacePlusPlus/FaceRecognitionService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\AiNegotiationService\:\:analyse\(\) has parameter \$messages with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\AiNegotiationService\:\:analyse\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\AiNegotiationService\:\:analyzeForInvestor\(\) has parameter \$messages with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\AiNegotiationService\:\:analyzeForInvestor\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\AiNegotiationService\:\:analyzeForStartup\(\) has parameter \$messages with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\AiNegotiationService\:\:analyzeForStartup\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\AiNegotiationService\:\:buildActionPlan\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\AiNegotiationService\:\:buildDrafts\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\AiNegotiationService\:\:buildPrompts\(\) has parameter \$messages with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\AiNegotiationService\:\:buildPrompts\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\AiNegotiationService\:\:buildStartupPrompts\(\) has parameter \$messages with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\AiNegotiationService\:\:buildStartupPrompts\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\AiNegotiationService\:\:buildStrengths\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\AiNegotiationService\:\:buildWeaknesses\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\AiNegotiationService\:\:callOpenAi\(\) has parameter \$messages with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\AiNegotiationService\:\:callOpenAi\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\AiNegotiationService\:\:callOpenAiDraft\(\) has parameter \$messages with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\AiNegotiationService\:\:callOpenAiStartup\(\) has parameter \$messages with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\AiNegotiationService\:\:callOpenAiStartup\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\AiNegotiationService\:\:generateDraft\(\) has parameter \$messages with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\AiNegotiationService\:\:hasOfferMessages\(\) has parameter \$messages with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\AiNegotiationService\:\:localAnalysis\(\) has parameter \$messages with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\AiNegotiationService\:\:localAnalysis\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\AiNegotiationService\:\:localStartupAnalysis\(\) has parameter \$messages with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\AiNegotiationService\:\:localStartupAnalysis\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\AiNegotiationService\:\:sanitize\(\) has parameter \$r with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\AiNegotiationService\:\:sanitize\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\AiNegotiationService\:\:sanitizeStartup\(\) has parameter \$r with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\AiNegotiationService\:\:sanitizeStartup\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Parameter \#1 \$json of function json_decode expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Parameter \#3 \$subject of function preg_replace expects array\<float\|int\|string\>\|string, string\|null given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\ContractPdfService\:\:buildHtml\(\) has parameter \$project with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Service/Investissement/ContractPdfService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\DashboardInvestisseurService\:\:buildAlerts\(\) has parameter \$investments with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/DashboardInvestisseurService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\DashboardInvestisseurService\:\:buildAlerts\(\) has parameter \$negotiations with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/DashboardInvestisseurService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\DashboardInvestisseurService\:\:buildAlerts\(\) has parameter \$sectorMap with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/DashboardInvestisseurService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\DashboardInvestisseurService\:\:buildAlerts\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/DashboardInvestisseurService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\DashboardInvestisseurService\:\:buildPortfolio\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/DashboardInvestisseurService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\DashboardInvestisseurService\:\:callOpenAiReco\(\) has parameter \$portfolio with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/DashboardInvestisseurService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\DashboardInvestisseurService\:\:callOpenAiReco\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/DashboardInvestisseurService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\DashboardInvestisseurService\:\:getAiRecommendations\(\) has parameter \$portfolio with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/DashboardInvestisseurService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\DashboardInvestisseurService\:\:getAiRecommendations\(\) should return array\{items\: array\<string\>, source\: ''local''\|''openai''\} but returns array\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Service/Investissement/DashboardInvestisseurService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\DashboardInvestisseurService\:\:localRecommendations\(\) has parameter \$sectors with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/DashboardInvestisseurService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\DashboardInvestisseurService\:\:localRecommendations\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/DashboardInvestisseurService.php
+
+		-
+			message: '#^Parameter \#1 \$buyerId of method App\\Repository\\Investissement\\DealRepository\:\:countActiveByBuyerId\(\) expects int, int\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Service/Investissement/DashboardInvestisseurService.php
+
+		-
+			message: '#^Cannot call method getProject_id\(\) on App\\Entity\\Investissement\\Project\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Service/Investissement/DealWorkflowService.php
+
+		-
+			message: '#^Cannot call method getUserId\(\) on App\\Entity\\UsersAvis\\User\|null\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: src/Service/Investissement/DealWorkflowService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\DealWorkflowService\:\:findDealByInvestment\(\) should return App\\Entity\\Investissement\\Deal\|null but returns object\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Service/Investissement/DealWorkflowService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\DealWorkflowService\:\:findDealByNegotiation\(\) should return App\\Entity\\Investissement\\Deal\|null but returns object\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Service/Investissement/DealWorkflowService.php
+
+		-
+			message: '#^Parameter \#1 \$buyer_id of method App\\Entity\\Investissement\\Deal\:\:setBuyer_id\(\) expects int, int\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Service/Investissement/DealWorkflowService.php
+
+		-
+			message: '#^Parameter \#1 \$projectId of method App\\Repository\\InvestmentRepository\:\:findOneByProjectIdAndBuyerId\(\) expects int, int\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Service/Investissement/DealWorkflowService.php
+
+		-
+			message: '#^Parameter \#1 \$project_id of method App\\Entity\\Investissement\\Deal\:\:setProject_id\(\) expects int, int\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Service/Investissement/DealWorkflowService.php
+
+		-
+			message: '#^Parameter \#1 \$seller_id of method App\\Entity\\Investissement\\Deal\:\:setSeller_id\(\) expects int, int\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Service/Investissement/DealWorkflowService.php
+
+		-
+			message: '#^Parameter \#2 \$buyerId of method App\\Repository\\InvestmentRepository\:\:findOneByProjectIdAndBuyerId\(\) expects int, int\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Service/Investissement/DealWorkflowService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\MatchingService\:\:badge\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/MatchingService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\MatchingService\:\:buildProfile\(\) has parameter \$investments with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/MatchingService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\MatchingService\:\:buildProfile\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/MatchingService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\MatchingService\:\:computeComponents\(\) has parameter \$profile with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/MatchingService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\MatchingService\:\:generateReason\(\) has parameter \$c with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/MatchingService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\MatchingService\:\:generateReason\(\) has parameter \$profile with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/MatchingService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\MatchingService\:\:matchProjects\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/MatchingService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\MatchingService\:\:scoreBudget\(\) has parameter \$profile with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/MatchingService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\MatchingService\:\:scoreSector\(\) has parameter \$profile with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/MatchingService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\MatchingService\:\:weightedScore\(\) has parameter \$c with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/MatchingService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\MoneyHelper\:\:sum\(\) has parameter \$moneys with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/MoneyHelper.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\MoneyHelper\:\:sumInvestments\(\) has parameter \$investments with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/MoneyHelper.php
+
+		-
+			message: '#^Parameter \#1 \$code of class Money\\Currency constructor expects non\-empty\-string, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Service/Investissement/MoneyHelper.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\PortfolioAnalysisService\:\:analyzePortfolio\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 3
+			path: src/Service/Investissement/PortfolioAnalysisService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\PortfolioAnalysisService\:\:buildChart\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/PortfolioAnalysisService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\PortfolioAnalysisService\:\:buildPredictions\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/PortfolioAnalysisService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\PortfolioAnalysisService\:\:buildSectorBreakdown\(\) has parameter \$investments with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/PortfolioAnalysisService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\PortfolioAnalysisService\:\:buildSectorBreakdown\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/PortfolioAnalysisService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\PortfolioAnalysisService\:\:calculateScore\(\) has parameter \$deals with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/PortfolioAnalysisService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\PortfolioAnalysisService\:\:calculateScore\(\) has parameter \$investments with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/PortfolioAnalysisService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\PortfolioAnalysisService\:\:calculateScore\(\) has parameter \$negotiations with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/PortfolioAnalysisService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\PortfolioAnalysisService\:\:calculateWeightedRoi\(\) has parameter \$investments with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/PortfolioAnalysisService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\PortfolioAnalysisService\:\:callOpenAi\(\) has parameter \$investments with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/PortfolioAnalysisService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\PortfolioAnalysisService\:\:callOpenAi\(\) has parameter \$negotiations with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/PortfolioAnalysisService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\PortfolioAnalysisService\:\:callOpenAi\(\) has parameter \$predictions with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/PortfolioAnalysisService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\PortfolioAnalysisService\:\:callOpenAi\(\) has parameter \$sectors with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/PortfolioAnalysisService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\PortfolioAnalysisService\:\:callOpenAi\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/PortfolioAnalysisService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\PortfolioAnalysisService\:\:getAnalysis\(\) has parameter \$investments with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/PortfolioAnalysisService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\PortfolioAnalysisService\:\:getAnalysis\(\) has parameter \$negotiations with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/PortfolioAnalysisService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\PortfolioAnalysisService\:\:getAnalysis\(\) has parameter \$predictions with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/PortfolioAnalysisService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\PortfolioAnalysisService\:\:getAnalysis\(\) has parameter \$sectors with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/PortfolioAnalysisService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\PortfolioAnalysisService\:\:getAnalysis\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/PortfolioAnalysisService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\PortfolioAnalysisService\:\:localAnalysis\(\) has parameter \$sectors with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/PortfolioAnalysisService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\PortfolioAnalysisService\:\:localAnalysis\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/PortfolioAnalysisService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\PortfolioAnalysisService\:\:zeroPredictions\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/PortfolioAnalysisService.php
+
+		-
+			message: '#^Parameter \#1 \$buyerId of method App\\Repository\\Investissement\\DealRepository\:\:findByBuyerId\(\) expects int, int\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Service/Investissement/PortfolioAnalysisService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\ProjectAdvisorService\:\:analyzeProject\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/ProjectAdvisorService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\ProjectAdvisorService\:\:buildPrompts\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/ProjectAdvisorService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\ProjectAdvisorService\:\:callOpenAi\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/ProjectAdvisorService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\ProjectAdvisorService\:\:localAnalysis\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/ProjectAdvisorService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\ProjectAdvisorService\:\:parseJson\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/ProjectAdvisorService.php
+
+		-
+			message: '#^Parameter \#1 \$string of function trim expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Service/Investissement/ProjectAdvisorService.php
+
+		-
+			message: '#^Parameter \#3 \$subject of function preg_replace expects array\<float\|int\|string\>\|string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Service/Investissement/ProjectAdvisorService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\RoiSimulatorService\:\:callOpenAi\(\) has parameter \$sim with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/RoiSimulatorService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\RoiSimulatorService\:\:callOpenAi\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/RoiSimulatorService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\RoiSimulatorService\:\:getAiInterpretation\(\) has parameter \$sim with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/RoiSimulatorService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\RoiSimulatorService\:\:getAiInterpretation\(\) should return array\{verdict\: string, verdict_key\: string, text\: string, advice\: string\} but returns array\.$#'
+			identifier: return.type
+			count: 3
+			path: src/Service/Investissement/RoiSimulatorService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\RoiSimulatorService\:\:localInterpretation\(\) has parameter \$sim with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/RoiSimulatorService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\RoiSimulatorService\:\:localInterpretation\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/RoiSimulatorService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\RoiSimulatorService\:\:sanitizeInterpretation\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/RoiSimulatorService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\RoiSimulatorService\:\:sanitizeInterpretation\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/RoiSimulatorService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\RoiSimulatorService\:\:simulate\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/RoiSimulatorService.php
+
+		-
+			message: '#^Parameter \#1 \$address of class Symfony\\Component\\Mime\\Address constructor expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Service/Investissement/SignatureEmailService.php
+
+		-
+			message: '#^Parameter \#2 \$name of class Symfony\\Component\\Mime\\Address constructor expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Service/Investissement/SignatureEmailService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\YousignService\:\:apiPost\(\) has parameter \$body with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/YousignService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\YousignService\:\:apiPost\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/YousignService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\YousignService\:\:apiUploadPdf\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/YousignService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\YousignService\:\:getStatus\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/YousignService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\YousignService\:\:handleWebhook\(\) has parameter \$payload with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/YousignService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\YousignService\:\:jsonHeaders\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/YousignService.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\YousignService\:\:splitFullName\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Investissement/YousignService.php
+
+		-
+			message: '#^Method App\\Service\\MarketDataService\:\:fetchCrypto\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/MarketDataService.php
+
+		-
+			message: '#^Method App\\Service\\MarketDataService\:\:fetchExchangeRates\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/MarketDataService.php
+
+		-
+			message: '#^Method App\\Service\\MarketDataService\:\:getMarketData\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 2
+			path: src/Service/MarketDataService.php
+
+		-
+			message: '#^Call to an undefined method object\:\:getNom\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Service/Marketplace/FactureService.php
+
+		-
+			message: '#^Method App\\Service\\Marketplace\\FactureService\:\:buildLignesDetail\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Marketplace/FactureService.php
+
+		-
+			message: '#^Parameter \#1 \$commande of method App\\Service\\Marketplace\\FactureService\:\:buildLignesDetail\(\) expects App\\Entity\\Marketplace\\Commande, App\\Entity\\Marketplace\\Commande\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Service/Marketplace/FactureService.php
+
+		-
+			message: '#^Method App\\Service\\Marketplace\\GrokService\:\:fallbackMarketAnalysis\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Marketplace/GrokService.php
+
+		-
+			message: '#^Method App\\Service\\Marketplace\\GrokService\:\:fallbackOrderRecommendation\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Marketplace/GrokService.php
+
+		-
+			message: '#^Method App\\Service\\Marketplace\\GrokService\:\:generateMarketAnalysis\(\) should return array\{demand\: string, competition\: string, potential\: string, summary\: string, tips\: array\<string\>, source\: string\} but returns array\.$#'
+			identifier: return.type
+			count: 2
+			path: src/Service/Marketplace/GrokService.php
+
+		-
+			message: '#^Method App\\Service\\Marketplace\\GrokService\:\:generateMarketAnalysis\(\) should return array\{demand\: string, competition\: string, potential\: string, summary\: string, tips\: array\<string\>, source\: string\} but returns non\-empty\-array\<mixed, mixed\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Service/Marketplace/GrokService.php
+
+		-
+			message: '#^Method App\\Service\\Marketplace\\GrokService\:\:generateOrderRecommendation\(\) should return array\{text\: string, priority\: string, source\: string\} but returns array\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Service/Marketplace/GrokService.php
+
+		-
+			message: '#^Parameter \#1 \$clientId of method App\\Repository\\Marketplace\\CommandeRepository\:\:findByClient\(\) expects int, int\|null given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Service/Marketplace/OrderScoringService.php
+
+		-
+			message: '#^Method App\\Service\\Marketplace\\ShippoTrackerService\:\:getTrackingStatus\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Marketplace/ShippoTrackerService.php
+
+		-
+			message: '#^Method App\\Service\\Marketplace\\StatisticsService\:\:getDashboardSummary\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 5
+			path: src/Service/Marketplace/StatisticsService.php
+
+		-
+			message: '#^Call to an undefined method object\:\:getNom\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Service/Marketplace/StripeService.php
+
+		-
+			message: '#^Method App\\Service\\Marketplace\\StripeService\:\:buildLineItems\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/Marketplace/StripeService.php
+
+		-
+			message: '#^Method App\\Service\\Marketplace\\TwilioService\:\:normalizePhone\(\) should return string but returns string\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Service/Marketplace/TwilioService.php
+
+		-
+			message: '#^Parameter \#1 \$haystack of function str_starts_with expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Service/Marketplace/TwilioService.php
+
+		-
+			message: '#^Parameter \#1 \$string of function ltrim expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Service/Marketplace/TwilioService.php
+
+		-
+			message: '#^Parameter \#1 \$string of function substr expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Service/Marketplace/TwilioService.php
+
+		-
+			message: '#^Method App\\Service\\NewsService\:\:fetchGNews\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/NewsService.php
+
+		-
+			message: '#^Method App\\Service\\NewsService\:\:getLatestWorldNews\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/NewsService.php
+
+		-
+			message: '#^Method App\\Service\\NewsService\:\:normalizeGNews\(\) has parameter \$raw with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/NewsService.php
+
+		-
+			message: '#^Method App\\Service\\NewsService\:\:normalizeGNews\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/NewsService.php

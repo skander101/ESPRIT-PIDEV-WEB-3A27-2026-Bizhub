@@ -3,6 +3,7 @@
 namespace App\Controller\Investissement;
 
 use App\Entity\Investissement\Investment;
+use App\Entity\UsersAvis\User;
 use App\Entity\Investissement\Project;
 use App\Repository\InvestmentRepository;
 use App\Repository\NegotiationRepository;
@@ -307,7 +308,7 @@ class InvestissementApiController extends AbstractController
         if ($err = $this->requireAuth()) return $err;
 
         $user     = $this->getUser();
-        $userType = $user->getUserType();
+        $userType = ($user instanceof User ? $user->getUserType() : null);
 
         if ($userType === 'investisseur') {
             $total        = $this->investmentRepo->getTotalInvestedByUser($user);

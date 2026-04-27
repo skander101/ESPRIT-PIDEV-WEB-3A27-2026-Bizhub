@@ -36,7 +36,7 @@ final class Version20260414000001 extends AbstractMigration
         $this->addSql('
             ALTER TABLE facture
                 ADD CONSTRAINT fk_facture_commande
-                FOREIGN KEY (commande_id) REFERENCES commande (id_commande)
+                FOREIGN KEY (commande_id) REFERENCES commande (commande_id)
                 ON DELETE CASCADE
         ');
     }

@@ -54,17 +54,17 @@ class Negotiation
     )]
     private ?string $status = null;
 
-    #[ORM\Column(type: 'float', nullable: true)]
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
     #[Assert\Positive(message: 'Le montant proposé doit être positif.')]
-    private ?float $proposed_amount = null;
+    private ?string $proposed_amount = null;
 
-    #[ORM\Column(type: 'float', nullable: true)]
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
     #[Assert\Positive(message: 'Le montant final doit être positif.')]
-    private ?float $final_amount = null;
+    private ?string $final_amount = null;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
+    #[ORM\Column(type: 'datetime', nullable: false)]
     #[Assert\LessThanOrEqual(value: 'now', message: 'La date de création ne peut pas être dans le futur.')]
-    private ?\DateTimeInterface $created_at = null;
+    private \DateTimeInterface $created_at;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     #[Assert\LessThanOrEqual(value: 'now', message: 'La date de mise à jour ne peut pas être dans le futur.')]
@@ -76,6 +76,7 @@ class Negotiation
     public function __construct()
     {
         $this->negotiationMessages = new ArrayCollection();
+        $this->created_at = new \DateTime();
     }
 
     public function getNegotiation_id(): ?int { return $this->negotiation_id; }
@@ -93,17 +94,17 @@ class Negotiation
     public function getStatus(): ?string { return $this->status; }
     public function setStatus(?string $status): self { $this->status = $status; return $this; }
 
-    public function getProposed_amount(): ?float { return $this->proposed_amount; }
-    public function setProposed_amount(?float $proposed_amount): self { $this->proposed_amount = $proposed_amount; return $this; }
+    public function getProposed_amount(): ?string { return $this->proposed_amount; }
+    public function setProposed_amount(?string $proposed_amount): self { $this->proposed_amount = $proposed_amount; return $this; }
 
-    public function getFinal_amount(): ?float { return $this->final_amount; }
-    public function setFinal_amount(?float $final_amount): self { $this->final_amount = $final_amount; return $this; }
+    public function getFinal_amount(): ?string { return $this->final_amount; }
+    public function setFinal_amount(?string $final_amount): self { $this->final_amount = $final_amount; return $this; }
 
     public function getCreated_at(): ?\DateTimeInterface { return $this->created_at; }
-    public function setCreated_at(?\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
+    protected function setCreated_at(?\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
 
     public function getUpdated_at(): ?\DateTimeInterface { return $this->updated_at; }
-    public function setUpdated_at(?\DateTimeInterface $updated_at): self { $this->updated_at = $updated_at; return $this; }
+    protected function setUpdated_at(?\DateTimeInterface $updated_at): self { $this->updated_at = $updated_at; return $this; }
 
     /** @return Collection<int, NegotiationMessage> */
     public function getNegotiationMessages(): Collection

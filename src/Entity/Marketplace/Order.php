@@ -29,7 +29,7 @@ class Order
         return $this;
     }
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'orders')]
+    #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'buyer_id', referencedColumnName: 'user_id')]
     private ?User $user = null;
 
@@ -73,29 +73,29 @@ class Order
         return $this;
     }
 
-    #[ORM\Column(type: 'decimal', precision: 10, scale: 3, nullable: true)]
-    private ?float $unit_price = null;
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
+    private ?string $unit_price = null;
 
-    public function getUnit_price(): ?float
+    public function getUnit_price(): ?string
     {
         return $this->unit_price;
     }
 
-    public function setUnit_price(?float $unit_price): self
+    public function setUnit_price(?string $unit_price): self
     {
         $this->unit_price = $unit_price;
         return $this;
     }
 
-    #[ORM\Column(type: 'decimal', precision: 10, scale: 3, nullable: true)]
-    private ?float $total_price = null;
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
+    private ?string $total_price = null;
 
-    public function getTotal_price(): ?float
+    public function getTotal_price(): ?string
     {
         return $this->total_price;
     }
 
-    public function setTotal_price(?float $total_price): self
+    public function setTotal_price(?string $total_price): self
     {
         $this->total_price = $total_price;
         return $this;
@@ -109,7 +109,7 @@ class Order
         return $this->order_date;
     }
 
-    public function setOrder_date(?\DateTimeInterface $order_date): self
+    protected function setOrder_date(?\DateTimeInterface $order_date): self
     {
         $this->order_date = $order_date;
         return $this;
@@ -123,7 +123,7 @@ class Order
         return $this->delivery_address;
     }
 
-    public function setDelivery_address(?string $delivery_address): self
+    protected function setDelivery_address(?string $delivery_address): self
     {
         $this->delivery_address = $delivery_address;
         return $this;

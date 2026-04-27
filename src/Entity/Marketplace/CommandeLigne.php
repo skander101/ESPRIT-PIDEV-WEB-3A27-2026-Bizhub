@@ -17,23 +17,20 @@ class CommandeLigne
 
     // Relation ManyToOne vers Commande
     #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: 'lignes')]
-    #[ORM\JoinColumn(name: 'id_commande', referencedColumnName: 'id_commande', nullable: false)]
+    #[ORM\JoinColumn(name: 'commande_id', referencedColumnName: 'commande_id', nullable: false)]
     private ?Commande $commande = null;
 
     #[ORM\Column(name: 'id_produit', type: 'integer', nullable: false)]
-    private ?int $idProduit = null;
+    private int $idProduit;
 
     #[ORM\Column(name: 'quantite', type: 'integer', nullable: false)]
-    private ?int $quantite = null;
+    private int $quantite;
 
-    #[ORM\Column(name: 'prix_ht_unitaire', type: 'decimal', precision: 10, scale: 3, nullable: false)]
-    private ?string $prixHtUnitaire = null;
+    #[ORM\Column(name: 'prix_ht_unitaire', type: 'decimal', precision: 10, scale: 2, nullable: false)]
+    private string $prixHtUnitaire = '0.00';
 
-    #[ORM\Column(name: 'tva_rate', type: 'decimal', precision: 5, scale: 2, nullable: false, options: ['default' => '19.00'])]
+#[ORM\Column(name: 'tva_rate', type: 'decimal', precision: 5, scale: 2, nullable: false, options: ['default' => '19.00'])]
     private string $tvaRate = '19.00';
-
-    #[ORM\Column(name: 'created_at', type: 'datetime', nullable: false)]
-    private ?\DateTimeInterface $createdAt = null;
 
     public function __construct()
     {
@@ -69,10 +66,10 @@ class CommandeLigne
     public function setCommande(?Commande $v): self { $this->commande = $v; return $this; }
 
     public function getIdProduit(): ?int { return $this->idProduit; }
-    public function setIdProduit(?int $v): self { $this->idProduit = $v; return $this; }
+    public function setIdProduit(int $v): self { $this->idProduit = $v; return $this; }
 
-    public function getQuantite(): ?int { return $this->quantite; }
-    public function setQuantite(?int $v): self { $this->quantite = $v; return $this; }
+    public function getQuantite(): int { return $this->quantite; }
+    public function setQuantite(int $v): self { $this->quantite = $v; return $this; }
 
     public function getPrixHtUnitaire(): ?string { return $this->prixHtUnitaire; }
     public function setPrixHtUnitaire(?string $v): self { $this->prixHtUnitaire = $v; return $this; }

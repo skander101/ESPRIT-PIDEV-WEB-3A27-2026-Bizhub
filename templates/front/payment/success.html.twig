@@ -1,0 +1,40 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Paiement réussi — BizHub{% endblock %}
+
+{% block extra_styles %}
+  .pay-success { min-height: 70vh; display: flex; align-items: center; justify-content: center; padding: 100px 5% 48px; background: linear-gradient(180deg,#ecfdf5,#f0fdf4); }
+  .pay-success-card {
+    max-width: 520px; text-align: center; background: #fff; border-radius: 20px; padding: 2.5rem 2rem;
+    box-shadow: 0 24px 60px rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.25);
+  }
+  .pay-success-icon {
+    width: 88px; height: 88px; margin: 0 auto 1.25rem; border-radius: 50%;
+    background: linear-gradient(135deg,#34d399,#059669); color: #fff; font-size: 2.5rem;
+    display: flex; align-items: center; justify-content: center;
+    animation: popIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes popIn { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .pay-success h1 { font-family: 'Josefin Sans', sans-serif; color: #065f46; font-size: 1.65rem; margin: 0 0 0.75rem; }
+  .pay-success p { color: #475569; line-height: 1.6; margin: 0 0 1.5rem; }
+  .pay-success .btn-main {
+    display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.85rem 1.5rem; border-radius: 12px;
+    background: linear-gradient(135deg,#0ea5e9,#0369a1); color: #fff; font-weight: 700; text-decoration: none;
+    box-shadow: 0 8px 24px rgba(14,165,233,0.35);
+  }
+  .pay-success .btn-main:hover { color: #fff; transform: translateY(-1px); }
+{% endblock %}
+
+{% block content %}
+<div class="pay-success">
+  <div class="pay-success-card">
+    <div class="pay-success-icon"><i class="fa-solid fa-check"></i></div>
+    <h1>Paiement confirmé</h1>
+    <p>
+      Votre participation à <strong>{{ formation.title|e }}</strong> est enregistrée.
+      Vous recevrez un email de confirmation avec votre attestation PDF en pièce jointe.
+    </p>
+    <a class="btn-main" href="{{ path('app_front_formations_index') }}"><i class="fa-solid fa-graduation-cap"></i> Retour aux formations</a>
+  </div>
+</div>
+{% endblock %}

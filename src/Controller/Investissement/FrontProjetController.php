@@ -3,6 +3,7 @@
 namespace App\Controller\Investissement;
 
 use App\Entity\Investissement\Project;
+use App\Entity\UsersAvis\User;
 // Project::STATUTS et Project::SECTEURS utilisés dans index()
 use App\Form\Investissement\ProjetType;
 use App\Repository\InvestmentRepository;
@@ -40,7 +41,7 @@ class FrontProjetController extends AbstractController
     {
         $user = $this->getUser();
 
-        if ($user && $user->getUserType() === 'startup') {
+        if ($user && ($user instanceof User ? $user->getUserType() : null) === 'startup') {
             $projets = $this->projectRepository->findBy(
                 ['user' => $user],
                 ['created_at' => 'DESC']
@@ -104,7 +105,7 @@ class FrontProjetController extends AbstractController
         // Pour chaque projet, récupérer la négociation et le deal de l'investisseur connecté
         $browseNegMap  = [];
         $browseDealMap = [];
-        if ($user && $user->getUserType() === 'investisseur') {
+        if ($user && ($user instanceof User ? $user->getUserType() : null) === 'investisseur') {
             foreach ($projets as $projet) {
                 $neg = $this->negotiationRepo->findOneBy([
                     'project'  => $projet,
@@ -171,12 +172,12 @@ class FrontProjetController extends AbstractController
             : 0;
 
         $user        = $this->getUser();
-        $isOwner     = $user && $projet->getUser() && $projet->getUser()->getUserId() === $user->getUserId();
+        $isOwner     = $user && $projet->getUser() && $projet->getUser()->getUserId() === ($user instanceof User ? $user->getUserId() : null);
         $dejaInvesti = false;
 
         if ($user && !$isOwner) {
             foreach ($investissements as $inv) {
-                if ($inv->getUser() && $inv->getUser()->getUserId() === $user->getUserId()) {
+                if ($inv->getUser() && $inv->getUser()->getUserId() === ($user instanceof User ? $user->getUserId() : null)) {
                     $dejaInvesti = true;
                     break;
                 }
@@ -212,7 +213,7 @@ class FrontProjetController extends AbstractController
             }
             // Also find the investor's investment to link to negotiation creation
             foreach ($investissements as $inv) {
-                if ($inv->getUser() && $inv->getUser()->getUserId() === $user->getUserId()) {
+                if ($inv->getUser() && $inv->getUser()->getUserId() === ($user instanceof User ? $user->getUserId() : null)) {
                     $myInvestment = $inv;
                     if (!$myDeal) {
                         $myDeal = $this->workflow->findDealByInvestment($inv);
@@ -298,7 +299,7 @@ class FrontProjetController extends AbstractController
             $project = $this->projectRepository->find($projectId);
             // Security: only owner can use context of their project
             $user = $this->getUser();
-            if ($project && (!$user || !$project->getUser() || $project->getUser()->getUserId() !== $user->getUserId())) {
+            if ($project && (!$user || !$project->getUser() || $project->getUser()->getUserId() !== ($user instanceof User ? $user->getUserId() : null))) {
                 $project = null;
             }
         }
@@ -329,7 +330,7 @@ class FrontProjetController extends AbstractController
         }
 
         $user = $this->getUser();
-        if (!$user || !$projet->getUser() || $projet->getUser()->getUserId() !== $user->getUserId()) {
+        if (!$user || !$projet->getUser() || $projet->getUser()->getUserId() !== ($user instanceof User ? $user->getUserId() : null)) {
             throw $this->createAccessDeniedException('Accès réservé au propriétaire du projet.');
         }
 
@@ -355,7 +356,7 @@ class FrontProjetController extends AbstractController
         }
 
         $user = $this->getUser();
-        if (!$user || !$projet->getUser() || $projet->getUser()->getUserId() !== $user->getUserId()) {
+        if (!$user || !$projet->getUser() || $projet->getUser()->getUserId() !== ($user instanceof User ? $user->getUserId() : null)) {
             throw $this->createAccessDeniedException('Accès réservé au propriétaire du projet.');
         }
 
@@ -388,7 +389,7 @@ class FrontProjetController extends AbstractController
         }
 
         $user = $this->getUser();
-        if (!$user || !$projet->getUser() || $projet->getUser()->getUserId() !== $user->getUserId()) {
+        if (!$user || !$projet->getUser() || $projet->getUser()->getUserId() !== ($user instanceof User ? $user->getUserId() : null)) {
             throw $this->createAccessDeniedException('Accès réservé au propriétaire du projet.');
         }
 

@@ -13,6 +13,11 @@ use App\Entity\UsersAvis\User;
 #[ORM\Table(name: 'negotiation_message')]
 class NegotiationMessage
 {
+    public function __construct()
+    {
+        $this->created_at = new \DateTime();
+    }
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
@@ -60,7 +65,7 @@ class NegotiationMessage
     }
 
     #[ORM\Column(type: 'text', nullable: false)]
-    private ?string $message = null;
+    private string $message;
 
     public function getMessage(): ?string
     {
@@ -87,15 +92,15 @@ class NegotiationMessage
         return $this;
     }
 
-    #[ORM\Column(type: 'float', nullable: true)]
-    private ?float $proposed_amount = null;
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
+    private ?string $proposed_amount = null;
 
-    public function getProposed_amount(): ?float
+    public function getProposed_amount(): ?string
     {
         return $this->proposed_amount;
     }
 
-    public function setProposed_amount(?float $proposed_amount): self
+    public function setProposed_amount(?string $proposed_amount): self
     {
         $this->proposed_amount = $proposed_amount;
         return $this;
@@ -115,15 +120,15 @@ class NegotiationMessage
         return $this;
     }
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?\DateTimeInterface $created_at = null;
+    #[ORM\Column(type: 'datetime', nullable: false)]
+    private \DateTimeInterface $created_at;
 
-    public function getCreated_at(): ?\DateTimeInterface
+    public function getCreated_at(): \DateTimeInterface
     {
         return $this->created_at;
     }
 
-    public function setCreated_at(?\DateTimeInterface $created_at): self
+    protected function setCreated_at(\DateTimeInterface $created_at): self
     {
         $this->created_at = $created_at;
         return $this;

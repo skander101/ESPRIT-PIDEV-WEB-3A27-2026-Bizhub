@@ -15,10 +15,15 @@ use App\Entity\Elearning\Formation;
 #[ORM\HasLifecycleCallbacks]
 class Participation
 {
-    #[ORM\Column(type: 'integer', nullable: false)]
-    private ?int $user_id = null;
+    public const STATUS_PAID = 'PAID';
+    public const STATUS_PENDING = 'PENDING';
+    public const STATUS_REFUNDED = 'REFUNDED';
+    public const STATUS_AWAITING_PAYMENT = 'AWAITING_PAYMENT';
 
-    public function getUser_id(): ?int
+    #[ORM\Column(type: 'integer', nullable: false)]
+    private int $user_id;
+
+    public function getUser_id(): int
     {
         return $this->user_id;
     }
@@ -48,13 +53,6 @@ class Participation
         return $this;
     }
 
-    public function setDateAffectation(?\DateTimeInterface $dateAffectation): self
-    {
-        $this->date_affectation = $dateAffectation;
-
-        return $this;
-    }
-
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $remarques = null;
 
@@ -70,7 +68,10 @@ class Participation
     }
 
     #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $payment_status = null;
+    private string $payment_status = '';
+
+    #[ORM\Column(name: 'participation_status', type: 'string', nullable: false)]
+    private string $lifecycleStatus = 'PENDING';
 
     public function getPayment_status(): ?string
     {
@@ -92,6 +93,17 @@ class Participation
     {
         $this->payment_status = $paymentStatus;
 
+        return $this;
+    }
+
+    public function getLifecycleStatus(): string
+    {
+        return $this->lifecycleStatus;
+    }
+
+    public function setLifecycleStatus(string $lifecycleStatus): self
+    {
+        $this->lifecycleStatus = $lifecycleStatus;
         return $this;
     }
 
@@ -147,19 +159,12 @@ class Participation
         return $this;
     }
 
-    #[ORM\Column(type: 'decimal', nullable: false)]
-    private ?float $amount = null;
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: false)]
+    private string $amount = '0.00';
 
-    public function getAmount(): ?float
-    {
-        return $this->amount;
-    }
+    public function getAmount(): ?string { return $this->amount; }
 
-    public function setAmount(float $amount): self
-    {
-        $this->amount = $amount;
-        return $this;
-    }
+    public function setAmount(string $amount): self { $this->amount = $amount; return $this; }
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $paid_at = null;
@@ -174,16 +179,9 @@ class Participation
         return $this->paid_at;
     }
 
-    public function setPaid_at(?\DateTimeInterface $paid_at): self
+    protected function setPaid_at(?\DateTimeInterface $paid_at): self
     {
         $this->paid_at = $paid_at;
-        return $this;
-    }
-
-    public function setPaidAt(?\DateTimeInterface $paidAt): self
-    {
-        $this->paid_at = $paidAt;
-
         return $this;
     }
 
@@ -204,7 +202,7 @@ class Participation
     }
 
     #[ORM\Column(type: 'integer', nullable: false)]
-    private ?int $formation_id = null;
+    private int $formation_id;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'user_id')]
@@ -232,7 +230,7 @@ class Participation
     }
 
     #[ORM\Column(type: 'datetime', nullable: false)]
-    private ?\DateTimeInterface $created_at = null;
+    private \DateTimeInterface $created_at;
 
     #[ORM\PrePersist]
     public function setCreatedAt(): void

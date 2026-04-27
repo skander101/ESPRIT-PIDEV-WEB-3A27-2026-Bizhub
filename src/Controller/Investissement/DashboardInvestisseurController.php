@@ -2,6 +2,7 @@
 
 namespace App\Controller\Investissement;
 
+use App\Entity\UsersAvis\User;
 use App\Repository\InvestmentRepository;
 use App\Repository\ProjectRepository;
 use App\Service\Investissement\DashboardInvestisseurService;
@@ -37,14 +38,14 @@ class DashboardInvestisseurController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        if ($user->getUserType() !== 'investisseur') {
+        if (($user instanceof User ? $user->getUserType() : null) !== 'investisseur') {
             return $this->redirectToRoute('app_front_dashboard');
         }
 
         $portfolio = $this->dashboardService->buildPortfolio($user);
 
         // Read portfolio analysis from session (set by the analyser route)
-        $sessionKey = 'portfolio_analysis_' . $user->getUserId();
+        $sessionKey = 'portfolio_analysis_' . ($user instanceof User ? $user->getUserId() : null);
         $analysis   = $request->getSession()->get($sessionKey);
 
         // Matching: recommended projects for this investor
@@ -93,7 +94,7 @@ class DashboardInvestisseurController extends AbstractController
 
         try {
             $result = $this->portfolioAnalysis->analyzePortfolio($user);
-            $request->getSession()->set('portfolio_analysis_' . $user->getUserId(), $result);
+            $request->getSession()->set('portfolio_analysis_' . ($user instanceof User ? $user->getUserId() : null), $result);
             $this->addFlash('success', 'Analyse du portefeuille générée avec succès.');
         } catch (\Throwable $e) {
             $this->addFlash('error', 'Erreur lors de l\'analyse. Veuillez réessayer.');

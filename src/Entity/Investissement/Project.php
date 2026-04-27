@@ -84,7 +84,7 @@ class Project
         minMessage: 'Le titre doit contenir au moins {{ limit }} caractères.',
         maxMessage: 'Le titre ne peut pas dépasser {{ limit }} caractères.'
     )]
-    private ?string $title = null;
+    private string $title = '';
 
     #[ORM\Column(type: 'text', nullable: true)]
     #[Assert\NotBlank(message: 'La description est obligatoire.', normalizer: 'trim')]
@@ -99,7 +99,7 @@ class Project
     #[ORM\Column(type: 'float', nullable: false)]
     #[Assert\NotBlank(message: 'Le budget est obligatoire.')]
     #[Assert\Positive(message: 'Le budget doit être positif.')]
-    private ?float $required_budget = null;
+    private float $required_budget = 0.0;
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
     #[Assert\NotBlank(message: 'Veuillez sélectionner un secteur.')]
@@ -117,8 +117,8 @@ class Project
     )]
     private ?string $status = self::STATUS_BROUILLON;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?\DateTimeInterface $created_at = null;
+    #[ORM\Column(type: 'datetime', nullable: false)]
+    private \DateTimeInterface $created_at;
 
     // ── Champs métier enrichis ───────────────────────────────────────────────
 
@@ -202,7 +202,7 @@ class Project
     )]
     private ?string $team_description = null;
 
-    #[ORM\OneToMany(targetEntity: AiAnalysis::class, mappedBy: 'project')]
+    #[ORM\OneToMany(targetEntity: AiAnalysis::class, mappedBy: 'project', cascade: ['remove'])]
     private Collection $aiAnalysis;
 
     #[ORM\OneToMany(targetEntity: Investment::class, mappedBy: 'project')]
@@ -216,6 +216,7 @@ class Project
         $this->aiAnalysis   = new ArrayCollection();
         $this->investments  = new ArrayCollection();
         $this->negotiations = new ArrayCollection();
+        $this->created_at  = new \DateTime();
     }
 
     public function getProject_id(): ?int { return $this->project_id; }
@@ -241,10 +242,10 @@ class Project
     public function getStatus(): ?string { return $this->status; }
     public function setStatus(?string $status): self { $this->status = $status; return $this; }
 
-    public function getCreated_at(): ?\DateTimeInterface { return $this->created_at; }
-    public function getCreatedAt(): ?\DateTimeInterface { return $this->created_at; }
-    public function setCreated_at(?\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
-    public function setCreatedAt(?\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
+    public function getCreated_at(): \DateTimeInterface { return $this->created_at; }
+    public function getCreatedAt(): \DateTimeInterface { return $this->created_at; }
+    protected function setCreated_at(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
+    protected function setCreatedAt(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
 
     public function getProblemDescription(): ?string { return $this->problem_description; }
     public function setProblemDescription(?string $v): self { $this->problem_description = $v; return $this; }

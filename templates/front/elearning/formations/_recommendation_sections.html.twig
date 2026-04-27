@@ -1,0 +1,85 @@
+{# Expects: reco, track_url, track_csrf — reco_compact: n'affiche que la ligne « Recommandé » + lien catalogue #}
+{% if reco is defined %}
+{% macro reco_row(title, icon, formations, section) %}
+  {% if formations|length > 0 %}
+    <section class="reco-section" data-reco-section="{{ section|e('html_attr') }}">
+      <div class="reco-section-head">
+        <h2 class="reco-title"><span class="reco-title-icon">{{ icon|raw }}</span>{{ title }}</h2>
+        <div class="reco-nav">
+          <button type="button" class="reco-nav-btn reco-prev" aria-label="Précédent"><i class="fa-solid fa-chevron-left"></i></button>
+          <button type="button" class="reco-nav-btn reco-next" aria-label="Suivant"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+      </div>
+      <div class="reco-rail" tabindex="0">
+        {% for f in formations %}
+          <article class="reco-card" data-formation-id="{{ f.formation_id }}">
+            {% if section == 'personalized' %}
+              <span class="reco-badge">IA</span>
+            {% endif %}
+            <div class="reco-card-accent {{ f.enLigne ? 'reco-card-accent--online' : 'reco-card-accent--present' }}"></div>
+            <div class="reco-card-body">
+              <div class="reco-card-tag {{ f.enLigne ? 'online' : '' }}">{{ f.enLigne ? 'En ligne' : 'Présentielle' }}</div>
+              <h3 class="reco-card-title"><a href="{{ path('app_front_formation_show', { formation_id: f.formation_id, reco_section: section }) }}">{{ f.title }}</a></h3>
+              {% if f.description %}
+                <p class="reco-card-desc">{{ f.description }}</p>
+              {% endif %}
+            </div>
+            <div class="reco-card-meta">
+              <span><i class="fa-regular fa-calendar"></i> {{ f.start_date|date('d/m/Y') }}</span>
+              {% if f.cost is not null %}
+                <span class="reco-price">{{ f.cost|number_format(2, ',', ' ') }} TND</span>
+              {% endif %}
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+{% endmacro %}
+<div class="reco-wrap" id="formation-reco-root"
+     data-track-url="{{ track_url|default('')|e('html_attr') }}"
+     data-track-csrf="{{ track_csrf|default('')|e('html_attr') }}">
+
+  {% if show_ai_best_pick|default(false) and ai_best_pick_url|default('')|trim != '' %}
+  <div class="reco-ai-toolbar">
+    <button type="button" class="reco-ai-pick-btn" id="formation-ai-best-pick-open" aria-haspopup="dialog" aria-controls="formation-ai-best-pick-modal">
+      <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+      Meilleure formation pour moi (IA)
+    </button>
+    <p class="reco-ai-toolbar-hint">Suggestion basée sur vos anciennes inscriptions et le catalogue ouvert.</p>
+  </div>
+
+  <div id="formation-ai-best-pick-modal" class="reco-ai-modal" role="dialog" aria-modal="true" aria-labelledby="formation-ai-best-pick-title" hidden
+       data-ai-url="{{ ai_best_pick_url|e('html_attr') }}"
+       data-ai-csrf="{{ ai_best_pick_csrf|default('')|e('html_attr') }}">
+    <div class="reco-ai-modal-backdrop" data-ai-close="1" tabindex="-1"></div>
+    <div class="reco-ai-modal-panel">
+      <div class="reco-ai-modal-head">
+        <h2 id="formation-ai-best-pick-title" class="reco-ai-modal-title">Conseiller IA</h2>
+        <button type="button" class="reco-ai-modal-close" data-ai-close="1" aria-label="Fermer"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="reco-ai-modal-body">
+        <label for="formation-ai-best-pick-notes" class="reco-ai-label">Objectifs ou préférences (optionnel)</label>
+        <textarea id="formation-ai-best-pick-notes" class="reco-ai-textarea" rows="3" maxlength="500" placeholder="Ex. : approfondir le marketing digital, préférence pour le distanciel…"></textarea>
+        <div class="reco-ai-modal-actions">
+          <button type="button" class="reco-ai-submit" id="formation-ai-best-pick-run">Obtenir une suggestion</button>
+        </div>
+        <p class="reco-ai-status" id="formation-ai-best-pick-status" hidden></p>
+        <div id="formation-ai-best-pick-result" class="reco-ai-result" hidden></div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {{ _self.reco_row('Recommandé pour vous', '&#128293;', reco.personalized|default([]), 'personalized') }}
+  {% if not reco_compact|default(false) %}
+    {{ _self.reco_row('Formations tendance', '&#128200;', reco.trending|default([]), 'trending') }}
+    {{ _self.reco_row('Les plus populaires', '&#11088;', reco.popular|default([]), 'popular') }}
+    {{ _self.reco_row('Nouvelles formations', '&#127381;', reco.newFormations|default([]), 'new') }}
+  {% else %}
+    <div class="reco-home-cta">
+      <a href="{{ path('app_front_formations_index') }}" class="reco-home-cta-btn">Voir toutes les formations <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+  {% endif %}
+</div>
+{% endif %}

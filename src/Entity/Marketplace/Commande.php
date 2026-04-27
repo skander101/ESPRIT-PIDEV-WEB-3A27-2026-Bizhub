@@ -30,13 +30,13 @@ class Commande
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: 'id_commande', type: 'integer')]
-    private ?int $idCommande = null;
+    #[ORM\Column(name: 'commande_id', type: 'integer')]
+    private int $idCommande = 0;
 
     #[ORM\Column(name: 'id_client', type: 'integer', nullable: false)]
     #[Assert\NotNull(message: 'Le client est obligatoire.')]
     #[Assert\Positive(message: 'ID client invalide.')]
-    private ?int $idClient = null;
+    private int $idClient;
 
     #[ORM\Column(name: 'id_produit', type: 'integer', nullable: true)]
     #[Assert\Positive(message: 'ID produit invalide.')]
@@ -48,7 +48,7 @@ class Commande
     private ?int $quantite = null;
 
     #[ORM\Column(name: 'date_commande', type: 'datetime', nullable: false)]
-    private ?\DateTimeInterface $dateCommande = null;
+    private \DateTimeInterface $dateCommande;
 
     #[ORM\Column(name: 'statut', type: 'string', length: 50, nullable: false)]
     #[Assert\NotBlank(message: 'Le statut est obligatoire.')]
@@ -94,16 +94,17 @@ class Commande
     #[ORM\Column(name: 'score_auto', type: 'integer', nullable: true)]
     private ?int $scoreAuto = null;
 
-    #[ORM\Column(name: 'total_ht', type: 'decimal', precision: 10, scale: 3, nullable: true)]
+    #[ORM\Column(name: 'total_ht', type: 'decimal', precision: 10, scale: 2, nullable: true)]
     private ?string $totalHt = null;
 
-    #[ORM\Column(name: 'total_tva', type: 'decimal', precision: 10, scale: 3, nullable: true)]
+    #[ORM\Column(name: 'total_tva', type: 'decimal', precision: 10, scale: 2, nullable: true)]
     private ?string $totalTva = null;
 
-    #[ORM\Column(name: 'total_ttc', type: 'decimal', precision: 10, scale: 3, nullable: true)]
+    #[ORM\Column(name: 'total_ttc', type: 'decimal', precision: 10, scale: 2, nullable: true)]
     private ?string $totalTtc = null;
 
     #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeLigne::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\JoinColumn(name: 'commande_id', referencedColumnName: 'commande_id', onDelete: 'CASCADE')]
     private Collection $lignes;
 
     public function __construct()
@@ -124,8 +125,8 @@ class Commande
 
     public function getIdCommande(): ?int { return $this->idCommande; }
 
-    public function getIdClient(): ?int { return $this->idClient; }
-    public function setIdClient(?int $v): self { $this->idClient = $v; return $this; }
+    public function getIdClient(): int { return $this->idClient; }
+    public function setIdClient(int $v): self { $this->idClient = $v; return $this; }
 
     public function getIdProduit(): ?int { return $this->idProduit; }
     public function setIdProduit(?int $v): self { $this->idProduit = $v; return $this; }
@@ -133,8 +134,8 @@ class Commande
     public function getQuantite(): ?int { return $this->quantite; }
     public function setQuantite(?int $v): self { $this->quantite = $v; return $this; }
 
-    public function getDateCommande(): ?\DateTimeInterface { return $this->dateCommande; }
-    public function setDateCommande(?\DateTimeInterface $v): self { $this->dateCommande = $v; return $this; }
+    public function getDateCommande(): \DateTimeInterface { return $this->dateCommande; }
+    protected function setDateCommande(\DateTimeInterface $v): self { $this->dateCommande = $v; return $this; }
 
     public function getStatut(): string { return $this->statut; }
     public function setStatut(string $v): self { $this->statut = $v; return $this; }
@@ -166,7 +167,7 @@ class Commande
     public function setEstPayee(bool $v): self { $this->estPayee = $v; return $this; }
 
     public function getPaidAt(): ?\DateTimeInterface { return $this->paidAt; }
-    public function setPaidAt(?\DateTimeInterface $v): self { $this->paidAt = $v; return $this; }
+    protected function setPaidAt(?\DateTimeInterface $v): self { $this->paidAt = $v; return $this; }
 
     public function getTotalHt(): ?string { return $this->totalHt; }
     public function setTotalHt(?string $v): self { $this->totalHt = $v; return $this; }

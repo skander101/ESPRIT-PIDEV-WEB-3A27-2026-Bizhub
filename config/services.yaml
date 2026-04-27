@@ -7,7 +7,9 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-    app.auth.mail_from_email: 'bizbot64@gmail.com'
+    # Default when APP_AUTH_MAIL_FROM_EMAIL is unset (.env.local should match your Gmail SMTP user).
+    env(APP_AUTH_MAIL_FROM_EMAIL): 'bizbot64@gmail.com'
+    app.auth.mail_from_email: '%env(APP_AUTH_MAIL_FROM_EMAIL)%'
     app.auth.mail_from_name: 'BizHub'
     app.google_client_id: '%env(trim:GOOGLE_CLIENT_ID)%'
     app.google_client_secret: '%env(trim:GOOGLE_CLIENT_SECRET)%'
@@ -28,6 +30,7 @@ parameters:
     app.twilio_auth_token: '%env(default::TWILIO_AUTH_TOKEN)%'
     app.twilio_whatsapp_from: '%env(default::TWILIO_WHATSAPP_FROM)%'
     app.gnews_api_key: '%env(default::GNEWS_API_KEY)%'
+    app.shippo_api_key: '%env(default::SHIPPO_API_KEY)%'
 
 services:
     # default configuration for services in *this* file
@@ -120,9 +123,31 @@ services:
             $apiKey: '%app.groq_api_key%'
             $model: '%app.groq_model%'
 
+    App\Service\Elearning\ParticipationCertificatePdfService:
+        arguments:
+            $certificatesDir: '%app.elearning.certificates_dir%'
+            $certificatesPublicPath: '%app.elearning.certificates_public_path%'
+
+    App\Service\Elearning\ParticipationConfirmationMailService:
+        arguments:
+            $fromEmail: '%app.auth.mail_from_email%'
+            $fromName: '%app.auth.mail_from_name%'
+
+    App\Service\Elearning\PythonRecommendationClient:
+        arguments:
+            $apiBaseUrl: '%env(RECOMMENDATIONS_API_URL)%'
+
+    App\Controller\Front\PaymentController:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+
     App\Service\NewsService:
         arguments:
             $gnewsApiKey: '%app.gnews_api_key%'
+
+    App\Service\Marketplace\ShippoTrackerService:
+        arguments:
+            $shippoApiKey: '%app.shippo_api_key%'
 
     App\Command\TwilioTestCommand:
         arguments:

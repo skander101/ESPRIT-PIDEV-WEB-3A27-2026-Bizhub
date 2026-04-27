@@ -20,19 +20,19 @@ class ProduitService
     private ?int $idProduit = null;
 
     #[ORM\Column(name: 'id_profile', type: 'integer', nullable: false)]
-    private ?int $idProfile = null;
+    private int $idProfile;
 
     #[ORM\Column(name: 'nom', type: 'string', length: 255, nullable: false)]
-    private ?string $nom = null;
+    private string $nom;
 
     #[ORM\Column(name: 'description', type: 'text', nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column(name: 'prix', type: 'decimal', precision: 10, scale: 3, nullable: false)]
-    private ?string $prix = null;
+    #[ORM\Column(name: 'prix', type: 'decimal', precision: 10, scale: 2, nullable: false)]
+    private string $prix = '0.00';
 
     #[ORM\Column(name: 'quantite', type: 'integer', nullable: false)]
-    private ?int $quantite = null;
+    private int $quantite = 0;
 
     #[ORM\Column(name: 'categorie', type: 'string', length: 100, nullable: true)]
     private ?string $categorie = null;

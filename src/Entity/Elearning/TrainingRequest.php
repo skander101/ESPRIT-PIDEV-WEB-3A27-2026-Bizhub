@@ -24,10 +24,10 @@ class TrainingRequest
     private ?Formation $formation = null;
 
     #[ORM\Column(type: 'string', length: 50, nullable: false)]
-    private ?string $status = 'pending'; // pending, accepted, rejected, completed
+    private string $status = 'pending'; // pending, accepted, rejected, completed
 
     #[ORM\Column(name: 'request_date', type: 'datetime', nullable: false)]
-    private ?\DateTimeInterface $created_at = null;
+    private \DateTimeInterface $created_at;
 
     public function __construct()
     {

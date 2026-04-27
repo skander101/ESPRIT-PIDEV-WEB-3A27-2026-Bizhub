@@ -1,0 +1,89 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}{{ formation.title|e }} — Formation — BizHub{% endblock %}
+
+{% block extra_styles %}
+  .fshow { padding-top: 88px; min-height: 100vh; background: linear-gradient(180deg,#eef0f5,#f4f6fa); padding-bottom: 3rem; }
+  .fshow-inner { max-width: 900px; margin: 0 auto; padding: 0 5%; }
+  .fshow-card {
+    background: #fff; border-radius: 20px; padding: 2rem 1.75rem; box-shadow: 0 16px 48px rgba(0,0,0,0.07);
+    border: 1px solid rgba(0,0,0,0.05);
+  }
+  .fshow-tag { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #0369a1; margin-bottom: 0.5rem; }
+  .fshow-tag.online { color: #3b82f6; }
+  .fshow h1 { font-family: 'Josefin Sans', sans-serif; font-size: clamp(1.5rem, 4vw, 2rem); color: #1e2533; margin: 0 0 1rem; }
+  .fshow-meta { display: grid; gap: 0.65rem; margin: 1.25rem 0; font-size: 0.9rem; color: #475569; }
+  .fshow-row { display: flex; gap: 0.65rem; align-items: flex-start; }
+  .fshow-actions { margin-top: 1.75rem; display: flex; flex-wrap: wrap; gap: 0.75rem; }
+  .fshow-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; padding: 0.85rem 1.35rem;
+    border-radius: 12px; font-weight: 800; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em;
+    font-family: 'Josefin Sans', sans-serif; border: none; cursor: pointer; text-decoration: none;
+  }
+  .fshow-btn--primary { background: #ffbe33; color: #1e2533; box-shadow: 0 6px 18px rgba(255,190,51,0.35); }
+  .fshow-btn--ghost { background: transparent; border: 1px solid #e5e7eb; color: #475569; }
+{% endblock %}
+
+{% block content %}
+{% set maps_url = formation_google_maps_url(formation) %}
+<div class="fshow">
+  <div class="fshow-inner">
+    <p style="margin:0 0 1rem;"><a href="{{ path('app_front_formations_index') }}" style="color:#0369a1;font-weight:600;text-decoration:none;">← Toutes les formations</a></p>
+    <div class="fshow-card">
+      <div class="fshow-tag {{ formation.enLigne ? 'online' : '' }}">{{ formation.enLigne ? 'En ligne' : 'Présentielle' }}</div>
+      <h1>{{ formation.title|e }}</h1>
+      {% if formation.description %}
+        <div style="color:#64748b;line-height:1.65;font-size:0.95rem;">{{ formation.description|nl2br }}</div>
+      {% endif %}
+      <div class="fshow-meta">
+        <div class="fshow-row"><i class="fa-regular fa-calendar" style="color:#f59e0b;margin-top:3px;"></i><span>{{ formation.startDate|date('d/m/Y') }} → {{ formation.endDate|date('d/m/Y') }}</span></div>
+        <div class="fshow-row"><i class="fa-solid fa-coins" style="color:#10b981;margin-top:3px;"></i><span><strong>{{ formation.cost ?? '0.00' }}</strong> TND</span></div>
+        {% if formation.user %}
+          <div class="fshow-row"><i class="fa-regular fa-user" style="color:#8b5cf6;margin-top:3px;"></i><span>{{ formation.user.fullName }}</span></div>
+        {% endif %}
+        {% if not formation.enLigne %}
+          <div class="fshow-row"><i class="fa-solid fa-location-dot" style="color:#2563eb;margin-top:3px;"></i><span>{{ formation.lieu|default('—')|e }}</span></div>
+          {% if maps_url %}
+            <div class="fshow-row" style="flex-wrap:wrap;">
+              <a class="fshow-btn fshow-btn--ghost" style="text-transform:none;font-weight:700;" href="{{ maps_url }}" target="_blank" rel="noopener"><i class="fa-solid fa-map-location-dot"></i> Google Maps</a>
+            </div>
+          {% endif %}
+        {% endif %}
+      </div>
+
+      {% if is_formateur %}
+        <p class="text-muted mb-0">Les formateurs utilisent la demande d’affectation depuis la liste des formations.</p>
+      {% else %}
+        <div class="fshow-actions">
+          {% if already_paid %}
+            <button type="button" class="fshow-btn fshow-btn--ghost" disabled>Déjà inscrit (payé)</button>
+          {% elseif awaiting_participation_id %}
+            <a class="fshow-btn fshow-btn--primary" href="{{ path('app_payment_checkout', { id: awaiting_participation_id }) }}">Finaliser le paiement</a>
+            <a class="fshow-btn fshow-btn--ghost" href="{{ path('app_payment_cancel', { id: awaiting_participation_id }) }}" data-confirm="Annuler cette inscription ?" data-confirm-title="Annuler">Annuler</a>
+          {% else %}
+            <button type="button" class="fshow-btn fshow-btn--primary" id="fshow-open-part">Participer à cette formation</button>
+          {% endif %}
+        </div>
+        {% if participation_form %}
+          <div id="fshow-part-panel" style="display:none;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid #f0f2f5;">
+            {{ form_start(participation_form, { action: path('app_front_formation_participate', { formation_id: formation.formation_id }), attr: { class: 'elearning-validated-form', novalidate: 'novalidate', 'data-validate-mode': 'participation-front' } }) }}
+              {% if app.request.query.get('reco_section') %}
+                <input type="hidden" name="reco_section" value="{{ app.request.query.get('reco_section')|e('html_attr') }}" />
+              {% endif %}
+              {{ form_row(participation_form.remarques) }}
+              <button type="submit" class="fshow-btn fshow-btn--primary" style="width:100%;">Continuer vers le paiement</button>
+            {{ form_end(participation_form) }}
+          </div>
+          <script>
+            document.getElementById('fshow-open-part')?.addEventListener('click', function () {
+              var p = document.getElementById('fshow-part-panel');
+              if (p) p.style.display = 'block';
+            });
+          </script>
+          <script src="{{ asset('js/elearning-forms-validation.js') }}"></script>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

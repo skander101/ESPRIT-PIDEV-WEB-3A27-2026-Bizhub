@@ -1,33 +1,48 @@
 {{ form_start(form, { attr: { novalidate: 'novalidate', class: 'elearning-validated-form', 'data-validate-mode': form_js_mode|default('formation-new') } }) }}
-  <div class="row g-3">
-    <div class="col-md-12">
-      {{ form_row(form.title) }}
-    </div>
-    <div class="col-md-12">
-      {{ form_row(form.description) }}
-    </div>
-    <div class="col-md-12">
-      {{ form_row(form.user) }}
-    </div>
-    <div class="col-md-6">
-      {{ form_row(form.start_date) }}
-    </div>
-    <div class="col-md-6">
-      {{ form_row(form.end_date) }}
-    </div>
-    <div class="col-md-6">
-      {{ form_row(form.cost) }}
-    </div>
-    <div class="col-md-6">
-      {{ form_row(form.lieu) }}
-    </div>
-    <div class="col-md-6">
-      {{ form_row(form.max_formateurs) }}
-    </div>
-    <div class="col-12">
-      <div class="form-check">
-        {{ form_widget(form.en_ligne) }}
-        {{ form_label(form.en_ligne, null, { label_attr: { class: 'form-check-label' } }) }}
+  <div
+    class="formation-location-root"
+    data-formation-map-root
+    data-initial-lat="{{ formation.latitude ?? '' }}"
+    data-initial-lng="{{ formation.longitude ?? '' }}"
+  >
+    <div class="row g-3">
+      <div class="col-md-12">
+        {{ form_row(form.title) }}
+      </div>
+      <div class="col-md-12">
+        {{ form_row(form.description) }}
+      </div>
+      <div class="col-md-12">
+        {{ form_row(form.user) }}
+      </div>
+      <div class="col-md-6">
+        {{ form_row(form.start_date) }}
+      </div>
+      <div class="col-md-6">
+        {{ form_row(form.end_date) }}
+      </div>
+      <div class="col-md-6">
+        {{ form_row(form.cost) }}
+      </div>
+      <div class="col-md-6">
+        {{ form_row(form.en_ligne) }}
+      </div>
+      <div class="col-md-6">
+        {{ form_row(form.max_formateurs) }}
+      </div>
+
+      <div class="col-12 js-formation-presential-wrap" {% if formation.enLigne %}hidden aria-hidden="true"{% endif %}>
+        <div class="rounded-3 border border-secondary border-opacity-25 overflow-hidden mb-2" style="min-height: 320px;">
+          <div class="js-formation-leaflet-map" style="height: 320px; width: 100%; background: #1a1f2e;"></div>
+        </div>
+        <p class="small text-muted mb-2" style="opacity:.85;">
+          Cliquez sur la carte pour placer le marqueur (déplaçable). L’adresse est récupérée automatiquement via OpenStreetMap / Nominatim.
+        </p>
+        {{ form_row(form.lieu) }}
+        <div class="d-none">
+          {{ form_widget(form.latitude) }}
+          {{ form_widget(form.longitude) }}
+        </div>
       </div>
     </div>
   </div>

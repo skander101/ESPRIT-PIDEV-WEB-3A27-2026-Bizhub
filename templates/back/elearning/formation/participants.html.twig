@@ -81,7 +81,9 @@
               <th>Email</th>
               <th>Date affectation</th>
               <th>Montant</th>
+              <th>Paiement</th>
               <th>Statut</th>
+              <th>Transaction</th>
               <th class="text-center">Actions</th>
             </tr>
           </thead>
@@ -91,7 +93,7 @@
                 <td>{{ p.user ? p.user.fullName : '—' }}</td>
                 <td>{{ p.user ? p.user.email : '—' }}</td>
                 <td>{{ p.date_affectation ? p.date_affectation|date('d/m/Y H:i') : '—' }}</td>
-                <td>{{ p.amount }}</td>
+                <td>{{ p.amount }} TND</td>
                 {% set paymentStatus = (p.payment_status ?? 'pending')|lower %}
                 <td>
                   <span class="tiny-tag
@@ -101,8 +103,19 @@
                     {{ paymentStatus|upper }}
                   </span>
                 </td>
+                <td><span class="tiny-tag tag-accepted">{{ (p.status ?? '')|upper }}</span></td>
+                <td><small class="text-muted">{{ p.transactionId|default('—') }}</small></td>
                 <td class="text-center">
-                  <a href="{{ path('app_admin_participation_edit', { id_candidature: p.id_candidature }) }}" class="btn btn-sm btn-outline-primary">Modifier</a>
+                  {% if p.certificatePath %}
+                    <a href="{{ path('app_admin_participation_certificate', { id_candidature: p.id_candidature }) }}" class="btn btn-sm btn-outline-primary">Certificat</a>
+                  {% endif %}
+                  {% if p.isPaidEnrollment and p.certificatePath %}
+                    <form method="post" action="{{ path('app_admin_participation_resend_email', { id_candidature: p.id_candidature }) }}" class="d-inline">
+                      <input type="hidden" name="_token" value="{{ csrf_token('resend_participation_email_' ~ p.id_candidature) }}">
+                      <button type="submit" class="btn btn-sm btn-outline-success">Renvoyer email</button>
+                    </form>
+                  {% endif %}
+                  <a href="{{ path('app_admin_participation_edit', { id_candidature: p.id_candidature }) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
                   <form method="post" action="{{ path('app_admin_participation_delete', { id_candidature: p.id_candidature }) }}" class="d-inline" onsubmit="return confirm('Supprimer cette participation ?');">
                     <input type="hidden" name="_token" value="{{ csrf_token('delete_participation_' ~ p.id_candidature) }}">
                     <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>

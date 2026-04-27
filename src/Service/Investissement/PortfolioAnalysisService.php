@@ -302,6 +302,8 @@ class PortfolioAnalysisService
             array_keys($sectors), $sectors
         ));
         $lt = $predictions['long_terme'];
+        $investments_count = count($investments);
+        $neg_count = count($negotiations);
 
         $prompt = <<<PROMPT
 Tu es un conseiller financier expert en capital-risque pour le marché tunisien.

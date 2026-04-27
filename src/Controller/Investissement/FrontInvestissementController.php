@@ -3,6 +3,7 @@
 namespace App\Controller\Investissement;
 
 use App\Entity\Investissement\Investment;
+use App\Entity\UsersAvis\User;
 use App\Entity\Investissement\Project;
 use App\Form\Investissement\InvestisseurType;
 use App\Form\Investissement\InvestissementFrontType;
@@ -89,7 +90,7 @@ class FrontInvestissementController extends AbstractController
         }
 
         // 4. Une startup ne peut pas investir dans son propre projet
-        if ($projet->getUser() && $projet->getUser()->getUserId() === $user->getUserId()) {
+        if ($projet->getUser() && $projet->getUser()->getUserId() === ($user instanceof User ? $user->getUserId() : null)) {
             $this->addFlash('error', 'Vous ne pouvez pas investir dans votre propre projet.');
             return $this->redirectToRoute('app_front_projet_show', ['id' => $id]);
         }

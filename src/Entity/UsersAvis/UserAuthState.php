@@ -4,6 +4,8 @@ namespace App\Entity\UsersAvis;
 
 use App\Repository\UsersAvis\UserAuthStateRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Ignore;
+use Symfony\Component\Security\core\util\SensitiveParameter;
 
 #[ORM\Entity(repositoryClass: UserAuthStateRepository::class)]
 #[ORM\Table(name: 'user_auth_state')]
@@ -26,16 +28,18 @@ class UserAuthState
     private bool $is_verified = true;
 
     #[ORM\Column(type: 'string', length: 128, nullable: true)]
+    #[Ignore]
     private ?string $verification_token = null;
 
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
-    private ?\DateTimeInterface $verification_token_expires_at = null;
+    private ?\DateTimeImmutable $verification_token_expires_at = null;
 
     #[ORM\Column(type: 'string', length: 128, nullable: true)]
+    #[Ignore]
     private ?string $password_reset_token = null;
 
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
-    private ?\DateTimeInterface $password_reset_token_expires_at = null;
+    private ?\DateTimeImmutable $password_reset_token_expires_at = null;
 
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $mfa_enabled = false;
@@ -83,19 +87,19 @@ class UserAuthState
         return $this->verification_token;
     }
 
-    public function setVerificationToken(?string $verificationToken): self
+    public function setVerificationToken(#[SensitiveParameter] ?string $verificationToken): self
     {
         $this->verification_token = $verificationToken;
 
         return $this;
     }
 
-    public function getVerificationTokenExpiresAt(): ?\DateTimeInterface
+    public function getVerificationTokenExpiresAt(): ?\DateTimeImmutable
     {
         return $this->verification_token_expires_at;
     }
 
-    public function setVerificationTokenExpiresAt(?\DateTimeInterface $verificationTokenExpiresAt): self
+    public function setVerificationTokenExpiresAt(?\DateTimeImmutable $verificationTokenExpiresAt): self
     {
         $this->verification_token_expires_at = $verificationTokenExpiresAt;
 
@@ -107,19 +111,19 @@ class UserAuthState
         return $this->password_reset_token;
     }
 
-    public function setPasswordResetToken(?string $passwordResetToken): self
+    public function setPasswordResetToken(#[SensitiveParameter] ?string $passwordResetToken): self
     {
         $this->password_reset_token = $passwordResetToken;
 
         return $this;
     }
 
-    public function getPasswordResetTokenExpiresAt(): ?\DateTimeInterface
+    public function getPasswordResetTokenExpiresAt(): ?\DateTimeImmutable
     {
         return $this->password_reset_token_expires_at;
     }
 
-    public function setPasswordResetTokenExpiresAt(?\DateTimeInterface $passwordResetTokenExpiresAt): self
+    public function setPasswordResetTokenExpiresAt(?\DateTimeImmutable $passwordResetTokenExpiresAt): self
     {
         $this->password_reset_token_expires_at = $passwordResetTokenExpiresAt;
 

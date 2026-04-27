@@ -6,6 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\Ignore;
+use Symfony\Component\Security\core\util\SensitiveParameter;
 
 use App\Repository\Investissement\DealRepository;
 
@@ -41,22 +43,22 @@ class Deal
     #[ORM\Column(type: 'integer', nullable: false)]
     #[Assert\NotNull(message: 'Le projet est obligatoire.')]
     #[Assert\Positive(message: 'ID projet invalide.')]
-    private ?int $project_id = null;
+    private int $project_id = 0;
 
     #[ORM\Column(type: 'integer', nullable: false)]
     #[Assert\NotNull(message: 'L\'acheteur est obligatoire.')]
     #[Assert\Positive(message: 'ID acheteur invalide.')]
-    private ?int $buyer_id = null;
+    private int $buyer_id = 0;
 
     #[ORM\Column(type: 'integer', nullable: false)]
     #[Assert\NotNull(message: 'Le vendeur est obligatoire.')]
     #[Assert\Positive(message: 'ID vendeur invalide.')]
-    private ?int $seller_id = null;
+    private int $seller_id = 0;
 
-    #[ORM\Column(type: 'float', nullable: false)]
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: false)]
     #[Assert\NotNull(message: 'Le montant est obligatoire.')]
     #[Assert\Positive(message: 'Le montant doit être positif.')]
-    private ?float $amount = null;
+    private string $amount = '0.00';
 
     #[ORM\Column(type: 'string', nullable: true)]
     #[Assert\Length(max: 255, maxMessage: 'L\'ID Stripe ne peut pas dépasser {{ limit }} caractères.')]
@@ -83,6 +85,7 @@ class Deal
     private ?string $yousign_status = null;
 
     #[ORM\Column(type: 'string', length: 64, nullable: true)]
+    #[Ignore]
     private ?string $signature_token = null;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
@@ -102,13 +105,16 @@ class Deal
     )]
     private ?string $status = null;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    #[Assert\LessThanOrEqual(value: 'now', message: 'La date de création ne peut pas être dans le futur.')]
-    private ?\DateTimeInterface $created_at = null;
+    #[ORM\Column(type: 'datetime')]
+    private \DateTimeInterface $created_at;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    #[Assert\LessThanOrEqual(value: 'now', message: 'La date de fin ne peut pas être dans le futur.')]
     private ?\DateTimeInterface $completed_at = null;
+
+    public function __construct()
+    {
+        $this->created_at = new \DateTime();
+    }
 
     public function getDeal_id(): ?int { return $this->deal_id; }
     public function setDeal_id(int $deal_id): self { $this->deal_id = $deal_id; return $this; }
@@ -125,8 +131,8 @@ class Deal
     public function getSeller_id(): ?int { return $this->seller_id; }
     public function setSeller_id(int $seller_id): self { $this->seller_id = $seller_id; return $this; }
 
-    public function getAmount(): ?float { return $this->amount; }
-    public function setAmount(float $amount): self { $this->amount = $amount; return $this; }
+    public function getAmount(): ?string { return $this->amount; }
+    public function setAmount(string $amount): self { $this->amount = $amount; return $this; }
 
     public function getStripe_payment_intent_id(): ?string { return $this->stripe_payment_intent_id; }
     public function setStripe_payment_intent_id(?string $stripe_payment_intent_id): self { $this->stripe_payment_intent_id = $stripe_payment_intent_id; return $this; }
@@ -147,13 +153,13 @@ class Deal
     public function setYousign_status(?string $yousign_status): self { $this->yousign_status = $yousign_status; return $this; }
 
     public function getSignature_token(): ?string { return $this->signature_token; }
-    public function setSignature_token(?string $signature_token): self { $this->signature_token = $signature_token; return $this; }
+    public function setSignature_token(#[SensitiveParameter] ?string $signature_token): self { $this->signature_token = $signature_token; return $this; }
 
     public function getSignature_token_expires_at(): ?\DateTimeInterface { return $this->signature_token_expires_at; }
-    public function setSignature_token_expires_at(?\DateTimeInterface $signature_token_expires_at): self { $this->signature_token_expires_at = $signature_token_expires_at; return $this; }
+    protected function setSignature_token_expires_at(?\DateTimeInterface $signature_token_expires_at): self { $this->signature_token_expires_at = $signature_token_expires_at; return $this; }
 
     public function getSignature_sent_at(): ?\DateTimeInterface { return $this->signature_sent_at; }
-    public function setSignature_sent_at(?\DateTimeInterface $signature_sent_at): self { $this->signature_sent_at = $signature_sent_at; return $this; }
+    protected function setSignature_sent_at(?\DateTimeInterface $signature_sent_at): self { $this->signature_sent_at = $signature_sent_at; return $this; }
 
     public function isEmail_sent(): ?bool { return $this->email_sent; }
     public function setEmail_sent(?bool $email_sent): self { $this->email_sent = $email_sent; return $this; }
@@ -161,9 +167,9 @@ class Deal
     public function getStatus(): ?string { return $this->status; }
     public function setStatus(?string $status): self { $this->status = $status; return $this; }
 
-    public function getCreated_at(): ?\DateTimeInterface { return $this->created_at; }
-    public function setCreated_at(?\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
+    public function getCreated_at(): \DateTimeInterface { return $this->created_at; }
+    protected function setCreated_at(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
 
     public function getCompleted_at(): ?\DateTimeInterface { return $this->completed_at; }
-    public function setCompleted_at(?\DateTimeInterface $completed_at): self { $this->completed_at = $completed_at; return $this; }
+    protected function setCompleted_at(?\DateTimeInterface $completed_at): self { $this->completed_at = $completed_at; return $this; }
 }

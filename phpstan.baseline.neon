@@ -1,0 +1,685 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Offset ''role'' on array\{role\: string, total\: int\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/Controller/Admin/AdminController.php
+
+		-
+			message: '#^Offset ''total'' on array\{role\: string, total\: int\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 2
+			path: src/Controller/Admin/AdminController.php
+
+		-
+			message: '#^Offset ''clicks'' on array\{formation_id\: int, title\: string\|null, impressions\: int, clicks\: int, enrolls\: int\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/Controller/Admin/ElearningRecommendationStatsController.php
+
+		-
+			message: '#^Offset ''enrolls'' on array\{formation_id\: int, title\: string\|null, impressions\: int, clicks\: int, enrolls\: int\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/Controller/Admin/ElearningRecommendationStatsController.php
+
+		-
+			message: '#^Offset ''impressions'' on array\{formation_id\: int, title\: string\|null, impressions\: int, clicks\: int, enrolls\: int\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/Controller/Admin/ElearningRecommendationStatsController.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between float and '''' will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: src/Controller/Admin/ParticipationController.php
+
+		-
+			message: '#^Instanceof between App\\Entity\\UsersAvis\\User and App\\Entity\\UsersAvis\\User will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
+			path: src/Controller/Auth/AuthController.php
+
+		-
+			message: '#^Property App\\Controller\\Auth\\AuthController\:\:\$tokenStorage is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Controller/Auth/AuthController.php
+
+		-
+			message: '#^Using nullsafe method call on non\-nullable type App\\Entity\\UsersAvis\\UserAuthState\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 6
+			path: src/Controller/Auth/AuthController.php
+
+		-
+			message: '#^Instanceof between App\\Entity\\UsersAvis\\User and App\\Entity\\UsersAvis\\User will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 3
+			path: src/Controller/FaceEnrollmentController.php
+
+		-
+			message: '#^Instanceof between App\\Entity\\UsersAvis\\User and App\\Entity\\UsersAvis\\User will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
+			path: src/Controller/FaceVerificationController.php
+
+		-
+			message: '#^Offset ''ok'' on array\{ok\: bool, message\?\: string, formation_id\?\: int, title\?\: string, reason\?\: string, en_ligne\?\: bool, source\?\: string\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/Controller/Front/FormationController.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between float and '''' will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: src/Controller/Front/FormationController.php
+
+		-
+			message: '#^Offset ''discount_rate'' on array\{ok\: true, message\: string\|null, promo\: App\\Entity\\Elearning\\PromoCode\|null, discount_rate\: float, amount_ttc\: float\|null\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 2
+			path: src/Controller/Front/PaymentController.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserType\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Investissement/DashboardController.php
+
+		-
+			message: '#^Method App\\Controller\\Investissement\\DashboardController\:\:dashboardInvestisseur\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/Controller/Investissement/DashboardController.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserId\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Controller/Investissement/DashboardInvestisseurController.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserType\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Investissement/DashboardInvestisseurController.php
+
+		-
+			message: '#^Parameter \#1 \$investor of method App\\Service\\Investissement\\MatchingService\:\:matchProjects\(\) expects App\\Entity\\UsersAvis\\User, Symfony\\Component\\Security\\Core\\User\\UserInterface given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Investissement/DashboardInvestisseurController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Repository\\InvestmentRepository\:\:countByStatutForUser\(\) expects App\\Entity\\UsersAvis\\User, Symfony\\Component\\Security\\Core\\User\\UserInterface given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Investissement/DashboardInvestisseurController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Repository\\InvestmentRepository\:\:findLastByUser\(\) expects App\\Entity\\UsersAvis\\User, Symfony\\Component\\Security\\Core\\User\\UserInterface given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Investissement/DashboardInvestisseurController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Service\\Investissement\\DashboardInvestisseurService\:\:buildPortfolio\(\) expects App\\Entity\\UsersAvis\\User, Symfony\\Component\\Security\\Core\\User\\UserInterface given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Controller/Investissement/DashboardInvestisseurController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Service\\Investissement\\PortfolioAnalysisService\:\:analyzePortfolio\(\) expects App\\Entity\\UsersAvis\\User, Symfony\\Component\\Security\\Core\\User\\UserInterface given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Investissement/DashboardInvestisseurController.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserId\(\)\.$#'
+			identifier: method.notFound
+			count: 9
+			path: src/Controller/Investissement/DealController.php
+
+		-
+			message: '#^Parameter \#1 \$params of static method Stripe\\Checkout\\Session\:\:create\(\) expects array\{adaptive_pricing\?\: array\{enabled\?\: bool\}, after_expiration\?\: array\{recovery\?\: array\{allow_promotion_codes\?\: bool, enabled\: bool\}\}, allow_promotion_codes\?\: bool, automatic_tax\?\: array\{enabled\: bool, liability\?\: array\{account\?\: string, type\: string\}\}, billing_address_collection\?\: string, branding_settings\?\: array\{background_color\?\: string\|null, border_style\?\: string\|null, button_color\?\: string\|null, display_name\?\: string, font_family\?\: string\|null, icon\?\: array\{file\?\: string, type\: string, url\?\: string\}, logo\?\: array\{file\?\: string, type\: string, url\?\: string\}\}, cancel_url\?\: string, client_reference_id\?\: string, \.\.\.\}\|null, array\{payment_method_types\: array\{''card''\}, line_items\: array\{array\{price_data\: array\{currency\: ''eur'', unit_amount\: int\<min, 99999999\>, product_data\: array\{name\: non\-falsy\-string, description\: non\-falsy\-string\}\}, quantity\: 1\}\}, mode\: ''payment'', success_url\: non\-falsy\-string, cancel_url\: string, metadata\: array\{deal_id\: int\|null\}\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Investissement/DealController.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserId\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Investissement/FrontInvestissementController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Entity\\Investissement\\Investment\:\:setUser\(\) expects App\\Entity\\UsersAvis\\User\|null, Symfony\\Component\\Security\\Core\\User\\UserInterface given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Investissement/FrontInvestissementController.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserId\(\)\.$#'
+			identifier: method.notFound
+			count: 7
+			path: src/Controller/Investissement/FrontProjetController.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserType\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Controller/Investissement/FrontProjetController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Entity\\Investissement\\Project\:\:setUser\(\) expects App\\Entity\\UsersAvis\\User\|null, Symfony\\Component\\Security\\Core\\User\\UserInterface given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Investissement/FrontProjetController.php
+
+		-
+			message: '#^Call to an undefined method App\\Service\\Investissement\\DealWorkflowService\:\:createFromInvestment\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Investissement/InvestissementApiController.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserId\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Investissement/InvestissementApiController.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserType\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Investissement/InvestissementApiController.php
+
+		-
+			message: '#^Method App\\Service\\Investissement\\RoiSimulatorService\:\:simulate\(\) invoked with 4 parameters, 3 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: src/Controller/Investissement/InvestissementApiController.php
+
+		-
+			message: '#^Parameter \#1 \$investor of method App\\Repository\\NegotiationRepository\:\:findByInvestor\(\) expects App\\Entity\\UsersAvis\\User, Symfony\\Component\\Security\\Core\\User\\UserInterface\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Investissement/InvestissementApiController.php
+
+		-
+			message: '#^Parameter \#1 \$startup of method App\\Repository\\NegotiationRepository\:\:findByStartup\(\) expects App\\Entity\\UsersAvis\\User, Symfony\\Component\\Security\\Core\\User\\UserInterface\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Investissement/InvestissementApiController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Repository\\InvestmentRepository\:\:countByStatutForUser\(\) expects App\\Entity\\UsersAvis\\User, Symfony\\Component\\Security\\Core\\User\\UserInterface\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Investissement/InvestissementApiController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Repository\\InvestmentRepository\:\:countDistinctProjectsByUser\(\) expects App\\Entity\\UsersAvis\\User, Symfony\\Component\\Security\\Core\\User\\UserInterface\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Investissement/InvestissementApiController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Repository\\InvestmentRepository\:\:getTotalInvestedByUser\(\) expects App\\Entity\\UsersAvis\\User, Symfony\\Component\\Security\\Core\\User\\UserInterface\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Investissement/InvestissementApiController.php
+
+		-
+			message: '#^Parameter \#2 \$budget of method App\\Service\\Investissement\\RoiSimulatorService\:\:simulate\(\) expects float, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Investissement/InvestissementApiController.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserId\(\)\.$#'
+			identifier: method.notFound
+			count: 10
+			path: src/Controller/Investissement/NegociationController.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserType\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Controller/Investissement/NegociationController.php
+
+		-
+			message: '#^Parameter \#1 \$investor of method App\\Entity\\Investissement\\Negotiation\:\:setInvestor\(\) expects App\\Entity\\UsersAvis\\User\|null, Symfony\\Component\\Security\\Core\\User\\UserInterface given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Controller/Investissement/NegociationController.php
+
+		-
+			message: '#^Parameter \#1 \$investor of method App\\Repository\\NegotiationRepository\:\:findByInvestor\(\) expects App\\Entity\\UsersAvis\\User, Symfony\\Component\\Security\\Core\\User\\UserInterface given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Investissement/NegociationController.php
+
+		-
+			message: '#^Parameter \#1 \$startup of method App\\Repository\\NegotiationRepository\:\:findByStartup\(\) expects App\\Entity\\UsersAvis\\User, Symfony\\Component\\Security\\Core\\User\\UserInterface given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Investissement/NegociationController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Entity\\Investissement\\NegotiationMessage\:\:setUser\(\) expects App\\Entity\\UsersAvis\\User\|null, Symfony\\Component\\Security\\Core\\User\\UserInterface given\.$#'
+			identifier: argument.type
+			count: 5
+			path: src/Controller/Investissement/NegociationController.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserId\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: src/Controller/Investissement/WorkflowController.php
+
+		-
+			message: '#^Property App\\Controller\\Investissement\\WorkflowController\:\:\$investmentRepo is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Controller/Investissement/WorkflowController.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserId\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Marketplace/CommandeController.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserType\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: src/Controller/Marketplace/CommandeController.php
+
+		-
+			message: '#^Method App\\Controller\\Marketplace\\CommandeController\:\:exportCsv\(\) should return Symfony\\Component\\HttpFoundation\\StreamedResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Controller/Marketplace/CommandeController.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserId\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Marketplace/FactureController.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserType\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Marketplace/FactureController.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserId\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Marketplace/MarketAnalysisController.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserType\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Marketplace/MarketAnalysisController.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserId\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Marketplace/PanierController.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserId\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Controller/Marketplace/PaymentController.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserId\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Marketplace/ProduitController.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserType\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: src/Controller/Marketplace/ProduitController.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserId\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Controller/Marketplace/TrackingController.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserType\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Marketplace/TrackingController.php
+
+		-
+			message: '#^Offset ''confirmee''\|''en_attente''\|''en_cours_paiement''\|''en_preparation''\|''livree''\|''payee'' on array\{en_attente\: ''En attente'', confirmee\: ''Confirmée'', en_cours_paiement\: ''Paiement en cours'', payee\: ''Payée'', en_preparation\: ''En préparation'', livree\: ''Livrée''\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/Controller/Marketplace/TrackingController.php
+
+		-
+			message: '#^Instanceof between App\\Entity\\UsersAvis\\User and App\\Entity\\UsersAvis\\User will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 3
+			path: src/Controller/TotpController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Repository\\UsersAvis\\AvisRepository\:\:findByUser\(\) expects App\\Entity\\UsersAvis\\User, Symfony\\Component\\Security\\Core\\User\\UserInterface given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/UsersAvis/AvisController.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between App\\Entity\\Elearning\\Formation and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: src/Controller/UsersAvis/AvisController.php
+
+		-
+			message: '#^Offset ''mimeType'' on array\{bytes\: string, mimeType\: string\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/Controller/UsersAvis/UserController.php
+
+		-
+			message: '#^Property App\\Controller\\UsersAvis\\UserController\:\:\$userAuthenticator is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Controller/UsersAvis/UserController.php
+
+		-
+			message: '#^Variable \$secret on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.variable
+			count: 1
+			path: src/Controller/UsersAvis/UserController.php
+
+		-
+			message: '#^Instanceof between Doctrine\\Common\\Collections\\Collection and Doctrine\\Common\\Collections\\Collection will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 2
+			path: src/Entity/Elearning/Formation.php
+
+		-
+			message: '#^Property App\\Entity\\Elearning\\FormationRecommendationEvent\:\:\$id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Elearning/FormationRecommendationEvent.php
+
+		-
+			message: '#^Property App\\Entity\\Elearning\\PromoCode\:\:\$id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Elearning/PromoCode.php
+
+		-
+			message: '#^Property App\\Entity\\Elearning\\TrainingRequest\:\:\$id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Elearning/TrainingRequest.php
+
+		-
+			message: '#^Property App\\Entity\\Elearning\\TrainingRequest\:\:\$status \(string\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Elearning/TrainingRequest.php
+
+		-
+			message: '#^Instanceof between Doctrine\\Common\\Collections\\Collection and Doctrine\\Common\\Collections\\Collection will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
+			path: src/Entity/Investissement/Negotiation.php
+
+		-
+			message: '#^Instanceof between Doctrine\\Common\\Collections\\Collection and Doctrine\\Common\\Collections\\Collection will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 3
+			path: src/Entity/Investissement/Project.php
+
+		-
+			message: '#^Property App\\Entity\\Marketplace\\AutoConfirmNotification\:\:\$id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Marketplace/AutoConfirmNotification.php
+
+		-
+			message: '#^Property App\\Entity\\Marketplace\\Commande\:\:\$idCommande \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Marketplace/Commande.php
+
+		-
+			message: '#^Property App\\Entity\\Marketplace\\CommandeLigne\:\:\$idLigne \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Marketplace/CommandeLigne.php
+
+		-
+			message: '#^Property App\\Entity\\Marketplace\\CommandeStatusHistory\:\:\$id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Marketplace/CommandeStatusHistory.php
+
+		-
+			message: '#^Property App\\Entity\\Marketplace\\Facture\:\:\$id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Marketplace/Facture.php
+
+		-
+			message: '#^Property App\\Entity\\Marketplace\\Panier\:\:\$idPanier \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Marketplace/Panier.php
+
+		-
+			message: '#^Property App\\Entity\\Marketplace\\ProductService\:\:\$product_id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Marketplace/ProductService.php
+
+		-
+			message: '#^Property App\\Entity\\Marketplace\\ProduitService\:\:\$idProduit \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Marketplace/ProduitService.php
+
+		-
+			message: '#^Instanceof between Doctrine\\Common\\Collections\\Collection and Doctrine\\Common\\Collections\\Collection will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
+			path: src/Entity/UsersAvis/User.php
+
+		-
+			message: '#^Property App\\Entity\\UsersAvis\\User\:\:\$is_verified \(bool\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/UsersAvis/User.php
+
+		-
+			message: '#^Property App\\Entity\\UsersAvis\\UserAuthState\:\:\$id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/UsersAvis/UserAuthState.php
+
+		-
+			message: '#^Expression on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.expr
+			count: 1
+			path: src/EventListener/EmailVerificationListener.php
+
+		-
+			message: '#^Using nullsafe method call on non\-nullable type Symfony\\Component\\HttpFoundation\\Session\\SessionInterface\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: src/EventListener/EmailVerificationListener.php
+
+		-
+			message: '#^Call to function ctype_digit\(\) with \*NEVER\* will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Repository/Elearning/FormationRepository.php
+
+		-
+			message: '#^Call to function is_int\(\) with int will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Repository/Elearning/FormationRepository.php
+
+		-
+			message: '#^Method App\\Repository\\Marketplace\\CommandeRepository\:\:findMonthlyRevenue\(\) should return array\<int, array\{mois\: string, total\: string, nb\: int\}\> but returns list\<array\{mois\: string, total\: float, nb\: int\<1, max\>\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Repository/Marketplace/CommandeRepository.php
+
+		-
+			message: '#^Property App\\Security\\LoginSuccessHandler\:\:\$userAuthStateService is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Security/LoginSuccessHandler.php
+
+		-
+			message: '#^Offset ''content'' on array\{role\: string, content\: string\} in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.offset
+			count: 1
+			path: src/Service/AI/AiDatabaseAssistantService.php
+
+		-
+			message: '#^Offset ''role'' on array\{role\: string, content\: string\} in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.offset
+			count: 1
+			path: src/Service/AI/AiDatabaseAssistantService.php
+
+		-
+			message: '#^Call to an undefined method App\\Service\\Marketplace\\GrokService\:\:chatWithMessages\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Service/Elearning/FormationAiBestPickService.php
+
+		-
+			message: '#^PHPDoc tag @param references unknown parameter\: \$candidates$#'
+			identifier: parameter.notFound
+			count: 1
+			path: src/Service/Elearning/FormationAiBestPickService.php
+
+		-
+			message: '#^Property DateInterval\:\:\$days \(int\|false\) on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.property
+			count: 1
+			path: src/Service/Elearning/LocalFormationRecommender.php
+
+		-
+			message: '#^Match expression does not handle remaining value\: string$#'
+			identifier: match.unhandled
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Variable \$plan in empty\(\) always exists and is not falsy\.$#'
+			identifier: empty.variable
+			count: 1
+			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Offset ''sante'' on non\-empty\-array\<mixed, mixed\> on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/Service/Investissement/PortfolioAnalysisService.php
+
+		-
+			message: '#^Parameter \#2 \$replace of function str_replace expects array\<string\>\|string, array\<int, int\<0, max\>\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Service/Investissement/PortfolioAnalysisService.php
+
+		-
+			message: '#^Offset 0 on non\-empty\-list\<string\> on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/Service/Investissement/YousignService.php
+
+		-
+			message: '#^Constant App\\Service\\Marketplace\\OrderScoringService\:\:PENALTY_POINTS is unused\.$#'
+			identifier: classConstant.unused
+			count: 1
+			path: src/Service/Marketplace/OrderScoringService.php
+
+		-
+			message: '#^Ternary operator condition is always true\.$#'
+			identifier: ternary.alwaysTrue
+			count: 1
+			path: src/Service/Marketplace/ShippoTrackerService.php
+
+		-
+			message: '#^Instanceof between DateTimeInterface and DateTimeInterface will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
+			path: src/Service/Marketplace/StatisticsService.php
+
+		-
+			message: '#^Offset ''categorie'' on array\{idProduit\: int, nomProduit\: string, totalQuantite\: int, totalRevenue\: string, nbCommandes\: int\} on left side of \?\? does not exist\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/Service/Marketplace/StatisticsService.php
+
+		-
+			message: '#^Offset ''categorie'' on array\{idProduit\: int, nomProduit\: string, totalRevenue\: string, totalQuantite\: int\} on left side of \?\? does not exist\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/Service/Marketplace/StatisticsService.php
+
+		-
+			message: '#^Offset ''nbCommandes'' does not exist on array\{idProduit\: int, nomProduit\: string, totalRevenue\: string, totalQuantite\: int\}\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: src/Service/Marketplace/StatisticsService.php
+
+		-
+			message: '#^Offset ''total'' on array\{mois\: string, total\: string, nb\: int\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/Service/Marketplace/StatisticsService.php
+
+		-
+			message: '#^Offset ''totalHt'' on array\{idCommande\: int, idClient\: int, statut\: string, dateCommande\: DateTimeInterface, totalTtc\: string\} on left side of \?\? does not exist\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/Service/Marketplace/StatisticsService.php
+
+		-
+			message: '#^Offset ''totalTtc'' on array\{idCommande\: int, idClient\: int, statut\: string, dateCommande\: DateTimeInterface, totalTtc\: string\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/Service/Marketplace/StatisticsService.php
+
+		-
+			message: '#^Offset ''totalTtc'' on array\{statut\: string, nb\: int, totalTtc\: string\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/Service/Marketplace/StatisticsService.php
+
+		-
+			message: '#^Offset ''totalTva'' on array\{idCommande\: int, idClient\: int, statut\: string, dateCommande\: DateTimeInterface, totalTtc\: string\} on left side of \?\? does not exist\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/Service/Marketplace/StatisticsService.php
+
+		-
+			message: '#^Parameter \#1 \$params of static method Stripe\\Checkout\\Session\:\:create\(\) expects array\{adaptive_pricing\?\: array\{enabled\?\: bool\}, after_expiration\?\: array\{recovery\?\: array\{allow_promotion_codes\?\: bool, enabled\: bool\}\}, allow_promotion_codes\?\: bool, automatic_tax\?\: array\{enabled\: bool, liability\?\: array\{account\?\: string, type\: string\}\}, billing_address_collection\?\: string, branding_settings\?\: array\{background_color\?\: string\|null, border_style\?\: string\|null, button_color\?\: string\|null, display_name\?\: string, font_family\?\: string\|null, icon\?\: array\{file\?\: string, type\: string, url\?\: string\}, logo\?\: array\{file\?\: string, type\: string, url\?\: string\}\}, cancel_url\?\: string, client_reference_id\?\: string, \.\.\.\}\|null, array\{payment_method_types\: array\{''card''\}, line_items\: array, mode\: ''payment'', success_url\: string, cancel_url\: string, metadata\: array\{commande_id\: int\|null, client_id\: int\|null\}, client_reference_id\: ''''\|numeric\-string\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Service/Marketplace/StripeService.php

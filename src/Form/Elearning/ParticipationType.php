@@ -71,6 +71,7 @@ class ParticipationType extends AbstractType
                     'label' => 'Date de paiement',
                     'required' => false,
                     'widget' => 'single_text',
+                    'input' => 'datetime_immutable',
                 ]);
         }
 

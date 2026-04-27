@@ -2,6 +2,10 @@
 
 {% block title %}Formations — BizHub{% endblock %}
 
+{% block head_extra %}
+  <link rel="stylesheet" href="{{ asset('css/formation-recommendations.css') }}" />
+{% endblock %}
+
 {# Le bloc extra_styles est déjà à l'intérieur de <style> dans base.html.twig : ne pas ajouter de <style></style> ici. #}
 {% block extra_styles %}
   .formations-page { min-height: 100vh; padding-top: 72px; background: linear-gradient(180deg, #eef0f5 0%, #f4f6fa 35%, #eef0f5 100%); }
@@ -124,6 +128,35 @@
   .formation-meta-icon.coin { background: rgba(16,185,129,0.12); color: #059669; }
   .formation-meta-icon.user { background: rgba(139,92,246,0.12); color: #7c3aed; }
   .formation-meta-text { padding-top: 0.15rem; line-height: 1.4; word-break: break-word; }
+  .formation-location-actions {
+    display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.15rem;
+  }
+  .formation-loc-btn {
+    flex: 1; min-width: 120px; display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;
+    height: 38px; padding: 0 0.75rem; border-radius: 10px; font-size: 0.78rem; font-weight: 700;
+    text-decoration: none; border: none; cursor: pointer; font-family: 'Josefin Sans', sans-serif;
+    letter-spacing: 0.03em; text-transform: uppercase; transition: transform .15s, box-shadow .2s;
+  }
+  .formation-loc-btn--maps {
+    background: #2563eb; color: #fff; box-shadow: 0 4px 12px rgba(37,99,235,0.25);
+  }
+  .formation-loc-btn--maps:hover { transform: translateY(-1px); color: #fff; }
+  .formation-loc-btn--qr {
+    background: rgba(139,92,246,0.12); color: #6d28d9; border: 1px solid rgba(139,92,246,0.35);
+  }
+  .formation-loc-btn--qr:hover { transform: translateY(-1px); background: rgba(139,92,246,0.18); }
+  .formations-qr-dialog {
+    border: none; border-radius: 16px; padding: 0; max-width: 92vw; background: #fff;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.2);
+  }
+  .formations-qr-dialog::backdrop { background: rgba(15,23,42,0.45); }
+  .formations-qr-dialog-inner { padding: 1.25rem 1.25rem 1rem; text-align: center; }
+  .formations-qr-dialog-inner h3 { font-size: 1rem; margin: 0 0 0.75rem; color: #1e2533; font-weight: 700; }
+  .formations-qr-dialog-inner img { width: 220px; height: 220px; max-width: 100%; border-radius: 12px; border: 1px solid #e5e7eb; }
+  .formations-qr-close {
+    width: 100%; margin-top: 1rem; height: 42px; border-radius: 10px; border: none; cursor: pointer;
+    background: #1e2533; color: #fff; font-weight: 700; font-size: 0.82rem;
+  }
   .formation-actions { padding: 0 1.35rem 1.35rem; margin-top: auto; }
   .formation-btn-participate {
     width: 100%; height: 46px; border: none; border-radius: 12px; cursor: pointer;
@@ -138,6 +171,15 @@
     background: rgba(16,185,129,0.1); color: #059669; font-weight: 700; font-size: 0.82rem;
     cursor: default;
   }
+  .formation-btn-payresume {
+    width: 100%; height: 46px; border-radius: 12px; border: none; cursor: pointer;
+    font-weight: 700; font-size: 0.82rem; letter-spacing: 0.05em; text-transform: uppercase;
+    font-family: 'Josefin Sans', sans-serif;
+    background: linear-gradient(135deg,#0ea5e9,#0369a1); color: #fff;
+    box-shadow: 0 4px 14px rgba(14,165,233,0.35); text-decoration: none; display: flex; align-items: center; justify-content: center;
+  }
+  .formation-title a { color: inherit; text-decoration: none; }
+  .formation-title a:hover { color: #0369a1; }
   .formation-panel { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #f0f2f5; }
   .formation-panel .btn-submit-msg {
     width: 100%; height: 44px; border-radius: 10px; border: none; background: #1e2533; color: #fff;
@@ -214,6 +256,18 @@
       {% endfor %}
     {% endfor %}
 
+    {% if reco is defined %}
+      {% include 'front/elearning/formations/_recommendation_sections.html.twig' with {
+        reco: reco,
+        reco_compact: false,
+        track_url: path('app_front_formation_recommendations_track'),
+        track_csrf: csrf_token('formation_reco_track'),
+        show_ai_best_pick: not is_formateur,
+        ai_best_pick_url: path('app_front_formation_ai_best_pick'),
+        ai_best_pick_csrf: csrf_token('formation_ai_best_pick')
+      } %}
+    {% endif %}
+
     <div class="formations-meta-bar">
       <p class="formations-count">
         {% set n = formations|length %}
@@ -224,11 +278,12 @@
     {% if formations|length > 0 %}
       <div class="formations-grid">
         {% for f in formations %}
+          {% set maps_url = formation_google_maps_url(f) %}
           <article class="formation-card">
             <div class="formation-card-accent {{ f.enLigne ? 'formation-card-accent--online' : 'formation-card-accent--present' }}"></div>
             <div class="formation-card-body">
-              <div class="formation-tag {{ f.enLigne ? 'online' : '' }}">{{ f.enLigne ? 'En ligne' : 'Présentiel' }}</div>
-              <h2 class="formation-title">{{ f.title }}</h2>
+              <div class="formation-tag {{ f.enLigne ? 'online' : '' }}">{{ f.enLigne ? 'En ligne' : 'Présentielle' }}</div>
+              <h2 class="formation-title"><a href="{{ path('app_front_formation_show', { formation_id: f.formation_id }) }}">{{ f.title }}</a></h2>
               {% if f.description %}
                 <p class="formation-desc">{{ f.description }}</p>
               {% endif %}
@@ -238,10 +293,29 @@
                 <span class="formation-meta-icon cal"><i class="fa-regular fa-calendar"></i></span>
                 <span class="formation-meta-text">{{ f.start_date|date('d/m/Y') }} <span style="color:#9ca3af;">→</span> {{ f.end_date|date('d/m/Y') }}</span>
               </div>
-              <div class="formation-meta-row">
-                <span class="formation-meta-icon pin"><i class="fa-solid fa-location-dot"></i></span>
-                <span class="formation-meta-text" title="{{ f.lieu|e('html_attr') }}">{% set lieu = f.lieu %}{{ lieu|length > 48 ? lieu|slice(0,45) ~ '…' : lieu }}</span>
-              </div>
+              {% if not f.enLigne %}
+                <div class="formation-meta-row">
+                  <span class="formation-meta-icon pin"><i class="fa-solid fa-location-dot"></i></span>
+                  <span class="formation-meta-text" title="{{ (f.lieu ?? '')|e('html_attr') }}">
+                    {% set lieu = f.lieu ?? '' %}
+                    {% if lieu|trim != '' %}
+                      {{ lieu|length > 48 ? lieu|slice(0,45) ~ '…' : lieu }}
+                    {% else %}
+                      <span style="color:#9ca3af;">Adresse à confirmer</span>
+                    {% endif %}
+                  </span>
+                </div>
+                {% if maps_url %}
+                  <div class="formation-meta-row formation-location-actions">
+                    <a class="formation-loc-btn formation-loc-btn--maps" href="{{ maps_url }}" target="_blank" rel="noopener noreferrer">
+                      <i class="fa-solid fa-map-location-dot"></i> Google Maps
+                    </a>
+                    <button type="button" class="formation-loc-btn formation-loc-btn--qr formation-qr-trigger" data-qr-src="{{ path('app_front_formation_location_qr_svg', { formation_id: f.formation_id }) }}" aria-label="Afficher le QR code Google Maps">
+                      <i class="fa-solid fa-qrcode"></i> QR code
+                    </button>
+                  </div>
+                {% endif %}
+              {% endif %}
               <div class="formation-meta-row">
                 <span class="formation-meta-icon coin"><i class="fa-solid fa-coins"></i></span>
                 <span class="formation-meta-text"><strong>{{ f.cost ?? '0.00' }}</strong> TND</span>
@@ -278,17 +352,11 @@
                 {% else %}
                   {% if already_participating[f.formation_id] %}
                     <button type="button" class="formation-btn-inscrit" disabled>Déjà inscrit</button>
+                  {% elseif awaiting_payment_participation[f.formation_id]|default(null) %}
+                    <a class="formation-btn-payresume" href="{{ path('app_payment_checkout', { id: awaiting_payment_participation[f.formation_id] }) }}">Finaliser le paiement</a>
+                    <p class="small text-muted mt-2 mb-0" style="text-align:center;">Inscription en attente de règlement.</p>
                   {% else %}
-                    <button type="button" class="formation-btn-participate nb-toggle-participation" data-target="participation-panel-{{ f.formation_id }}">Participer</button>
-                    <div id="participation-panel-{{ f.formation_id }}" class="formation-panel" style="display:none;">
-                      {{ form_start(forms[f.formation_id], { action: path('app_front_formation_participate', { formation_id: f.formation_id }), attr: { novalidate: 'novalidate', class: 'elearning-validated-form', 'data-validate-mode': 'participation-front' } }) }}
-                        {% if search_query|default('')|trim != '' %}
-                          <input type="hidden" name="q" value="{{ search_query|e('html_attr') }}">
-                        {% endif %}
-                        {{ form_row(forms[f.formation_id].remarques) }}
-                        <button type="submit" class="btn-submit-msg">Envoyer la demande</button>
-                      {{ form_end(forms[f.formation_id]) }}
-                    </div>
+                    <a href="{{ path('app_front_formation_show', { formation_id: f.formation_id }) }}" class="formation-btn-participate" style="display:flex;align-items:center;justify-content:center;text-decoration:none;">Participer</a>
                   {% endif %}
                 {% endif %}
 
@@ -356,19 +424,47 @@
     {% endif %}
   </div>
 </div>
+
+<dialog class="formations-qr-dialog" id="formation-qr-dialog" aria-labelledby="formation-qr-dialog-title">
+  <div class="formations-qr-dialog-inner">
+    <h3 id="formation-qr-dialog-title">Scanner pour ouvrir Google Maps</h3>
+    <img src="" alt="QR code Google Maps" width="220" height="220" id="formation-qr-dialog-img" />
+    <button type="button" class="formations-qr-close" id="formation-qr-dialog-close">Fermer</button>
+  </div>
+</dialog>
 {% endblock %}
 
 {% block javascripts %}
   {{ parent() }}
   <script>
-    document.querySelectorAll('.nb-toggle-participation').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var id = btn.getAttribute('data-target');
-        var el = document.getElementById(id);
-        if (!el) return;
-        el.style.display = el.style.display === 'none' ? 'block' : 'none';
+    (function () {
+      var dlg = document.getElementById('formation-qr-dialog');
+      var img = document.getElementById('formation-qr-dialog-img');
+      var closeBtn = document.getElementById('formation-qr-dialog-close');
+      if (!dlg || !img) return;
+      document.querySelectorAll('.formation-qr-trigger').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var src = btn.getAttribute('data-qr-src');
+          if (!src) return;
+          img.removeAttribute('src');
+          img.setAttribute('src', src + (src.indexOf('?') >= 0 ? '&' : '?') + 't=' + Date.now());
+          if (typeof dlg.showModal === 'function') {
+            dlg.showModal();
+          }
+        });
       });
-    });
+      if (closeBtn) {
+        closeBtn.addEventListener('click', function () {
+          if (typeof dlg.close === 'function') dlg.close();
+        });
+      }
+      dlg.addEventListener('click', function (e) {
+        if (e.target === dlg && typeof dlg.close === 'function') dlg.close();
+      });
+    })();
   </script>
   <script src="{{ asset('js/elearning-forms-validation.js') }}"></script>
+  {% if reco is defined %}
+  <script src="{{ asset('js/formation-recommendations.js') }}"></script>
+  {% endif %}
 {% endblock %}

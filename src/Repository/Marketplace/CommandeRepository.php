@@ -70,9 +70,9 @@ class CommandeRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
 
         $sql = '
-            SELECT DISTINCT c.id_commande
+            SELECT DISTINCT c.commande_id
             FROM commande c
-            JOIN commande_ligne cl ON cl.id_commande = c.id_commande
+            JOIN commande_ligne cl ON cl.commande_id = c.commande_id
             JOIN produit_service ps ON ps.id_produit = cl.id_produit
             WHERE ps.owner_user_id = :owner
         ';
@@ -83,7 +83,7 @@ class CommandeRepository extends ServiceEntityRepository
             $params['statut'] = $statut;
         }
 
-        $ids = array_column($conn->fetchAllAssociative($sql, $params), 'id_commande');
+        $ids = array_column($conn->fetchAllAssociative($sql, $params), 'commande_id');
 
         if (empty($ids)) {
             return [];

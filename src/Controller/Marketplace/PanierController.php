@@ -3,6 +3,7 @@
 namespace App\Controller\Marketplace;
 
 use App\Entity\Marketplace\Panier;
+use App\Entity\UsersAvis\User;
 use App\Entity\Marketplace\ProduitService;
 use App\Repository\Marketplace\PanierRepository;
 use App\Repository\Marketplace\ProduitServiceRepository;
@@ -20,7 +21,7 @@ class PanierController extends AbstractController
     private function getUserId(): int
     {
         $user = $this->getUser();
-        return $user ? (int) $user->getUserId() : 0;
+        return $user ? (int) ($user instanceof User ? $user->getUserId() : null) : 0;
     }
 
     private function requireLogin(): ?Response

@@ -1,0 +1,67 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Class App\\Service\\AI\\CloudflareAiService referenced with incorrect case\: App\\Service\\Ai\\CloudflareAiService\.$#'
+			identifier: class.nameCase
+			count: 2
+			path: tests/Controller/UsersAvis/UserAiAvatarControllerTest.php
+
+		-
+			message: '#Method.*never returns null#'
+			identifier: return.unusedType
+			count: 1
+			path: tests/Controller/UsersAvis/UserAiAvatarControllerTest.php
+
+		-
+			message: '#Method.*never returns UnitEnum#'
+			identifier: return.unusedType
+			count: 1
+			path: tests/Controller/UsersAvis/UserAiAvatarControllerTest.php
+
+		-
+			message: '#Method.*never returns array#'
+			identifier: return.unusedType
+			count: 1
+			path: tests/Controller/UsersAvis/UserAiAvatarControllerTest.php
+
+		-
+			message: '#Method.*never returns bool#'
+			identifier: return.unusedType
+			count: 1
+			path: tests/Controller/UsersAvis/UserAiAvatarControllerTest.php
+
+		-
+			message: '#Method.*never returns float#'
+			identifier: return.unusedType
+			count: 1
+			path: tests/Controller/UsersAvis/UserAiAvatarControllerTest.php
+
+		-
+			message: '#Method.*never returns int#'
+			identifier: return.unusedType
+			count: 1
+			path: tests/Controller/UsersAvis/UserAiAvatarControllerTest.php
+
+		-
+			message: '#return type has no value type specified#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: tests/Controller/UsersAvis/UserAiAvatarControllerTest.php
+
+		-
+			message: '#has parameter \$context with no value type specified#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: tests/Controller/UsersAvis/UserAiAvatarControllerTest.php
+
+		-
+			message: '#has parameter \$headers with no value type specified#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: tests/Controller/UsersAvis/UserAiAvatarControllerTest.php
+
+		-
+			message: '#Call to function method_exists.*will always evaluate to true#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: tests/bootstrap.php

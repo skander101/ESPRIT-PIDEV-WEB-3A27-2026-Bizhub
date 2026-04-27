@@ -3,6 +3,7 @@
 namespace App\Controller\Investissement;
 
 use App\Entity\Investissement\Deal;
+use App\Entity\UsersAvis\User;
 use App\Entity\Investissement\Negotiation;
 use App\Entity\Investissement\Project;
 use App\Repository\InvestmentRepository;
@@ -37,7 +38,7 @@ class DashboardController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        $type = $user->getUserType();
+        $type = ($user instanceof User ? $user->getUserType() : null);
 
         if ($type === 'startup') {
             return $this->dashboardStartup($user, $request);
@@ -50,7 +51,7 @@ class DashboardController extends AbstractController
 
     private function dashboardInvestisseur($user): Response
     {
-        $userId = $user->getUserId();
+        $userId = ($user instanceof User ? $user->getUserId() : null);
 
         // All investments for this investor
         $allInvestments = $this->investmentRepository->findAllByUser($user);

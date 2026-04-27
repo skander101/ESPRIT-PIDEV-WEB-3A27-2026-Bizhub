@@ -1,0 +1,16 @@
+knp_snappy:
+    pdf:
+        enabled:    true
+        binary:     '%env(WKHTMLTOPDF_PATH)%'
+        options:
+            page-size:      A4
+            orientation:    Portrait
+            margin-top:     0
+            margin-right:   0
+            margin-bottom:  0
+            margin-left:    0
+            encoding:       UTF-8
+            enable-local-file-access: true
+    image:
+        enabled:  false
+        binary:   /usr/bin/wkhtmltoimage

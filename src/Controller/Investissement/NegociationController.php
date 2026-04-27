@@ -3,6 +3,7 @@
 namespace App\Controller\Investissement;
 
 use App\Entity\Investissement\Investment;
+use App\Entity\UsersAvis\User;
 use App\Entity\Investissement\Negotiation;
 use App\Entity\Investissement\NegotiationMessage;
 use App\Repository\InvestmentRepository;
@@ -44,7 +45,7 @@ class NegociationController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        if ($user->getUserType() === 'startup') {
+        if (($user instanceof User ? $user->getUserType() : null) === 'startup') {
             $negociations = $this->negotiationRepo->findByStartup($user);
         } else {
             $negociations = $this->negotiationRepo->findByInvestor($user);
@@ -52,7 +53,7 @@ class NegociationController extends AbstractController
 
         return $this->render('front/negociation/index.html.twig', [
             'negociations' => $negociations,
-            'user_type'   => $user->getUserType(),
+            'user_type'   => ($user instanceof User ? $user->getUserType() : null),
         ]);
     }
 
@@ -76,7 +77,7 @@ class NegociationController extends AbstractController
         }
 
         // Seul l'investisseur propriétaire peut initier
-        if ($investment->getUser()?->getUserId() !== $user->getUserId()) {
+        if ($investment->getUser()?->getUserId() !== ($user instanceof User ? $user->getUserId() : null)) {
             throw $this->createAccessDeniedException();
         }
 
@@ -155,7 +156,7 @@ class NegociationController extends AbstractController
         }
 
         // L'investisseur ne peut pas négocier son propre projet
-        if ($startup->getUserId() === $user->getUserId()) {
+        if ($startup->getUserId() === ($user instanceof User ? $user->getUserId() : null)) {
             $this->addFlash('error', 'Vous ne pouvez pas négocier votre propre projet.');
             return $this->redirectToRoute('app_front_projet_show', ['id' => $id]);
         }
@@ -211,14 +212,14 @@ class NegociationController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        $this->assertParticipant($negociation, $user->getUserId());
+        $this->assertParticipant($negociation, ($user instanceof User ? $user->getUserId() : null));
 
         $deal     = $this->workflow->findDealByNegotiation($negociation);
         // Utiliser le repository dédié avec LEFT JOIN sur le sender pour
         // éviter les proxies Doctrine non initialisés (bug côté startup)
         $messages = $this->messageRepo->findByNegotiation($negociation);
 
-        $myId      = (int) $user->getUserId();
+        $myId      = (int) ($user instanceof User ? $user->getUserId() : null);
         $isStartup = $negociation->getStartup()  && (int)$negociation->getStartup()->getUserId()  === $myId;
         $isInvestor = $negociation->getInvestor() && (int)$negociation->getInvestor()->getUserId() === $myId;
 
@@ -247,7 +248,7 @@ class NegociationController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        $this->assertParticipant($negociation, $user->getUserId());
+        $this->assertParticipant($negociation, ($user instanceof User ? $user->getUserId() : null));
 
         if (!$this->isCsrfTokenValid('msg_' . $negociation->getNegotiation_id(), $request->request->get('_token'))) {
             $this->addFlash('error', 'Token invalide.');
@@ -297,7 +298,7 @@ class NegociationController extends AbstractController
         Negotiation $negociation
     ): Response {
         $user = $this->getUser();
-        if (!$user || !$negociation->getStartup() || (int)$user->getUserId() !== (int)$negociation->getStartup()->getUserId()) {
+        if (!$user || !$negociation->getStartup() || (int)($user instanceof User ? $user->getUserId() : null) !== (int)$negociation->getStartup()->getUserId()) {
             throw $this->createAccessDeniedException('Seule la startup peut valider la négociation.');
         }
 
@@ -350,7 +351,7 @@ class NegociationController extends AbstractController
         Negotiation $negociation
     ): Response {
         $user = $this->getUser();
-        if (!$user || !$negociation->getStartup() || (int)$user->getUserId() !== (int)$negociation->getStartup()->getUserId()) {
+        if (!$user || !$negociation->getStartup() || (int)($user instanceof User ? $user->getUserId() : null) !== (int)$negociation->getStartup()->getUserId()) {
             throw $this->createAccessDeniedException('Seule la startup peut rejeter la négociation.');
         }
 
@@ -390,7 +391,7 @@ class NegociationController extends AbstractController
             return $this->json(['error' => 'Non authentifié.'], 401);
         }
 
-        $this->assertParticipant($negociation, $user->getUserId());
+        $this->assertParticipant($negociation, ($user instanceof User ? $user->getUserId() : null));
 
         if (!$this->isCsrfTokenValid('ai_analyse_' . $negociation->getNegotiation_id(), $request->request->get('_token'))) {
             return $this->json(['error' => 'Token invalide.'], 403);
@@ -399,7 +400,7 @@ class NegociationController extends AbstractController
         $messages = $this->messageRepo->findByNegotiation($negociation);
 
         // Detect role: is the current user the investor or the startup?
-        $userType = ($negociation->getInvestor() && $negociation->getInvestor()->getUserId() === $user->getUserId())
+        $userType = ($negociation->getInvestor() && $negociation->getInvestor()->getUserId() === ($user instanceof User ? $user->getUserId() : null))
             ? 'investor'
             : 'startup';
 
@@ -423,7 +424,7 @@ class NegociationController extends AbstractController
             return $this->json(['error' => 'Non authentifié.'], 401);
         }
 
-        $this->assertParticipant($negociation, $user->getUserId());
+        $this->assertParticipant($negociation, ($user instanceof User ? $user->getUserId() : null));
 
         if (!$this->isCsrfTokenValid('neg_draft_' . $negociation->getNegotiation_id(), $request->request->get('_token', ''))) {
             return $this->json(['error' => 'Token invalide. Rechargez la page.'], 403);
