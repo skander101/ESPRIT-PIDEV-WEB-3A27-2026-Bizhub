@@ -2,90 +2,77 @@
 
 namespace App\Entity\Community;
 
-use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use App\Repository\Community\ReactionRepository;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ReactionRepository::class)]
 #[ORM\Table(name: 'reaction')]
 class Reaction
 {
-    public function __construct()
-    {
-        $this->created_at = new \DateTime();
-    }
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private ?int $reaction_id = null;
+    #[ORM\Column(name: 'reaction_id', type: Types::INTEGER)]
+    private ?int $id = null;
 
-    public function getReaction_id(): ?int
+    #[ORM\Column(name: 'post_id', type: Types::INTEGER)]
+    private ?int $postId = null;
+
+    #[ORM\Column(name: 'user_id', type: Types::INTEGER)]
+    private ?int $userId = null;
+
+    #[ORM\Column(type: Types::STRING, length: 50)]
+    private ?string $type = null;
+
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $createdAt = null;
+
+    public function getId(): ?int
     {
-        return $this->reaction_id;
+        return $this->id;
     }
 
-    public function setReaction_id(int $reaction_id): self
+    public function getPostId(): ?int
     {
-        $this->reaction_id = $reaction_id;
+        return $this->postId;
+    }
+
+    public function setPostId(int $postId): static
+    {
+        $this->postId = $postId;
         return $this;
     }
 
-    public function getPost_id(): int
+    public function getUserId(): ?int
     {
-        return $this->post_id;
+        return $this->userId;
     }
 
-    public function setPost_id(int $post_id): self
+    public function setUserId(int $userId): static
     {
-        $this->post_id = $post_id;
+        $this->userId = $userId;
         return $this;
     }
-
-#[ORM\Column(type: 'integer', nullable: false)]
-    private int $post_id;
-
-    #[ORM\Column(type: 'integer', nullable: false)]
-    private int $user_id;
-
-    public function getUser_id(): ?int
-    {
-        return $this->user_id;
-    }
-
-    public function setUser_id(int $user_id): self
-    {
-        $this->user_id = $user_id;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'string', nullable: false)]
-    private string $type = '';
 
     public function getType(): ?string
     {
         return $this->type;
     }
 
-    public function setType(string $type): self
+    public function setType(string $type): static
     {
         $this->type = $type;
         return $this;
     }
 
-    #[ORM\Column(type: 'datetime', nullable: false)]
-    private \DateTimeInterface $created_at;
-
-    public function getCreated_at(): \DateTimeInterface
+    public function getCreatedAt(): ?\DateTimeInterface
     {
-        return $this->created_at;
+        return $this->createdAt;
     }
 
-    protected function setCreated_at(\DateTimeInterface $created_at): self
+    public function setCreatedAt(?\DateTimeInterface $createdAt): static
     {
-        $this->created_at = $created_at;
+        $this->createdAt = $createdAt;
         return $this;
     }
-
 }

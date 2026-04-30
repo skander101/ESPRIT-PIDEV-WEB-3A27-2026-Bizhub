@@ -1,0 +1,115 @@
+{# Partial template: rendered for both full page and AJAX updates #}
+{% for post in posts %}
+  <div class="card mb-3 shadow-sm">
+    <div class="card-body">
+      <div class="post-meta">
+        <div class="author">
+          <img src="{{ post.avatar_url ? asset(post.avatar_url) : asset('assets/front/images/logo.png') }}"
+               class="rounded-circle me-2"
+               width="40"
+               height="40"
+               style="object-fit:cover;border:1px solid var(--border);background:var(--light-bg);"
+               alt="avatar">
+          <div style="min-width:0;">
+            <div class="author-name">{{ post.author_name ?? 'Utilisateur' }}</div>
+            <div class="meta-line">
+              <span>{{ post.created_at ? (post.created_at|date('d/m/Y H:i')) : '' }}</span>
+              {% if post.category %}
+                <span class="badge badge-pending">{{ post.category }}</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        {% if app.user and (app.user.userId == post.user_id or is_granted('ROLE_ADMIN')) %}
+          <div class="post-actions">
+            <a class="btn btn-secondary" href="{{ path('community_edit', {id: post.post_id}) }}"><i class="fa fa-pen"></i> Modifier</a>
+            <form method="post" action="{{ path('community_delete', {id: post.post_id}) }}"
+                  data-confirm="Supprimer ce post ?"
+                  data-confirm-title="Suppression"
+                  data-confirm-label="<i class='fa fa-trash-alt'></i>&nbsp;Supprimer">
+              <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i> Supprimer</button>
+            </form>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="card-title post-title">{{ post.title }}</div>
+      <div class="card-text post-content">{{ post.content }}</div>
+
+      {% if post.location %}
+        <div class="meta-line" style="margin-top:8px;">
+          <a class="link-muted" href="https://www.openstreetmap.org/?mlat={{ post.location_lat }}&mlon={{ post.location_lon }}" target="_blank" rel="noopener noreferrer">
+            📍 {{ post.location }}
+          </a>
+        </div>
+      {% endif %}
+
+      <div class="react-row" data-react-post="{{ post.post_id }}">
+        <div class="react-wrap">
+          <button class="react-btn {{ post.user_reaction ? 'active' : '' }}"
+                  type="button"
+                  data-react-button
+                  data-react-token="{{ csrf_token('community_react_' ~ post.post_id) }}"
+                  data-react-active="{{ post.user_reaction ?? '' }}">
+            <span class="react-emoji" data-react-emoji>{{ post.user_reaction_emoji ?? '👍' }}</span>
+            <span data-react-label>{{ post.user_reaction_label ?? 'Like' }}</span>
+          </button>
+          <div class="react-picker" role="menu" aria-label="Réactions">
+            <button class="react-opt" type="button" data-react-type="LIKE" title="Like">👍</button>
+            <button class="react-opt" type="button" data-react-type="LOVE" title="Love">❤️</button>
+            <button class="react-opt" type="button" data-react-type="CELEBRATE" title="Celebrate">🎉</button>
+            <button class="react-opt" type="button" data-react-type="SUPPORT" title="Support">🤝</button>
+            <button class="react-opt" type="button" data-react-type="INSIGHTFUL" title="Insightful">💡</button>
+            <button class="react-opt" type="button" data-react-type="CURIOUS" title="Curious">🔥</button>
+          </div>
+        </div>
+
+        <div class="react-counts" data-react-counts>
+          {% for t, c in (post.reaction_counts ?? {}) %}
+            {% if c > 0 %}
+              <span class="react-pill" data-react-pill="{{ t }}">
+                <span>{{ post.reaction_emojis[t] ?? '👍' }}</span>
+                <span data-react-count="{{ t }}">{{ c }}</span>
+              </span>
+            {% endif %}
+          {% endfor %}
+          {% if (post.reaction_total ?? 0) == 0 %}
+            <span class="react-pill" style="opacity:0.65;">
+              <span>👍</span><span>0</span>
+            </span>
+          {% endif %}
+        </div>
+      </div>
+
+      <div style="margin-top:10px;">
+        <a class="link-muted" href="{{ path('community_show', {id: post.post_id}) }}">
+          <i class="fa fa-comment"></i> Voir les commentaires ({{ post.comment_count }})
+        </a>
+      </div>
+
+      {% if app.user %}
+        <div class="divider"></div>
+        <form method="post" action="{{ path('community_comment_new', {postId: post.post_id}) }}">
+          <div class="form-row" style="grid-template-columns: 1fr 130px; gap:10px;">
+            <div class="form-group" style="margin-bottom:0;">
+              <textarea name="content" class="form-control comment-text" rows="2" placeholder="Ajouter un commentaire..."></textarea>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <button class="btn btn-primary w-100" type="submit">
+                <i class="fa fa-paper-plane"></i> Envoyer
+              </button>
+            </div>
+          </div>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+{% else %}
+  <div class="empty-state">
+    <span class="empty-state-icon"><i class="fa fa-users"></i></span>
+    <h3>Aucun post trouvé</h3>
+    <p>Essayez de modifier votre recherche ou filtre.</p>
+  </div>
+{% endfor %}
+

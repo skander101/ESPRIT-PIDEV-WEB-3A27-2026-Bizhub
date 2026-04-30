@@ -1,0 +1,636 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Communauté - BizHub{% endblock %}
+
+{% block flash_messages %}
+  <div class="community-wrap" style="margin-top: 16px; margin-bottom: 0;">
+    {% for message in app.flashes('error') %}
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+    {% for message in app.flashes('success') %}
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}
+
+{% block extra_styles %}
+  /* ------------------------------------------------------------------
+     Community uses BizHub layout (front/base.html.twig).
+     The project does not reliably load Bootstrap, so we provide a small,
+     compatible subset of classes used in Community templates.
+  ------------------------------------------------------------------ */
+  .community-feed{ font-size: 15px; }
+  .community-feed .card-title{ font-size: 1.25rem; }
+  .community-feed .card-text{ font-size: 1rem; }
+  .community-feed .comment-text{ font-size: 0.95rem; }
+
+  .mb-3{ margin-bottom: 1rem; }
+  .mb-4{ margin-bottom: 1.5rem; }
+  .shadow-sm{ box-shadow: var(--shadow-sm); }
+
+  .card{
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    border: 1.5px solid var(--border);
+    overflow: hidden;
+  }
+  .card-body{ padding: 16px; }
+
+  .form-control, .form-select{
+    width: 100%;
+    background: var(--light-bg);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 11px 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.92rem;
+    color: var(--text);
+    outline: none;
+    transition: border-color var(--transition), background var(--transition), box-shadow var(--transition);
+  }
+  .form-control:focus, .form-select:focus{
+    border-color: var(--primary);
+    background: var(--white);
+    box-shadow: var(--shadow-glow);
+  }
+  textarea.form-control{ resize: vertical; min-height: 110px; line-height: 1.6; }
+
+  .btn{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: var(--radius-md);
+    border: 1.5px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 800;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    font-size: 0.78rem;
+    transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+  }
+  .btn:hover{ transform: translateY(-1px); }
+  .btn:active{ transform: translateY(0); }
+  .btn-primary{ background: var(--primary); color: var(--dark); }
+  .btn-primary:hover{ background: var(--primary-dark); }
+  .btn-secondary{ background: #fff; color: var(--text-muted); border-color: var(--border); }
+  .btn-secondary:hover{ border-color: #cbd5e1; color: var(--text); }
+  .btn-danger{ background: rgba(239,68,68,0.10); color: #b91c1c; border-color: rgba(239,68,68,0.25); }
+  .btn-danger:hover{ background: rgba(239,68,68,0.14); }
+  .btn-link{ background: transparent; border-color: transparent; padding: 0; text-transform: none; letter-spacing: normal; font-family: 'Inter', sans-serif; font-weight: 700; }
+  .btn-link:hover{ transform: none; opacity: 0.85; }
+
+  .rounded-circle{ border-radius: 50%; }
+  .me-2{ margin-right: 0.5rem; }
+  .w-100{ width: 100%; }
+
+  .community-wrap{
+    max-width: 860px;
+    margin: 24px auto;
+    padding: 0 16px;
+  }
+  .community-head{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .community-head h1{
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 1.25rem;
+    letter-spacing: 0.02em;
+    margin: 0;
+  }
+  .post-form{
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 16px;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 16px;
+  }
+  .post-form .row{
+    display:grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .post-meta{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap: 10px;
+  }
+  .author{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    min-width: 0;
+  }
+  .avatar{
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    background: var(--light-bg);
+    flex-shrink: 0;
+  }
+  .author-name{
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .meta-line{
+    display:flex;
+    align-items:center;
+    gap: 8px;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+  }
+  .post-title{
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 800;
+    margin-top: 10px;
+    margin-bottom: 6px;
+    font-size: 1rem;
+  }
+  .post-content{
+    color: var(--text);
+    font-size: 0.92rem;
+    white-space: pre-wrap;
+  }
+  .post-actions{
+    display:flex;
+    align-items:center;
+    gap: 8px;
+  }
+  .link-muted{
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .link-muted:hover{ color: var(--primary-dark); }
+
+  /* Bootstrap-like alerts (local, sans dépendances) */
+  .alert{
+    border-radius: var(--radius-lg);
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    background: var(--white);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 10px;
+    position: relative;
+  }
+  .alert.alert-danger{ background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.22); color: #7f1d1d; }
+  .alert.alert-success{ background: rgba(16,185,129,0.10); border-color: rgba(16,185,129,0.22); color: #065f46; }
+  .btn-close{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: rgba(255,255,255,0.6);
+    border-radius: 10px;
+    cursor: pointer;
+    color: inherit;
+  }
+  .btn-close::before{
+    content: '×';
+    font-size: 18px;
+    font-weight: 900;
+    line-height: 28px;
+    display:block;
+    text-align:center;
+    opacity: 0.75;
+  }
+  .btn-close:hover::before{ opacity: 1; }
+
+  /* Reactions UI */
+  .react-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top: 10px; }
+  .react-wrap{ position: relative; display: inline-flex; align-items:center; gap:10px; }
+  .react-btn{
+    display:inline-flex; align-items:center; gap:8px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    background: var(--light-bg2);
+    border: 1.5px solid var(--border);
+    color: var(--text);
+    font-weight: 800;
+    font-family: 'Josefin Sans', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 0.72rem;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  }
+  .react-btn:hover{ border-color: rgba(255,190,51,0.45); background: rgba(255,190,51,0.10); transform: translateY(-1px); }
+  .react-btn.active{ border-color: rgba(255,190,51,0.75); background: rgba(255,190,51,0.16); }
+  .react-emoji{ font-size: 1rem; line-height: 1; }
+  .react-picker{
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 10px);
+    display:flex;
+    gap: 6px;
+    padding: 8px 10px;
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(6px);
+    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+    pointer-events: none;
+    z-index: 50;
+  }
+  .react-picker.visible{
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: all;
+  }
+  .react-opt{
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border: 1px solid transparent;
+    background: transparent;
+    cursor: pointer;
+    font-size: 1.05rem;
+    transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  }
+  .react-opt:hover{ transform: scale(1.3); background: rgba(255,190,51,0.12); border-color: rgba(255,190,51,0.28); }
+  .react-counts{ display:flex; align-items:center; gap:10px; flex-wrap: wrap; justify-content:flex-end; }
+  .react-pill{
+    display:inline-flex; align-items:center; gap:6px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-weight: 800;
+    font-family: 'Josefin Sans', sans-serif;
+    letter-spacing: 0.02em;
+  }
+{% endblock %}
+
+{% block content %}
+<div class="community-wrap community-feed">
+    <div class="community-head">
+      <div>
+        <h1>Communauté</h1>
+        <div class="meta-line">Partagez, discutez, et échangez avec la communauté BizHub.</div>
+      </div>
+    </div>
+
+    <div class="card mb-3 shadow-sm">
+      <div class="card-body" style="display:grid; grid-template-columns: 1fr; gap:10px;">
+        <div style="display:grid; grid-template-columns: 1fr; gap:10px;">
+          <input type="text"
+                 class="form-control"
+                 placeholder="Rechercher un post..."
+                 value="{{ search ?? app.request.query.get('search') }}"
+                 data-filter-search>
+          <select class="form-select" data-filter-category>
+            <option value="">Toutes catégories</option>
+            <option value="General"  {% if (category ?? app.request.query.get('category')) == 'General' %}selected{% endif %}>General</option>
+            <option value="Business" {% if (category ?? app.request.query.get('category')) == 'Business' %}selected{% endif %}>Business</option>
+            <option value="Investment" {% if (category ?? app.request.query.get('category')) == 'Investment' %}selected{% endif %}>Investment</option>
+            <option value="Other" {% if (category ?? app.request.query.get('category')) == 'Other' %}selected{% endif %}>Other</option>
+          </select>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+          <button type="button" class="btn btn-secondary" data-filter-reset><i class="fa fa-rotate-left"></i> Reset</button>
+        </div>
+      </div>
+    </div>
+
+    {# Formulaire de création de post #}
+    {% if app.user %}
+      <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+        <span class="section-label">Quoi de neuf ?</span>
+        <form method="post" action="{{ path('community_new') }}">
+          <div class="row">
+            <div class="form-group" style="margin-bottom:0;">
+              <input type="text" name="title" class="form-control" placeholder="Titre">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <textarea name="content" class="form-control" rows="3" placeholder="Partagez quelque chose..."></textarea>
+            </div>
+            <div class="form-row" style="grid-template-columns: 1fr 220px; align-items:end;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label>Catégorie</label>
+                <select name="category" class="form-select">
+                  <option value="General">General</option>
+                  <option value="Business">Business</option>
+                  <option value="Investment">Investment</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom:0; position:relative;">
+                <label>📍 Lieu (optionnel)</label>
+                <input type="text" name="location" class="form-control" placeholder="Ex: Tunis, Sousse..." autocomplete="off" data-location-input>
+                <input type="hidden" name="location_lat" data-location-lat>
+                <input type="hidden" name="location_lon" data-location-lon>
+                <div data-location-suggest style="position:absolute;left:0;right:0;top: calc(100% + 6px); z-index:60; display:none;"></div>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <button type="submit" class="btn btn-primary w-100"><i class="fa fa-paper-plane"></i> Publier</button>
+              </div>
+            </div>
+          </div>
+        </form>
+        </div>
+      </div>
+    {% endif %}
+
+    <div id="communityPosts" data-posts-container>
+      {% include 'community/_posts.html.twig' with { posts: posts } %}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+  <script>
+    (function(){
+      const EMOJI = { LIKE:'👍', LOVE:'❤️', CELEBRATE:'🎉', SUPPORT:'🤝', INSIGHTFUL:'💡', CURIOUS:'🔥' };
+      const LABEL = { LIKE:'Like', LOVE:'Love', CELEBRATE:'Celebrate', SUPPORT:'Support', INSIGHTFUL:'Insightful', CURIOUS:'Curious' };
+
+      function setButtonState(root, userReaction){
+        const btn = root.querySelector('[data-react-button]');
+        const emojiEl = root.querySelector('[data-react-emoji]');
+        const labelEl = root.querySelector('[data-react-label]');
+        btn.dataset.reactActive = userReaction || '';
+        if(userReaction){
+          btn.classList.add('active');
+          emojiEl.textContent = EMOJI[userReaction] || '👍';
+          labelEl.textContent = LABEL[userReaction] || userReaction;
+        }else{
+          btn.classList.remove('active');
+          emojiEl.textContent = '👍';
+          labelEl.textContent = 'Like';
+        }
+      }
+
+      function renderCounts(root, counts){
+        const wrap = root.querySelector('[data-react-counts]');
+        wrap.innerHTML = '';
+        let total = 0;
+        Object.keys(EMOJI).forEach(t => { total += (counts[t] || 0); });
+
+        const types = Object.keys(EMOJI).filter(t => (counts[t] || 0) > 0);
+        if(types.length === 0){
+          const pill = document.createElement('span');
+          pill.className = 'react-pill';
+          pill.style.opacity = '0.65';
+          pill.innerHTML = '<span>👍</span><span>0</span>';
+          wrap.appendChild(pill);
+          return;
+        }
+        types.forEach(t => {
+          const pill = document.createElement('span');
+          pill.className = 'react-pill';
+          pill.dataset.reactPill = t;
+          pill.innerHTML = `<span>${EMOJI[t]}</span><span data-react-count="${t}">${counts[t] || 0}</span>`;
+          wrap.appendChild(pill);
+        });
+      }
+
+      async function react(postId, type, token){
+        const res = await fetch(`/community/${postId}/react`, {
+          method: 'POST',
+          headers: { 'Content-Type':'application/json', 'X-Requested-With':'XMLHttpRequest' },
+          body: JSON.stringify({ type, _token: token })
+        });
+        if(!res.ok){
+          const txt = await res.text();
+          throw new Error(txt || 'Erreur');
+        }
+        return await res.json();
+      }
+
+      function attachReactions(scope){
+        (scope || document).querySelectorAll('[data-react-post]').forEach(root => {
+          if (root.dataset.reactInit === '1') return;
+          root.dataset.reactInit = '1';
+
+          const postId = root.getAttribute('data-react-post');
+          const btn = root.querySelector('[data-react-button]');
+          const token = btn.getAttribute('data-react-token');
+          const picker = root.querySelector('.react-picker');
+
+          let showTimer = null;
+          let hideTimer = null;
+
+          function scheduleShow(){
+            clearTimeout(hideTimer);
+            hideTimer = null;
+            if (picker.classList.contains('visible')) return;
+            clearTimeout(showTimer);
+            showTimer = setTimeout(() => picker.classList.add('visible'), 420);
+          }
+          function scheduleHide(){
+            clearTimeout(showTimer);
+            showTimer = null;
+            clearTimeout(hideTimer);
+            hideTimer = setTimeout(() => {
+              if (!picker.matches(':hover') && !btn.matches(':hover')) {
+                picker.classList.remove('visible');
+              }
+            }, 320);
+          }
+
+          btn.addEventListener('mouseenter', scheduleShow);
+          btn.addEventListener('mouseleave', scheduleHide);
+          picker.addEventListener('mouseenter', () => {
+            clearTimeout(hideTimer);
+            hideTimer = null;
+            picker.classList.add('visible');
+          });
+          picker.addEventListener('mouseleave', scheduleHide);
+
+          root.querySelectorAll('[data-react-type]').forEach(opt => {
+            opt.addEventListener('click', async () => {
+              const type = opt.getAttribute('data-react-type');
+              try{
+                const data = await react(postId, type, token);
+                setButtonState(root, data.userReaction);
+                renderCounts(root, data.counts || {});
+                picker.classList.remove('visible');
+              }catch(e){
+                console.error(e);
+                alert('Impossible de réagir pour le moment.');
+              }
+            });
+          });
+        });
+      }
+
+      attachReactions(document);
+
+      // Instant search + category filter (AJAX, no full reload)
+      const postsContainer = document.querySelector('[data-posts-container]');
+      const searchInput = document.querySelector('[data-filter-search]');
+      const categorySelect = document.querySelector('[data-filter-category]');
+      const resetBtn = document.querySelector('[data-filter-reset]');
+
+      let filterTimer = null;
+      let lastFetch = 0;
+
+      async function fetchPosts(){
+        const q = (searchInput?.value || '').trim();
+        const cat = (categorySelect?.value || '').trim();
+        const params = new URLSearchParams();
+        if (q) params.set('search', q);
+        if (cat) params.set('category', cat);
+        const url = `/community/?${params.toString()}`;
+        const stamp = Date.now();
+        lastFetch = stamp;
+
+        const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        if(!res.ok) return;
+        const html = await res.text();
+        if (lastFetch !== stamp) return;
+
+        if (postsContainer){
+          postsContainer.innerHTML = html;
+          attachReactions(postsContainer);
+        }
+        window.history.replaceState({}, '', url);
+      }
+
+      function scheduleFetch(){
+        clearTimeout(filterTimer);
+        filterTimer = setTimeout(fetchPosts, 250);
+      }
+
+      searchInput?.addEventListener('input', scheduleFetch);
+      categorySelect?.addEventListener('change', fetchPosts);
+      resetBtn?.addEventListener('click', () => {
+        if (searchInput) searchInput.value = '';
+        if (categorySelect) categorySelect.value = '';
+        fetchPosts();
+      });
+
+      // Prevent empty post submit -> show message immediately
+      const createForm = document.querySelector('form[action*="/community/new"]');
+      if (createForm){
+        createForm.addEventListener('submit', (e) => {
+          const title = createForm.querySelector('input[name="title"]')?.value?.trim() || '';
+          const content = createForm.querySelector('textarea[name="content"]')?.value?.trim() || '';
+          if (!title || !content){
+            e.preventDefault();
+            const wrap = document.querySelector('.community-wrap');
+            if (wrap){
+              const alert = document.createElement('div');
+              alert.className = 'alert alert-danger alert-dismissible fade show';
+              alert.setAttribute('role','alert');
+              alert.innerHTML = `Le titre et le contenu sont obligatoires.<button type="button" class="btn-close" aria-label="Close"></button>`;
+              wrap.insertBefore(alert, wrap.firstChild);
+              alert.querySelector('.btn-close')?.addEventListener('click', () => alert.remove());
+            }
+          }
+        });
+      }
+
+      // Dismiss alerts (si Bootstrap JS absent)
+      document.querySelectorAll('.alert .btn-close').forEach(btn => {
+        btn.addEventListener('click', () => btn.closest('.alert')?.remove());
+      });
+
+      // Nominatim location autocomplete (server proxy)
+      const input = document.querySelector('[data-location-input]');
+      const latEl = document.querySelector('[data-location-lat]');
+      const lonEl = document.querySelector('[data-location-lon]');
+      const suggest = document.querySelector('[data-location-suggest]');
+      let debounceTimer = null;
+      let lastQuery = '';
+
+      function closeSuggest(){
+        if (!suggest) return;
+        suggest.style.display = 'none';
+        suggest.innerHTML = '';
+      }
+      function renderSuggest(items){
+        if (!suggest) return;
+        if (!items || items.length === 0) { closeSuggest(); return; }
+        suggest.style.display = 'block';
+        suggest.innerHTML = '';
+        const card = document.createElement('div');
+        card.className = 'card shadow-sm';
+        const body = document.createElement('div');
+        body.className = 'card-body';
+        body.style.padding = '10px';
+        body.style.display = 'grid';
+        body.style.gap = '6px';
+        items.forEach(it => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'btn btn-secondary';
+          btn.style.justifyContent = 'flex-start';
+          btn.style.textTransform = 'none';
+          btn.style.letterSpacing = 'normal';
+          btn.style.fontFamily = 'Inter, sans-serif';
+          btn.style.fontWeight = '700';
+          btn.textContent = it.display_name;
+          btn.addEventListener('click', () => {
+            input.value = it.display_name;
+            latEl.value = it.lat;
+            lonEl.value = it.lon;
+            closeSuggest();
+          });
+          body.appendChild(btn);
+        });
+        card.appendChild(body);
+        suggest.appendChild(card);
+      }
+
+      async function fetchLocations(q){
+        const res = await fetch(`/community/location-search?q=${encodeURIComponent(q)}`, {
+          headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        if (!res.ok) return [];
+        return await res.json();
+      }
+
+      if (input && suggest && latEl && lonEl){
+        input.addEventListener('input', () => {
+          latEl.value = '';
+          lonEl.value = '';
+          const q = input.value.trim();
+          if (q.length < 3){ closeSuggest(); return; }
+          lastQuery = q;
+          clearTimeout(debounceTimer);
+          debounceTimer = setTimeout(async () => {
+            const data = await fetchLocations(q);
+            if (input.value.trim() !== lastQuery) return;
+            renderSuggest(data);
+          }, 300);
+        });
+        document.addEventListener('click', (e) => {
+          if (!suggest.contains(e.target) && e.target !== input) closeSuggest();
+        });
+      }
+    })();
+  </script>
+{% endblock %}

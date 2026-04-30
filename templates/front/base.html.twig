@@ -1111,6 +1111,7 @@
 
   <a href="{{ path('app_front_projet_index') }}"><i class="fa fa-rocket"></i> Investissement</a>
   <a href="{{ path('app_front_formations_index') }}"><i class="fa fa-graduation-cap"></i> Formations</a>
+  <a href="{{ path('community_index') }}"><i class="fa fa-comments"></i> Forums</a>
   {% if app.user %}
   <a href="{{ path('app_front_dashboard') }}" style="font-size:1.1rem;opacity:0.9;"><i class="fa fa-chart-line"></i> Dashboard</a>
   {% endif %}
@@ -1164,6 +1165,7 @@
     </li>
 
     <li><a href="{{ path('app_front_formations_index') }}" {% if 'formation' in currentRoute %}class="active"{% endif %}><i class="fa fa-graduation-cap"></i> Formations</a></li>
+    <li><a href="{{ path('community_index') }}" {% if 'community' in currentRoute %}class="active"{% endif %}><i class="fa fa-comments"></i> Forums</a></li>
     <li class="nav-spacer" aria-hidden="true"></li>
 
     {% if app.user and app.user.userType == 'startup' %}
@@ -1243,6 +1245,7 @@
         <li><a href="{{ path('app_front_investissement_index') }}">Mes Investissements</a></li>
         {% endif %}
         <li><a href="#">Formations</a></li>
+        <li><a href="{{ path('community_index') }}">Forums</a></li>
         <li><a href="#">Incubation</a></li>
       </ul>
     </div>

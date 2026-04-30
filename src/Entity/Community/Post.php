@@ -2,174 +2,161 @@
 
 namespace App\Entity\Community;
 
-use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use App\Repository\Community\PostRepository;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
 #[ORM\Table(name: 'post')]
 class Post
 {
-    public function __construct()
-    {
-        $this->created_at = new \DateTime();
-    }
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private ?int $post_id = null;
+    #[ORM\Column(name: 'post_id')]
+    private ?int $id = null;
 
-    public function getPost_id(): ?int
+    #[ORM\Column(name: 'user_id')]
+    private ?int $userId = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $title = null;
+
+    #[ORM\Column(type: Types::TEXT)]
+    private ?string $content = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $category = null;
+
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $createdAt = null;
+
+    #[ORM\Column(name: 'media_url', length: 255, nullable: true)]
+    private ?string $mediaUrl = null;
+
+    #[ORM\Column(name: 'media_type', length: 50, nullable: true)]
+    private ?string $mediaType = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $location = null;
+
+    #[ORM\Column(name: 'location_lat', type: Types::FLOAT, nullable: true)]
+    private ?float $locationLat = null;
+
+    #[ORM\Column(name: 'location_lon', type: Types::FLOAT, nullable: true)]
+    private ?float $locationLon = null;
+
+    public function getId(): ?int
     {
-        return $this->post_id;
+        return $this->id;
     }
 
-    public function setPost_id(int $post_id): self
+    public function getUserId(): ?int
     {
-        $this->post_id = $post_id;
+        return $this->userId;
+    }
+
+    public function setUserId(int $userId): static
+    {
+        $this->userId = $userId;
         return $this;
     }
 
-    public function getUser_id(): int
-    {
-        return $this->user_id;
-    }
-
-    public function setUser_id(int $user_id): self
-    {
-        $this->user_id = $user_id;
-        return $this;
-    }
-
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }
 
-    public function setTitle(string $title): self
+    public function setTitle(string $title): static
     {
         $this->title = $title;
         return $this;
     }
-
-#[ORM\Column(type: 'integer', nullable: false)]
-    private int $user_id;
-
-    #[ORM\Column(type: 'string', nullable: false)]
-    private string $title;
-
-    #[ORM\Column(type: 'text', nullable: false)]
-    private string $content;
 
     public function getContent(): ?string
     {
         return $this->content;
     }
 
-    public function setContent(string $content): self
+    public function setContent(string $content): static
     {
         $this->content = $content;
         return $this;
     }
-
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $category = null;
 
     public function getCategory(): ?string
     {
         return $this->category;
     }
 
-    public function setCategory(?string $category): self
+    public function setCategory(?string $category): static
     {
         $this->category = $category;
         return $this;
     }
 
-    #[ORM\Column(type: 'datetime', nullable: false)]
-    private \DateTimeInterface $created_at;
-
-    public function getCreated_at(): \DateTimeInterface
+    public function getCreatedAt(): ?\DateTimeInterface
     {
-        return $this->created_at;
+        return $this->createdAt;
     }
 
-    protected function setCreated_at(\DateTimeInterface $created_at): self
+    public function setCreatedAt(?\DateTimeInterface $createdAt): static
     {
-        $this->created_at = $created_at;
+        $this->createdAt = $createdAt;
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $media_url = null;
-
-    public function getMedia_url(): ?string
+    public function getMediaUrl(): ?string
     {
-        return $this->media_url;
+        return $this->mediaUrl;
     }
 
-    public function setMedia_url(?string $media_url): self
+    public function setMediaUrl(?string $mediaUrl): static
     {
-        $this->media_url = $media_url;
+        $this->mediaUrl = $mediaUrl;
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $media_type = null;
-
-    public function getMedia_type(): ?string
+    public function getMediaType(): ?string
     {
-        return $this->media_type;
+        return $this->mediaType;
     }
 
-    public function setMedia_type(?string $media_type): self
+    public function setMediaType(?string $mediaType): static
     {
-        $this->media_type = $media_type;
+        $this->mediaType = $mediaType;
         return $this;
     }
-
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $location = null;
 
     public function getLocation(): ?string
     {
         return $this->location;
     }
 
-    public function setLocation(?string $location): self
+    public function setLocation(?string $location): static
     {
         $this->location = $location;
         return $this;
     }
 
-    #[ORM\Column(type: 'decimal', precision: 10, scale: 7, nullable: true)]
-    private ?string $location_lat = null;
-
-    public function getLocation_lat(): ?string
+    public function getLocationLat(): ?float
     {
-        return $this->location_lat;
+        return $this->locationLat;
     }
 
-    public function setLocation_lat(?string $location_lat): self
+    public function setLocationLat(?float $locationLat): static
     {
-        $this->location_lat = $location_lat;
+        $this->locationLat = $locationLat;
         return $this;
     }
 
-    #[ORM\Column(type: 'decimal', precision: 10, scale: 7, nullable: true)]
-    private ?string $location_lon = null;
-
-    public function getLocation_lon(): ?string
+    public function getLocationLon(): ?float
     {
-        return $this->location_lon;
+        return $this->locationLon;
     }
 
-    public function setLocation_lon(?string $location_lon): self
+    public function setLocationLon(?float $locationLon): static
     {
-        $this->location_lon = $location_lon;
+        $this->locationLon = $locationLon;
         return $this;
     }
-
 }
