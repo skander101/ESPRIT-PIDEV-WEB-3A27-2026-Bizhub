@@ -35,14 +35,14 @@ class PromoCode
     #[ORM\Column(type: 'boolean', options: ['default' => true])]
     private bool $isActive = true;
 
-#[ORM\Column(type: 'datetime_immutable')]
-    private \DateTimeImmutable $createdAt;
+#[ORM\Column(type: 'datetime')]
+    private \DateTimeInterface $createdAt;
 
-    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
-    private ?\DateTimeImmutable $expiresAt = null;
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $expiresAt = null;
 
-    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
-    private ?\DateTimeImmutable $usedAt = null;
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $usedAt = null;
 
     #[ORM\ManyToOne(targetEntity: Participation::class)]
     #[ORM\JoinColumn(name: 'participation_source_id', referencedColumnName: 'id_candidature', nullable: true, onDelete: 'SET NULL')]
@@ -113,36 +113,36 @@ class PromoCode
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;
     }
 
-    protected function setCreatedAt(\DateTimeImmutable $createdAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getExpiresAt(): ?\DateTimeImmutable
+    public function getExpiresAt(): ?\DateTimeInterface
     {
         return $this->expiresAt;
     }
 
-    protected function setExpiresAt(\DateTimeImmutable $expiresAt): self
+    public function setExpiresAt(\DateTimeInterface $expiresAt): self
     {
         $this->expiresAt = $expiresAt;
 
         return $this;
     }
 
-    public function getUsedAt(): ?\DateTimeImmutable
+    public function getUsedAt(): ?\DateTimeInterface
     {
         return $this->usedAt;
     }
 
-    protected function setUsedAt(?\DateTimeImmutable $usedAt): self
+    public function setUsedAt(?\DateTimeInterface $usedAt): self
     {
         $this->usedAt = $usedAt;
 
@@ -161,14 +161,14 @@ class PromoCode
         return $this;
     }
 
-    public function markUsed(\DateTimeImmutable $at): void
+    public function markUsed(\DateTimeInterface $at): void
     {
         $this->isUsed = true;
         $this->isActive = false;
         $this->usedAt = $at;
     }
 
-    public function isUsableNow(\DateTimeImmutable $now): bool
+    public function isUsableNow(\DateTimeInterface $now): bool
     {
         return $this->isActive
             && !$this->isUsed

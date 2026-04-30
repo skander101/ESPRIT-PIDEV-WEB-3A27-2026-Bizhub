@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Ignore;
-use Symfony\Component\Security\core\util\SensitiveParameter;
+use Symfony\Component\Security\Util\SensitiveParameter;
 
 use App\Repository\Investissement\DealRepository;
 

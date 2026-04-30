@@ -30,8 +30,8 @@ final class PromoCodeService
      */
     public function createRewardAfterPayment(User $user, Participation $sourceParticipation): PromoCode
     {
-        $now = new \DateTimeImmutable();
-        $expires = $now->modify('+' . self::VALIDITY_DAYS . ' days');
+        $now = new \DateTime();
+        $expires = (clone $now)->modify('+' . self::VALIDITY_DAYS . ' days');
         $percent = random_int(35, 75);
 
         $promo = (new PromoCode())
@@ -49,7 +49,7 @@ final class PromoCodeService
         return $promo;
     }
 
-    public function markUsed(PromoCode $promo, \DateTimeImmutable $at): void
+    public function markUsed(PromoCode $promo, \DateTime $at): void
     {
         $promo->markUsed($at);
     }
@@ -100,7 +100,7 @@ final class PromoCodeService
             ];
         }
 
-        $now = new \DateTimeImmutable();
+        $now = new \DateTime();
         if ($promo->getUser()?->getUserId() !== $user->getUserId()) {
             return [
                 'ok' => false,

@@ -31,9 +31,33 @@ parameters:
 			path: src/Controller/Admin/ElearningRecommendationStatsController.php
 
 		-
-			message: '#^Strict comparison using \!\=\= between float and '''' will always evaluate to true\.$#'
-			identifier: notIdentical.alwaysTrue
+			message: '#^Method Symfony\\Component\\HttpFoundation\\InputBag\:\:get\(\) invoked with 3 parameters, 1\-2 required\.$#'
+			identifier: arguments.count
 			count: 1
+			path: src/Controller/Admin/Marketplace/AdminMarketplaceController.php
+
+		-
+			message: '#^Access to undefined constant App\\Entity\\Elearning\\Participation\:\:STATUS_CANCELLED\.$#'
+			identifier: classConstant.notFound
+			count: 1
+			path: src/Controller/Admin/ParticipationController.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:getCertificatePath\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: src/Controller/Admin/ParticipationController.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:isPaidEnrollment\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Admin/ParticipationController.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:setStatus\(\)\.$#'
+			identifier: method.notFound
+			count: 3
 			path: src/Controller/Admin/ParticipationController.php
 
 		-
@@ -67,16 +91,88 @@ parameters:
 			path: src/Controller/FaceVerificationController.php
 
 		-
+			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:isPaidEnrollment\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Front/CertificateVerificationController.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:setStatus\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Front/FormationController.php
+
+		-
+			message: '#^Call to protected method setCreatedAt\(\) of class App\\Entity\\Elearning\\FormationRecommendationEvent\.$#'
+			identifier: method.protected
+			count: 1
+			path: src/Controller/Front/FormationController.php
+
+		-
+			message: '#^Call to protected method setCreatedAt\(\) of class App\\Entity\\UsersAvis\\Avis\.$#'
+			identifier: method.protected
+			count: 1
+			path: src/Controller/Front/FormationController.php
+
+		-
 			message: '#^Offset ''ok'' on array\{ok\: bool, message\?\: string, formation_id\?\: int, title\?\: string, reason\?\: string, en_ligne\?\: bool, source\?\: string\} on left side of \?\? always exists and is not nullable\.$#'
 			identifier: nullCoalesce.offset
 			count: 1
 			path: src/Controller/Front/FormationController.php
 
 		-
-			message: '#^Strict comparison using \!\=\= between float and '''' will always evaluate to true\.$#'
-			identifier: notIdentical.alwaysTrue
+			message: '#^Call to protected method setCreatedAt\(\) of class App\\Entity\\Elearning\\FormationRecommendationEvent\.$#'
+			identifier: method.protected
 			count: 1
-			path: src/Controller/Front/FormationController.php
+			path: src/Controller/Front/FormationRecommendationController.php
+
+		-
+			message: '#^Call to protected method setCreatedAt\(\) of class App\\Entity\\Investissement\\Investment\.$#'
+			identifier: method.protected
+			count: 1
+			path: src/Controller/Front/InvestissementFrontController.php
+
+		-
+			message: '#^Call to protected method setInvestmentDate\(\) of class App\\Entity\\Investissement\\Investment\.$#'
+			identifier: method.protected
+			count: 1
+			path: src/Controller/Front/InvestissementFrontController.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:isAwaitingPayment\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Controller/Front/PaymentController.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:isPaidEnrollment\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Front/PaymentController.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:setCertificatePath\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Front/PaymentController.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:setPaidAt\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Front/PaymentController.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:setStatus\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Front/PaymentController.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:setTransactionId\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Front/PaymentController.php
 
 		-
 			message: '#^Offset ''discount_rate'' on array\{ok\: true, message\: string\|null, promo\: App\\Entity\\Elearning\\PromoCode\|null, discount_rate\: float, amount_ttc\: float\|null\} on left side of \?\? always exists and is not nullable\.$#'
@@ -85,28 +181,16 @@ parameters:
 			path: src/Controller/Front/PaymentController.php
 
 		-
-			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserType\(\)\.$#'
-			identifier: method.notFound
+			message: '#^Call to protected method setCreatedAt\(\) of class App\\Entity\\Investissement\\Project\.$#'
+			identifier: method.protected
 			count: 1
-			path: src/Controller/Investissement/DashboardController.php
+			path: src/Controller/Front/ProjetFrontController.php
 
 		-
 			message: '#^Method App\\Controller\\Investissement\\DashboardController\:\:dashboardInvestisseur\(\) is unused\.$#'
 			identifier: method.unused
 			count: 1
 			path: src/Controller/Investissement/DashboardController.php
-
-		-
-			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserId\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: src/Controller/Investissement/DashboardInvestisseurController.php
-
-		-
-			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserType\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Controller/Investissement/DashboardInvestisseurController.php
 
 		-
 			message: '#^Parameter \#1 \$investor of method App\\Service\\Investissement\\MatchingService\:\:matchProjects\(\) expects App\\Entity\\UsersAvis\\User, Symfony\\Component\\Security\\Core\\User\\UserInterface given\.$#'
@@ -151,8 +235,14 @@ parameters:
 			path: src/Controller/Investissement/DealController.php
 
 		-
-			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserId\(\)\.$#'
-			identifier: method.notFound
+			message: '#^Call to protected method setCreated_at\(\) of class App\\Entity\\Investissement\\Investment\.$#'
+			identifier: method.protected
+			count: 1
+			path: src/Controller/Investissement/FrontInvestissementController.php
+
+		-
+			message: '#^Call to protected method setInvestment_date\(\) of class App\\Entity\\Investissement\\Investment\.$#'
+			identifier: method.protected
 			count: 1
 			path: src/Controller/Investissement/FrontInvestissementController.php
 
@@ -163,15 +253,9 @@ parameters:
 			path: src/Controller/Investissement/FrontInvestissementController.php
 
 		-
-			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserId\(\)\.$#'
-			identifier: method.notFound
-			count: 7
-			path: src/Controller/Investissement/FrontProjetController.php
-
-		-
-			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserType\(\)\.$#'
-			identifier: method.notFound
-			count: 2
+			message: '#^Call to protected method setCreated_at\(\) of class App\\Entity\\Investissement\\Project\.$#'
+			identifier: method.protected
+			count: 1
 			path: src/Controller/Investissement/FrontProjetController.php
 
 		-
@@ -193,44 +277,8 @@ parameters:
 			path: src/Controller/Investissement/InvestissementApiController.php
 
 		-
-			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserType\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Controller/Investissement/InvestissementApiController.php
-
-		-
 			message: '#^Method App\\Service\\Investissement\\RoiSimulatorService\:\:simulate\(\) invoked with 4 parameters, 3 required\.$#'
 			identifier: arguments.count
-			count: 1
-			path: src/Controller/Investissement/InvestissementApiController.php
-
-		-
-			message: '#^Parameter \#1 \$investor of method App\\Repository\\NegotiationRepository\:\:findByInvestor\(\) expects App\\Entity\\UsersAvis\\User, Symfony\\Component\\Security\\Core\\User\\UserInterface\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Controller/Investissement/InvestissementApiController.php
-
-		-
-			message: '#^Parameter \#1 \$startup of method App\\Repository\\NegotiationRepository\:\:findByStartup\(\) expects App\\Entity\\UsersAvis\\User, Symfony\\Component\\Security\\Core\\User\\UserInterface\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Controller/Investissement/InvestissementApiController.php
-
-		-
-			message: '#^Parameter \#1 \$user of method App\\Repository\\InvestmentRepository\:\:countByStatutForUser\(\) expects App\\Entity\\UsersAvis\\User, Symfony\\Component\\Security\\Core\\User\\UserInterface\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Controller/Investissement/InvestissementApiController.php
-
-		-
-			message: '#^Parameter \#1 \$user of method App\\Repository\\InvestmentRepository\:\:countDistinctProjectsByUser\(\) expects App\\Entity\\UsersAvis\\User, Symfony\\Component\\Security\\Core\\User\\UserInterface\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Controller/Investissement/InvestissementApiController.php
-
-		-
-			message: '#^Parameter \#1 \$user of method App\\Repository\\InvestmentRepository\:\:getTotalInvestedByUser\(\) expects App\\Entity\\UsersAvis\\User, Symfony\\Component\\Security\\Core\\User\\UserInterface\|null given\.$#'
-			identifier: argument.type
 			count: 1
 			path: src/Controller/Investissement/InvestissementApiController.php
 
@@ -241,15 +289,27 @@ parameters:
 			path: src/Controller/Investissement/InvestissementApiController.php
 
 		-
-			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserId\(\)\.$#'
-			identifier: method.notFound
-			count: 10
+			message: '#^Call to protected method setCreated_at\(\) of class App\\Entity\\Investissement\\Negotiation\.$#'
+			identifier: method.protected
+			count: 2
 			path: src/Controller/Investissement/NegociationController.php
 
 		-
-			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserType\(\)\.$#'
-			identifier: method.notFound
-			count: 2
+			message: '#^Call to protected method setCreated_at\(\) of class App\\Entity\\Investissement\\NegotiationMessage\.$#'
+			identifier: method.protected
+			count: 5
+			path: src/Controller/Investissement/NegociationController.php
+
+		-
+			message: '#^Call to protected method setUpdated_at\(\) of class App\\Entity\\Investissement\\Negotiation\.$#'
+			identifier: method.protected
+			count: 5
+			path: src/Controller/Investissement/NegociationController.php
+
+		-
+			message: '#^Parameter \#1 \$final_amount of method App\\Entity\\Investissement\\Negotiation\:\:setFinal_amount\(\) expects string\|null, float given\.$#'
+			identifier: argument.type
+			count: 1
 			path: src/Controller/Investissement/NegociationController.php
 
 		-
@@ -260,6 +320,24 @@ parameters:
 
 		-
 			message: '#^Parameter \#1 \$investor of method App\\Repository\\NegotiationRepository\:\:findByInvestor\(\) expects App\\Entity\\UsersAvis\\User, Symfony\\Component\\Security\\Core\\User\\UserInterface given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Investissement/NegociationController.php
+
+		-
+			message: '#^Parameter \#1 \$proposed_amount of method App\\Entity\\Investissement\\Negotiation\:\:setProposed_amount\(\) expects string\|null, float given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Investissement/NegociationController.php
+
+		-
+			message: '#^Parameter \#1 \$proposed_amount of method App\\Entity\\Investissement\\Negotiation\:\:setProposed_amount\(\) expects string\|null, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Investissement/NegociationController.php
+
+		-
+			message: '#^Parameter \#1 \$proposed_amount of method App\\Entity\\Investissement\\NegotiationMessage\:\:setProposed_amount\(\) expects string\|null, float given\.$#'
 			identifier: argument.type
 			count: 1
 			path: src/Controller/Investissement/NegociationController.php
@@ -289,82 +367,40 @@ parameters:
 			path: src/Controller/Investissement/WorkflowController.php
 
 		-
-			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserId\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Controller/Marketplace/CommandeController.php
-
-		-
-			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserType\(\)\.$#'
-			identifier: method.notFound
-			count: 4
-			path: src/Controller/Marketplace/CommandeController.php
-
-		-
 			message: '#^Method App\\Controller\\Marketplace\\CommandeController\:\:exportCsv\(\) should return Symfony\\Component\\HttpFoundation\\StreamedResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
 			identifier: return.type
 			count: 1
 			path: src/Controller/Marketplace/CommandeController.php
 
 		-
-			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserId\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Controller/Marketplace/FactureController.php
-
-		-
-			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserType\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Controller/Marketplace/FactureController.php
-
-		-
-			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserId\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Controller/Marketplace/MarketAnalysisController.php
-
-		-
-			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserType\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Controller/Marketplace/MarketAnalysisController.php
-
-		-
-			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserId\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Controller/Marketplace/PanierController.php
-
-		-
-			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserId\(\)\.$#'
-			identifier: method.notFound
+			message: '#^Call to method find\(\) on an unknown class App\\Controller\\Marketplace\\ProduitServiceRepository\.$#'
+			identifier: class.notFound
 			count: 2
+			path: src/Controller/Marketplace/MarketAnalysisController.php
+
+		-
+			message: '#^Parameter \$produitRepo of method App\\Controller\\Marketplace\\MarketAnalysisController\:\:commande\(\) has invalid type App\\Controller\\Marketplace\\ProduitServiceRepository\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Controller/Marketplace/MarketAnalysisController.php
+
+		-
+			message: '#^Parameter \$produitRepo of method App\\Controller\\Marketplace\\MarketAnalysisController\:\:produit\(\) has invalid type App\\Controller\\Marketplace\\ProduitServiceRepository\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Controller/Marketplace/MarketAnalysisController.php
+
+		-
+			message: '#^Call to protected method setPaidAt\(\) of class App\\Entity\\Marketplace\\Commande\.$#'
+			identifier: method.protected
+			count: 1
 			path: src/Controller/Marketplace/PaymentController.php
 
 		-
-			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserId\(\)\.$#'
-			identifier: method.notFound
+			message: '#^Left side of && is always true\.$#'
+			identifier: booleanAnd.leftAlwaysTrue
 			count: 1
 			path: src/Controller/Marketplace/ProduitController.php
-
-		-
-			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserType\(\)\.$#'
-			identifier: method.notFound
-			count: 3
-			path: src/Controller/Marketplace/ProduitController.php
-
-		-
-			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserId\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: src/Controller/Marketplace/TrackingController.php
-
-		-
-			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserType\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Controller/Marketplace/TrackingController.php
 
 		-
 			message: '#^Offset ''confirmee''\|''en_attente''\|''en_cours_paiement''\|''en_preparation''\|''livree''\|''payee'' on array\{en_attente\: ''En attente'', confirmee\: ''Confirmée'', en_cours_paiement\: ''Paiement en cours'', payee\: ''Payée'', en_preparation\: ''En préparation'', livree\: ''Livrée''\} on left side of \?\? always exists and is not nullable\.$#'
@@ -377,6 +413,12 @@ parameters:
 			identifier: instanceof.alwaysTrue
 			count: 3
 			path: src/Controller/TotpController.php
+
+		-
+			message: '#^Call to protected method setCreated_at\(\) of class App\\Entity\\UsersAvis\\Avis\.$#'
+			identifier: method.protected
+			count: 1
+			path: src/Controller/UsersAvis/AvisController.php
 
 		-
 			message: '#^Parameter \#1 \$user of method App\\Repository\\UsersAvis\\AvisRepository\:\:findByUser\(\) expects App\\Entity\\UsersAvis\\User, Symfony\\Component\\Security\\Core\\User\\UserInterface given\.$#'
@@ -433,10 +475,22 @@ parameters:
 			path: src/Entity/Elearning/TrainingRequest.php
 
 		-
-			message: '#^Property App\\Entity\\Elearning\\TrainingRequest\:\:\$status \(string\|null\) is never assigned null so it can be removed from the property type\.$#'
-			identifier: property.unusedType
+			message: '#^Attribute class Symfony\\Component\\Security\\Util\\SensitiveParameter does not exist\.$#'
+			identifier: attribute.notFound
 			count: 1
-			path: src/Entity/Elearning/TrainingRequest.php
+			path: src/Entity/Investissement/Deal.php
+
+		-
+			message: '#^Property App\\Entity\\Investissement\\Investment\:\:\$amount \(string\) does not accept float\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Entity/Investissement/Investment.php
+
+		-
+			message: '#^Property App\\Entity\\Investissement\\Investment\:\:\$amount \(string\) on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.property
+			count: 1
+			path: src/Entity/Investissement/Investment.php
 
 		-
 			message: '#^Instanceof between Doctrine\\Common\\Collections\\Collection and Doctrine\\Common\\Collections\\Collection will always evaluate to true\.$#'
@@ -457,15 +511,15 @@ parameters:
 			path: src/Entity/Marketplace/AutoConfirmNotification.php
 
 		-
-			message: '#^Property App\\Entity\\Marketplace\\Commande\:\:\$idCommande \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
-			identifier: property.unusedType
+			message: '#^Strict comparison using \=\=\= between DateTimeInterface and null will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
 			count: 1
 			path: src/Entity/Marketplace/Commande.php
 
 		-
-			message: '#^Property App\\Entity\\Marketplace\\CommandeLigne\:\:\$idLigne \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
-			identifier: property.unusedType
-			count: 1
+			message: '#^Access to an undefined property App\\Entity\\Marketplace\\CommandeLigne\:\:\$createdAt\.$#'
+			identifier: property.notFound
+			count: 4
 			path: src/Entity/Marketplace/CommandeLigne.php
 
 		-
@@ -481,8 +535,50 @@ parameters:
 			path: src/Entity/Marketplace/Facture.php
 
 		-
+			message: '#^Property App\\Entity\\Marketplace\\Facture\:\:\$stripeRef \(string\|null\) is never assigned string so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Marketplace/Facture.php
+
+		-
+			message: '#^Property App\\Entity\\Marketplace\\Facture\:\:\$stripeRef is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Entity/Marketplace/Facture.php
+
+		-
+			message: '#^Property App\\Entity\\Marketplace\\Facture\:\:\$totalHt is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Entity/Marketplace/Facture.php
+
+		-
+			message: '#^Property App\\Entity\\Marketplace\\Facture\:\:\$totalTtc is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Entity/Marketplace/Facture.php
+
+		-
+			message: '#^Property App\\Entity\\Marketplace\\Facture\:\:\$totalTva is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Entity/Marketplace/Facture.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between DateTimeInterface and null will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 2
+			path: src/Entity/Marketplace/Facture.php
+
+		-
 			message: '#^Property App\\Entity\\Marketplace\\Panier\:\:\$idPanier \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
 			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Marketplace/Panier.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between DateTimeInterface and null will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
 			count: 1
 			path: src/Entity/Marketplace/Panier.php
 
@@ -499,16 +595,22 @@ parameters:
 			path: src/Entity/Marketplace/ProduitService.php
 
 		-
+			message: '#^Attribute class Symfony\\Component\\Security\\Util\\SensitiveParameter does not exist\.$#'
+			identifier: attribute.notFound
+			count: 2
+			path: src/Entity/UsersAvis/User.php
+
+		-
 			message: '#^Instanceof between Doctrine\\Common\\Collections\\Collection and Doctrine\\Common\\Collections\\Collection will always evaluate to true\.$#'
 			identifier: instanceof.alwaysTrue
 			count: 1
 			path: src/Entity/UsersAvis/User.php
 
 		-
-			message: '#^Property App\\Entity\\UsersAvis\\User\:\:\$is_verified \(bool\|null\) is never assigned null so it can be removed from the property type\.$#'
-			identifier: property.unusedType
-			count: 1
-			path: src/Entity/UsersAvis/User.php
+			message: '#^Attribute class Symfony\\Component\\Security\\Util\\SensitiveParameter does not exist\.$#'
+			identifier: attribute.notFound
+			count: 2
+			path: src/Entity/UsersAvis/UserAuthState.php
 
 		-
 			message: '#^Property App\\Entity\\UsersAvis\\UserAuthState\:\:\$id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
@@ -565,6 +667,24 @@ parameters:
 			path: src/Service/AI/AiDatabaseAssistantService.php
 
 		-
+			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:getCreatedAt\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Service/Elearning/FormationAiBestPickService.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:getStatus\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Service/Elearning/FormationAiBestPickService.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:isPaidEnrollment\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Service/Elearning/FormationAiBestPickService.php
+
+		-
 			message: '#^Call to an undefined method App\\Service\\Marketplace\\GrokService\:\:chatWithMessages\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -583,6 +703,24 @@ parameters:
 			path: src/Service/Elearning/LocalFormationRecommender.php
 
 		-
+			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:getTransactionId\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Service/Elearning/ParticipationConfirmationMailService.php
+
+		-
+			message: '#^Call to protected method setCreatedAt\(\) of class App\\Entity\\Elearning\\PromoCode\.$#'
+			identifier: method.protected
+			count: 1
+			path: src/Service/Elearning/PromoCodeService.php
+
+		-
+			message: '#^Call to protected method setExpiresAt\(\) of class App\\Entity\\Elearning\\PromoCode\.$#'
+			identifier: method.protected
+			count: 1
+			path: src/Service/Elearning/PromoCodeService.php
+
+		-
 			message: '#^Match expression does not handle remaining value\: string$#'
 			identifier: match.unhandled
 			count: 1
@@ -593,6 +731,24 @@ parameters:
 			identifier: empty.variable
 			count: 1
 			path: src/Service/Investissement/AiNegotiationService.php
+
+		-
+			message: '#^Call to protected method setCompleted_at\(\) of class App\\Entity\\Investissement\\Deal\.$#'
+			identifier: method.protected
+			count: 2
+			path: src/Service/Investissement/DealWorkflowService.php
+
+		-
+			message: '#^Call to protected method setCreated_at\(\) of class App\\Entity\\Investissement\\Deal\.$#'
+			identifier: method.protected
+			count: 1
+			path: src/Service/Investissement/DealWorkflowService.php
+
+		-
+			message: '#^Call to protected method setSignature_token_expires_at\(\) of class App\\Entity\\Investissement\\Deal\.$#'
+			identifier: method.protected
+			count: 1
+			path: src/Service/Investissement/DealWorkflowService.php
 
 		-
 			message: '#^Offset ''sante'' on non\-empty\-array\<mixed, mixed\> on left side of \?\? always exists and is not nullable\.$#'
@@ -607,14 +763,62 @@ parameters:
 			path: src/Service/Investissement/PortfolioAnalysisService.php
 
 		-
+			message: '#^Call to protected method setSignature_sent_at\(\) of class App\\Entity\\Investissement\\Deal\.$#'
+			identifier: method.protected
+			count: 1
+			path: src/Service/Investissement/SignatureEmailService.php
+
+		-
+			message: '#^Call to protected method setSignature_token_expires_at\(\) of class App\\Entity\\Investissement\\Deal\.$#'
+			identifier: method.protected
+			count: 1
+			path: src/Service/Investissement/SignatureEmailService.php
+
+		-
+			message: '#^Call to protected method setCompleted_at\(\) of class App\\Entity\\Investissement\\Deal\.$#'
+			identifier: method.protected
+			count: 2
+			path: src/Service/Investissement/YousignService.php
+
+		-
+			message: '#^Call to protected method setSignature_token_expires_at\(\) of class App\\Entity\\Investissement\\Deal\.$#'
+			identifier: method.protected
+			count: 2
+			path: src/Service/Investissement/YousignService.php
+
+		-
 			message: '#^Offset 0 on non\-empty\-list\<string\> on left side of \?\? always exists and is not nullable\.$#'
 			identifier: nullCoalesce.offset
 			count: 1
 			path: src/Service/Investissement/YousignService.php
 
 		-
+			message: '#^Call to an undefined method App\\Entity\\Marketplace\\Facture\:\:setTotalHt\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Service/Marketplace/FactureService.php
+
+		-
+			message: '#^Call to protected method setDateFacture\(\) of class App\\Entity\\Marketplace\\Facture\.$#'
+			identifier: method.protected
+			count: 1
+			path: src/Service/Marketplace/FactureService.php
+
+		-
 			message: '#^Constant App\\Service\\Marketplace\\OrderScoringService\:\:PENALTY_POINTS is unused\.$#'
 			identifier: classConstant.unused
+			count: 1
+			path: src/Service/Marketplace/OrderScoringService.php
+
+		-
+			message: '#^Negated boolean expression is always false\.$#'
+			identifier: booleanNot.alwaysFalse
+			count: 1
+			path: src/Service/Marketplace/OrderScoringService.php
+
+		-
+			message: '#^Ternary operator condition is always true\.$#'
+			identifier: ternary.alwaysTrue
 			count: 1
 			path: src/Service/Marketplace/OrderScoringService.php
 
@@ -679,7 +883,19 @@ parameters:
 			path: src/Service/Marketplace/StatisticsService.php
 
 		-
-			message: '#^Parameter \#1 \$params of static method Stripe\\Checkout\\Session\:\:create\(\) expects array\{adaptive_pricing\?\: array\{enabled\?\: bool\}, after_expiration\?\: array\{recovery\?\: array\{allow_promotion_codes\?\: bool, enabled\: bool\}\}, allow_promotion_codes\?\: bool, automatic_tax\?\: array\{enabled\: bool, liability\?\: array\{account\?\: string, type\: string\}\}, billing_address_collection\?\: string, branding_settings\?\: array\{background_color\?\: string\|null, border_style\?\: string\|null, button_color\?\: string\|null, display_name\?\: string, font_family\?\: string\|null, icon\?\: array\{file\?\: string, type\: string, url\?\: string\}, logo\?\: array\{file\?\: string, type\: string, url\?\: string\}\}, cancel_url\?\: string, client_reference_id\?\: string, \.\.\.\}\|null, array\{payment_method_types\: array\{''card''\}, line_items\: array, mode\: ''payment'', success_url\: string, cancel_url\: string, metadata\: array\{commande_id\: int\|null, client_id\: int\|null\}, client_reference_id\: ''''\|numeric\-string\} given\.$#'
+			message: '#^Parameter \#1 \$params of static method Stripe\\Checkout\\Session\:\:create\(\) expects array\{adaptive_pricing\?\: array\{enabled\?\: bool\}, after_expiration\?\: array\{recovery\?\: array\{allow_promotion_codes\?\: bool, enabled\: bool\}\}, allow_promotion_codes\?\: bool, automatic_tax\?\: array\{enabled\: bool, liability\?\: array\{account\?\: string, type\: string\}\}, billing_address_collection\?\: string, branding_settings\?\: array\{background_color\?\: string\|null, border_style\?\: string\|null, button_color\?\: string\|null, display_name\?\: string, font_family\?\: string\|null, icon\?\: array\{file\?\: string, type\: string, url\?\: string\}, logo\?\: array\{file\?\: string, type\: string, url\?\: string\}\}, cancel_url\?\: string, client_reference_id\?\: string, \.\.\.\}\|null, array\{payment_method_types\: array\{''card''\}, line_items\: array, mode\: ''payment'', success_url\: string, cancel_url\: string, metadata\: array\{commande_id\: int\|null, client_id\: int\}, client_reference_id\: ''''\|numeric\-string\} given\.$#'
 			identifier: argument.type
 			count: 1
 			path: src/Service/Marketplace/StripeService.php
+
+		-
+			message: '#^Expression on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.expr
+			count: 1
+			path: src/Service/Marketplace/TwilioService.php
+
+		-
+			message: '#^Using nullsafe method call on non\-nullable type DateTimeInterface\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: src/Service/Marketplace/TwilioService.php

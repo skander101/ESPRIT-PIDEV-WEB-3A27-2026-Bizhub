@@ -5,7 +5,7 @@ namespace App\Entity\UsersAvis;
 use App\Repository\UsersAvis\UserAuthStateRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Ignore;
-use Symfony\Component\Security\core\util\SensitiveParameter;
+use Symfony\Component\Security\Util\SensitiveParameter;
 
 #[ORM\Entity(repositoryClass: UserAuthStateRepository::class)]
 #[ORM\Table(name: 'user_auth_state')]

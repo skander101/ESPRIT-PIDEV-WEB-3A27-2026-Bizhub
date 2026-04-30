@@ -263,4 +263,50 @@ PROMPT;
             'source'      => 'fallback',
         ];
     }
+
+    public function chatWithMessages(array $messages, int $maxTokens = 520, float $temperature = 0.28): ?string
+    {
+        if (empty($this->apiKey) || str_starts_with($this->apiKey, 'your_')) {
+            $this->logger->info('GrokService: API key not configured — returning null');
+            return null;
+        }
+
+        try {
+            $response = $this->httpClient->request('POST', self::API_URL, [
+                'timeout' => self::TIMEOUT,
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->apiKey,
+                    'Content-Type'  => 'application/json',
+                ],
+                'json' => [
+                    'model'       => $this->resolveModel(),
+                    'messages'    => $messages,
+                    'max_tokens'  => $maxTokens,
+                    'temperature' => $temperature,
+                ],
+            ]);
+
+            $statusCode = $response->getStatusCode();
+            if ($statusCode !== 200) {
+                $this->logger->warning('GrokService: API returned HTTP ' . $statusCode);
+                return null;
+            }
+
+            $data = $response->toArray(false);
+            $content = $data['choices'][0]['message']['content'] ?? null;
+
+            if (is_string($content)) {
+                return $content;
+            }
+
+            return null;
+
+        } catch (\Throwable $e) {
+            $this->logger->warning('GrokService: chatWithMessages call failed', [
+                'error'    => $e->getMessage(),
+                'class'    => get_class($e),
+            ]);
+            return null;
+        }
+    }
 }

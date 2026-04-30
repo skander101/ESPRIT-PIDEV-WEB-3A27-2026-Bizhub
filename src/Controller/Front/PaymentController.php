@@ -155,7 +155,7 @@ final class PaymentController extends AbstractController
         }
 
         $txn = $this->fakeCardPaymentValidator->generateTransactionId();
-        $now = new \DateTimeImmutable();
+        $now = new \DateTime();
 
         $participation->setAmount((string) $charged);
         $participation->setTransactionId($txn);

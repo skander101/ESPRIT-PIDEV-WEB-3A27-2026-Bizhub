@@ -32,6 +32,11 @@ class Commentaire
         return $this;
     }
 
+    public function getPost_id(): int
+    {
+        return $this->post_id;
+    }
+
 #[ORM\Column(type: 'integer', nullable: false)]
     private int $post_id;
 

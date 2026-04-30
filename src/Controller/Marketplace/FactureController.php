@@ -2,6 +2,7 @@
 
 namespace App\Controller\Marketplace;
 
+use App\Entity\UsersAvis\User;
 use App\Entity\Marketplace\Commande;
 use App\Repository\Marketplace\FactureRepository;
 use App\Service\Marketplace\FactureService;
@@ -27,6 +28,7 @@ class FactureController extends AbstractController
 
     private function checkAccess(Commande $commande): void
     {
+        /** @var User $user */
         $user   = $this->getUser();
         $userId = (int) $user->getUserId();
 

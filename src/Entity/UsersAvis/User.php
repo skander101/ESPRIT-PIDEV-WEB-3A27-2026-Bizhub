@@ -12,7 +12,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 use Symfony\Component\Serializer\Annotation\Ignore;
-use Symfony\Component\Security\core\util\SensitiveParameter;
+use Symfony\Component\Security\Util\SensitiveParameter;
 
 use App\Repository\UsersAvis\UserRepository;
 
@@ -29,10 +29,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         'investisseur' => 'investisseur',
     ];
 
-    public function __construct()
+public function __construct()
     {
         $this->avis = new ArrayCollection();
         $this->created_at = new \DateTime();
+        $this->full_name = '';
+        $this->email = '';
+        $this->password_hash = '';
+        $this->user_type = '';
+        $this->is_active = true;
     }
 
     #[ORM\Id]
@@ -167,7 +172,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     private ?\DateTimeImmutable $face_enrolled_at = null;
 
     #[ORM\Column(type: 'boolean', nullable: true)]
-    private ?bool $is_verified = false;
+    private ?bool $is_verified = null;
 
     #[ORM\OneToMany(targetEntity: Avis::class, mappedBy: 'user')]
     private Collection $avis;
@@ -191,8 +196,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function getCreatedAt(): \DateTimeInterface { return $this->created_at; }
     public function getCreated_at(): \DateTimeInterface { return $this->created_at; }
-    protected function setCreatedAt(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
-    protected function setCreated_at(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
+    public function setCreatedAt(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
+    public function setCreated_at(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
 
     public function getIsActive(): ?bool { return $this->is_active; }
     public function is_active(): ?bool { return $this->is_active; }

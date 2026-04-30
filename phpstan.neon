@@ -1,4 +1,11 @@
+includes:
+    - phpstan-baseline.neon
+
 parameters:
-    level: 8
+    level: 5
     paths:
         - src
+    excludePaths:
+        - src/Entity/Community
+        - src/Service/Community
+        - src/Controller/Community

@@ -298,7 +298,7 @@ class FormationController extends AbstractController
         $participation = new Participation();
         $participation->setUser($user);
         $participation->setFormation($formation);
-        $participation->setStatus(Participation::STATUS_AWAITING_PAYMENT);
+        $participation->setLifecycleStatus(Participation::STATUS_AWAITING_PAYMENT);
         $participation->setPaymentStatus('PENDING');
         $cost = $formation->getCost();
         $participation->setAmount($cost !== null && $cost !== '' ? (string) $cost : '0.00');

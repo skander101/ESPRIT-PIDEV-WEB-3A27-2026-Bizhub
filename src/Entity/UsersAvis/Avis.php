@@ -73,8 +73,8 @@ class Avis
 
     public function getCreatedAt(): \DateTimeInterface { return $this->created_at; }
     public function getCreated_at(): \DateTimeInterface { return $this->created_at; }
-    protected function setCreatedAt(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
-    protected function setCreated_at(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
+    public function setCreatedAt(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
+    public function setCreated_at(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
 
     public function getIsVerified(): ?bool { return $this->is_verified; }
     public function is_verified(): ?bool { return $this->is_verified; }

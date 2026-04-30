@@ -32,6 +32,28 @@ class Post
         return $this;
     }
 
+    public function getUser_id(): int
+    {
+        return $this->user_id;
+    }
+
+    public function setUser_id(int $user_id): self
+    {
+        $this->user_id = $user_id;
+        return $this;
+    }
+
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(string $title): self
+    {
+        $this->title = $title;
+        return $this;
+    }
+
 #[ORM\Column(type: 'integer', nullable: false)]
     private int $user_id;
 

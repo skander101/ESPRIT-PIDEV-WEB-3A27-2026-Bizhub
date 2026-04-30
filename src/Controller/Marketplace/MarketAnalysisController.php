@@ -2,8 +2,9 @@
 
 namespace App\Controller\Marketplace;
 
+use App\Entity\UsersAvis\User;
 use App\Repository\Marketplace\CommandeRepository;
-use App\Repository\Marketplace\ProduitServiceRepository;
+use App\Repository\Marketplace\ProduitRepository;
 use App\Service\Marketplace\GrokService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -75,6 +76,7 @@ class MarketAnalysisController extends AbstractController
         }
 
         // Accès : startup (propriétaire) ou investisseur
+        /** @var User $user */
         $user = $this->getUser();
         $userId = (int) $user->getUserId();
 

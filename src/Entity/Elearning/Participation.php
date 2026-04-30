@@ -240,4 +240,57 @@ class Participation
 
     public function getCreated_at(): ?\DateTimeInterface { return $this->created_at; }
 
+    public function setStatus(string $status): self
+    {
+        return $this->setLifecycleStatus($status);
+    }
+
+    public function getStatus(): string
+    {
+        return $this->lifecycleStatus;
+    }
+
+    #[ORM\Column(type: 'string', nullable: true)]
+    private ?string $transactionId = null;
+
+    public function getTransactionId(): ?string
+    {
+        return $this->transactionId;
+    }
+
+    public function setTransactionId(string $transactionId): self
+    {
+        $this->transactionId = $transactionId;
+        return $this;
+    }
+
+    public function setPaidAt(?\DateTimeInterface $paidAt): self
+    {
+        return $this->setPaid_at($paidAt);
+    }
+
+    #[ORM\Column(type: 'string', nullable: true)]
+    private ?string $certificatePath = null;
+
+    public function getCertificatePath(): ?string
+    {
+        return $this->certificatePath;
+    }
+
+    public function setCertificatePath(?string $path): self
+    {
+        $this->certificatePath = $path;
+        return $this;
+    }
+
+    public function isPaidEnrollment(): bool
+    {
+        return $this->payment_status === 'PAID' && strtoupper($this->lifecycleStatus) === 'PAID';
+    }
+
+    public function isAwaitingPayment(): bool
+    {
+        return $this->lifecycleStatus === self::STATUS_AWAITING_PAYMENT && $this->payment_status === 'PENDING';
+    }
+
 }

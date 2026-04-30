@@ -170,7 +170,7 @@ class ParticipationController extends AbstractController
         if ($ps === 'PAID') {
             $participation->setStatus(Participation::STATUS_PAID);
         } elseif ($ps === 'REFUNDED' || $ps === 'FAILED') {
-            $participation->setStatus(Participation::STATUS_CANCELLED);
+            $participation->setStatus(Participation::STATUS_REFUNDED);
         } else {
             $participation->setStatus(Participation::STATUS_AWAITING_PAYMENT);
         }

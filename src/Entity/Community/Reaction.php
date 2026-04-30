@@ -32,6 +32,17 @@ class Reaction
         return $this;
     }
 
+    public function getPost_id(): int
+    {
+        return $this->post_id;
+    }
+
+    public function setPost_id(int $post_id): self
+    {
+        $this->post_id = $post_id;
+        return $this;
+    }
+
 #[ORM\Column(type: 'integer', nullable: false)]
     private int $post_id;
 

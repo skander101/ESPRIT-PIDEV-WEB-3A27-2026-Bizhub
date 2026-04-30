@@ -2,6 +2,7 @@
 
 namespace App\Controller\Marketplace;
 
+use App\Entity\UsersAvis\User;
 use App\Entity\Marketplace\Commande;
 use App\Repository\Marketplace\CommandeRepository;
 use App\Repository\Marketplace\CommandeStatusHistoryRepository;
@@ -20,6 +21,7 @@ class TrackingController extends AbstractController
 {
     private function requireStartup(): ?Response
     {
+        /** @var User|null $user */
         $user = $this->getUser();
         if (!$user) {
             return $this->redirectToRoute('app_login');
@@ -43,7 +45,9 @@ class TrackingController extends AbstractController
     ): Response {
         if ($r = $this->requireStartup()) return $r;
 
-        $userId  = (int) $this->getUser()->getUserId();
+        /** @var User $user */
+        $user = $this->getUser();
+        $userId  = (int) $user->getUserId();
         $statut  = $request->query->get('statut');
         $search  = $request->query->get('q', '');
         $toutes  = $commandeRepo->findByClient($userId);
@@ -112,7 +116,9 @@ class TrackingController extends AbstractController
     ): Response {
         if ($r = $this->requireStartup()) return $r;
 
-        if ($commande->getIdClient() !== (int) $this->getUser()->getUserId()) {
+        /** @var User $user */
+        $user = $this->getUser();
+        if ($commande->getIdClient() !== (int) $user->getUserId()) {
             throw $this->createAccessDeniedException();
         }
 
