@@ -42,30 +42,27 @@
 
   {% if show_ai_best_pick|default(false) and ai_best_pick_url|default('')|trim != '' %}
   <div class="reco-ai-toolbar">
-    <button type="button" class="reco-ai-pick-btn" id="formation-ai-best-pick-open" aria-haspopup="dialog" aria-controls="formation-ai-best-pick-modal">
+    <button type="button" class="reco-ai-pick-btn" onclick="openAIModal()" aria-haspopup="dialog">
       <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
       Meilleure formation pour moi (IA)
     </button>
     <p class="reco-ai-toolbar-hint">Suggestion basée sur vos anciennes inscriptions et le catalogue ouvert.</p>
   </div>
 
-  <div id="formation-ai-best-pick-modal" class="reco-ai-modal" role="dialog" aria-modal="true" aria-labelledby="formation-ai-best-pick-title" hidden
-       data-ai-url="{{ ai_best_pick_url|e('html_attr') }}"
-       data-ai-csrf="{{ ai_best_pick_csrf|default('')|e('html_attr') }}">
-    <div class="reco-ai-modal-backdrop" data-ai-close="1" tabindex="-1"></div>
-    <div class="reco-ai-modal-panel">
-      <div class="reco-ai-modal-head">
-        <h2 id="formation-ai-best-pick-title" class="reco-ai-modal-title">Conseiller IA</h2>
-        <button type="button" class="reco-ai-modal-close" data-ai-close="1" aria-label="Fermer"><i class="fa-solid fa-xmark"></i></button>
+  <div id="formation-ai-best-pick-modal" data-ai-url="{{ ai_best_pick_url|e('html_attr') }}" data-ai-csrf="{{ ai_best_pick_csrf|default('')|e('html_attr') }}" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.55);z-index:9999;">
+    <div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:18px;padding:0;max-width:520px;width:90%;box-shadow:0 24px 64px rgba(0,0,0,0.22);" onclick="event.stopPropagation();">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid #f0f2f5;">
+        <h2 style="font-size:1rem;font-weight:700;color:#1e2533;margin:0;">Conseiller IA</h2>
+        <button type="button" onclick="closeAIModal()" style="width:32px;height:32px;border-radius:8px;border:none;background:#f4f6fa;color:#6b7280;cursor:pointer;display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      <div class="reco-ai-modal-body">
-        <label for="formation-ai-best-pick-notes" class="reco-ai-label">Objectifs ou préférences (optionnel)</label>
-        <textarea id="formation-ai-best-pick-notes" class="reco-ai-textarea" rows="3" maxlength="500" placeholder="Ex. : approfondir le marketing digital, préférence pour le distanciel…"></textarea>
-        <div class="reco-ai-modal-actions">
-          <button type="button" class="reco-ai-submit" id="formation-ai-best-pick-run">Obtenir une suggestion</button>
+      <div style="padding:1.5rem;">
+        <label style="display:block;font-size:0.75rem;font-weight:700;color:#4b5563;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.5rem;">Objectifs ou préférences (optionnel)</label>
+        <textarea id="formation-ai-best-pick-notes" rows="3" maxlength="500" placeholder="Ex. : approfondir le marketing digital, préférence pour le distanciel…" style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:0.75rem;font-size:0.85rem;resize:vertical;min-height:80px;"></textarea>
+        <div style="margin-top:1rem;display:flex;justify-content:flex-end;">
+          <a href="javascript:void(0);" onclick="runAIRecommendation(); return false;" style="display:inline-block;height:40px;line-height:40px;padding:0 1.25rem;border-radius:10px;background:#8b5cf6;color:#fff;font-size:0.78rem;font-weight:700;font-family:'Josefin Sans',sans-serif;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer;text-decoration:none;">Obtenir une suggestion</a>
         </div>
-        <p class="reco-ai-status" id="formation-ai-best-pick-status" hidden></p>
-        <div id="formation-ai-best-pick-result" class="reco-ai-result" hidden></div>
+        <p id="formation-ai-best-pick-status" style="display:none;margin-top:0.75rem;font-size:0.82rem;color:#6b7280;text-align:center;"></p>
+        <div id="formation-ai-best-pick-result" style="display:none;margin-top:1rem;"></div>
       </div>
     </div>
   </div>

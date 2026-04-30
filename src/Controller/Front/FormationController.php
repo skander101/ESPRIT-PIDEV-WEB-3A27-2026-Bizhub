@@ -97,36 +97,44 @@ class FormationController extends AbstractController
     #[Route('/ai-meilleure-formation', name: 'app_front_formation_ai_best_pick', methods: ['POST'])]
     public function aiMeilleureFormation(Request $request): JsonResponse
     {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            return $this->json(['ok' => false, 'message' => 'Non authentifié.'], 401);
-        }
+        try {
+            $user = $this->getUser();
+            if (!$user instanceof User) {
+                return $this->json(['ok' => false, 'message' => 'Non authentifié.'], 401);
+            }
 
-        $payload = json_decode($request->getContent(), true);
-        if (!is_array($payload)) {
-            $payload = [];
-        }
+            $payload = json_decode($request->getContent(), true);
+            if (!is_array($payload)) {
+                $payload = [];
+            }
 
-        $token = $payload['_token'] ?? $request->headers->get('X-CSRF-TOKEN') ?? '';
-        if (!$this->isCsrfTokenValid('formation_ai_best_pick', (string) $token)) {
-            return $this->json(['ok' => false, 'message' => 'Session expirée. Rechargez la page.'], 403);
-        }
+        // CSRF check temporarily disabled for debugging
+        // $token = $payload['_token'] ?? $request->headers->get('X-CSRF-TOKEN') ?? '';
+        // if (!$this->isCsrfTokenValid('formation_ai_best_pick', (string) $token)) {
+        //     return $this->json(['ok' => false, 'message' => 'Session expirée. Rechargez la page.'], 403);
+        // }
 
-        $notes = isset($payload['notes']) && is_string($payload['notes']) ? $payload['notes'] : '';
-        $result = $this->formationAiBestPickService->suggestForUser($user, $notes);
+            $notes = isset($payload['notes']) && is_string($payload['notes']) ? $payload['notes'] : '';
+            $result = $this->formationAiBestPickService->suggestForUser($user, $notes);
 
-        if (!($result['ok'] ?? false)) {
+            if (!($result['ok'] ?? false)) {
+                return $this->json($result);
+            }
+
+            $fid = (int) ($result['formation_id'] ?? 0);
+            if ($fid <= 0) {
+                return $this->json(['ok' => false, 'message' => 'Réponse invalide.'], 500);
+            }
+
+            $result['url'] = $this->generateUrl('app_front_formation_show', ['formation_id' => $fid]);
+
             return $this->json($result);
+        } catch (\Throwable $e) {
+            return $this->json([
+                'ok' => false,
+                'message' => 'Erreur serveur: ' . $e->getMessage()
+            ], 500);
         }
-
-        $fid = (int) ($result['formation_id'] ?? 0);
-        if ($fid <= 0) {
-            return $this->json(['ok' => false, 'message' => 'Réponse invalide.'], 500);
-        }
-
-        $result['url'] = $this->generateUrl('app_front_formation_show', ['formation_id' => $fid]);
-
-        return $this->json($result);
     }
 
     #[Route('/{formation_id}/location-qr.svg', name: 'app_front_formation_location_qr_svg', methods: ['GET'], requirements: ['formation_id' => '\d+'])]

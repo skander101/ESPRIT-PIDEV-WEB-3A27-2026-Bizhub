@@ -49,11 +49,31 @@
 
 /* AI Modal */
 .reco-ai-modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   border-radius: 18px;
   padding: 0;
   max-width: 520px;
+  width: 90%;
   background: #fff;
   box-shadow: 0 24px 64px rgba(0,0,0,0.22);
+  z-index: 10000;
+}
+.reco-ai-modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,0.55);
+  z-index: 9999;
+}
+.reco-ai-modal[hidden] {
+  display: none;
+}
+.reco-ai-modal:not([hidden]) {
+  display: block;
 }
 .reco-ai-modal::backdrop {
   background: rgba(15,23,42,0.55);
