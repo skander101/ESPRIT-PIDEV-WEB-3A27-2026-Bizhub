@@ -419,6 +419,9 @@
     </style>
 </head>
 <body>
+<style>
+      * { cursor: none !important; }
+    </style>
 <div class="auth-wrapper">
     <aside class="auth-hero" aria-hidden="true">
         <video class="auth-hero-video" autoplay muted loop playsinline preload="metadata" poster="{{ asset('assets/front/images/hero-bg1.png') }}">
@@ -443,6 +446,7 @@
         </footer>
     </section>
 </div>
+<script src="{{ asset('bee.js') }}"></script>
 
 {% block auth_scripts %}{% endblock %}
 </body>

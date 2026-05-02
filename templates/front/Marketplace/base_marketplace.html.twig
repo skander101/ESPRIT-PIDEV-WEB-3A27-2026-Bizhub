@@ -452,7 +452,9 @@
   {% block stylesheets %}{% endblock %}
 </head>
 <body>
-
+<style>
+      * { cursor: none !important; }
+    </style>
 {# Custom confirm modal #}
 <div id="biz-modal-overlay">
   <div id="biz-modal">
@@ -885,6 +887,7 @@ window.__flashMessages = [
   window.showToast = showToast;
 })();
 </script>
+<script src="{{ asset('bee.js') }}"></script>
 
 {% include 'partials/ai_chat_sidebar.html.twig' %}
 

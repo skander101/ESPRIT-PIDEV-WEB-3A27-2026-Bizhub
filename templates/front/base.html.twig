@@ -1069,6 +1069,10 @@
 </head>
 <body>
 
+    <style>
+      * { cursor: none !important; }
+    </style>
+
 <!-- ── Flash messages (toast) ── -->
 <div class="flash-container" id="flashContainer">
   {% for type, messages in app.flashes %}
@@ -1452,4 +1456,5 @@
 
 {% block javascripts %}{% endblock %}
 </body>
+<script src="{{ asset('bee.js') }}"></script>
 </html>
