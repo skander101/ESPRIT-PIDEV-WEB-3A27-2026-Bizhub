@@ -132,7 +132,11 @@ class FrontProjetController extends AbstractController
     public function new(Request $request): Response
     {
         $projet = new Project();
-        $projet->setCreated_at(new \DateTime());
+        // Set created_at directly since setCreated_at is protected
+        $reflection = new \ReflectionClass($projet);
+        $property = $reflection->getProperty('created_at');
+        $property->setAccessible(true);
+        $property->setValue($projet, new \DateTime());
         $projet->setStatus(Project::STATUS_BROUILLON);
 
         if ($this->getUser()) {

@@ -61,7 +61,7 @@
             }
 
             const storageKey = 'bizhub_ai_chat_messages_v1';
-            const createMessage = (role, text, isLoading = false, navigateUrl = null) => ({ role, text, isLoading, navigateUrl });
+            const createMessage = (role, text, isLoading = false, navigateUrl = null, navLinks = []) => ({ role, text, isLoading, navigateUrl, navLinks });
 
             const renderMessage = (message) => {
                 const row = document.createElement('div');
@@ -89,7 +89,7 @@
                     bubble.style.border = '1px solid var(--border)';
                     bubble.style.color = 'var(--dark)';
                 }
-
+                
                 if (!message.isLoading) {
                     bubble.textContent = message.text;
 
@@ -106,6 +106,36 @@
 
                         linkWrap.appendChild(link);
                         bubble.appendChild(linkWrap);
+                    }
+
+                    if (Array.isArray(message.navLinks) && message.navLinks.length > 0) {
+                        const navWrap = document.createElement('div');
+                        navWrap.style.marginTop = '0.65rem';
+                        navWrap.style.display = 'flex';
+                        navWrap.style.flexWrap = 'wrap';
+                        navWrap.style.gap = '0.5rem';
+
+                        message.navLinks.forEach((linkData) => {
+                            const link = document.createElement('a');
+                            link.href = linkData.url;
+                            link.textContent = linkData.label;
+                            link.style.display = 'inline-block';
+                            link.style.padding = '8px 16px';
+                            link.style.fontSize = '0.82rem';
+                            link.style.borderRadius = '8px';
+                            link.style.background = 'var(--primary)';
+                            link.style.color = '#fff';
+                            link.style.textDecoration = 'none';
+                            link.style.fontWeight = '600';
+                            link.style.transition = 'opacity 0.15s';
+
+                            link.addEventListener('mouseenter', () => { link.style.opacity = '0.85'; });
+                            link.addEventListener('mouseleave', () => { link.style.opacity = '1'; });
+
+                            navWrap.appendChild(link);
+                        });
+
+                        bubble.appendChild(navWrap);
                     }
                 }
 
@@ -209,7 +239,11 @@
                     if (!response.ok || !data.success) {
                         pushMessage(createMessage('assistant', data.message || 'Something went wrong while processing your message.'));
                     } else {
-                        pushMessage(createMessage('assistant', data.reply || '', false, data.navigateUrl || null));
+                        const reply = data.reply || data.response || '';
+                        const navigateUrl = data.navigateUrl || null;
+                        const navLinks = data.navLinks || [];
+
+                        pushMessage(createMessage('assistant', reply, false, navigateUrl, navLinks));
                     }
                 } catch (error) {
                     removeLastLoading();

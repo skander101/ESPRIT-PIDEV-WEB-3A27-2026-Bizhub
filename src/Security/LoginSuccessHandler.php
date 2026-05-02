@@ -21,22 +21,8 @@ class LoginSuccessHandler implements AuthenticationSuccessHandlerInterface
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token): ?RedirectResponse
     {
-        $user = $token->getUser();
+        $request->getSession()->remove('_totp_login_requested');
 
-        if ((bool) $request->getSession()->get('login_via_totp', false)) {
-            $request->getSession()->remove('login_via_totp');
-            $request->getSession()->set('mfa_verified', true);
-
-            return new RedirectResponse($this->urlGenerator->generate('app_transition'));
-        }
-
-        if ((bool) $request->getSession()->get('login_via_face', false)) {
-            $request->getSession()->remove('login_via_face');
-            $request->getSession()->set('mfa_verified', true);
-
-            return new RedirectResponse($this->urlGenerator->generate('app_transition'));
-        }
-
-        return new RedirectResponse($this->urlGenerator->generate('app_transition'));
+        return new RedirectResponse($this->urlGenerator->generate('app_user_dashboard'));
     }
 }

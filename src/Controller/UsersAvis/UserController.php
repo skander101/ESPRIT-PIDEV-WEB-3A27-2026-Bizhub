@@ -220,9 +220,13 @@ class UserController extends AbstractController
                 return $this->redirectToRoute('app_login_totp');
             }
 
-            $request->getSession()->set('login_via_totp', true);
+            $token = new UsernamePasswordToken($user, 'main', $user->getRoles());
+            $this->tokenStorage->setToken($token);
 
-            return $this->redirectToRoute('app_index');
+            $request->getSession()->set('_security_main', serialize($token));
+            $request->getSession()->set('_totp_login_requested', true);
+
+            return $this->redirectToRoute('app_transition');
         }
 
         return $this->render('auth/totp_login.html.twig', ['form' => $form]);
@@ -313,6 +317,7 @@ class UserController extends AbstractController
         $this->tokenStorage->setToken($token);
         
         $request->getSession()->set('_security_main', serialize($token));
+        $request->getSession()->remove('_totp_login_requested');
         $request->getSession()->set('login_via_face', true);
         $request->getSession()->set('mfa_verified', true);
         

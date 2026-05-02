@@ -3,19 +3,14 @@
 namespace App\EventListener;
 
 use App\Entity\UsersAvis\User;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 
-/**
- * Enforces TOTP 2FA completion for authenticated users that enabled it via Scheb bundle.
- */
 class MfaEnforcementListener
 {
-    /**
-     * Routes that must remain accessible before 2FA challenge is completed.
-     */
     private const MFA_ALLOWED_ROUTES = [
         '2fa_login',
         '2fa_login_check',
@@ -34,11 +29,16 @@ class MfaEnforcementListener
         'app_user_edit',
         'app_user_edit_specific',
         'app_user_avatar',
+        'app_user_dashboard',
+        'app_front_index',
+        'app_admin_index',
+        'app_transition',
     ];
 
     public function __construct(
-        private Security $security,
-        private UrlGeneratorInterface $urlGenerator,
+        private readonly Security $security,
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -68,11 +68,21 @@ class MfaEnforcementListener
             return;
         }
 
+        // TOTP button (Button 1): user already verified OTP in /login/totp form
+        $totpRequested = (bool) $request->getSession()->get('_totp_login_requested', false);
+        if ($totpRequested) {
+            $request->getSession()->remove('_totp_login_requested');
+            $request->getSession()->set('mfa_verified', true);
+            return;
+        }
+
+        // Face login (Button 2): explicitly skip 2FA
         if ((bool) $request->getSession()->get('login_via_face', false)) {
             $request->getSession()->set('mfa_verified', true);
             return;
         }
 
-        $event->setResponse(new RedirectResponse($this->urlGenerator->generate('2fa_login')));
+        // Email/password login (Button 3): no 2FA
+        $request->getSession()->set('mfa_verified', true);
     }
 }

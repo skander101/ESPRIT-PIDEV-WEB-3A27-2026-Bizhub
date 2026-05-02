@@ -18,6 +18,7 @@ class AiNavigationBotService
 
     public function classifyIntent(string $message): string
     {
+        file_put_contents(dirname(__DIR__, 3) . '/var/log/router_debug.log', date('H:i:s') . ' | called with: ' . $message . "\n", FILE_APPEND);
         $input = mb_strtolower(trim($message));
 
         if ($input === '') {

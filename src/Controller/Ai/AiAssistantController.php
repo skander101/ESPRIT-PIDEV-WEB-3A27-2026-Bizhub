@@ -6,6 +6,10 @@ use App\Model\Ai\ChatMessageInput;
 use App\Service\AI\AiDatabaseAssistantService;
 use App\Service\AI\AiNavigationBotService;
 use App\Service\AI\CloudflareAiService;
+use App\Service\Chatbot\RouterAgent;
+use App\Service\Chatbot\NavAgent;
+use App\Service\Chatbot\DBAgent;
+use App\Service\Chatbot\GeneralAgent;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,6 +33,10 @@ class AiAssistantController extends AbstractController
         private readonly AiNavigationBotService $navigationBotService,
         private readonly AiDatabaseAssistantService $databaseAssistantService,
         private readonly CloudflareAiService $cloudflareAiService,
+        private readonly RouterAgent $routerAgent,
+        private readonly NavAgent $navAgent,
+        private readonly DBAgent $dbAgent,
+        private readonly GeneralAgent $generalAgent,
     ) {
     }
 
@@ -68,34 +76,31 @@ class AiAssistantController extends AbstractController
         }
 
         $userMessage = (string) $input->getMessage();
-        $intent = $this->navigationBotService->classifyIntent($userMessage);
         $session = $request->getSession();
+        $sessionId = $session->getId();
+        $intent = $this->routerAgent->classify($userMessage);
 
-        if ($intent === AiNavigationBotService::UNKNOWN) {
-            $intent = AiNavigationBotService::QUERY_DATABASE;
-        }
-
-        $reply = '';
-        $navigateUrl = null;
-
-        if ($intent === AiNavigationBotService::REFUSE_SENSITIVE) {
-            $reply = $this->navigationBotService->sensitiveDataRefusalMessage();
-        } elseif ($intent === AiNavigationBotService::HELP) {
-            $reply = $this->navigationBotService->helpMessage();
-        } elseif ($intent === AiNavigationBotService::QUERY_DATABASE) {
-            $reply = $this->databaseAssistantService->answer($userMessage, $this->getHistory($session));
-        } else {
-            [$reply, $navigateUrl] = $this->resolveNavigationReply($intent);
-        }
+        $agentResponse = match($intent) {
+            'db'  => $this->dbAgent->reply($userMessage, $sessionId),
+            'nav' => $this->navAgent->reply($userMessage, $sessionId),
+            default => $this->generalAgent->reply($userMessage, $sessionId),
+        };
 
         $this->appendHistory($session, 'user', $userMessage);
-        $this->appendHistory($session, 'assistant', $reply);
+        $this->appendHistory($session, 'assistant', $agentResponse->text);
+
+        // Build navigateUrl from first navLink if present
+        $navigateUrl = $agentResponse->navLinks[0]['url'] ?? null;
+
+        // Build navButtons array for frontend (label + url pairs)
+        $navButtons = $agentResponse->navLinks;
 
         return $this->json([
-            'success' => true,
-            'intent' => $intent,
-            'reply' => $reply,
+            'success'     => true,
+            'intent'      => $agentResponse->intent,
+            'reply'       => $agentResponse->text,
             'navigateUrl' => $navigateUrl,
+            'navLinks'    => $navButtons,
         ]);
     }
 

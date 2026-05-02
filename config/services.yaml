@@ -64,6 +64,11 @@ services:
             $cloudflareApiToken: '%app.cloudflare_api_token%'
             $cloudflareAccountId: '%app.cloudflare_acc_id%'
 
+    App\Service\Chatbot\CloudflareClient:
+        arguments:
+            $cloudflareApiToken: '%env(CLOUDFLARE_API_TOKEN)%'
+            $cloudflareAccId: '%env(CLOUDFLARE_ACC_ID)%'
+
     App\EventListener\MfaEnforcementListener:
         tags:
             - { name: kernel.event_listener, event: kernel.request }

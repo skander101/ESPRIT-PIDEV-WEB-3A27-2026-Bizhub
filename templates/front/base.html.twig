@@ -1446,7 +1446,9 @@
       }).then(r => { if (r.isConfirmed) window.location.href = href; });
     });
   });
-</script>
+  </script>
+
+{% include 'partials/ai_chat_sidebar.html.twig' %}
 
 {% block javascripts %}{% endblock %}
 </body>

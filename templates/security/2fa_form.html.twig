@@ -35,7 +35,7 @@
     <p>Enter the 6-digit code from your authenticator app.</p>
 
     {% if authenticationError %}
-        <div class="flash flash-error">{{ authenticationError|trans(authenticationErrorData, 'scheb_two_factor') }}</div>
+        <div class="flash flash-error">{{ authenticationError }}</div>
     {% endif %}
 
     {% for message in app.flashes('success') %}
