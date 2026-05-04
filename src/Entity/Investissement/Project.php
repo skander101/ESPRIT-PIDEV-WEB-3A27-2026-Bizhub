@@ -108,7 +108,7 @@ class Project
     )]
     private ?string $secteur = null;
 
-    #[ORM\Column(type: 'string', length: 30, options: ['default' => 'brouillon'])]
+    #[ORM\Column(type: 'string', length: 30, nullable: true, options: ['default' => 'brouillon'])]
     #[Assert\NotBlank(message: 'Veuillez choisir un statut.')]
     #[Assert\Choice(
         choices: ['brouillon', 'pending', 'in_progress', 'funded', 'completed'],
@@ -116,8 +116,8 @@ class Project
     )]
     private ?string $status = 'brouillon';
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?\DateTimeInterface $created_at = null;
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
     #[Assert\Length(
@@ -213,7 +213,7 @@ class Project
         $this->aiAnalysis   = new ArrayCollection();
         $this->investments  = new ArrayCollection();
         $this->negotiations = new ArrayCollection();
-        $this->created_at  = new \DateTime();
+        $this->created_at  = new \DateTimeImmutable();
     }
 
     public function getProject_id(): ?int { return $this->project_id; }
@@ -237,12 +237,12 @@ class Project
     public function setSecteur(?string $secteur): self { $this->secteur = $secteur; return $this; }
 
     public function getStatus(): ?string { return $this->status; }
-    public function setStatus(?string $status): self { $this->status = $status; return $this; }
+    public function setStatus(?string $status): self { $this->status = $status ?? 'brouillon'; return $this; }
 
-    public function getCreated_at(): ?\DateTimeInterface { return $this->created_at; }
-    public function getCreatedAt(): ?\DateTimeInterface { return $this->created_at; }
-    protected function setCreated_at(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
-    protected function setCreatedAt(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
+    public function getCreated_at(): ?\DateTimeImmutable { return $this->created_at; }
+    public function getCreatedAt(): ?\DateTimeImmutable { return $this->created_at; }
+    protected function setCreated_at(?\DateTimeImmutable $created_at): self { $this->created_at = $created_at; return $this; }
+    protected function setCreatedAt(?\DateTimeImmutable $created_at): self { $this->created_at = $created_at; return $this; }
 
     public function getProblemDescription(): ?string { return $this->problem_description; }
     public function setProblemDescription(?string $v): self { $this->problem_description = $v; return $this; }

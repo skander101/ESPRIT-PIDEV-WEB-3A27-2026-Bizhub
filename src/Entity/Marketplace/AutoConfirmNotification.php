@@ -17,8 +17,9 @@ class AutoConfirmNotification
     #[ORM\Column]
     private int $investisseurId;
 
-    #[ORM\Column(name: 'commande_id')]
-    private int $commandeId;
+    #[ORM\ManyToOne(targetEntity: Commande::class)]
+    #[ORM\JoinColumn(name: 'commande_id', referencedColumnName: 'commande_id', nullable: false)]
+    private ?Commande $order = null;
 
     #[ORM\Column(length: 50)]
     private string $startupName;
@@ -45,8 +46,8 @@ class AutoConfirmNotification
     public function getInvestisseurId(): int { return $this->investisseurId; }
     public function setInvestisseurId(int $v): static { $this->investisseurId = $v; return $this; }
 
-    public function getCommandeId(): int { return $this->commandeId; }
-    public function setCommandeId(int $v): static { $this->commandeId = $v; return $this; }
+    public function getOrder(): ?Commande { return $this->order; }
+    public function setOrder(?Commande $order): static { $this->order = $order; return $this; }
 
     public function getStartupName(): string { return $this->startupName; }
     public function setStartupName(string $v): static { $this->startupName = $v; return $this; }

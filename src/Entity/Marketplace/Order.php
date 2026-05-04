@@ -60,15 +60,15 @@ class Order
         return $this;
     }
 
-    #[ORM\Column(type: 'integer', options: ['default' => 1])]
+    #[ORM\Column(type: 'integer', nullable: true, options: ['default' => 1])]
     private ?int $quantity = 1;
 
-    public function getQuantity(): ?int
+    public function getQuantity(): int
     {
         return $this->quantity;
     }
 
-    public function setQuantity(?int $quantity): self
+    public function setQuantity(int $quantity): self
     {
         $this->quantity = $quantity;
         return $this;
@@ -88,7 +88,15 @@ class Order
         return $this;
     }
 
-    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, insertable: false, updatable: false, generated: 'ALWAYS')]
+    #[ORM\Column(
+        type: 'decimal',
+        precision: 10,
+        scale: 2,
+        nullable: true,
+        insertable: false,
+        updatable: false,
+        columnDefinition: 'DECIMAL(10,2) GENERATED ALWAYS AS (quantity * unit_price) STORED'
+    )]
     private ?string $total_price = null;
 
     public function getTotal_price(): ?string
@@ -124,15 +132,15 @@ class Order
         return $this;
     }
 
-    #[ORM\Column(type: 'string', length: 30, options: ['default' => 'en_attente'])]
+    #[ORM\Column(type: 'string', length: 30, nullable: true, options: ['default' => 'en_attente'])]
     private ?string $status = 'en_attente';
 
-    public function getStatus(): ?string
+    public function getStatus(): string
     {
         return $this->status;
     }
 
-    public function setStatus(?string $status): self
+    public function setStatus(string $status): self
     {
         $this->status = $status;
         return $this;

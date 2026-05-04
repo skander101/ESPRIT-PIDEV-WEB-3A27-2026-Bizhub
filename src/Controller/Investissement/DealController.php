@@ -53,20 +53,16 @@ class DealController extends AbstractController
 
         $this->assertParticipant($deal, $user->getUserId());
 
-        $negotiation = $this->negotiationRepo->find($deal->getNegotiation_id());
-        $buyer  = $this->em->getRepository(User::class)->find($deal->getBuyer_id());
-        $seller = $this->em->getRepository(User::class)->find($deal->getSeller_id());
-
         return $this->render('front/deal/show.html.twig', [
             'deal'            => $deal,
-            'negotiation'     => $negotiation,
-            'buyer'           => $buyer,
-            'seller'          => $seller,
+            'negotiation'     => $deal->getNegotiation(),
+            'buyer'           => $deal->getBuyer(),
+            'seller'          => $deal->getSeller(),
             'can_pay'         => $this->workflow->canPay($deal),
             'can_sign'        => $this->workflow->canSign($deal),
             'can_download'    => $this->workflow->canDownload($deal),
             'stripe_pub_key'  => $this->stripePublicKey,
-            'is_buyer'        => $user->getUserId() === $deal->getBuyer_id(),
+            'is_buyer'        => $user->getUserId() === $deal->getBuyer()->getUserId(),
         ]);
     }
 
@@ -80,7 +76,7 @@ class DealController extends AbstractController
         Deal $deal
     ): Response {
         $user = $this->getUser();
-        if (!$user || $user->getUserId() !== $deal->getBuyer_id()) {
+        if (!$user || $user->getUserId() !== $deal->getBuyer()->getUserId()) {
             throw $this->createAccessDeniedException('Seul l\'investisseur peut initier le paiement.');
         }
 
@@ -142,7 +138,7 @@ class DealController extends AbstractController
         Deal $deal
     ): Response {
         $user = $this->getUser();
-        if (!$user || $user->getUserId() !== $deal->getBuyer_id()) {
+        if (!$user || $user->getUserId() !== $deal->getBuyer()->getUserId()) {
             throw $this->createAccessDeniedException();
         }
 
@@ -157,18 +153,14 @@ class DealController extends AbstractController
                 $this->workflow->markAsPaid($deal, $sessionId, $paymentIntentId);
 
                 // Générer le contrat PDF
-                $negotiation = $this->negotiationRepo->find($deal->getNegotiation_id());
-                $buyer  = $this->em->getRepository(User::class)->find($deal->getBuyer_id());
-                $seller = $this->em->getRepository(User::class)->find($deal->getSeller_id());
-
-                if ($negotiation && $buyer && $seller) {
-                    $pdfPath = $this->pdfService->generate($deal, $negotiation, $buyer, $seller);
+                if ($deal->getNegotiation() && $deal->getBuyer() && $deal->getSeller()) {
+                    $pdfPath = $this->pdfService->generate($deal, $deal->getNegotiation(), $deal->getBuyer(), $deal->getSeller());
                     $this->workflow->generateContract($deal, $pdfPath);
 
                     // Envoyer la demande de signature électronique via Yousign
                     try {
-                        $this->yousignService->sendSignatureRequest($deal, $buyer);
-                        $this->addFlash('success', '✅ Paiement reçu ! Un email de signature électronique (Yousign) a été envoyé à ' . $buyer->getEmail() . '.');
+                        $this->yousignService->sendSignatureRequest($deal, $deal->getBuyer());
+                        $this->addFlash('success', '✅ Paiement reçu ! Un email de signature électronique (Yousign) a été envoyé à ' . $deal->getBuyer()->getEmail() . '.');
                     } catch (\Exception $yousignEx) {
                         // Yousign failed — fallback to token-based email
                         try {
@@ -221,12 +213,9 @@ class DealController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        if ($user->getUserId() !== $deal->getBuyer_id()) {
+        if ($user->getUserId() !== $deal->getBuyer()->getUserId()) {
             throw $this->createAccessDeniedException('Ce lien de signature ne vous est pas destiné.');
         }
-
-        $buyer  = $this->em->getRepository(User::class)->find($deal->getBuyer_id());
-        $seller = $this->em->getRepository(User::class)->find($deal->getSeller_id());
 
         // Validate token
         $tokenValid   = true;
@@ -308,7 +297,7 @@ class DealController extends AbstractController
         Deal $deal
     ): Response {
         $user = $this->getUser();
-        if (!$user || $user->getUserId() !== $deal->getBuyer_id()) {
+        if (!$user || $user->getUserId() !== $deal->getBuyer()->getUserId()) {
             throw $this->createAccessDeniedException('Seul l\'investisseur peut demander un renvoi de l\'email.');
         }
 
@@ -322,14 +311,13 @@ class DealController extends AbstractController
             return $this->redirectToRoute('app_deal_show', ['id' => $deal->getDeal_id()]);
         }
 
-        $buyer = $this->em->getRepository(User::class)->find($deal->getBuyer_id());
-        if (!$buyer) {
+        if (!$deal->getBuyer()) {
             $this->addFlash('error', 'Investisseur introuvable.');
             return $this->redirectToRoute('app_deal_show', ['id' => $deal->getDeal_id()]);
         }
 
         try {
-            $this->signatureEmailService->sendSignatureEmail($deal, $buyer);
+            $this->signatureEmailService->sendSignatureEmail($deal, $deal->getBuyer());
             $this->addFlash('success', '✅ Email de signature renvoyé ! Vérifiez votre boîte mail (lien valide 48h).');
         } catch (\Exception $e) {
             $this->addFlash('error', 'Erreur lors de l\'envoi de l\'email : ' . $e->getMessage());
@@ -349,7 +337,7 @@ class DealController extends AbstractController
         Deal $deal
     ): Response {
         $user = $this->getUser();
-        if (!$user || $user->getUserId() !== $deal->getBuyer_id()) {
+        if (!$user || $user->getUserId() !== $deal->getBuyer()->getUserId()) {
             throw $this->createAccessDeniedException('Seul l\'investisseur peut déclencher la signature.');
         }
 
@@ -368,14 +356,13 @@ class DealController extends AbstractController
             return $this->redirectToRoute('app_deal_show', ['id' => $deal->getDeal_id()]);
         }
 
-        $buyer = $this->em->getRepository(User::class)->find($deal->getBuyer_id());
-        if (!$buyer) {
+        if (!$deal->getBuyer()) {
             $this->addFlash('error', 'Investisseur introuvable.');
             return $this->redirectToRoute('app_deal_show', ['id' => $deal->getDeal_id()]);
         }
 
         try {
-            $this->yousignService->sendSignatureRequest($deal, $buyer);
+            $this->yousignService->sendSignatureRequest($deal, $deal->getBuyer());
             $this->addFlash('success', '✅ Demande de signature envoyée via Yousign à ' . $buyer->getEmail() . '.');
         } catch (\Exception $e) {
             $this->addFlash('error', 'Erreur Yousign : ' . $e->getMessage());
@@ -532,7 +519,7 @@ class DealController extends AbstractController
 
     private function assertParticipant(Deal $deal, int $userId): void
     {
-        if ($deal->getBuyer_id() !== $userId && $deal->getSeller_id() !== $userId) {
+        if ($deal->getBuyer()->getUserId() !== $userId && $deal->getSeller()->getUserId() !== $userId) {
             throw $this->createAccessDeniedException('Accès refusé à ce deal.');
         }
     }

@@ -47,7 +47,7 @@ class Negotiation
     #[Assert\NotNull(message: 'La startup est obligatoire.')]
     private ?User $startup = null;
 
-    #[ORM\Column(type: 'string', length: 30, options: ['default' => 'open'])]
+    #[ORM\Column(type: 'string', length: 30, nullable: true, options: ['default' => 'open'])]
     #[Assert\NotBlank(message: 'Le statut est obligatoire.')]
     #[Assert\Choice(
         choices: [self::STATUS_OPEN, self::STATUS_ACCEPTED, self::STATUS_REJECTED, self::STATUS_EXPIRED],
@@ -63,9 +63,9 @@ class Negotiation
     #[Assert\Positive(message: 'Le montant final doit être positif.')]
     private ?string $final_amount = null;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     #[Assert\LessThanOrEqual(value: 'now', message: 'La date de création ne peut pas être dans le futur.')]
-    private ?\DateTimeInterface $created_at = null;
+    private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     #[Assert\LessThanOrEqual(value: 'now', message: 'La date de mise à jour ne peut pas être dans le futur.')]
@@ -77,13 +77,7 @@ class Negotiation
     public function __construct()
     {
         $this->negotiationMessages = new ArrayCollection();
-        $this->created_at = new \DateTime();
-    }
-
-    #[ORM\PreUpdate]
-    public function onPreUpdate(): void
-    {
-        $this->updated_at = new \DateTime();
+        $this->created_at = new \DateTimeImmutable();
     }
 
     public function getNegotiation_id(): ?int { return $this->negotiation_id; }
@@ -99,7 +93,7 @@ class Negotiation
     public function setStartup(?User $startup): self { $this->startup = $startup; return $this; }
 
     public function getStatus(): ?string { return $this->status; }
-    public function setStatus(?string $status): self { $this->status = $status; return $this; }
+    public function setStatus(?string $status): self { $this->status = $status ?? self::STATUS_OPEN; return $this; }
 
     public function getProposed_amount(): ?string { return $this->proposed_amount; }
     public function setProposed_amount(?string $proposed_amount): self { $this->proposed_amount = $proposed_amount; return $this; }
@@ -107,8 +101,8 @@ class Negotiation
     public function getFinal_amount(): ?string { return $this->final_amount; }
     public function setFinal_amount(?string $final_amount): self { $this->final_amount = $final_amount; return $this; }
 
-    public function getCreated_at(): ?\DateTimeInterface { return $this->created_at; }
-    protected function setCreated_at(?\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
+    public function getCreated_at(): ?\DateTimeImmutable { return $this->created_at; }
+    protected function setCreated_at(?\DateTimeImmutable $created_at): self { $this->created_at = $created_at; return $this; }
 
     public function getUpdated_at(): ?\DateTimeInterface { return $this->updated_at; }
     protected function setUpdated_at(?\DateTimeInterface $updated_at): self { $this->updated_at = $updated_at; return $this; }

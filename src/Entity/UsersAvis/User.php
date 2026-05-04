@@ -44,8 +44,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[ORM\Column(type: 'string', nullable: true)]
     private ?string $email = null;
 
-    #[ORM\Column(name: 'password_hash', type: 'string', length: 255)]
-    private ?string $password_hash = null;
+    #[ORM\Column(name: 'password_hash', type: 'string', length: 255, nullable: false)]
+    private string $password_hash;
 
     #[ORM\Column(type: 'string', nullable: true)]
     private ?string $user_type = null;
@@ -193,10 +193,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     public function getEmail(): ?string { return $this->email; }
     public function setEmail(string $email): self { $this->email = $email; return $this; }
 
-    public function getPasswordHash(): ?string { return $this->password_hash; }
-    public function getPassword_hash(): ?string { return $this->password_hash; }
-    public function setPasswordHash(?string $password_hash): self { $this->password_hash = $password_hash; return $this; }
-    public function setPassword_hash(?string $password_hash): self { $this->password_hash = $password_hash; return $this; }
+    public function getPasswordHash(): string { return $this->password_hash; }
+    public function getPassword_hash(): string { return $this->password_hash; }
+    public function setPasswordHash(string $password_hash): self { $this->password_hash = $password_hash; return $this; }
+    public function setPassword_hash(string $password_hash): self { $this->password_hash = $password_hash; return $this; }
 
     public function getUserType(): ?string { return $this->user_type; }
     public function getUser_type(): ?string { return $this->user_type; }

@@ -135,10 +135,10 @@ class DashboardInvestisseurService
             // Find linked deal
             $deal = null;
             if ($neg) {
-                $deal = $this->dealRepo->findOneBy(['negotiation_id' => $neg->getNegotiation_id()]);
+                $deal = $this->dealRepo->findOneBy(['negotiation' => $neg]);
             }
             if (!$deal) {
-                $deal = $this->dealRepo->findOneBy(['project_id' => $project?->getProject_id(), 'buyer_id' => $buyerId]);
+                $deal = $this->dealRepo->findOneBy(['project' => $project, 'buyer' => $user]);
             }
 
             $investmentDetails[] = [

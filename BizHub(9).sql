@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Hôte : 127.0.0.1
--- Généré le : sam. 18 avr. 2026 à 18:14
--- Version du serveur : 10.4.32-MariaDB
--- Version de PHP : 8.2.12
+-- Host: localhost
+-- Generation Time: May 04, 2026 at 09:26 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,23 +18,24 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de données : `bizhub`
+-- Database: `BizHub`
 --
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `ai_analysis`
+-- Table structure for table `ai_analysis`
 --
 
 CREATE TABLE `ai_analysis` (
-  `id` int(11) NOT NULL
+  `id` int(11) NOT NULL,
+  `project_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `application`
+-- Table structure for table `application`
 --
 
 CREATE TABLE `application` (
@@ -44,7 +45,74 @@ CREATE TABLE `application` (
 -- --------------------------------------------------------
 
 --
--- Structure de la table `auto_confirm_notification`
+-- Table structure for table `app_user`
+--
+
+CREATE TABLE `app_user` (
+  `user_id` int(11) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password_hash` varchar(255) NOT NULL,
+  `user_type` enum('startup','fournisseur','formateur','investisseur','admin') NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `is_active` tinyint(1) DEFAULT 1,
+  `full_name` varchar(100) NOT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  `bio` text DEFAULT NULL,
+  `avatar_url` varchar(500) DEFAULT NULL,
+  `company_name` varchar(100) DEFAULT NULL,
+  `sector` varchar(100) DEFAULT NULL,
+  `company_description` text DEFAULT NULL,
+  `website` varchar(255) DEFAULT NULL,
+  `founding_date` date DEFAULT NULL,
+  `business_type` varchar(100) DEFAULT NULL,
+  `delivery_zones` text DEFAULT NULL,
+  `payment_methods` varchar(255) DEFAULT NULL,
+  `return_policy` text DEFAULT NULL,
+  `investment_sector` varchar(100) DEFAULT NULL,
+  `max_budget` decimal(15,2) DEFAULT NULL,
+  `years_experience` int(11) DEFAULT NULL,
+  `represented_company` varchar(100) DEFAULT NULL,
+  `specialty` varchar(100) DEFAULT NULL,
+  `hourly_rate` decimal(10,2) DEFAULT NULL,
+  `availability` text DEFAULT NULL,
+  `cv_url` varchar(500) DEFAULT NULL,
+  `totp_secret` varchar(255) DEFAULT NULL,
+  `face_token` varchar(255) DEFAULT NULL,
+  `is_verified` tinyint(1) NOT NULL DEFAULT 0,
+  `face_enrolled_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `app_user`
+--
+
+INSERT INTO `app_user` (`user_id`, `email`, `password_hash`, `user_type`, `created_at`, `is_active`, `full_name`, `phone`, `address`, `bio`, `avatar_url`, `company_name`, `sector`, `company_description`, `website`, `founding_date`, `business_type`, `delivery_zones`, `payment_methods`, `return_policy`, `investment_sector`, `max_budget`, `years_experience`, `represented_company`, `specialty`, `hourly_rate`, `availability`, `cv_url`, `totp_secret`, `face_token`, `is_verified`, `face_enrolled_at`, `updated_at`) VALUES
+(6, 'TestAdmin@gmail.com', '$2a$12$V9CASbvSMt.auCGAmcEz/uVfWV4jN4NFqZM99n8dZy9x6ix9Aus02', 'admin', '2026-02-06 05:19:11', 1, 'jeremy', '23456789', NULL, NULL, 'com/bizhub/images/avatars/8ef86e74-d02d-4081-87dc-25d2040b8bf6.png', 'AstroWorld', 'Informatics', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL),
+(7, 'TestFormateur@gmail.com', '$2a$12$Vvk/.eHr9tPmH6AtYG10neYwxbh9MmyvN8/0f7QTvZ5.BQar3LX0q', 'formateur', '2026-02-06 05:26:11', 1, 'BlueWall', '12345678', NULL, NULL, '/assets/images/avatars/cHNhbGN-removebg-preview-69d8b659a323b.png', 'My dd', 'Baby Oil', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL),
+(8, 'TestStartup@gmail.com', '$2a$12$UKZh0JBfN.1RQ/g7RZbAVOKU9gBy.FwiRCFlzQJ.6BW2uF58gnB.a', 'startup', '2026-02-06 05:30:20', 1, 'skandrr', '29523310', NULL, NULL, 'com/bizhub/images/avatars/4038c4dc-e04d-495a-83f7-1fb29a921a3f.png', 'Dar Baba', 'Shanghai', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL),
+(9, 'Test1@gmail.com', '$2a$12$bvvRVl71HXL5T5y7J6/52.OUGvpT07JDV5U4Y7QPjSGS9awWBXHua', 'investisseur', '2026-02-07 19:21:13', 1, 'skandoura', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Java', 20.00, NULL, NULL, NULL, NULL, 0, NULL, NULL),
+(10, 'test3@gmail.com', '$2a$12$1S7CUW.6wRB6rKRS53zsNO0s/Xdy7Qu0SZGCnJdfvqJs4208cMIqq', 'investisseur', '2026-02-07 19:22:33', 1, 'skannn', NULL, NULL, NULL, 'com/bizhub/images/avatars/23b44342-e8ce-4bc3-ae86-84ab7800c12d.png', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'FinTech', 50000.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL),
+(11, 'invest@esprit.tn', '$2a$12$PDFeYX9W9cMccJZAV7CiRecN6Lqasp7sD8WeldmoWgtLieocCSZxG', 'investisseur', '2026-03-01 13:23:11', 1, '123456', '10203010', 'ariana', 'power in the money , money in the power', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'IT', 75000.00, 5, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL),
+(12, 'startup@esprit.tn', '$2a$12$atxx/OUWPo1j3rJYAUi/W.uQsX9vwET.H275rai4p4IQDU6YD./0q', 'startup', '2026-03-01 13:28:44', 1, '123456', NULL, NULL, NULL, NULL, 'esprit', 'Finance', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL),
+(13, 'ziadijizel26@gmail.com', '$2a$12$xgekLmvAV9AU3NcFqBHAVeb7LqfN.t6J4IaAzqTck.Z.UUXjSrU6e', 'startup', '2026-03-01 14:13:30', 1, '123456', NULL, NULL, NULL, NULL, 'HP', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL),
+(15, 'startup@gmail.com', '$2a$12$evXjEssfWdq9FHtaV3NF1uZq03tlkZUs3QyQQ5ZBfR7LVZmfAwHUK', 'startup', '2026-03-02 23:33:39', 1, 'fatma', NULL, NULL, NULL, NULL, 'fatyy', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL),
+(16, 'investisseur@gmail..com', '$2a$12$Z/Nkf6fjOW2AuewOxre9neXiKKjc7ZfxmpucUBJnOH3wPJWt099N.', 'investisseur', '2026-03-02 23:34:35', 1, 'fatou', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'fatouu', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL),
+(29, 'selmi.skan@gmail.com', '$2y$13$7MhujAJgyPs.yBNehKFxY.VcZBzLDGl8QOG8pohRi0wQVABY.3PhK', 'formateur', '2026-04-04 21:04:31', 1, 'bobo', NULL, NULL, NULL, '/assets/images/avatars/2AOqvyd4-69d1a85b286e9.jpg', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 24, NULL, 'yourmom', NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL),
+(34, 'boughoula.fatma@esprit.tn', '$2y$13$cRTrjwUsXD4xByq4cq0bzurHtcsqRjOPeoS4AwPO/FsPQ7/svzLwC', 'investisseur', '2026-04-06 16:38:03', 1, 'boughoula fatma ezahra', '+21629523310', 'araian', 'faty', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL),
+(36, 'fatma2@gmail.com', '$2y$13$JWtohAldIaph8E0wIW4N3u5hp4O6Zr3QqGSUkOW.t0Qric43DXbaG', 'investisseur', '2026-04-06 16:40:25', 1, 'boughoula fatma ezahra', '+216 29523310', 'araian', 'fatyma', '/assets/images/avatars/ai-avatar-69f5fb217fb361.24773395.png', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL),
+(37, 'fatma3@gmail.com', '$2y$13$kTRwwnAb3LaEW14DnfOGTOMu.SDttqFzZWDIQ5m/JXE9.rTRtxYpW', 'startup', '2026-04-06 23:46:10', 1, 'iram trabelsi', '+21629523310', 'ariana', 'fatyy', '/assets/images/avatars/638357820-930737542806290-4707335109899648181-n-69d520210d5ea.png', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL),
+(38, 'boutique@bizhub.tn', '$2y$13$demo.hash.not.real.login', 'fournisseur', '2026-04-07 22:02:23', 1, 'BizHub Store', '22333444', NULL, NULL, NULL, 'BizHub Commerce', 'Informatique', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL),
+(39, 'ffet.gre@gmail.com', '$2y$13$Mpc6TcJJDiaOZOcdkl6bm.iAixjqlEt668S825/XOarkzA0aQcliC', 'admin', '2026-04-08 10:27:29', 1, 'selmi skan', '33596478', NULL, '874', '/assets/images/avatars/cHNhbGN-removebg-preview-69d62dd8b8e30.png', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL),
+(62, 'iramtrabelsi30@gmail.com', '$2y$13$1ySEnKL0oADBhthzSjlZY..a5Oyyfv0jP7EIeaZxVoEqM7nZa3nRG', 'startup', '2026-04-14 11:13:27', 1, 'iram trabelsi', '24132420', '4726 Rue de la Roche', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL),
+(64, 'selmiskander0.8@gmail.com', '$2y$13$xXWV5ynPxFosfcmbwDI0FeKA7XAXLZoZVGUoovBp0OwydXWxzKVZK', 'startup', '2026-04-18 18:58:07', 1, 'skander selmi', '+216 12345678', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '95d263a5ea1d44afdb4790b652ded159', 0, '2026-04-18 20:10:34', NULL),
+(66, 'fatmaezahraboughoula@gmail.com', '$2y$13$xYTAnf7Qt7lebaqBb7jxX.jWg6Nejx2pVQ1.3FKYcqiS0d9z3b6.y', 'investisseur', '2026-04-21 09:43:40', 1, 'fatma ezzahra', '+216 29523310', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `auto_confirm_notification`
 --
 
 CREATE TABLE `auto_confirm_notification` (
@@ -58,10 +126,30 @@ CREATE TABLE `auto_confirm_notification` (
   `created_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `auto_confirm_notification`
+--
+
+INSERT INTO `auto_confirm_notification` (`id`, `investisseur_id`, `commande_id`, `startup_name`, `montant_ttc`, `score_auto`, `is_read`, `created_at`) VALUES
+(1, 9, 103, 'iram trabelsi', 1011.500, 52, 0, '2026-04-21 10:57:38'),
+(2, 36, 105, 'iram trabelsi', 119.000, 57, 1, '2026-04-21 14:14:02'),
+(3, 36, 106, 'iram trabelsi', 119.000, 66, 1, '2026-04-21 14:20:14'),
+(4, 8, 107, 'iram trabelsi', 535.500, 61, 0, '2026-04-21 15:29:16'),
+(5, 36, 109, 'iram trabelsi', 119.000, 66, 1, '2026-04-21 19:27:43'),
+(6, 36, 111, 'iram trabelsi', 595.000, 70, 1, '2026-04-21 19:31:03'),
+(7, 36, 112, 'iram trabelsi', 119.000, 75, 1, '2026-04-21 19:37:22'),
+(8, 9, 113, 'iram trabelsi', 1011.500, 70, 0, '2026-04-21 19:47:37'),
+(9, 36, 114, 'iram trabelsi', 595.000, 70, 1, '2026-04-21 19:48:39'),
+(10, 66, 115, 'iram trabelsi', 11900.000, 55, 1, '2026-04-21 19:58:11'),
+(11, 36, 116, 'iram trabelsi', 595.000, 60, 1, '2026-04-21 20:02:24'),
+(12, 66, 117, 'iram trabelsi', 11900.000, 45, 1, '2026-04-21 20:02:44'),
+(13, 36, 119, 'iram trabelsi', 59.500, 75, 1, '2026-04-22 07:50:33'),
+(14, 36, 120, 'iram trabelsi', 119.000, 75, 1, '2026-04-22 10:55:20');
+
 -- --------------------------------------------------------
 
 --
--- Structure de la table `avis`
+-- Table structure for table `avis`
 --
 
 CREATE TABLE `avis` (
@@ -69,44 +157,41 @@ CREATE TABLE `avis` (
   `reviewer_id` int(11) NOT NULL,
   `formation_id` int(11) NOT NULL,
   `rating` int(11) DEFAULT NULL CHECK (`rating` >= 1 and `rating` <= 5),
-  `comment` text DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `is_verified` tinyint(1) DEFAULT 0,
+  `comment` longtext DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `is_verified` tinyint(4) DEFAULT NULL,
   `is_edited` tinyint(1) DEFAULT NULL,
   `is_removed` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `avis`
+-- Dumping data for table `avis`
 --
 
 INSERT INTO `avis` (`avis_id`, `reviewer_id`, `formation_id`, `rating`, `comment`, `created_at`, `is_verified`, `is_edited`, `is_removed`) VALUES
-(2, 8, 2, 4, 'better but still too serious', '2026-02-06 05:52:06', 0, 0, NULL),
-(10, 10, 3, 5, 'hi', '2026-03-04 14:38:24', 0, 0, NULL),
-(11, 10, 9, 5, 'funny', '2026-03-04 19:54:01', 0, 0, NULL),
-(14, 36, 4, 1, 'brobro', '2026-04-09 03:16:32', NULL, 1, NULL),
-(16, 7, 3, 2, 'duuuuuuude', '2026-04-10 08:36:28', 0, 0, 0);
+(17, 64, 18, 1, 'raciste', '2026-04-29 20:20:08', 0, 0, 0),
+(18, 36, 18, 5, 'OUI', '2026-04-29 20:30:53', 0, 0, 0);
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `avis_produit`
+-- Table structure for table `avis_produit`
 --
 
 CREATE TABLE `avis_produit` (
   `avis_produit_id` int(11) NOT NULL,
-  `buyer_id` int(11) NOT NULL,
-  `product_id` int(11) NOT NULL,
+  `buyer_id` int(11) DEFAULT NULL,
+  `product_id` int(11) DEFAULT NULL,
   `rating` int(11) DEFAULT NULL CHECK (`rating` >= 1 and `rating` <= 5),
-  `comment` text DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `is_verified` tinyint(1) DEFAULT 0
+  `comment` longtext DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `is_verified` tinyint(4) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `chatbot_conversation`
+-- Table structure for table `chatbot_conversation`
 --
 
 CREATE TABLE `chatbot_conversation` (
@@ -114,7 +199,7 @@ CREATE TABLE `chatbot_conversation` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `chatbot_conversation`
+-- Dumping data for table `chatbot_conversation`
 --
 
 INSERT INTO `chatbot_conversation` (`id`) VALUES
@@ -164,19 +249,19 @@ INSERT INTO `chatbot_conversation` (`id`) VALUES
 -- --------------------------------------------------------
 
 --
--- Structure de la table `commande`
+-- Table structure for table `commande`
 --
 
 CREATE TABLE `commande` (
-  `id_commande` int(11) NOT NULL,
+  `commande_id` int(11) NOT NULL,
   `id_client` int(11) NOT NULL,
   `id_produit` int(11) DEFAULT NULL,
   `quantite` int(11) DEFAULT NULL,
-  `date_commande` datetime NOT NULL DEFAULT current_timestamp(),
-  `statut` enum('en_attente','confirmee','annulee','livree') NOT NULL DEFAULT 'en_attente',
-  `payment_status` varchar(20) DEFAULT 'non_initie',
+  `date_commande` datetime NOT NULL,
+  `statut` varchar(50) NOT NULL,
+  `payment_status` varchar(50) DEFAULT NULL,
   `payment_ref` varchar(255) DEFAULT NULL,
-  `payment_url` text DEFAULT NULL,
+  `payment_url` longtext DEFAULT NULL,
   `est_payee` tinyint(1) NOT NULL DEFAULT 0,
   `paid_at` datetime DEFAULT NULL,
   `total_ht` decimal(10,2) DEFAULT NULL,
@@ -188,10 +273,10 @@ CREATE TABLE `commande` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `commande`
+-- Dumping data for table `commande`
 --
 
-INSERT INTO `commande` (`id_commande`, `id_client`, `id_produit`, `quantite`, `date_commande`, `statut`, `payment_status`, `payment_ref`, `payment_url`, `est_payee`, `paid_at`, `total_ht`, `total_tva`, `total_ttc`, `stripe_session_id`, `stripe_payment_intent_id`, `score_auto`) VALUES
+INSERT INTO `commande` (`commande_id`, `id_client`, `id_produit`, `quantite`, `date_commande`, `statut`, `payment_status`, `payment_ref`, `payment_url`, `est_payee`, `paid_at`, `total_ht`, `total_tva`, `total_ttc`, `stripe_session_id`, `stripe_payment_intent_id`, `score_auto`) VALUES
 (1, 13, 2, 45, '2026-02-11 22:44:10', 'livree', 'non_initie', NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (2, 13, 2, 5, '2026-02-12 13:56:16', 'confirmee', 'non_initie', NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (3, 10, 2, 25, '2026-02-17 00:53:13', 'livree', 'non_initie', NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
@@ -249,9 +334,9 @@ INSERT INTO `commande` (`id_commande`, `id_client`, `id_produit`, `quantite`, `d
 (81, 37, NULL, NULL, '2026-04-07 22:22:42', 'en_attente', NULL, NULL, NULL, 0, NULL, 10.00, 1.90, 11.90, NULL, NULL, NULL),
 (82, 37, NULL, NULL, '2026-04-07 22:53:29', 'en_attente', NULL, NULL, NULL, 0, NULL, 1200.00, 228.00, 1428.00, NULL, NULL, NULL),
 (83, 37, NULL, NULL, '2026-04-07 22:55:08', 'livree', NULL, NULL, NULL, 0, NULL, 10.00, 1.90, 11.90, NULL, NULL, NULL),
-(84, 37, NULL, NULL, '2026-04-08 09:10:40', 'confirmee', NULL, NULL, NULL, 0, NULL, 10.00, 1.90, 11.90, NULL, NULL, NULL),
-(85, 37, NULL, NULL, '2026-04-08 09:42:49', 'confirmee', NULL, NULL, NULL, 0, NULL, 123.00, 23.37, 146.37, NULL, NULL, NULL),
-(86, 37, NULL, NULL, '2026-04-08 10:16:52', 'confirmee', NULL, NULL, NULL, 0, NULL, 202.00, 38.38, 240.38, NULL, NULL, NULL),
+(84, 37, NULL, NULL, '2026-04-08 09:10:40', 'en_cours_paiement', 'en cours', NULL, 'https://checkout.stripe.com/c/pay/cs_test_a14qoXHSGDBNSIkkn6ohFsn2UlU78wmyq6LbhWQI8KRFyBrUkmfhXNb3ax#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWjA0UTNgXGM0YmozUzFqR0FmbURCPTFXYXQ2fVxXNzdkQmNgY1JvZjNqUEt9cTxKbldnRkhqT2RsRHFzV0sxQH98a1dPZjxEVmszMjNSYkNuYDVpcXxNf0FhNTU9TWNWZFZ8YCcpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl', 0, NULL, 10.00, 1.90, 11.90, 'cs_test_a14qoXHSGDBNSIkkn6ohFsn2UlU78wmyq6LbhWQI8KRFyBrUkmfhXNb3ax', NULL, NULL),
+(85, 37, NULL, NULL, '2026-04-08 09:42:49', 'en_cours_paiement', 'en cours', NULL, 'https://checkout.stripe.com/c/pay/cs_test_a1tngqNo0i7UitltLdKiZRGoJC8rIfyy5vkQ9jGobMorKO18xgqrBjg80i#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWjA0UTNgXGM0YmozUzFqR0FmbURCPTFXYXQ2fVxXNzdkQmNgY1JvZjNqUEt9cTxKbldnRkhqT2RsRHFzV0sxQH98a1dPZjxEVmszMjNSYkNuYDVpcXxNf0FhNTU9TWNWZFZ8YCcpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl', 0, NULL, 123.00, 23.37, 146.37, 'cs_test_a1tngqNo0i7UitltLdKiZRGoJC8rIfyy5vkQ9jGobMorKO18xgqrBjg80i', NULL, NULL),
+(86, 37, NULL, NULL, '2026-04-08 10:16:52', 'livree', 'complété', 'cs_test_b1UNwylt2792FJKhPm0abzNbdo6s3kdd0R3xd35tlARmv86UOkk5P3ZXoO', 'https://checkout.stripe.com/c/pay/cs_test_b1UNwylt2792FJKhPm0abzNbdo6s3kdd0R3xd35tlARmv86UOkk5P3ZXoO#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWjA0UTNgXGM0YmozUzFqR0FmbURCPTFXYXQ2fVxXNzdkQmNgY1JvZjNqUEt9cTxKbldnRkhqT2RsRHFzV0sxQH98a1dPZjxEVmszMjNSYkNuYDVpcXxNf0FhNTU9TWNWZFZ8YCcpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8naHBpcWxabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl', 1, '2026-04-21 10:26:42', 202.00, 38.38, 240.38, 'cs_test_b1UNwylt2792FJKhPm0abzNbdo6s3kdd0R3xd35tlARmv86UOkk5P3ZXoO', 'pi_3TObVr1go6V4oBDc17WCDiH7', NULL),
 (87, 37, NULL, NULL, '2026-04-08 10:17:13', 'annulee', NULL, NULL, NULL, 0, NULL, 602.00, 114.38, 716.38, NULL, NULL, NULL),
 (88, 59, NULL, NULL, '2026-04-11 14:34:47', 'en_attente', NULL, NULL, NULL, 0, NULL, 179.00, 34.01, 213.01, NULL, NULL, NULL),
 (89, 8, NULL, NULL, '2026-04-13 23:47:29', 'en_attente', 'en cours', NULL, 'https://checkout.stripe.com/c/pay/cs_test_a1zHG1elvNigLux1QgAY0VzaUJQzU6Hr0h9Hq1dRcFJPr65wEp3L8dGXOq#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWjA0UTZtNmNGXEhudGJ1MDdiQnNUX1NhY102NlM0c01NS1JGUFFvaHdjY2NBU2BHPEk0Y3QydnZhSU5ucGRjUmRhV0BVMXFRUmZAXDFoc0ZuYjxocj00UmZLNTVSRjBQTF1hXycpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl', 0, NULL, 100.00, 19.00, 119.00, 'cs_test_a1zHG1elvNigLux1QgAY0VzaUJQzU6Hr0h9Hq1dRcFJPr65wEp3L8dGXOq', NULL, 62),
@@ -266,81 +351,117 @@ INSERT INTO `commande` (`id_commande`, `id_client`, `id_produit`, `quantite`, `d
 (98, 8, NULL, NULL, '2026-04-16 23:30:23', 'en_attente', NULL, NULL, NULL, 0, NULL, 478.00, 90.82, 568.82, NULL, NULL, 57),
 (99, 8, NULL, NULL, '2026-04-16 23:31:35', 'confirmee', NULL, NULL, NULL, 0, NULL, 5000.00, 950.00, 5950.00, NULL, NULL, 47),
 (100, 8, NULL, NULL, '2026-04-16 23:42:31', 'confirmee', NULL, NULL, NULL, 0, NULL, 2000.00, 380.00, 2380.00, NULL, NULL, 52),
-(101, 8, NULL, NULL, '2026-04-16 23:48:07', 'confirmee', NULL, NULL, NULL, 0, NULL, 2100.00, 399.00, 2499.00, NULL, NULL, 52);
+(101, 8, NULL, NULL, '2026-04-16 23:48:07', 'confirmee', NULL, NULL, NULL, 0, NULL, 2100.00, 399.00, 2499.00, NULL, NULL, 52),
+(102, 64, NULL, NULL, '2026-04-21 09:37:12', 'annulee', NULL, NULL, NULL, 0, NULL, 2365.00, 449.35, 2814.35, NULL, NULL, 30),
+(103, 37, NULL, NULL, '2026-04-21 10:57:38', 'confirmee', NULL, NULL, NULL, 0, NULL, 850.00, 161.50, 1011.50, NULL, NULL, 52),
+(104, 37, NULL, NULL, '2026-04-21 10:57:57', 'payee', 'complété', 'cs_test_a1udqWEPliw4EXVtgXTUyavSbMx2qrrfS2TXEei6b3a12foYxTgocmZdTL', 'https://checkout.stripe.com/c/pay/cs_test_a1udqWEPliw4EXVtgXTUyavSbMx2qrrfS2TXEei6b3a12foYxTgocmZdTL#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWjA0UTNgXGM0YmozUzFqR0FmbURCPTFXYXQ2fVxXNzdkQmNgY1JvZjNqUEt9cTxKbldnRkhqT2RsRHFzV0sxQH98a1dPZjxEVmszMjNSYkNuYDVpcXxNf0FhNTU9TWNWZFZ8YCcpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl', 1, '2026-04-21 10:58:19', 50.00, 9.50, 59.50, 'cs_test_a1udqWEPliw4EXVtgXTUyavSbMx2qrrfS2TXEei6b3a12foYxTgocmZdTL', 'pi_3TOc0S1go6V4oBDc1ecz9IHB', 57),
+(105, 37, NULL, NULL, '2026-04-21 14:14:01', 'confirmee', NULL, NULL, NULL, 0, NULL, 100.00, 19.00, 119.00, NULL, NULL, 57),
+(106, 37, NULL, NULL, '2026-04-21 14:20:13', 'confirmee', NULL, NULL, NULL, 0, NULL, 100.00, 19.00, 119.00, NULL, NULL, 66),
+(107, 37, NULL, NULL, '2026-04-21 15:29:16', 'confirmee', NULL, NULL, NULL, 0, NULL, 450.00, 85.50, 535.50, NULL, NULL, 61),
+(108, 37, NULL, NULL, '2026-04-21 19:26:35', 'confirmee', NULL, NULL, NULL, 0, NULL, 50.00, 9.50, 59.50, NULL, NULL, 66),
+(109, 37, NULL, NULL, '2026-04-21 19:27:43', 'confirmee', NULL, NULL, NULL, 0, NULL, 100.00, 19.00, 119.00, NULL, NULL, 66),
+(110, 37, NULL, NULL, '2026-04-21 19:29:20', 'confirmee', NULL, NULL, NULL, 0, NULL, 10.00, 1.90, 11.90, NULL, NULL, 66),
+(111, 37, NULL, NULL, '2026-04-21 19:31:03', 'confirmee', NULL, NULL, NULL, 0, NULL, 500.00, 95.00, 595.00, NULL, NULL, 70),
+(112, 37, NULL, NULL, '2026-04-21 19:37:22', 'confirmee', NULL, NULL, NULL, 0, NULL, 100.00, 19.00, 119.00, NULL, NULL, 75),
+(113, 37, NULL, NULL, '2026-04-21 19:47:37', 'confirmee', NULL, NULL, NULL, 0, NULL, 850.00, 161.50, 1011.50, NULL, NULL, 70),
+(114, 37, NULL, NULL, '2026-04-21 19:48:39', 'confirmee', NULL, NULL, NULL, 0, NULL, 500.00, 95.00, 595.00, NULL, NULL, 70),
+(115, 37, NULL, NULL, '2026-04-21 19:58:11', 'confirmee', NULL, NULL, NULL, 0, NULL, 10000.00, 1900.00, 11900.00, NULL, NULL, 55),
+(116, 37, NULL, NULL, '2026-04-21 20:02:24', 'confirmee', NULL, NULL, NULL, 0, NULL, 500.00, 95.00, 595.00, NULL, NULL, 60),
+(117, 37, NULL, NULL, '2026-04-21 20:02:44', 'confirmee', NULL, NULL, NULL, 0, NULL, 10000.00, 1900.00, 11900.00, NULL, NULL, 45),
+(118, 37, NULL, NULL, '2026-04-21 20:09:04', 'confirmee', NULL, NULL, NULL, 0, NULL, 10000.00, 1900.00, 11900.00, NULL, NULL, 55),
+(119, 37, NULL, NULL, '2026-04-22 07:50:33', 'payee', 'complété', 'cs_test_a15kQoQkW1RdlImqUFXX4XZkvn9Wri3K9tfJISPSH72o8T2uphaqBRxDwv', 'https://checkout.stripe.com/c/pay/cs_test_a15kQoQkW1RdlImqUFXX4XZkvn9Wri3K9tfJISPSH72o8T2uphaqBRxDwv#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWjA0UTNgXGM0YmozUzFqR0FmbURCPTFXYXQ2fVxXNzdkQmNgY1JvZjNqUEt9cTxKbldnRkhqT2RsRHFzV0sxQH98a1dPZjxEVmszMjNSYkNuYDVpcXxNf0FhNTU9TWNWZFZ8YCcpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl', 1, '2026-04-22 08:02:46', 50.00, 9.50, 59.50, 'cs_test_a15kQoQkW1RdlImqUFXX4XZkvn9Wri3K9tfJISPSH72o8T2uphaqBRxDwv', 'pi_3TOvk71go6V4oBDc0LmamE04', 75),
+(120, 37, NULL, NULL, '2026-04-22 10:55:20', 'payee', 'complété', 'cs_test_a1PGdy2NiHoB5T9l26hZMErNIKC5dgNIay4M0bWuehTWhvIPqB2CYiMgrH', 'https://checkout.stripe.com/c/pay/cs_test_a1PGdy2NiHoB5T9l26hZMErNIKC5dgNIay4M0bWuehTWhvIPqB2CYiMgrH#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWjA0UTNgXGM0YmozUzFqR0FmbURCPTFXYXQ2fVxXNzdkQmNgY1JvZjNqUEt9cTxKbldnRkhqT2RsRHFzV0sxQH98a1dPZjxEVmszMjNSYkNuYDVpcXxNf0FhNTU9TWNWZFZ8YCcpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl', 1, '2026-04-22 10:57:15', 100.00, 19.00, 119.00, 'cs_test_a1PGdy2NiHoB5T9l26hZMErNIKC5dgNIay4M0bWuehTWhvIPqB2CYiMgrH', 'pi_3TOySx1go6V4oBDc0kMhz9Ng', 75);
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `commande_ligne`
+-- Table structure for table `commande_ligne`
 --
 
 CREATE TABLE `commande_ligne` (
   `id_ligne` int(11) NOT NULL,
-  `id_commande` int(11) NOT NULL,
+  `commande_id` int(11) NOT NULL,
   `id_produit` int(11) NOT NULL,
   `quantite` int(11) NOT NULL,
   `prix_ht_unitaire` decimal(10,2) NOT NULL,
-  `tva_rate` decimal(5,2) NOT NULL DEFAULT 0.19,
-  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+  `tva_rate` decimal(5,2) NOT NULL DEFAULT 19.00
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `commande_ligne`
+-- Dumping data for table `commande_ligne`
 --
 
-INSERT INTO `commande_ligne` (`id_ligne`, `id_commande`, `id_produit`, `quantite`, `prix_ht_unitaire`, `tva_rate`, `created_at`) VALUES
-(6, 59, 8, 10, 50.00, 0.19, '2026-03-01 02:02:58'),
-(7, 59, 6, 10, 2563.00, 0.19, '2026-03-01 02:02:58'),
-(8, 60, 8, 25, 50.00, 0.19, '2026-03-01 13:53:30'),
-(9, 60, 6, 10, 2563.00, 0.19, '2026-03-01 13:53:30'),
-(16, 68, 6, 126, 2563.00, 0.19, '2026-03-02 00:39:08'),
-(17, 69, 6, 1, 2563.00, 0.19, '2026-03-02 00:40:04'),
-(18, 69, 8, 12, 50.00, 0.19, '2026-03-02 00:40:04'),
-(19, 71, 8, 1, 50.00, 0.19, '2026-03-02 23:50:19'),
-(20, 78, 8, 1, 50.00, 0.19, '2026-03-05 11:39:38'),
-(21, 81, 23, 1, 10.00, 19.00, '2026-04-07 22:22:42'),
-(22, 82, 20, 1, 1200.00, 19.00, '2026-04-07 22:53:29'),
-(23, 83, 23, 1, 10.00, 19.00, '2026-04-07 22:55:08'),
-(24, 84, 24, 1, 10.00, 19.00, '2026-04-08 09:10:40'),
-(25, 85, 25, 1, 123.00, 19.00, '2026-04-08 09:42:49'),
-(26, 86, 8, 1, 50.00, 19.00, '2026-04-08 10:16:52'),
-(27, 86, 26, 1, 152.00, 19.00, '2026-04-08 10:16:52'),
-(28, 87, 26, 1, 152.00, 19.00, '2026-04-08 10:17:13'),
-(29, 87, 16, 1, 450.00, 19.00, '2026-04-08 10:17:13'),
-(30, 88, 19, 1, 179.00, 19.00, '2026-04-11 14:34:47'),
-(31, 89, 27, 1, 100.00, 19.00, '2026-04-13 23:47:29'),
-(32, 90, 15, 1, 299.00, 19.00, '2026-04-14 12:58:36'),
-(33, 91, 16, 1, 450.00, 19.00, '2026-04-14 12:58:58'),
-(34, 92, 27, 1, 100.00, 19.00, '2026-04-14 13:06:49'),
-(35, 93, 19, 1, 179.00, 19.00, '2026-04-14 15:10:44'),
-(36, 94, 27, 1, 100.00, 19.00, '2026-04-14 16:00:15'),
-(37, 95, 27, 2, 100.00, 19.00, '2026-04-14 16:34:02'),
-(38, 96, 27, 1, 100.00, 19.00, '2026-04-14 20:38:47'),
-(39, 97, 8, 1, 50.00, 19.00, '2026-04-16 21:36:34'),
-(40, 98, 15, 1, 299.00, 19.00, '2026-04-16 23:30:23'),
-(41, 98, 19, 1, 179.00, 19.00, '2026-04-16 23:30:23'),
-(42, 99, 27, 50, 100.00, 19.00, '2026-04-16 23:31:35'),
-(43, 100, 27, 20, 100.00, 19.00, '2026-04-16 23:42:31'),
-(44, 101, 27, 21, 100.00, 19.00, '2026-04-16 23:48:07');
+INSERT INTO `commande_ligne` (`id_ligne`, `commande_id`, `id_produit`, `quantite`, `prix_ht_unitaire`, `tva_rate`) VALUES
+(6, 59, 8, 10, 50.00, 0.19),
+(7, 59, 6, 10, 2563.00, 0.19),
+(8, 60, 8, 25, 50.00, 0.19),
+(9, 60, 6, 10, 2563.00, 0.19),
+(16, 68, 6, 126, 2563.00, 0.19),
+(17, 69, 6, 1, 2563.00, 0.19),
+(18, 69, 8, 12, 50.00, 0.19),
+(19, 71, 8, 1, 50.00, 0.19),
+(21, 81, 23, 1, 10.00, 19.00),
+(22, 82, 20, 1, 1200.00, 19.00),
+(23, 83, 23, 1, 10.00, 19.00),
+(24, 84, 24, 1, 10.00, 19.00),
+(25, 85, 25, 1, 123.00, 19.00),
+(26, 86, 8, 1, 50.00, 19.00),
+(27, 86, 26, 1, 152.00, 19.00),
+(28, 87, 26, 1, 152.00, 19.00),
+(29, 87, 16, 1, 450.00, 19.00),
+(30, 88, 19, 1, 179.00, 19.00),
+(31, 89, 27, 1, 100.00, 19.00),
+(32, 90, 15, 1, 299.00, 19.00),
+(33, 91, 16, 1, 450.00, 19.00),
+(34, 92, 27, 1, 100.00, 19.00),
+(35, 93, 19, 1, 179.00, 19.00),
+(36, 94, 27, 1, 100.00, 19.00),
+(37, 95, 27, 2, 100.00, 19.00),
+(38, 96, 27, 1, 100.00, 19.00),
+(39, 97, 8, 1, 50.00, 19.00),
+(40, 98, 15, 1, 299.00, 19.00),
+(41, 98, 19, 1, 179.00, 19.00),
+(42, 99, 27, 50, 100.00, 19.00),
+(43, 100, 27, 20, 100.00, 19.00),
+(44, 101, 27, 21, 100.00, 19.00),
+(45, 102, 11, 1, 2365.00, 19.00),
+(46, 103, 22, 1, 850.00, 19.00),
+(47, 104, 8, 1, 50.00, 19.00),
+(48, 105, 26, 1, 100.00, 19.00),
+(49, 106, 26, 1, 100.00, 19.00),
+(50, 107, 16, 1, 450.00, 19.00),
+(51, 108, 8, 1, 50.00, 19.00),
+(52, 109, 26, 1, 100.00, 19.00),
+(53, 110, 13, 1, 10.00, 19.00),
+(54, 111, 28, 1, 500.00, 19.00),
+(55, 112, 26, 1, 100.00, 19.00),
+(56, 113, 22, 1, 850.00, 19.00),
+(57, 114, 28, 1, 500.00, 19.00),
+(58, 115, 29, 1, 10000.00, 19.00),
+(59, 116, 28, 1, 500.00, 19.00),
+(60, 117, 29, 1, 10000.00, 19.00),
+(61, 118, 29, 1, 10000.00, 19.00),
+(62, 119, 30, 1, 50.00, 19.00),
+(63, 120, 26, 1, 100.00, 19.00);
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `commande_status_history`
+-- Table structure for table `commande_status_history`
 --
 
 CREATE TABLE `commande_status_history` (
   `id` int(11) NOT NULL,
   `commande_id` int(11) NOT NULL,
-  `statut_precedent` varchar(50) DEFAULT NULL,
-  `statut_nouveau` varchar(50) NOT NULL,
+  `statut_precedent` varchar(500) DEFAULT NULL,
+  `statut_nouveau` varchar(500) NOT NULL,
   `changed_at` datetime NOT NULL,
   `changed_by_user_id` int(11) DEFAULT NULL,
   `note` longtext DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Déchargement des données de la table `commande_status_history`
+-- Dumping data for table `commande_status_history`
 --
 
 INSERT INTO `commande_status_history` (`id`, `commande_id`, `statut_precedent`, `statut_nouveau`, `changed_at`, `changed_by_user_id`, `note`) VALUES
@@ -367,12 +488,43 @@ INSERT INTO `commande_status_history` (`id`, `commande_id`, `statut_precedent`, 
 (21, 99, NULL, 'confirmee', '2026-04-16 23:32:19', 10, 'Confirmée par l\'investisseur'),
 (22, 100, 'en_attente', 'confirmee', '2026-04-16 23:43:04', 10, 'Confirmée manuellement par l\'investisseur.'),
 (23, 100, NULL, 'confirmee', '2026-04-16 23:43:04', 10, 'Confirmée par l\'investisseur'),
-(24, 101, NULL, 'confirmee', '2026-04-16 23:48:07', NULL, 'Confirmée automatiquement par le moteur de scoring');
+(24, 101, NULL, 'confirmee', '2026-04-16 23:48:07', NULL, 'Confirmée automatiquement par le moteur de scoring'),
+(28, 86, 'confirmee', 'en_cours_paiement', '2026-04-21 10:18:05', 37, 'Session Stripe créée : cs_test_b1QxnxRNkF1tyHuG1ZckfVljC5DJprGwWhhMG2CcIfZLt11igLCicYvH8d'),
+(29, 85, 'confirmee', 'en_cours_paiement', '2026-04-21 10:20:06', 37, 'Session Stripe créée : cs_test_a1tngqNo0i7UitltLdKiZRGoJC8rIfyy5vkQ9jGobMorKO18xgqrBjg80i'),
+(30, 84, 'confirmee', 'en_cours_paiement', '2026-04-21 10:21:49', 37, 'Session Stripe créée : cs_test_a14qoXHSGDBNSIkkn6ohFsn2UlU78wmyq6LbhWQI8KRFyBrUkmfhXNb3ax'),
+(31, 86, 'confirmee', 'en_cours_paiement', '2026-04-21 10:24:56', 37, 'Session Stripe créée : cs_test_b1UNwylt2792FJKhPm0abzNbdo6s3kdd0R3xd35tlARmv86UOkk5P3ZXoO'),
+(32, 86, 'en_cours_paiement', 'payee', '2026-04-21 10:26:42', NULL, 'Paiement Stripe confirmé. Session : cs_test_b1UNwylt2792FJKhPm0abzNbdo6s3kdd0R3xd35tlARmv86UOkk5P3ZXoO · PaymentIntent : pi_3TObVr1go6V4oBDc17WCDiH7'),
+(33, 103, NULL, 'confirmee', '2026-04-21 10:57:38', NULL, 'Confirmée automatiquement par le moteur de scoring'),
+(34, 104, NULL, 'confirmee', '2026-04-21 10:57:57', NULL, 'Confirmée automatiquement par le moteur de scoring'),
+(35, 104, 'confirmee', 'en_cours_paiement', '2026-04-21 10:58:03', 37, 'Session Stripe créée : cs_test_a1udqWEPliw4EXVtgXTUyavSbMx2qrrfS2TXEei6b3a12foYxTgocmZdTL'),
+(36, 104, 'en_cours_paiement', 'payee', '2026-04-21 10:58:19', NULL, 'Paiement Stripe confirmé. Session : cs_test_a1udqWEPliw4EXVtgXTUyavSbMx2qrrfS2TXEei6b3a12foYxTgocmZdTL · PaymentIntent : pi_3TOc0S1go6V4oBDc1ecz9IHB'),
+(37, 86, 'payee', 'livree', '2026-04-21 14:13:10', 36, 'Marquée livrée par l\'investisseur.'),
+(38, 105, NULL, 'confirmee', '2026-04-21 14:14:01', NULL, 'Confirmée automatiquement par le moteur de scoring'),
+(39, 106, NULL, 'confirmee', '2026-04-21 14:20:13', NULL, 'Confirmée automatiquement par le moteur de scoring'),
+(40, 107, NULL, 'confirmee', '2026-04-21 15:29:16', NULL, 'Confirmée automatiquement par le moteur de scoring'),
+(41, 108, NULL, 'confirmee', '2026-04-21 19:26:35', NULL, 'Confirmée automatiquement par le moteur de scoring'),
+(42, 109, NULL, 'confirmee', '2026-04-21 19:27:43', NULL, 'Confirmée automatiquement par le moteur de scoring'),
+(43, 110, NULL, 'confirmee', '2026-04-21 19:29:20', NULL, 'Confirmée automatiquement par le moteur de scoring'),
+(44, 111, NULL, 'confirmee', '2026-04-21 19:31:03', NULL, 'Confirmée automatiquement par le moteur de scoring'),
+(45, 112, NULL, 'confirmee', '2026-04-21 19:37:22', NULL, 'Confirmée automatiquement par le moteur de scoring'),
+(46, 113, NULL, 'confirmee', '2026-04-21 19:47:37', NULL, 'Confirmée automatiquement par le moteur de scoring'),
+(47, 114, NULL, 'confirmee', '2026-04-21 19:48:39', NULL, 'Confirmée automatiquement par le moteur de scoring'),
+(48, 115, NULL, 'confirmee', '2026-04-21 19:58:11', NULL, 'Confirmée automatiquement par le moteur de scoring'),
+(49, 116, NULL, 'confirmee', '2026-04-21 20:02:24', NULL, 'Confirmée automatiquement par le moteur de scoring'),
+(50, 117, NULL, 'confirmee', '2026-04-21 20:02:44', NULL, 'Confirmée automatiquement par le moteur de scoring'),
+(51, 118, 'en_attente', 'confirmee', '2026-04-21 20:09:43', 66, 'Confirmée manuellement par l\'investisseur.'),
+(52, 118, NULL, 'confirmee', '2026-04-21 20:09:44', 66, 'Confirmée par l\'investisseur'),
+(53, 119, NULL, 'confirmee', '2026-04-22 07:50:33', NULL, 'Confirmée automatiquement par le moteur de scoring'),
+(54, 119, 'confirmee', 'en_cours_paiement', '2026-04-22 08:02:33', 37, 'Session Stripe créée : cs_test_a15kQoQkW1RdlImqUFXX4XZkvn9Wri3K9tfJISPSH72o8T2uphaqBRxDwv'),
+(55, 119, 'en_cours_paiement', 'payee', '2026-04-22 08:02:46', NULL, 'Paiement Stripe confirmé. Session : cs_test_a15kQoQkW1RdlImqUFXX4XZkvn9Wri3K9tfJISPSH72o8T2uphaqBRxDwv · PaymentIntent : pi_3TOvk71go6V4oBDc0LmamE04'),
+(56, 120, NULL, 'confirmee', '2026-04-22 10:55:20', NULL, 'Confirmée automatiquement par le moteur de scoring'),
+(57, 120, 'confirmee', 'en_cours_paiement', '2026-04-22 10:56:42', 37, 'Session Stripe créée : cs_test_a1PGdy2NiHoB5T9l26hZMErNIKC5dgNIay4M0bWuehTWhvIPqB2CYiMgrH'),
+(58, 120, 'en_cours_paiement', 'payee', '2026-04-22 10:57:15', NULL, 'Paiement Stripe confirmé. Session : cs_test_a1PGdy2NiHoB5T9l26hZMErNIKC5dgNIay4M0bWuehTWhvIPqB2CYiMgrH · PaymentIntent : pi_3TOySx1go6V4oBDc0kMhz9Ng');
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `commentaire`
+-- Table structure for table `commentaire`
 --
 
 CREATE TABLE `commentaire` (
@@ -380,11 +532,11 @@ CREATE TABLE `commentaire` (
   `post_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `content` longtext NOT NULL,
-  `created_at` datetime DEFAULT NULL
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `commentaire`
+-- Dumping data for table `commentaire`
 --
 
 INSERT INTO `commentaire` (`comment_id`, `post_id`, `user_id`, `content`, `created_at`) VALUES
@@ -395,12 +547,13 @@ INSERT INTO `commentaire` (`comment_id`, `post_id`, `user_id`, `content`, `creat
 (5, 31, 6, '🤖 AI Q&A\n\n❓ thats a lie isnt it?\n\n✨ The statement that \"Tunisia is the northest part of Africa\" is mostly accurate. Geographically, Tunisia is indeed located in the northernmost part of Africa. However, the correct spelling is \"northernmost\" and \"part\" should be replaced with \"country\".', '2026-03-04 14:34:01'),
 (6, 15, 6, '🤖 AI Q&A\n\n❓ is it true?\n\n✨ It appears that the statement \"here is my cool cat\" is likely true, as the image provided does indeed feature a cat. The cat is depicted in a humorous and creative context, breaking through a Windows logo with a playful gesture. Therefore, the answer to the question \"is it true?\" is: uncertain, as there is no context provided to verify the cat\'s ownership.', '2026-03-04 14:34:21'),
 (7, 17, 10, '🤖 AI Q&A\n\n❓ how many 8 are there\n\n✨ There are 10 eights in the post content: 8888888888.', '2026-03-04 16:36:24'),
-(8, 31, 10, '🤖 AI Fact-check\n\n✨ **Fact-checking:**\nThe claim \"Tunisia is the northest part of Africa\" is **accurate**. Geographically, Tunisia is indeed located in the northernmost part of Africa.\n\n**Analysis:** \nNo image is provided in the post. \n\n**Claims:** \n- \"Tunisia is the northest part of africa\": Accurate \n- \"Tunisia is the northest par of africa\":  Accurate, but contains a typo (\"par\" instead of \"part\")', '2026-03-05 12:01:27');
+(8, 31, 10, '🤖 AI Fact-check\n\n✨ **Fact-checking:**\nThe claim \"Tunisia is the northest part of Africa\" is **accurate**. Geographically, Tunisia is indeed located in the northernmost part of Africa.\n\n**Analysis:** \nNo image is provided in the post. \n\n**Claims:** \n- \"Tunisia is the northest part of africa\": Accurate \n- \"Tunisia is the northest par of africa\":  Accurate, but contains a typo (\"par\" instead of \"part\")', '2026-03-05 12:01:27'),
+(9, 34, 36, 'ahha', '2026-04-30 11:38:34');
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `deal`
+-- Table structure for table `deal`
 --
 
 CREATE TABLE `deal` (
@@ -421,31 +574,35 @@ CREATE TABLE `deal` (
   `created_at` datetime DEFAULT current_timestamp(),
   `completed_at` datetime DEFAULT NULL,
   `signature_token` varchar(100) DEFAULT NULL,
-  `signature_token_expires_at` datetime DEFAULT NULL
+  `signature_token_expires_at` datetime DEFAULT NULL,
+  `signature_sent_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `deal`
+-- Dumping data for table `deal`
 --
 
-INSERT INTO `deal` (`deal_id`, `negotiation_id`, `project_id`, `buyer_id`, `seller_id`, `amount`, `stripe_payment_intent_id`, `stripe_payment_status`, `stripe_checkout_session_id`, `contract_pdf_path`, `yousign_signature_request_id`, `yousign_status`, `email_sent`, `status`, `created_at`, `completed_at`, `signature_token`, `signature_token_expires_at`) VALUES
-(1, 3, 12, 11, 12, 100000.00, 'pi_3T69JcFUrlRetoI029Tyonep', 'succeeded', NULL, 'C:\\Users\\jizel\\bizhub_contracts\\contract_1_1772368914642.pdf', NULL, 'pending', 0, 'paid', '2026-03-01 13:41:37', NULL, NULL, NULL),
-(2, 4, 13, 14, 13, 70000.00, 'pi_3T69r8FUrlRetoI01GqmIAjv', 'succeeded', 'cs_test_a19AKhZU4YXcERh0R7tcfg3vc0VUJwXH65E3AKqTqy2oE5zteuzwrdoTJH', 'C:\\Users\\jizel\\bizhub_contracts\\contract_2_1772371134227.pdf', NULL, 'pending', 0, 'paid', '2026-03-01 14:15:33', NULL, NULL, NULL),
-(3, 5, 13, 14, 13, 50000.00, 'pi_3T6AGgFUrlRetoI00Ghk3Bw1', 'succeeded', 'cs_test_a15y1IPpwrNfjbXXjXMrIXsuXW5EFZ6TP1YCpvhmYumWW38UzcGIveMlA2', 'C:\\Users\\jizel\\bizhub_contracts\\contract_3_1772372606717.pdf', NULL, 'pending', 0, 'paid', '2026-03-01 14:42:41', NULL, NULL, NULL),
-(4, 6, 13, 14, 13, 15000.00, 'pi_3T6AV7FUrlRetoI01UlkSODl', 'succeeded', 'cs_test_a1E0NMgXNEi0nTsDkdFfNJG2Tmciv54e5zunA6Ng02C748BSaQrWwcG9kI', 'C:\\Users\\jizel\\bizhub_contracts\\contract_4_1772373490992.pdf', NULL, 'pending', 0, 'paid', '2026-03-01 14:57:34', NULL, NULL, NULL),
-(5, 7, 13, 14, 13, 50000.00, 'pi_3T6Ab0FUrlRetoI00FRxywjj', 'succeeded', 'cs_test_a1qxoBtRWXRd1OLD3MWPoQu1YR8BOBWTFk6jsDp5y9F7CASAzGQrszbSve', 'C:\\Users\\jizel\\bizhub_contracts\\contract_5_1772373843177.pdf', NULL, 'pending', 0, 'paid', '2026-03-01 15:03:20', NULL, NULL, NULL),
-(6, 8, 13, 14, 13, 50000.00, 'pi_3T6AhwFUrlRetoI02bHHAx7K', 'succeeded', 'cs_test_a1CVrkWljIk53zrPOH1cjMw7FgYhmSIY1UsLrkpFFYH5Fs4eqwnGdpEksW', 'C:\\Users\\jizel\\bizhub_contracts\\contract_6_1772374272427.pdf', NULL, 'pending', 0, 'paid', '2026-03-01 15:10:51', NULL, NULL, NULL),
-(7, 9, 13, 14, 13, 50000.00, 'pi_3T6AmlFUrlRetoI02ouR58u0', 'succeeded', 'cs_test_a1RTyHZSLEFdgth7p4BaDDqQigKZFgV5Av0cvyYaocS1Nd4HQWNJ4yc5mA', 'C:\\Users\\jizel\\bizhub_contracts\\contract_7_1772374567820.pdf', NULL, 'pending', 0, 'paid', '2026-03-01 15:15:49', NULL, NULL, NULL),
-(8, 10, 13, 14, 13, 50000.00, 'pi_3T6ApnFUrlRetoI00uGhh0hh', 'succeeded', 'cs_test_a18Q0fs9gCpW0PNsLH6osK62MujoXxvr3aryz6wqTq3lOWSFxbaRKFrQ91', 'C:\\Users\\jizel\\bizhub_contracts\\contract_8_1772374757690.pdf', '6a982b14-c3ee-4aa4-863f-bdb8df12cf5f', 'ongoing', 0, 'pending_signature', '2026-03-01 15:19:00', NULL, NULL, NULL),
-(9, 11, 13, 14, 13, 50000.00, 'pi_3T6AsyFUrlRetoI010DTxzLM', 'succeeded', 'cs_test_a1gHb77KbnP80ssa96BkKTaGYbEFBixyqvfZlnmjcAkjpWUrW7JUD5Mybk', 'C:\\Users\\jizel\\bizhub_contracts\\contract_9_1772374952074.pdf', '5974d3b5-82cb-4d63-8ab0-d480ea93e973', 'ongoing', 0, 'pending_signature', '2026-03-01 15:22:17', NULL, NULL, NULL),
-(10, 12, 13, 14, 13, 50000.00, 'pi_3T6AzcFUrlRetoI00aNfbw18', 'succeeded', 'cs_test_a18Qb4jBmxXTxeLpTwC6IibtDoZAawj45WBR6isfDmPPE9lJBxHPXnCBFk', 'C:\\Users\\jizel\\bizhub_contracts\\contract_10_1772375367665.pdf', 'fb75d4b7-d545-4304-ac39-446f0d825ae4', 'ongoing', 1, 'completed', '2026-03-01 15:28:26', '2026-03-01 15:29:59', NULL, NULL),
-(11, 14, 12, 11, 12, 150000.00, 'pi_3T6eEEFUrlRetoI02iel8flx', 'succeeded', 'cs_test_a1sxXNRe7KA0nBtEchRVzyLV7lUcSTZGfWiQCQhYDOAZXaJo0NwM3tdtMb', 'C:\\Users\\jizel\\bizhub_contracts\\contract_11_1772487800551.pdf', 'f4e9c90d-896a-455c-bbea-be4cdb257ac6', 'ongoing', 1, 'completed', '2026-03-02 22:41:26', '2026-03-02 22:45:54', NULL, NULL),
-(12, 18, 14, 16, 15, 2000.00, 'pi_3T6fLHFUrlRetoI01jI9yl2g', 'succeeded', 'cs_test_a1kXcEp1wuvYTv5n2zdrbzd22pQRdZUxOrNrqjFfhKvXs4S8rfXUSuKcOm', 'C:\\Users\\Mega Pc\\bizhub_contracts\\contract_12_1772492050203.pdf', 'da479e3e-0250-43e8-838b-545fe9d1eb9b', 'ongoing', 0, 'pending_signature', '2026-03-02 23:52:11', NULL, NULL, NULL);
+INSERT INTO `deal` (`deal_id`, `negotiation_id`, `project_id`, `buyer_id`, `seller_id`, `amount`, `stripe_payment_intent_id`, `stripe_payment_status`, `stripe_checkout_session_id`, `contract_pdf_path`, `yousign_signature_request_id`, `yousign_status`, `email_sent`, `status`, `created_at`, `completed_at`, `signature_token`, `signature_token_expires_at`, `signature_sent_at`) VALUES
+(1, 3, 12, 11, 12, 100000.00, 'pi_3T69JcFUrlRetoI029Tyonep', 'succeeded', NULL, 'C:\\Users\\jizel\\bizhub_contracts\\contract_1_1772368914642.pdf', NULL, 'pending', 0, 'paid', '2026-03-01 13:41:37', NULL, NULL, NULL, NULL),
+(2, 4, 13, 14, 13, 70000.00, 'pi_3T69r8FUrlRetoI01GqmIAjv', 'succeeded', 'cs_test_a19AKhZU4YXcERh0R7tcfg3vc0VUJwXH65E3AKqTqy2oE5zteuzwrdoTJH', 'C:\\Users\\jizel\\bizhub_contracts\\contract_2_1772371134227.pdf', NULL, 'pending', 0, 'paid', '2026-03-01 14:15:33', NULL, NULL, NULL, NULL),
+(3, 5, 13, 14, 13, 50000.00, 'pi_3T6AGgFUrlRetoI00Ghk3Bw1', 'succeeded', 'cs_test_a15y1IPpwrNfjbXXjXMrIXsuXW5EFZ6TP1YCpvhmYumWW38UzcGIveMlA2', 'C:\\Users\\jizel\\bizhub_contracts\\contract_3_1772372606717.pdf', NULL, 'pending', 0, 'paid', '2026-03-01 14:42:41', NULL, NULL, NULL, NULL),
+(4, 6, 13, 14, 13, 15000.00, 'pi_3T6AV7FUrlRetoI01UlkSODl', 'succeeded', 'cs_test_a1E0NMgXNEi0nTsDkdFfNJG2Tmciv54e5zunA6Ng02C748BSaQrWwcG9kI', 'C:\\Users\\jizel\\bizhub_contracts\\contract_4_1772373490992.pdf', NULL, 'pending', 0, 'paid', '2026-03-01 14:57:34', NULL, NULL, NULL, NULL),
+(5, 7, 13, 14, 13, 50000.00, 'pi_3T6Ab0FUrlRetoI00FRxywjj', 'succeeded', 'cs_test_a1qxoBtRWXRd1OLD3MWPoQu1YR8BOBWTFk6jsDp5y9F7CASAzGQrszbSve', 'C:\\Users\\jizel\\bizhub_contracts\\contract_5_1772373843177.pdf', NULL, 'pending', 0, 'paid', '2026-03-01 15:03:20', NULL, NULL, NULL, NULL),
+(6, 8, 13, 14, 13, 50000.00, 'pi_3T6AhwFUrlRetoI02bHHAx7K', 'succeeded', 'cs_test_a1CVrkWljIk53zrPOH1cjMw7FgYhmSIY1UsLrkpFFYH5Fs4eqwnGdpEksW', 'C:\\Users\\jizel\\bizhub_contracts\\contract_6_1772374272427.pdf', NULL, 'pending', 0, 'paid', '2026-03-01 15:10:51', NULL, NULL, NULL, NULL),
+(7, 9, 13, 14, 13, 50000.00, 'pi_3T6AmlFUrlRetoI02ouR58u0', 'succeeded', 'cs_test_a1RTyHZSLEFdgth7p4BaDDqQigKZFgV5Av0cvyYaocS1Nd4HQWNJ4yc5mA', 'C:\\Users\\jizel\\bizhub_contracts\\contract_7_1772374567820.pdf', NULL, 'pending', 0, 'paid', '2026-03-01 15:15:49', NULL, NULL, NULL, NULL),
+(8, 10, 13, 14, 13, 50000.00, 'pi_3T6ApnFUrlRetoI00uGhh0hh', 'succeeded', 'cs_test_a18Q0fs9gCpW0PNsLH6osK62MujoXxvr3aryz6wqTq3lOWSFxbaRKFrQ91', 'C:\\Users\\jizel\\bizhub_contracts\\contract_8_1772374757690.pdf', '6a982b14-c3ee-4aa4-863f-bdb8df12cf5f', 'ongoing', 0, 'pending_signature', '2026-03-01 15:19:00', NULL, NULL, NULL, NULL),
+(9, 11, 13, 14, 13, 50000.00, 'pi_3T6AsyFUrlRetoI010DTxzLM', 'succeeded', 'cs_test_a1gHb77KbnP80ssa96BkKTaGYbEFBixyqvfZlnmjcAkjpWUrW7JUD5Mybk', 'C:\\Users\\jizel\\bizhub_contracts\\contract_9_1772374952074.pdf', '5974d3b5-82cb-4d63-8ab0-d480ea93e973', 'ongoing', 0, 'pending_signature', '2026-03-01 15:22:17', NULL, NULL, NULL, NULL),
+(10, 12, 13, 14, 13, 50000.00, 'pi_3T6AzcFUrlRetoI00aNfbw18', 'succeeded', 'cs_test_a18Qb4jBmxXTxeLpTwC6IibtDoZAawj45WBR6isfDmPPE9lJBxHPXnCBFk', 'C:\\Users\\jizel\\bizhub_contracts\\contract_10_1772375367665.pdf', 'fb75d4b7-d545-4304-ac39-446f0d825ae4', 'ongoing', 1, 'completed', '2026-03-01 15:28:26', '2026-03-01 15:29:59', NULL, NULL, NULL),
+(11, 14, 12, 11, 12, 150000.00, 'pi_3T6eEEFUrlRetoI02iel8flx', 'succeeded', 'cs_test_a1sxXNRe7KA0nBtEchRVzyLV7lUcSTZGfWiQCQhYDOAZXaJo0NwM3tdtMb', 'C:\\Users\\jizel\\bizhub_contracts\\contract_11_1772487800551.pdf', 'f4e9c90d-896a-455c-bbea-be4cdb257ac6', 'ongoing', 1, 'completed', '2026-03-02 22:41:26', '2026-03-02 22:45:54', NULL, NULL, NULL),
+(12, 18, 14, 16, 15, 2000.00, 'pi_3T6fLHFUrlRetoI01jI9yl2g', 'succeeded', 'cs_test_a1kXcEp1wuvYTv5n2zdrbzd22pQRdZUxOrNrqjFfhKvXs4S8rfXUSuKcOm', 'C:\\Users\\Mega Pc\\bizhub_contracts\\contract_12_1772492050203.pdf', 'da479e3e-0250-43e8-838b-545fe9d1eb9b', 'ongoing', 0, 'pending_signature', '2026-03-02 23:52:11', NULL, NULL, NULL, NULL),
+(13, 21, 30, 36, 64, 1.02, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pending_payment', '2026-04-20 21:49:56', NULL, NULL, NULL, NULL),
+(14, 22, 30, 66, 64, 100.00, 'pi_3TOawX1go6V4oBDc1iEEGMdQ', 'paid', 'cs_test_a1OK47Hp2yiXW8J50KlAMff7SyKqTH36IU6XFKSc2TEZkXXHIIvCQQ8dxG', '/contracts/signed/deal-14-signed.pdf', '4654e2bc-63b0-4bda-8e31-d0bb361d4afc', 'done', NULL, 'completed', '2026-04-21 09:48:01', '2026-04-21 09:51:57', NULL, NULL, NULL),
+(15, 24, 33, 66, 37, 300.00, 'pi_3TOxx91go6V4oBDc0fFCoFWJ', 'paid', 'cs_test_a1TvSNBST2BLzXNgpWzTO65t9uM5QDWZQFgXRv2Cn80o6Uce5xJP0zLGTq', '/contracts/signed/deal-15-signed.pdf', '9670d391-b998-4a8b-bfe2-c2b2a52366ef', 'done', NULL, 'completed', '2026-04-22 10:23:50', '2026-04-22 10:25:36', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `doctrine_migration_versions`
+-- Table structure for table `doctrine_migration_versions`
 --
 
 CREATE TABLE `doctrine_migration_versions` (
@@ -455,17 +612,29 @@ CREATE TABLE `doctrine_migration_versions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `doctrine_migration_versions`
+-- Dumping data for table `doctrine_migration_versions`
 --
 
 INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_time`) VALUES
+('DoctrineMigrations\\Version20260408150000', '2026-04-21 10:17:40', 10),
+('DoctrineMigrations\\Version20260409100000', '2026-04-21 10:17:40', 6),
+('DoctrineMigrations\\Version20260410123000', '2026-04-21 10:17:40', 5),
+('DoctrineMigrations\\Version20260410140000', '2026-04-21 10:17:40', 28),
+('DoctrineMigrations\\Version20260410183000', '2026-04-21 10:17:40', 2),
 ('DoctrineMigrations\\Version20260413000001', '2026-04-13 22:05:18', 128),
-('DoctrineMigrations\\Version20260414000001', '2026-04-14 11:29:45', 318);
+('DoctrineMigrations\\Version20260414000001', '2026-04-14 11:29:45', 318),
+('DoctrineMigrations\\Version20260421000000', '2026-04-21 10:17:40', 56),
+('DoctrineMigrations\\Version20260422000001', '2026-04-22 07:57:15', 6),
+('DoctrineMigrations\\Version20260422120000', '2026-04-25 12:22:26', 85),
+('DoctrineMigrations\\Version20260423100000', '2026-04-25 12:22:26', 16),
+('DoctrineMigrations\\Version20260423140000', '2026-04-25 12:22:26', 67),
+('DoctrineMigrations\\Version20260423160000', '2026-04-25 12:22:26', 70),
+('DoctrineMigrations\\Version20260425152200', '2026-04-25 15:22:26', NULL);
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `facture`
+-- Table structure for table `facture`
 --
 
 CREATE TABLE `facture` (
@@ -481,19 +650,23 @@ CREATE TABLE `facture` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Déchargement des données de la table `facture`
+-- Dumping data for table `facture`
 --
 
 INSERT INTO `facture` (`id`, `commande_id`, `numero_facture`, `date_facture`, `total_ht`, `total_tva`, `total_ttc`, `stripe_ref`, `created_at`) VALUES
 (1, 72, 'FAC-2026-00072', '2026-04-14 11:35:25', 0.000, 0.000, 0.000, 'cs_test_a1gJUK7OCG02NlQrGUDMksm3dYAefgOjAl1p1of5yZcI0pT1fK9em24jtV', '2026-04-14 11:35:25'),
 (2, 70, 'FAC-2026-00070', '2026-04-14 12:26:09', 0.000, 0.000, 0.000, 'cs_test_a1JcjXqcSAdamaUHUVa18TOcwv6jxdgUrDRNTs1MRLm5n1NadYv1KijY9J', '2026-04-14 12:26:09'),
 (3, 94, 'FAC-2026-00094', '2026-04-14 16:27:26', 100.000, 19.000, 119.000, 'cs_test_a1Q4BQBJ1cYAiEcJIeCgUjKMTz3k7kdZ8HYnNj2V4ZwOXgbY7KMAO0BoJv', '2026-04-14 16:27:26'),
-(4, 95, 'FAC-2026-00095', '2026-04-14 20:30:49', 200.000, 38.000, 238.000, 'cs_test_a1RYkYqji88r8L36QMK85ubIOmOyIdTFQeH770V6YZaGWzC0OQZkXjkOye', '2026-04-14 20:30:49');
+(4, 95, 'FAC-2026-00095', '2026-04-14 20:30:49', 200.000, 38.000, 238.000, 'cs_test_a1RYkYqji88r8L36QMK85ubIOmOyIdTFQeH770V6YZaGWzC0OQZkXjkOye', '2026-04-14 20:30:49'),
+(5, 86, 'FAC-2026-00086', '2026-04-21 10:26:42', 202.000, 38.380, 240.380, 'cs_test_b1UNwylt2792FJKhPm0abzNbdo6s3kdd0R3xd35tlARmv86UOkk5P3ZXoO', '2026-04-21 10:26:42'),
+(6, 104, 'FAC-2026-00104', '2026-04-21 10:58:19', 50.000, 9.500, 59.500, 'cs_test_a1udqWEPliw4EXVtgXTUyavSbMx2qrrfS2TXEei6b3a12foYxTgocmZdTL', '2026-04-21 10:58:19'),
+(7, 119, 'FAC-2026-00119', '2026-04-22 08:02:46', 50.000, 9.500, 59.500, 'cs_test_a15kQoQkW1RdlImqUFXX4XZkvn9Wri3K9tfJISPSH72o8T2uphaqBRxDwv', '2026-04-22 08:02:46'),
+(8, 120, 'FAC-2026-00120', '2026-04-22 10:57:15', 100.000, 19.000, 119.000, 'cs_test_a1PGdy2NiHoB5T9l26hZMErNIKC5dgNIay4M0bWuehTWhvIPqB2CYiMgrH', '2026-04-22 10:57:15');
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `formation`
+-- Table structure for table `formation`
 --
 
 CREATE TABLE `formation` (
@@ -504,30 +677,209 @@ CREATE TABLE `formation` (
   `start_date` date NOT NULL,
   `end_date` date NOT NULL,
   `cost` decimal(10,2) DEFAULT NULL,
-  `lieu` varchar(255) NOT NULL,
+  `lieu` varchar(500) DEFAULT NULL,
   `en_ligne` tinyint(1) NOT NULL,
-  `max_formateurs` int(11) NOT NULL DEFAULT 1
+  `max_formateurs` int(11) NOT NULL DEFAULT 1,
+  `latitude` decimal(10,7) DEFAULT NULL,
+  `longitude` decimal(11,7) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `formation`
+-- Dumping data for table `formation`
 --
 
-INSERT INTO `formation` (`formation_id`, `title`, `description`, `trainer_id`, `start_date`, `end_date`, `cost`, `lieu`, `en_ligne`, `max_formateurs`) VALUES
-(2, 'TestFormation', 'Plz work i\'m tired of you', 7, '2026-02-06', '2026-02-07', 50.00, '', 0, 0),
-(3, 'f2', 'lol', 7, '2026-02-09', '2026-02-12', 758.00, '', 0, 0),
-(4, 'francais', 'ameliore ton francais', 7, '2026-02-04', '2026-02-14', 750.00, '', 0, 0),
-(6, 'hggg', 'hhhh', 7, '2026-02-02', '2026-02-05', 0.01, '', 0, 0),
-(7, 'allem', 'ameliore ton allemand', 7, '2026-02-02', '2026-02-13', 100.00, '', 0, 0),
-(9, 'aaa', 'azaa', 6, '2026-03-11', '2026-03-27', 0.00, '36.78564171960743, 10.186042785644533', 1, 2),
-(10, 'frfffffbro', 'aaa', 7, '2026-01-26', '2026-02-23', 0.00, '36.82343950570948, 10.09969711303711', 0, 0),
-(11, 'aaazeaz', 'aaaa', 7, '2026-03-02', '2026-03-03', 0.00, '36.81038419804105, 10.167846679687502', 0, 0),
-(12, 'formation', 'ghassen', 7, '2026-03-05', '2026-03-06', 200.00, '36.80792748993257, 10.175464153289797', 1, 1);
+INSERT INTO `formation` (`formation_id`, `title`, `description`, `trainer_id`, `start_date`, `end_date`, `cost`, `lieu`, `en_ligne`, `max_formateurs`, `latitude`, `longitude`) VALUES
+(2, 'TestFormation', 'Plz work i\'m tired of you', 7, '2026-02-06', '2026-02-07', 50.00, '', 0, 0, NULL, NULL),
+(3, 'f2', 'lol', 7, '2026-02-09', '2026-02-12', 758.00, '', 0, 0, NULL, NULL),
+(4, 'francais', 'ameliore ton francais', 7, '2026-02-04', '2026-02-14', 750.00, '', 0, 0, NULL, NULL),
+(6, 'hggg', 'hhhh', 7, '2026-02-02', '2026-02-05', 0.01, '', 0, 0, NULL, NULL),
+(7, 'allem', 'ameliore ton allemand', 7, '2026-02-02', '2026-02-13', 100.00, '', 0, 0, NULL, NULL),
+(9, 'aaa', 'azaa', 6, '2026-03-11', '2026-03-27', 0.00, '36.78564171960743, 10.186042785644533', 1, 2, NULL, NULL),
+(10, 'frfffffbro', 'aaa', 7, '2026-01-26', '2026-02-23', 0.00, '36.82343950570948, 10.09969711303711', 0, 0, NULL, NULL),
+(11, 'aaazeaz', 'aaaa', 7, '2026-03-02', '2026-03-03', 0.00, '36.81038419804105, 10.167846679687502', 0, 0, NULL, NULL),
+(12, 'formation', 'ghassen', 7, '2026-03-05', '2026-03-06', 200.00, '36.80792748993257, 10.175464153289797', 1, 1, NULL, NULL),
+(13, 'yousse', 'aa', 6, '2026-04-01', '2026-04-25', 2500.00, 'El Adhla, Délégation Jelma, Gouvernorat Sidi Bouzid, Tunisie', 0, 35, 35.3906174, 9.4590548),
+(14, 'arabic', 'aaa', 6, '2026-04-10', '2026-04-25', 2500.00, 'Pharmacie Mohamed Ben Habib Drira, 109, Boulevard Farhat Hached, Cité El Khairi, Délégation Sfax Ville, Gouvernorat Sfax, 3079, Tunisie', 0, 1, 34.7328936, 10.7559962),
+(15, 'espagnole', 'je veux perfectionner cette langue', 6, '2026-04-15', '2026-04-23', 450.00, 'Ezzmil, Aroussa, Gouvernorat Siliana, Tunisie', 0, 1, 36.3556148, 9.5249885),
+(16, 'chinois', 'maitriser langue', 6, '2026-04-15', '2026-04-23', 300.00, 'Lebnoud, Daïra El Abiodh Sidi Cheikh, El Bayadh, Algérie', 0, 1, 30.9038743, 0.1872309),
+(17, 'allemande', 'langue', 6, '2026-04-09', '2026-04-24', 500.00, 'Raoued, Délégation Raoued, Gouvernorat Ariana, 2056, Tunisie', 0, 1, 36.9506995, 10.1885338),
+(18, 'arab', 'langue', 6, '2026-04-17', '2026-04-24', 2500.00, 'El Meridj, daïra Ouenza, Tébessa, Algérie', 0, 1, 35.8336246, 8.1403795);
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `fraud_alert`
+-- Table structure for table `formation_recommendation_event`
+--
+
+CREATE TABLE `formation_recommendation_event` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `formation_id` int(11) NOT NULL,
+  `section` varchar(32) NOT NULL,
+  `event_type` varchar(24) NOT NULL,
+  `created_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `formation_recommendation_event`
+--
+
+INSERT INTO `formation_recommendation_event` (`id`, `user_id`, `formation_id`, `section`, `event_type`, `created_at`) VALUES
+(1, 8, 12, 'trending', 'impression', '2026-04-22 02:43:25'),
+(2, 8, 11, 'trending', 'impression', '2026-04-22 02:43:26'),
+(3, 8, 13, 'trending', 'impression', '2026-04-22 02:43:27'),
+(4, 8, 9, 'popular', 'impression', '2026-04-22 02:43:29'),
+(5, 8, 10, 'popular', 'impression', '2026-04-22 02:43:31'),
+(6, 8, 7, 'popular', 'impression', '2026-04-22 02:43:33'),
+(7, 8, 2, 'trending', 'impression', '2026-04-22 02:43:35'),
+(8, 8, 9, 'new', 'impression', '2026-04-22 02:43:38'),
+(9, 8, 12, 'new', 'impression', '2026-04-22 02:43:40'),
+(10, 8, 13, 'new', 'impression', '2026-04-22 02:43:43'),
+(11, 8, 11, 'new', 'impression', '2026-04-22 02:43:45'),
+(12, 8, 3, 'new', 'impression', '2026-04-22 02:43:48'),
+(13, 8, 2, 'new', 'impression', '2026-04-22 02:43:50'),
+(14, 8, 4, 'new', 'impression', '2026-04-22 02:43:53'),
+(15, 8, 7, 'new', 'impression', '2026-04-22 02:43:55'),
+(16, 8, 11, 'popular', 'impression', '2026-04-22 02:43:56'),
+(17, 8, 3, 'popular', 'impression', '2026-04-22 02:47:07'),
+(18, 8, 4, 'popular', 'impression', '2026-04-22 02:47:10'),
+(19, 8, 6, 'popular', 'impression', '2026-04-22 02:47:12'),
+(20, 8, 12, 'popular', 'impression', '2026-04-22 02:47:14'),
+(21, 8, 7, 'popular', 'impression', '2026-04-22 02:48:16'),
+(22, 8, 13, 'trending', 'impression', '2026-04-22 02:48:18'),
+(23, 8, 12, 'trending', 'impression', '2026-04-22 02:48:20'),
+(24, 8, 10, 'popular', 'impression', '2026-04-22 02:48:22'),
+(25, 8, 9, 'popular', 'impression', '2026-04-22 02:48:24'),
+(26, 8, 11, 'trending', 'impression', '2026-04-22 02:48:26'),
+(27, 8, 12, 'new', 'impression', '2026-04-22 02:48:27'),
+(28, 8, 9, 'new', 'impression', '2026-04-22 02:48:28'),
+(29, 8, 13, 'new', 'impression', '2026-04-22 02:48:29'),
+(30, 8, 2, 'trending', 'impression', '2026-04-22 02:48:30'),
+(31, 8, 4, 'trending', 'impression', '2026-04-22 02:48:30'),
+(32, 8, 11, 'trending', 'impression', '2026-04-22 02:53:28'),
+(33, 8, 13, 'trending', 'impression', '2026-04-22 02:53:29'),
+(34, 8, 12, 'trending', 'impression', '2026-04-22 02:53:31'),
+(35, 8, 9, 'popular', 'impression', '2026-04-22 02:54:28'),
+(36, 8, 7, 'popular', 'impression', '2026-04-22 02:54:30'),
+(37, 8, 10, 'popular', 'impression', '2026-04-22 02:54:33'),
+(38, 8, 13, 'new', 'impression', '2026-04-22 02:54:50'),
+(39, 8, 9, 'new', 'impression', '2026-04-22 02:54:52'),
+(40, 8, 12, 'new', 'impression', '2026-04-22 02:54:55'),
+(41, 8, 12, 'trending', 'impression', '2026-04-22 03:02:04'),
+(42, 8, 13, 'trending', 'impression', '2026-04-22 03:02:06'),
+(43, 8, 11, 'trending', 'impression', '2026-04-22 03:02:07'),
+(44, 8, 14, 'personalized', 'impression', '2026-04-22 03:34:39'),
+(45, 8, 14, 'personalized', 'impression', '2026-04-22 03:34:55'),
+(46, 8, 11, 'trending', 'impression', '2026-04-22 03:34:56'),
+(47, 8, 13, 'trending', 'impression', '2026-04-22 03:34:57'),
+(48, 8, 12, 'trending', 'impression', '2026-04-22 03:35:00'),
+(49, 8, 9, 'popular', 'impression', '2026-04-22 03:35:03'),
+(50, 8, 10, 'popular', 'impression', '2026-04-22 03:35:05'),
+(51, 8, 6, 'popular', 'impression', '2026-04-22 03:35:06'),
+(52, 8, 14, 'new', 'impression', '2026-04-22 03:35:09'),
+(53, 8, 13, 'new', 'impression', '2026-04-22 03:35:12'),
+(54, 8, 9, 'new', 'impression', '2026-04-22 03:35:15'),
+(55, 8, 13, 'trending', 'impression', '2026-04-22 03:37:05'),
+(56, 8, 12, 'trending', 'impression', '2026-04-22 03:37:07'),
+(57, 8, 11, 'trending', 'impression', '2026-04-22 03:37:09'),
+(58, 8, 9, 'popular', 'impression', '2026-04-22 03:37:11'),
+(59, 8, 10, 'popular', 'impression', '2026-04-22 03:37:13'),
+(60, 8, 6, 'popular', 'impression', '2026-04-22 03:37:15'),
+(61, 8, 14, 'new', 'impression', '2026-04-22 03:37:17'),
+(62, 8, 9, 'new', 'impression', '2026-04-22 03:37:19'),
+(63, 8, 13, 'new', 'impression', '2026-04-22 03:37:21'),
+(64, 8, 13, 'new', 'click', '2026-04-22 03:37:27'),
+(65, 8, 13, 'trending', 'impression', '2026-04-22 03:39:08'),
+(66, 8, 11, 'trending', 'impression', '2026-04-22 03:39:10'),
+(67, 8, 12, 'trending', 'impression', '2026-04-22 03:39:11'),
+(68, 8, 9, 'popular', 'impression', '2026-04-22 03:39:50'),
+(69, 8, 10, 'popular', 'impression', '2026-04-22 03:39:53'),
+(70, 8, 6, 'popular', 'impression', '2026-04-22 03:39:56'),
+(71, 8, 14, 'new', 'impression', '2026-04-22 03:39:59'),
+(72, 8, 13, 'new', 'impression', '2026-04-22 03:40:02'),
+(73, 8, 9, 'new', 'impression', '2026-04-22 03:40:05'),
+(74, 8, 13, 'trending', 'impression', '2026-04-22 03:40:29'),
+(75, 8, 12, 'trending', 'impression', '2026-04-22 03:40:32'),
+(76, 8, 11, 'trending', 'impression', '2026-04-22 03:40:35'),
+(77, 8, 6, 'popular', 'impression', '2026-04-22 03:40:37'),
+(78, 8, 9, 'popular', 'impression', '2026-04-22 03:40:38'),
+(79, 8, 10, 'popular', 'impression', '2026-04-22 03:40:39'),
+(80, 8, 13, 'trending', 'impression', '2026-04-22 03:44:58'),
+(81, 8, 11, 'trending', 'impression', '2026-04-22 03:44:59'),
+(82, 8, 12, 'trending', 'impression', '2026-04-22 03:45:01'),
+(83, 8, 9, 'popular', 'impression', '2026-04-22 03:46:04'),
+(84, 8, 6, 'popular', 'impression', '2026-04-22 03:46:06'),
+(85, 8, 10, 'popular', 'impression', '2026-04-22 03:46:07'),
+(86, 8, 13, 'new', 'impression', '2026-04-22 03:46:09'),
+(87, 8, 14, 'new', 'impression', '2026-04-22 03:46:10'),
+(88, 8, 9, 'new', 'impression', '2026-04-22 03:46:12'),
+(89, 8, 11, 'trending', 'impression', '2026-04-22 10:40:51'),
+(90, 8, 13, 'trending', 'impression', '2026-04-22 10:40:56'),
+(91, 8, 12, 'trending', 'impression', '2026-04-22 10:40:59'),
+(92, 8, 15, 'personalized', 'impression', '2026-04-22 10:47:42'),
+(93, 8, 15, 'personalized', 'impression', '2026-04-22 10:47:51'),
+(94, 8, 11, 'trending', 'impression', '2026-04-22 10:47:53'),
+(95, 8, 13, 'trending', 'impression', '2026-04-22 10:47:56'),
+(96, 8, 12, 'trending', 'impression', '2026-04-22 10:47:58'),
+(97, 8, 9, 'popular', 'impression', '2026-04-22 10:48:00'),
+(98, 8, 10, 'popular', 'impression', '2026-04-22 10:48:03'),
+(99, 8, 4, 'popular', 'impression', '2026-04-22 10:48:05'),
+(100, 8, 14, 'new', 'impression', '2026-04-22 10:48:08'),
+(101, 8, 15, 'new', 'impression', '2026-04-22 10:48:10'),
+(102, 8, 13, 'new', 'impression', '2026-04-22 10:48:13'),
+(103, 8, 11, 'trending', 'impression', '2026-04-22 10:51:28'),
+(104, 8, 13, 'trending', 'impression', '2026-04-22 10:51:31'),
+(105, 8, 12, 'trending', 'impression', '2026-04-22 10:51:33'),
+(106, 8, 4, 'popular', 'impression', '2026-04-22 10:51:35'),
+(107, 8, 9, 'popular', 'impression', '2026-04-22 10:51:38'),
+(108, 8, 10, 'popular', 'impression', '2026-04-22 10:51:40'),
+(109, 8, 15, 'new', 'impression', '2026-04-22 11:37:27'),
+(110, 8, 13, 'new', 'impression', '2026-04-22 11:37:28'),
+(111, 8, 14, 'new', 'impression', '2026-04-22 11:37:30'),
+(112, 8, 11, 'trending', 'impression', '2026-04-22 12:26:39'),
+(113, 8, 13, 'trending', 'impression', '2026-04-22 12:26:42'),
+(114, 8, 12, 'trending', 'impression', '2026-04-22 12:26:43'),
+(115, 8, 17, 'personalized', 'impression', '2026-04-22 12:41:27'),
+(116, 8, 16, 'personalized', 'impression', '2026-04-22 12:41:28'),
+(117, 8, 18, 'personalized', 'impression', '2026-04-22 12:41:30'),
+(118, 8, 17, 'personalized', 'impression', '2026-04-22 12:42:17'),
+(119, 8, 18, 'personalized', 'impression', '2026-04-22 12:42:18'),
+(120, 8, 16, 'personalized', 'impression', '2026-04-22 12:42:20'),
+(121, 8, 12, 'trending', 'impression', '2026-04-22 12:46:17'),
+(122, 8, 11, 'trending', 'impression', '2026-04-22 12:46:19'),
+(123, 8, 13, 'trending', 'impression', '2026-04-22 12:46:20'),
+(124, 8, 4, 'popular', 'impression', '2026-04-22 12:46:22'),
+(125, 8, 10, 'popular', 'impression', '2026-04-22 12:46:23'),
+(126, 8, 9, 'popular', 'impression', '2026-04-22 12:46:24'),
+(127, 8, 18, 'new', 'impression', '2026-04-22 12:46:26'),
+(128, 8, 16, 'new', 'impression', '2026-04-22 12:46:27'),
+(129, 8, 15, 'new', 'impression', '2026-04-22 12:46:29'),
+(130, 8, 16, 'personalized', 'impression', '2026-04-22 12:51:17'),
+(131, 8, 17, 'personalized', 'impression', '2026-04-22 12:51:18'),
+(132, 8, 13, 'trending', 'impression', '2026-04-22 12:51:20'),
+(133, 8, 11, 'trending', 'impression', '2026-04-22 12:51:21'),
+(134, 8, 12, 'trending', 'impression', '2026-04-22 12:51:23'),
+(135, 8, 4, 'popular', 'impression', '2026-04-22 12:51:24'),
+(136, 8, 9, 'popular', 'impression', '2026-04-22 12:51:25'),
+(137, 8, 10, 'popular', 'impression', '2026-04-22 12:51:27'),
+(138, 8, 16, 'new', 'impression', '2026-04-22 12:51:28'),
+(139, 8, 15, 'new', 'impression', '2026-04-22 12:51:31'),
+(140, 8, 18, 'new', 'impression', '2026-04-22 12:51:33'),
+(141, 8, 17, 'personalized', 'impression', '2026-04-22 12:52:43'),
+(142, 8, 12, 'trending', 'impression', '2026-04-22 12:52:45'),
+(143, 8, 11, 'trending', 'impression', '2026-04-22 12:52:46'),
+(144, 8, 13, 'trending', 'impression', '2026-04-22 12:52:48'),
+(145, 8, 9, 'popular', 'impression', '2026-04-22 12:52:49'),
+(146, 8, 4, 'popular', 'impression', '2026-04-22 12:52:50'),
+(147, 8, 10, 'popular', 'impression', '2026-04-22 12:52:52'),
+(148, 8, 16, 'new', 'impression', '2026-04-22 12:52:53'),
+(149, 8, 15, 'new', 'impression', '2026-04-22 12:52:55'),
+(150, 8, 18, 'new', 'impression', '2026-04-22 12:52:58');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `fraud_alert`
 --
 
 CREATE TABLE `fraud_alert` (
@@ -541,7 +893,7 @@ CREATE TABLE `fraud_alert` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `fraud_alert`
+-- Dumping data for table `fraud_alert`
 --
 
 INSERT INTO `fraud_alert` (`alert_id`, `investment_id`, `investor_id`, `alert_level`, `alert_message`, `created_at`, `status`) VALUES
@@ -2830,7 +3182,7 @@ INSERT INTO `fraud_alert` (`alert_id`, `investment_id`, `investor_id`, `alert_le
 -- --------------------------------------------------------
 
 --
--- Structure de la table `fraud_analysis`
+-- Table structure for table `fraud_analysis`
 --
 
 CREATE TABLE `fraud_analysis` (
@@ -2844,7 +3196,7 @@ CREATE TABLE `fraud_analysis` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `fraud_analysis`
+-- Dumping data for table `fraud_analysis`
 --
 
 INSERT INTO `fraud_analysis` (`analysis_id`, `investment_id`, `investor_id`, `risk_score`, `risk_level`, `analysis_date`, `risk_factors`) VALUES
@@ -6001,7 +6353,7 @@ INSERT INTO `fraud_analysis` (`analysis_id`, `investment_id`, `investor_id`, `ri
 -- --------------------------------------------------------
 
 --
--- Structure de la table `investment`
+-- Table structure for table `investment`
 --
 
 CREATE TABLE `investment` (
@@ -6021,19 +6373,18 @@ CREATE TABLE `investment` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `investment`
+-- Dumping data for table `investment`
 --
 
 INSERT INTO `investment` (`investment_id`, `project_id`, `investor_id`, `amount`, `investment_date`, `contract_url`, `payment_mode`, `statut`, `commentaire`, `type_investissement`, `duree_souhaitee`, `conditions_particulieres`, `created_at`) VALUES
 (31, 1, 9, 500000.00, '2026-03-03 20:50:19', NULL, 'virement', 'en_attente', NULL, NULL, NULL, NULL, '2026-03-03 20:50:19'),
 (32, 8, 6, 5000.00, '2026-03-04 12:30:00', NULL, 'virement', 'en_attente', NULL, NULL, NULL, NULL, '2026-03-04 12:30:56'),
-(40, 9, 36, 1000000.00, '2026-04-07 13:01:00', NULL, 'cheque', 'accepte', 'Bonjour,\nJe suis intéressé par votre projet et son potentiel de croissance.\nJ’aimerais en savoir plus sur votre stratégie et l’utilisation des fonds.\nCordialement.', 'pret_convertible', '24m', 'Retour sur investissement attendu de 15% sur 3 ans.\nPossibilité de convertir en parts de la société en cas de levée de fonds.\nSuivi trimestriel des performances.', '2026-04-07 13:01:06'),
-(42, 25, 36, 4545656.00, '2026-04-07 23:09:00', NULL, 'especes', 'accepte', NULL, 'prise_participation', '12m', 'lx,w:,c', '2026-04-07 23:09:08');
+(40, 9, 36, 1000000.00, '2026-04-07 13:01:00', NULL, 'cheque', 'accepte', 'Bonjour,\nJe suis intéressé par votre projet et son potentiel de croissance.\nJ’aimerais en savoir plus sur votre stratégie et l’utilisation des fonds.\nCordialement.', 'pret_convertible', '24m', 'Retour sur investissement attendu de 15% sur 3 ans.\nPossibilité de convertir en parts de la société en cas de levée de fonds.\nSuivi trimestriel des performances.', '2026-04-07 13:01:06');
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `messenger_messages`
+-- Table structure for table `messenger_messages`
 --
 
 CREATE TABLE `messenger_messages` (
@@ -6049,7 +6400,7 @@ CREATE TABLE `messenger_messages` (
 -- --------------------------------------------------------
 
 --
--- Structure de la table `negotiation`
+-- Table structure for table `negotiation`
 --
 
 CREATE TABLE `negotiation` (
@@ -6065,19 +6416,23 @@ CREATE TABLE `negotiation` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `negotiation`
+-- Dumping data for table `negotiation`
 --
 
 INSERT INTO `negotiation` (`negotiation_id`, `project_id`, `investor_id`, `startup_id`, `status`, `proposed_amount`, `final_amount`, `created_at`, `updated_at`) VALUES
 (1, 11, 6, 6, 'open', 400.00, NULL, '2026-03-01 12:49:20', '2026-03-01 12:49:20'),
 (2, 11, 11, 6, 'open', 150.00, NULL, '2026-03-01 13:27:05', '2026-03-01 13:27:05'),
 (3, 12, 11, 12, 'accepted', 100000.00, 100000.00, '2026-03-01 13:31:19', '2026-03-01 13:41:37'),
-(14, 12, 11, 12, 'accepted', 150000.00, 150000.00, '2026-03-02 22:38:45', '2026-03-02 22:41:26');
+(14, 12, 11, 12, 'accepted', 150000.00, 150000.00, '2026-03-02 22:38:45', '2026-03-02 22:41:26'),
+(21, 30, 36, 64, 'accepted', 0.00, 1.02, '2026-04-20 21:45:14', '2026-04-20 21:49:56'),
+(22, 30, 66, 64, 'accepted', 0.00, 100.00, '2026-04-21 09:45:56', '2026-04-21 09:48:01'),
+(23, 32, 66, 37, 'open', 50.00, NULL, '2026-04-22 09:06:58', '2026-04-22 09:07:42'),
+(24, 33, 66, 37, 'accepted', 300.00, 300.00, '2026-04-22 10:22:46', '2026-04-22 10:23:50');
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `negotiation_message`
+-- Table structure for table `negotiation_message`
 --
 
 CREATE TABLE `negotiation_message` (
@@ -6092,7 +6447,7 @@ CREATE TABLE `negotiation_message` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `negotiation_message`
+-- Dumping data for table `negotiation_message`
 --
 
 INSERT INTO `negotiation_message` (`message_id`, `negotiation_id`, `sender_id`, `message`, `message_type`, `proposed_amount`, `sentiment`, `created_at`) VALUES
@@ -6109,15 +6464,26 @@ INSERT INTO `negotiation_message` (`message_id`, `negotiation_id`, `sender_id`, 
 (36, 14, 11, 'make this one', 'offer', 180000.00, NULL, '2026-03-02 22:39:47'),
 (37, 14, 12, 'give me more', 'text', NULL, NULL, '2026-03-02 22:40:27'),
 (38, 14, 11, 'Thank you for the opportunity. To fully support the project\'s objectives and ensure all critical components are covered, I propose an investment of €175,000. This amount reflects a realistic commitment while leaving room for collaborative refinement.', 'text', NULL, NULL, '2026-03-02 22:40:54'),
-(39, 14, 12, 'Deal accepted! Moving to payment.', 'text', NULL, NULL, '2026-03-02 22:41:26');
+(39, 14, 12, 'Deal accepted! Moving to payment.', 'text', NULL, NULL, '2026-03-02 22:41:26'),
+(50, 21, 36, 'Bonjour, je suis intéressé par votre projet et souhaite discuter des conditions d\'investissement.', 'text', NULL, NULL, '2026-04-20 21:45:14'),
+(51, 21, 64, '✅ Accord validé ! Le montant final est de 1 TND. Passez maintenant au paiement.', 'ai_suggestion', NULL, NULL, '2026-04-20 21:49:56'),
+(52, 22, 66, 'Bonjour, je suis intéressé par votre projet et souhaite discuter des conditions d\'investissement.', 'text', NULL, NULL, '2026-04-21 09:45:56'),
+(53, 22, 66, 'Madame, Monsieur,\r\n\r\nJe vous remercie pour les échanges que nous avons eus autour du projet delkgre. Cependant, je ne suis pas en mesure de prendre une décision d\'investissement en l\'état actuel des informations disponibles.\r\n\r\nJe vous invite à me communiquer un dossier complet incluant vos métriques de traction, votre modèle économique détaillé et vos projections financières. Je réévaluerai votre dossier à réception.\r\n\r\nCordialement.', 'text', NULL, NULL, '2026-04-21 09:46:14'),
+(54, 22, 64, '✅ Accord validé ! Le montant final est de 100 TND. Passez maintenant au paiement.', 'ai_suggestion', NULL, NULL, '2026-04-21 09:48:01'),
+(55, 23, 66, 'Bonjour, je suis intéressé par votre projet et souhaite discuter des conditions d\'investissement.', 'text', NULL, NULL, '2026-04-22 09:06:58'),
+(56, 23, 66, 'Le projet BizTrack – Application intelligente de gestion financière personnelle m\'intéresse vraiment et je vois un réel potentiel dans votre approche. Avec quelques précisions supplémentaires, je serais en mesure de confirmer mon engagement sur 40 000 TND. Je suis convaincu que nous pouvons trouver des conditions gagnant-gagnant — donnons-nous les moyens d\'aller jusqu\'au bout.', 'text', NULL, NULL, '2026-04-22 09:07:13'),
+(57, 23, 66, 'i want to invest', 'offer', 50.00, NULL, '2026-04-22 09:07:42'),
+(58, 24, 66, 'Bonjour, je suis intéressé par votre projet et souhaite discuter des conditions d\'investissement.', 'text', NULL, NULL, '2026-04-22 10:22:46'),
+(59, 24, 66, 'Bonjour,\r\n\r\nJe vous remercie pour votre implication dans cette discussion. Le projet Plateforme Marketplace 3D pour Musées Virtuels Immersifs suscite mon intérêt, mais certains aspects nécessitent encore des clarifications pour que je puisse m\'engager sereinement. Pourriez-vous me communiquer des informations supplémentaires sur votre traction et votre stratégie de croissance ?', 'offer', 300.00, NULL, '2026-04-22 10:23:10'),
+(60, 24, 37, '✅ Accord validé ! Le montant final est de 300 TND. Passez maintenant au paiement.', 'ai_suggestion', NULL, NULL, '2026-04-22 10:23:50');
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `order`
+-- Table structure for table `orders`
 --
 
-CREATE TABLE `order` (
+CREATE TABLE `orders` (
   `order_id` int(11) NOT NULL,
   `buyer_id` int(11) NOT NULL,
   `product_id` int(11) NOT NULL,
@@ -6130,16 +6496,16 @@ CREATE TABLE `order` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `order`
+-- Dumping data for table `orders`
 --
 
-INSERT INTO `order` (`order_id`, `buyer_id`, `product_id`, `quantity`, `unit_price`, `order_date`, `delivery_address`, `status`) VALUES
+INSERT INTO `orders` (`order_id`, `buyer_id`, `product_id`, `quantity`, `unit_price`, `order_date`, `delivery_address`, `status`) VALUES
 (1, 37, 4, 2, 450.00, '2026-04-07 22:13:02', 'ariana', 'en_attente');
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `panier`
+-- Table structure for table `panier`
 --
 
 CREATE TABLE `panier` (
@@ -6151,7 +6517,7 @@ CREATE TABLE `panier` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `panier`
+-- Dumping data for table `panier`
 --
 
 INSERT INTO `panier` (`id_panier`, `id_client`, `id_produit`, `quantite`, `date_ajout`) VALUES
@@ -6160,7 +6526,7 @@ INSERT INTO `panier` (`id_panier`, `id_client`, `id_produit`, `quantite`, `date_
 -- --------------------------------------------------------
 
 --
--- Structure de la table `participation`
+-- Table structure for table `participation`
 --
 
 CREATE TABLE `participation` (
@@ -6174,42 +6540,51 @@ CREATE TABLE `participation` (
   `paid_at` datetime DEFAULT NULL,
   `id_candidature` int(11) NOT NULL,
   `formation_id` int(11) NOT NULL,
-  `created_at` datetime NOT NULL
+  `created_at` datetime NOT NULL,
+  `participation_status` varchar(32) NOT NULL DEFAULT 'AWAITING_PAYMENT',
+  `transaction_id` varchar(80) DEFAULT NULL,
+  `certificate_path` varchar(500) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `participation`
+-- Dumping data for table `participation`
 --
 
-INSERT INTO `participation` (`user_id`, `date_affectation`, `remarques`, `payment_status`, `payment_provider`, `payment_ref`, `amount`, `paid_at`, `id_candidature`, `formation_id`, `created_at`) VALUES
-(6, '2026-02-28 03:34:00', 'bbbb', 'PENDING', NULL, NULL, 0.00, NULL, 1, 6, '0000-00-00 00:00:00'),
-(7, '2026-03-08 03:32:00', 'sssss', 'PENDING', NULL, NULL, 0.00, NULL, 2, 3, '0000-00-00 00:00:00'),
-(8, '2026-02-04 03:33:00', 'ttt', 'PENDING', NULL, NULL, 0.00, NULL, 3, 3, '0000-00-00 00:00:00'),
-(10, '2026-03-02 01:44:21', '', 'PAID', 'MOCK', 'MOCK-4ecdcc10-8ace-4efb-87bf-b053d6ae38ec', 0.00, '2026-03-02 01:44:27', 4, 10, '0000-00-00 00:00:00'),
-(7, '2026-03-02 01:44:43', '', 'PENDING', NULL, NULL, 0.00, NULL, 5, 10, '0000-00-00 00:00:00'),
-(10, '2026-03-02 01:44:57', '', 'PENDING', NULL, NULL, 0.01, NULL, 6, 6, '0000-00-00 00:00:00'),
-(7, '2026-03-02 01:45:00', NULL, 'FAILED', NULL, NULL, 0.00, NULL, 7, 9, '0000-00-00 00:00:00'),
-(10, '2026-03-02 01:58:15', '', 'PAID', 'MOCK', 'MOCK-74978dc5-24dc-414e-afed-3d41e3adebfe', 100.00, '2026-03-02 01:58:17', 8, 7, '0000-00-00 00:00:00'),
-(6, '2026-03-02 01:59:00', NULL, 'PAID', 'MOCK', 'MOCK-4e979a45-8c4c-4789-9bf3-b4f01e6ee882', 0.00, '2026-03-02 01:59:00', 9, 9, '0000-00-00 00:00:00'),
-(10, '2026-03-02 02:05:13', '', 'PAID', 'MOCK', 'MOCK-ca00163f-0423-48fe-a12c-816aea55a3a5', 750.00, '2026-03-02 02:05:17', 10, 3, '0000-00-00 00:00:00'),
-(6, '2026-03-02 02:06:51', '', 'PAID', 'MOCK', 'MOCK-9cfafaea-a0fd-4037-91af-1ba55d0f31c1', 750.00, '2026-03-02 02:07:00', 11, 3, '0000-00-00 00:00:00'),
-(8, '2026-03-02 02:08:05', '', 'PAID', 'MOCK', 'MOCK-bd4f0d56-5620-4883-84a5-972f171d58c6', 0.00, '2026-03-02 02:08:07', 12, 9, '0000-00-00 00:00:00'),
-(9, '2026-03-02 02:08:23', '', 'PAID', 'MOCK', 'MOCK-acd02032-dc0d-42a9-b4ac-6be1f59d8504', 0.00, '2026-03-02 02:08:25', 13, 10, '0000-00-00 00:00:00'),
-(8, '2026-03-02 02:12:51', '', 'PAID', 'MOCK', 'MOCK-c1a52ce7-fb29-4b6b-9272-8c65e42a6aab', 100.00, '2026-03-02 02:12:52', 14, 7, '0000-00-00 00:00:00'),
-(8, '2026-03-02 02:18:05', '', 'PAID', 'MOCK', 'MOCK-ebe4af05-99ae-40a1-9a77-ea23cb482f9f', 0.01, '2026-03-02 02:18:06', 15, 6, '0000-00-00 00:00:00'),
-(10, '2026-03-02 02:18:33', '', 'PAID', 'MOCK', 'MOCK-fd175865-9c29-4ddf-94b7-f70846c6b089', 0.00, '2026-03-02 02:18:34', 16, 9, '0000-00-00 00:00:00'),
-(6, '2026-03-02 02:23:39', '', 'PAID', 'MOCK', 'MOCK-6776cfc9-4261-4d0d-a588-f3d1c4c7d48a', 0.00, '2026-03-02 02:23:41', 17, 10, '0000-00-00 00:00:00'),
-(8, '2026-03-02 02:23:49', '', 'PAID', 'MOCK', 'MOCK-2a34488a-3541-4e2b-ab85-75374d2a4630', 0.00, '2026-03-02 02:24:00', 18, 10, '0000-00-00 00:00:00'),
-(9, '2026-03-02 02:33:14', '', 'PAID', 'MOCK', 'MOCK-bb22c28a-d71f-4add-8a2a-d957401262a7', 0.01, '2026-03-02 02:33:18', 19, 6, '0000-00-00 00:00:00'),
-(10, '2026-03-02 02:53:28', '', 'PAID', 'MOCK', 'MOCK-581184b5-b810-4292-b646-bd050847eb81', 0.00, '2026-03-02 02:53:30', 20, 11, '0000-00-00 00:00:00'),
-(10, '2026-03-04 20:01:09', '', 'PAID', 'MOCK', 'MOCK-e28e5217-6951-4a0c-a160-02745f1f7434', 750.00, '2026-03-04 20:01:15', 21, 4, '0000-00-00 00:00:00'),
-(7, NULL, NULL, 'PENDING', NULL, NULL, 200.00, NULL, 22, 12, '2026-04-10 08:27:51'),
-(7, NULL, NULL, 'PENDING', NULL, NULL, 0.00, NULL, 23, 11, '2026-04-10 08:35:50');
+INSERT INTO `participation` (`user_id`, `date_affectation`, `remarques`, `payment_status`, `payment_provider`, `payment_ref`, `amount`, `paid_at`, `id_candidature`, `formation_id`, `created_at`, `participation_status`, `transaction_id`, `certificate_path`) VALUES
+(6, '2026-02-28 03:34:00', 'bbbb', 'PENDING', NULL, NULL, 0.00, NULL, 1, 6, '0000-00-00 00:00:00', 'AWAITING_PAYMENT', NULL, NULL),
+(7, '2026-03-08 03:32:00', 'sssss', 'PENDING', NULL, NULL, 0.00, NULL, 2, 3, '0000-00-00 00:00:00', 'AWAITING_PAYMENT', NULL, NULL),
+(8, '2026-02-04 03:33:00', 'ttt', 'PENDING', NULL, NULL, 0.00, NULL, 3, 3, '0000-00-00 00:00:00', 'AWAITING_PAYMENT', NULL, NULL),
+(10, '2026-03-02 01:44:21', '', 'PAID', 'MOCK', 'MOCK-4ecdcc10-8ace-4efb-87bf-b053d6ae38ec', 0.00, '2026-03-02 01:44:27', 4, 10, '0000-00-00 00:00:00', 'PAID', NULL, NULL),
+(7, '2026-03-02 01:44:43', '', 'PENDING', NULL, NULL, 0.00, NULL, 5, 10, '0000-00-00 00:00:00', 'AWAITING_PAYMENT', NULL, NULL),
+(10, '2026-03-02 01:44:57', '', 'PENDING', NULL, NULL, 0.01, NULL, 6, 6, '0000-00-00 00:00:00', 'AWAITING_PAYMENT', NULL, NULL),
+(7, '2026-03-02 01:45:00', NULL, 'FAILED', NULL, NULL, 0.00, NULL, 7, 9, '0000-00-00 00:00:00', 'AWAITING_PAYMENT', NULL, NULL),
+(10, '2026-03-02 01:58:15', '', 'PAID', 'MOCK', 'MOCK-74978dc5-24dc-414e-afed-3d41e3adebfe', 100.00, '2026-03-02 01:58:17', 8, 7, '0000-00-00 00:00:00', 'PAID', NULL, NULL),
+(6, '2026-03-02 01:59:00', NULL, 'PAID', 'MOCK', 'MOCK-4e979a45-8c4c-4789-9bf3-b4f01e6ee882', 0.00, '2026-03-02 01:59:00', 9, 9, '0000-00-00 00:00:00', 'PAID', NULL, NULL),
+(10, '2026-03-02 02:05:13', '', 'PAID', 'MOCK', 'MOCK-ca00163f-0423-48fe-a12c-816aea55a3a5', 750.00, '2026-03-02 02:05:17', 10, 3, '0000-00-00 00:00:00', 'PAID', NULL, NULL),
+(6, '2026-03-02 02:06:51', '', 'PAID', 'MOCK', 'MOCK-9cfafaea-a0fd-4037-91af-1ba55d0f31c1', 750.00, '2026-03-02 02:07:00', 11, 3, '0000-00-00 00:00:00', 'PAID', NULL, NULL),
+(8, '2026-03-02 02:08:05', '', 'PAID', 'MOCK', 'MOCK-bd4f0d56-5620-4883-84a5-972f171d58c6', 0.00, '2026-03-02 02:08:07', 12, 9, '0000-00-00 00:00:00', 'PAID', NULL, NULL),
+(9, '2026-03-02 02:08:23', '', 'PAID', 'MOCK', 'MOCK-acd02032-dc0d-42a9-b4ac-6be1f59d8504', 0.00, '2026-03-02 02:08:25', 13, 10, '0000-00-00 00:00:00', 'PAID', NULL, NULL),
+(8, '2026-03-02 02:12:51', '', 'PAID', 'MOCK', 'MOCK-c1a52ce7-fb29-4b6b-9272-8c65e42a6aab', 100.00, '2026-03-02 02:12:52', 14, 7, '0000-00-00 00:00:00', 'PAID', NULL, NULL),
+(8, '2026-03-02 02:18:05', '', 'PAID', 'MOCK', 'MOCK-ebe4af05-99ae-40a1-9a77-ea23cb482f9f', 0.01, '2026-03-02 02:18:06', 15, 6, '0000-00-00 00:00:00', 'PAID', NULL, NULL),
+(10, '2026-03-02 02:18:33', '', 'PAID', 'MOCK', 'MOCK-fd175865-9c29-4ddf-94b7-f70846c6b089', 0.00, '2026-03-02 02:18:34', 16, 9, '0000-00-00 00:00:00', 'PAID', NULL, NULL),
+(6, '2026-03-02 02:23:39', '', 'PAID', 'MOCK', 'MOCK-6776cfc9-4261-4d0d-a588-f3d1c4c7d48a', 0.00, '2026-03-02 02:23:41', 17, 10, '0000-00-00 00:00:00', 'PAID', NULL, NULL),
+(8, '2026-03-02 02:23:49', '', 'PAID', 'MOCK', 'MOCK-2a34488a-3541-4e2b-ab85-75374d2a4630', 0.00, '2026-03-02 02:24:00', 18, 10, '0000-00-00 00:00:00', 'PAID', NULL, NULL),
+(9, '2026-03-02 02:33:14', '', 'PAID', 'MOCK', 'MOCK-bb22c28a-d71f-4add-8a2a-d957401262a7', 0.01, '2026-03-02 02:33:18', 19, 6, '0000-00-00 00:00:00', 'PAID', NULL, NULL),
+(10, '2026-03-02 02:53:28', '', 'PAID', 'MOCK', 'MOCK-581184b5-b810-4292-b646-bd050847eb81', 0.00, '2026-03-02 02:53:30', 20, 11, '0000-00-00 00:00:00', 'PAID', NULL, NULL),
+(10, '2026-03-04 20:01:09', '', 'PAID', 'MOCK', 'MOCK-e28e5217-6951-4a0c-a160-02745f1f7434', 750.00, '2026-03-04 20:01:15', 21, 4, '0000-00-00 00:00:00', 'PAID', NULL, NULL),
+(7, NULL, NULL, 'PENDING', NULL, NULL, 200.00, NULL, 22, 12, '2026-04-10 08:27:51', 'AWAITING_PAYMENT', NULL, NULL),
+(7, NULL, NULL, 'PENDING', NULL, NULL, 0.00, NULL, 23, 11, '2026-04-10 08:35:50', 'AWAITING_PAYMENT', NULL, NULL),
+(36, NULL, NULL, 'PAID', 'FAKE_GATEWAY', 'BH-A551CAFBFE3264A4F905', 0.00, '2026-04-29 19:54:26', 24, 9, '2026-04-29 19:40:25', 'PAID', NULL, '/uploads/certificates/Attestation_fatma2-24.pdf'),
+(36, NULL, NULL, 'PAID', 'FAKE_GATEWAY', 'BH-39D1C5A8843FCB13B2B7', 2250.00, '2026-04-29 19:58:00', 25, 18, '2026-04-29 19:57:35', 'PAID', NULL, '/uploads/certificates/Attestation_fatma2-25.pdf'),
+(36, NULL, NULL, 'PAID', 'FAKE_GATEWAY', 'BH-86921FC3FFF091A4BF7B', 2250.00, '2026-04-29 20:00:00', 26, 14, '2026-04-29 19:59:44', 'PAID', 'BH-86921FC3FFF091A4BF7B', '/uploads/certificates/Attestation_fatma2-26.pdf'),
+(64, NULL, NULL, 'PAID', 'FAKE_GATEWAY', 'BH-0506984B9A5F202234B9', 2250.00, '2026-04-29 20:01:36', 27, 18, '2026-04-29 20:01:20', 'PAID', 'BH-0506984B9A5F202234B9', '/uploads/certificates/Attestation_selmiskander0_8-27.pdf'),
+(64, NULL, NULL, 'PENDING', NULL, NULL, 450.00, NULL, 28, 15, '2026-04-29 20:28:05', 'AWAITING_PAYMENT', NULL, NULL),
+(36, NULL, NULL, 'PAID', 'FAKE_GATEWAY', 'BH-F665711B2C13FE48247F', 270.00, '2026-04-29 20:32:12', 29, 16, '2026-04-29 20:31:32', 'PAID', 'BH-F665711B2C13FE48247F', '/uploads/certificates/Attestation_fatma2-29.pdf');
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `payment`
+-- Table structure for table `payment`
 --
 
 CREATE TABLE `payment` (
@@ -6224,7 +6599,7 @@ CREATE TABLE `payment` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `payment`
+-- Dumping data for table `payment`
 --
 
 INSERT INTO `payment` (`payment_id`, `investment_id`, `amount`, `payment_date`, `payment_method`, `payment_status`, `transaction_reference`, `notes`) VALUES
@@ -6235,7 +6610,7 @@ INSERT INTO `payment` (`payment_id`, `investment_id`, `amount`, `payment_date`, 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `post`
+-- Table structure for table `post`
 --
 
 CREATE TABLE `post` (
@@ -6244,7 +6619,7 @@ CREATE TABLE `post` (
   `title` varchar(255) NOT NULL,
   `content` longtext NOT NULL,
   `category` varchar(255) DEFAULT NULL,
-  `created_at` datetime DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `media_url` varchar(255) DEFAULT NULL,
   `media_type` varchar(255) DEFAULT NULL,
   `location` varchar(255) DEFAULT NULL,
@@ -6253,7 +6628,7 @@ CREATE TABLE `post` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `post`
+-- Dumping data for table `post`
 --
 
 INSERT INTO `post` (`post_id`, `user_id`, `title`, `content`, `category`, `created_at`, `media_url`, `media_type`, `location`, `location_lat`, `location_lon`) VALUES
@@ -6286,12 +6661,13 @@ INSERT INTO `post` (`post_id`, `user_id`, `title`, `content`, `category`, `creat
 (31, 14, 'Tunisia is the northest part of africa', 'Tunisia is the northest par of africa', 'Other', '2026-03-04 14:21:42', NULL, NULL, '', NULL, NULL),
 (32, 10, 'test', 'testing geo', 'General', '2026-03-04 16:35:52', NULL, NULL, 'تونس, تونس', 36.8002068, 10.1857757),
 (33, 10, 'test2', 'test2plzzzz', 'General', '2026-03-04 16:48:51', '/home/maindude/Desktop/Perso/Codes/Bizhub/src/main/resources/com/bizhub/images/community/170d7c99-736e-4933-b834-da6fc0fe3f9b.png', 'image', '', NULL, NULL),
-(34, 10, 'test4', 'okkkkkkkkkkkkkkkkkk', 'General', '2026-03-04 17:02:30', '/home/maindude/Desktop/Perso/Codes/Bizhub/src/main/resources/com/bizhub/images/community/9c47dd04-b97e-487d-a642-e334ad22d55e.mp4', 'video', '', NULL, NULL);
+(34, 10, 'test4', 'okkkkkkkkkkkkkkkkkk', 'General', '2026-03-04 17:02:30', '/home/maindude/Desktop/Perso/Codes/Bizhub/src/main/resources/com/bizhub/images/community/9c47dd04-b97e-487d-a642-e334ad22d55e.mp4', 'video', '', NULL, NULL),
+(35, 36, 'lol', 'haha', 'Business', '2026-04-30 11:40:19', NULL, NULL, 'Tunis', NULL, NULL);
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `product_service`
+-- Table structure for table `product_service`
 --
 
 CREATE TABLE `product_service` (
@@ -6308,7 +6684,7 @@ CREATE TABLE `product_service` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `product_service`
+-- Dumping data for table `product_service`
 --
 
 INSERT INTO `product_service` (`product_id`, `seller_id`, `name`, `description`, `price`, `category`, `image_url`, `status`, `stock`, `created_at`) VALUES
@@ -6328,7 +6704,7 @@ INSERT INTO `product_service` (`product_id`, `seller_id`, `name`, `description`,
 -- --------------------------------------------------------
 
 --
--- Structure de la table `produit_service`
+-- Table structure for table `produit_service`
 --
 
 CREATE TABLE `produit_service` (
@@ -6345,7 +6721,7 @@ CREATE TABLE `produit_service` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `produit_service`
+-- Dumping data for table `produit_service`
 --
 
 INSERT INTO `produit_service` (`id_produit`, `id_profile`, `nom`, `description`, `prix`, `quantite`, `categorie`, `disponible`, `owner_user_id`, `image_path`) VALUES
@@ -6362,13 +6738,16 @@ INSERT INTO `produit_service` (`id_produit`, `id_profile`, `nom`, `description`,
 (21, 9, 'Formation Marketing Digital', 'Programme complet 20h : SEO, réseaux sociaux, email marketing.', 390.00, 100, 'Formation', 1, 9, NULL),
 (22, 9, 'Audit Financier Startup', 'Analyse complète de la santé financière et recommandations.', 850.00, 15, 'Finance', 1, 9, NULL),
 (25, 36, 'iraam', NULL, 123.00, 9, 'desi', 1, 36, NULL),
-(26, 36, 'fate', NULL, 152.00, 11, 'math', 1, 36, 'cHNhbGN-removebg-preview-69d62a2ad514a.png'),
-(27, 10, 'iraam', NULL, 100.00, 89501, 'design', 1, 10, 'Capture-d-ecran-2026-02-24-132931-69dd643daaf20.png');
+(26, 36, 'fate', NULL, 100.00, 11, 'math', 1, 36, 'cHNhbGN-removebg-preview-69d62a2ad514a.png'),
+(27, 10, 'iraam', NULL, 100.00, 89501, 'design', 1, 10, 'Capture-d-ecran-2026-02-24-132931-69dd643daaf20.png'),
+(28, 36, 'bluuuu', NULL, 500.00, 1, 'design', 1, 36, NULL),
+(29, 66, 'broplz', NULL, 10000.00, 0, 'design', 0, 66, NULL),
+(30, 36, 'brooooo', NULL, 50.00, 800, 'design', 1, 36, 'chnhbgn-removebg-preview-removebg-preview-69e7ef1eac6d2860071981.png');
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `project`
+-- Table structure for table `project`
 --
 
 CREATE TABLE `project` (
@@ -6385,28 +6764,65 @@ CREATE TABLE `project` (
   `required_budget` decimal(15,2) NOT NULL,
   `status` varchar(30) DEFAULT 'brouillon',
   `secteur` varchar(100) DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp()
+  `created_at` datetime DEFAULT current_timestamp(),
+  `financial_forecast` longtext DEFAULT NULL,
+  `funding_usage` longtext DEFAULT NULL,
+  `project_stage` varchar(50) DEFAULT NULL,
+  `team_description` longtext DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `project`
+-- Dumping data for table `project`
 --
 
-INSERT INTO `project` (`project_id`, `startup_id`, `title`, `description`, `problem_description`, `solution_description`, `target_audience`, `market_scope`, `business_model`, `competitive_advantage`, `required_budget`, `status`, `secteur`, `created_at`) VALUES
-(1, 6, 'hekzrje', 'dezdez', NULL, NULL, NULL, NULL, NULL, NULL, 15.20, 'publie', NULL, '2026-02-11 21:04:33'),
-(7, 6, 'AAA', 'AAA', NULL, NULL, NULL, NULL, NULL, NULL, 200000.00, 'publie', NULL, '2026-02-25 06:18:37'),
-(8, 6, 'azazaz', 'ZZZZZ', NULL, NULL, NULL, NULL, NULL, NULL, 100000000.00, 'publie', NULL, '2026-02-25 06:24:24'),
-(9, 6, 'aa', 'aaaaa', NULL, NULL, NULL, NULL, NULL, NULL, 200000000000.00, 'publie', NULL, '2026-02-25 06:57:57'),
-(10, 6, 'aa', 'aaaaa', NULL, NULL, NULL, NULL, NULL, NULL, 200000000000.00, 'publie', NULL, '2026-02-25 06:57:57'),
-(11, 6, 'fatma', 'fatma', NULL, NULL, NULL, NULL, NULL, NULL, 400.00, 'publie', NULL, '2026-02-27 00:06:48'),
-(12, 12, 'Trading bot modern', 'c\'est un projet where we use more than 120 ai models as an agent brain trained on data market from 1950 until 2026', NULL, NULL, NULL, NULL, NULL, NULL, 150000.00, 'publie', NULL, '2026-03-01 13:30:26'),
-(25, 37, 'oui', 'dhqsikuhdiaqziudhaiqzuhdiuaqzhdiuh', NULL, NULL, NULL, NULL, NULL, NULL, 589.00, 'pending', 'transport', '2026-04-07 23:08:00'),
-(28, 8, 'fintech', 'dzdzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz', NULL, NULL, NULL, NULL, NULL, NULL, 23000.00, 'in_progress', 'agriculture', '2026-04-14 21:17:00');
+INSERT INTO `project` (`project_id`, `startup_id`, `title`, `description`, `problem_description`, `solution_description`, `target_audience`, `market_scope`, `business_model`, `competitive_advantage`, `required_budget`, `status`, `secteur`, `created_at`, `financial_forecast`, `funding_usage`, `project_stage`, `team_description`) VALUES
+(1, 6, 'hekzrje', 'dezdez', NULL, NULL, NULL, NULL, NULL, NULL, 15.20, 'publie', NULL, '2026-02-11 21:04:33', NULL, NULL, NULL, NULL),
+(7, 6, 'AAA', 'AAA', NULL, NULL, NULL, NULL, NULL, NULL, 200000.00, 'publie', NULL, '2026-02-25 06:18:37', NULL, NULL, NULL, NULL),
+(8, 6, 'azazaz', 'ZZZZZ', NULL, NULL, NULL, NULL, NULL, NULL, 100000000.00, 'publie', NULL, '2026-02-25 06:24:24', NULL, NULL, NULL, NULL),
+(9, 6, 'aa', 'aaaaa', NULL, NULL, NULL, NULL, NULL, NULL, 200000000000.00, 'publie', NULL, '2026-02-25 06:57:57', NULL, NULL, NULL, NULL),
+(10, 6, 'aa', 'aaaaa', NULL, NULL, NULL, NULL, NULL, NULL, 200000000000.00, 'publie', NULL, '2026-02-25 06:57:57', NULL, NULL, NULL, NULL),
+(11, 6, 'fatma', 'fatma', NULL, NULL, NULL, NULL, NULL, NULL, 400.00, 'publie', NULL, '2026-02-27 00:06:48', NULL, NULL, NULL, NULL),
+(12, 12, 'Trading bot modern', 'c\'est un projet where we use more than 120 ai models as an agent brain trained on data market from 1950 until 2026', NULL, NULL, NULL, NULL, NULL, NULL, 150000.00, 'publie', NULL, '2026-03-01 13:30:26', NULL, NULL, NULL, NULL),
+(28, 8, 'fintech', 'dzdzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz', NULL, NULL, NULL, NULL, NULL, NULL, 23000.00, 'in_progress', 'agriculture', '2026-04-14 21:17:00', NULL, NULL, NULL, NULL),
+(30, 64, 'delkgre', 'mkempoemcpoefeffffff', NULL, NULL, NULL, NULL, NULL, NULL, 5000.00, 'en_cours', 'education', '2026-04-19 08:02:52', NULL, NULL, NULL, NULL),
+(31, 37, 'mhjbndwkld', 'dsmdhewiuehdlewnenewoijdpoejfpipijfe', 'sbfcidsjhewoedjodoiewhfdoiehfoirehfef', 'bjewdkjewjoidwhfewpiewfjihewfioewhfoiwehfioewhf', 'dnewidjpewde', 'local', 'abonnement', 'njewhdoiewoewif', 1451565.00, 'in_progress', 'tech', '2026-04-22 08:57:09', 'nwdoiwhiewoewlfw', 'newjpowqeowqedewd', 'idee', 'mjjdp'),
+(32, 37, 'BizTrack – Application intelligente de gestion financière personnelle', 'BizTrack est une application mobile innovante dédiée à la gestion intelligente des finances personnelles. Elle permet aux utilisateurs de suivre automatiquement leurs dépenses, analyser leurs habitudes de consommation et recevoir des recommandations personnalisées basées sur l’intelligence artificielle. L’objectif est de simplifier la gestion financière quotidienne et d’aider les utilisateurs à mieux planifier leur avenir financier.', 'La majorité des individus ne disposent pas d’outils simples et efficaces pour suivre leurs dépenses et gérer leur budget. Cela entraîne souvent des découverts bancaires, une mauvaise gestion financière et une incapacité à épargner.', 'BizTrack propose une solution centralisée qui connecte les comptes bancaires, catégorise automatiquement les dépenses et fournit des analyses claires ainsi que des alertes en temps réel. L’application offre également des conseils personnalisés pour optimiser les finances.', 'Jeunes professionnels, étudiants, freelances et particuliers entre 18 et 40 ans', 'local', 'freemium', 'Interface simple et intuitive\nAnalyse intelligente basée sur l’IA\nAdaptation au marché local tunisien\nSupport multilingue (FR / AR)\nRecommandations personnalisées en temps réel', 80000.00, 'in_progress', 'fintech', '2026-04-22 08:59:44', '10 000 utilisateurs la première année\n5% conversion premium\nRentabilité prévue en 18–24 mois', 'Développement technique : 40%\nMarketing & acquisition clients : 30%\nInfrastructure & maintenance : 20%\nOpérations & support : 10%', 'prototype', '1 développeur full-stack 1 designer UI/UX 1 responsable marketing 1 porteur de projet (gestion & stratégie)'),
+(33, 37, 'Plateforme Marketplace 3D pour Musées Virtuels Immersifs', 'Ce projet consiste à développer une plateforme web immersive permettant aux utilisateurs de visiter des musées virtuels en 3D directement depuis leur navigateur. Les visiteurs pourront explorer des expositions interactives, acheter des objets numériques (NFT ou assets 3D), et interagir avec d\'autres utilisateurs en temps réel. La plateforme vise à démocratiser l’accès à la culture grâce aux technologies 3D et web.', 'L’accès aux musées physiques est limité par des contraintes géographiques, financières et logistiques. De plus, de nombreuses institutions culturelles manquent de solutions digitales modernes pour valoriser leurs collections auprès d’un public international.', 'Une plateforme digitale proposant des musées virtuels interactifs en 3D, accessibles depuis un simple navigateur, avec des fonctionnalités telles que :\n\nNavigation immersive (type jeu vidéo)\nIntégration d’objets 3D interactifs\nMarketplace pour acheter/vendre des œuvres numériques\nExpériences multi-utilisateurs', 'Jeunes (18–35 ans) intéressés par la technologie et le gaming\nInstitutions culturelles (musées, galeries)\nArtistes numériques et créateurs 3D', 'regional', 'freemium', 'Expérience 3D fluide directement dans le navigateur (sans installation)\nCombinaison unique entre musée virtuel + marketplace\nSolution accessible aux institutions sans compétences techniques avancées', 900.00, 'in_progress', 'education', '2026-04-22 09:50:49', 'Commission sur les ventes (objets numériques)\nAbonnement pour les institutions (création de musées)\nVente de fonctionnalités premium', '50% : développement technique (3D, backend, UX)\n20% : marketing et acquisition utilisateurs\n20% : infrastructure (serveurs, cloud)\n10% : frais opérationnels', 'prototype', '1 développeur full-stack (Symfony / JavaFX / 3D) 1 designer 3D 1 responsable produit');
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `reaction`
+-- Table structure for table `promo_code`
+--
+
+CREATE TABLE `promo_code` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `code` varchar(32) NOT NULL,
+  `discount_percent` int(11) NOT NULL,
+  `is_used` tinyint(1) NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)',
+  `expires_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)',
+  `used_at` datetime DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)',
+  `participation_source_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `promo_code`
+--
+
+INSERT INTO `promo_code` (`id`, `user_id`, `code`, `discount_percent`, `is_used`, `is_active`, `created_at`, `expires_at`, `used_at`, `participation_source_id`) VALUES
+(2, 36, 'NEXT65CRZSMSMN', 65, 0, 1, '2026-04-29 19:54:26', '2026-05-29 19:54:26', NULL, 24),
+(3, 36, 'NEXT74Z3EVN3S8', 74, 0, 1, '2026-04-29 19:58:00', '2026-05-29 19:58:00', NULL, 25),
+(4, 36, 'NEXT36JXBHXED7', 36, 0, 1, '2026-04-29 20:00:00', '2026-05-29 20:00:00', NULL, 26),
+(5, 64, 'NEXT616TT2AYTP', 61, 0, 1, '2026-04-29 20:01:36', '2026-05-29 20:01:36', NULL, 27),
+(6, 36, 'NEXT60CEBR4472', 60, 0, 1, '2026-04-29 20:32:12', '2026-05-29 20:32:12', NULL, 29);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `reaction`
 --
 
 CREATE TABLE `reaction` (
@@ -6414,11 +6830,11 @@ CREATE TABLE `reaction` (
   `post_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `type` varchar(255) NOT NULL,
-  `created_at` datetime DEFAULT NULL
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `reaction`
+-- Dumping data for table `reaction`
 --
 
 INSERT INTO `reaction` (`reaction_id`, `post_id`, `user_id`, `type`, `created_at`) VALUES
@@ -6428,12 +6844,14 @@ INSERT INTO `reaction` (`reaction_id`, `post_id`, `user_id`, `type`, `created_at
 (5, 31, 10, 'LOVE', '2026-03-04 16:23:01'),
 (7, 34, 10, 'SUPPORT', '2026-03-04 17:03:58'),
 (8, 32, 10, 'SUPPORT', '2026-03-05 12:01:30'),
-(10, 34, 6, 'LIKE', '2026-03-05 12:36:42');
+(10, 34, 6, 'LIKE', '2026-03-05 12:36:42'),
+(12, 35, 36, 'LOVE', '2026-04-30 11:40:32'),
+(13, 34, 36, 'CURIOUS', '2026-04-30 11:40:37');
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `recommendation_analytic`
+-- Table structure for table `recommendation_analytic`
 --
 
 CREATE TABLE `recommendation_analytic` (
@@ -6443,7 +6861,7 @@ CREATE TABLE `recommendation_analytic` (
 -- --------------------------------------------------------
 
 --
--- Structure de la table `training_request`
+-- Table structure for table `training_request`
 --
 
 CREATE TABLE `training_request` (
@@ -6457,73 +6875,7 @@ CREATE TABLE `training_request` (
 -- --------------------------------------------------------
 
 --
--- Structure de la table `user`
---
-
-CREATE TABLE `user` (
-  `user_id` int(11) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `password_hash` varchar(255) NOT NULL,
-  `user_type` enum('startup','fournisseur','formateur','investisseur','admin') NOT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `is_active` tinyint(1) DEFAULT 1,
-  `full_name` varchar(100) NOT NULL,
-  `phone` varchar(20) DEFAULT NULL,
-  `address` varchar(255) DEFAULT NULL,
-  `bio` text DEFAULT NULL,
-  `avatar_url` varchar(500) DEFAULT NULL,
-  `company_name` varchar(100) DEFAULT NULL,
-  `sector` varchar(100) DEFAULT NULL,
-  `company_description` text DEFAULT NULL,
-  `website` varchar(255) DEFAULT NULL,
-  `founding_date` date DEFAULT NULL,
-  `business_type` varchar(100) DEFAULT NULL,
-  `delivery_zones` text DEFAULT NULL,
-  `payment_methods` varchar(255) DEFAULT NULL,
-  `return_policy` text DEFAULT NULL,
-  `investment_sector` varchar(100) DEFAULT NULL,
-  `max_budget` decimal(15,2) DEFAULT NULL,
-  `years_experience` int(11) DEFAULT NULL,
-  `represented_company` varchar(100) DEFAULT NULL,
-  `specialty` varchar(100) DEFAULT NULL,
-  `hourly_rate` decimal(10,2) DEFAULT NULL,
-  `availability` text DEFAULT NULL,
-  `cv_url` varchar(500) DEFAULT NULL,
-  `totp_secret` varchar(255) DEFAULT NULL,
-  `face_token` varchar(255) DEFAULT NULL,
-  `is_verified` tinyint(1) NOT NULL DEFAULT 0,
-  `face_enrolled_at` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Déchargement des données de la table `user`
---
-
-INSERT INTO `user` (`user_id`, `email`, `password_hash`, `user_type`, `created_at`, `is_active`, `full_name`, `phone`, `address`, `bio`, `avatar_url`, `company_name`, `sector`, `company_description`, `website`, `founding_date`, `business_type`, `delivery_zones`, `payment_methods`, `return_policy`, `investment_sector`, `max_budget`, `years_experience`, `represented_company`, `specialty`, `hourly_rate`, `availability`, `cv_url`, `totp_secret`, `face_token`, `is_verified`, `face_enrolled_at`) VALUES
-(6, 'TestAdmin@gmail.com', '$2a$12$V9CASbvSMt.auCGAmcEz/uVfWV4jN4NFqZM99n8dZy9x6ix9Aus02', 'admin', '2026-02-06 05:19:11', 1, 'jeremy', '23456789', NULL, NULL, 'com/bizhub/images/avatars/8ef86e74-d02d-4081-87dc-25d2040b8bf6.png', 'AstroWorld', 'Informatics', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
-(7, 'TestFormateur@gmail.com', '$2a$12$Vvk/.eHr9tPmH6AtYG10neYwxbh9MmyvN8/0f7QTvZ5.BQar3LX0q', 'formateur', '2026-02-06 05:26:11', 1, 'BlueWall', '12345678', NULL, NULL, '/assets/images/avatars/cHNhbGN-removebg-preview-69d8b659a323b.png', 'My dd', 'Baby Oil', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
-(8, 'TestStartup@gmail.com', '$2a$12$UKZh0JBfN.1RQ/g7RZbAVOKU9gBy.FwiRCFlzQJ.6BW2uF58gnB.a', 'startup', '2026-02-06 05:30:20', 1, 'skandrr', '29523310', NULL, NULL, 'com/bizhub/images/avatars/4038c4dc-e04d-495a-83f7-1fb29a921a3f.png', 'Dar Baba', 'Shanghai', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
-(9, 'Test1@gmail.com', '$2a$12$bvvRVl71HXL5T5y7J6/52.OUGvpT07JDV5U4Y7QPjSGS9awWBXHua', 'investisseur', '2026-02-07 19:21:13', 1, 'skandoura', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Java', 20.00, NULL, NULL, NULL, NULL, 0, NULL),
-(10, 'test3@gmail.com', '$2a$12$1S7CUW.6wRB6rKRS53zsNO0s/Xdy7Qu0SZGCnJdfvqJs4208cMIqq', 'investisseur', '2026-02-07 19:22:33', 1, 'skannn', NULL, NULL, NULL, 'com/bizhub/images/avatars/23b44342-e8ce-4bc3-ae86-84ab7800c12d.png', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'FinTech', 50000.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
-(11, 'invest@esprit.tn', '$2a$12$PDFeYX9W9cMccJZAV7CiRecN6Lqasp7sD8WeldmoWgtLieocCSZxG', 'investisseur', '2026-03-01 13:23:11', 1, '123456', '10203010', 'ariana', 'power in the money , money in the power', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'IT', 75000.00, 5, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
-(12, 'startup@esprit.tn', '$2a$12$atxx/OUWPo1j3rJYAUi/W.uQsX9vwET.H275rai4p4IQDU6YD./0q', 'startup', '2026-03-01 13:28:44', 1, '123456', NULL, NULL, NULL, NULL, 'esprit', 'Finance', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
-(13, 'ziadijizel26@gmail.com', '$2a$12$xgekLmvAV9AU3NcFqBHAVeb7LqfN.t6J4IaAzqTck.Z.UUXjSrU6e', 'startup', '2026-03-01 14:13:30', 1, '123456', NULL, NULL, NULL, NULL, 'HP', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
-(15, 'startup@gmail.com', '$2a$12$evXjEssfWdq9FHtaV3NF1uZq03tlkZUs3QyQQ5ZBfR7LVZmfAwHUK', 'startup', '2026-03-02 23:33:39', 1, 'fatma', NULL, NULL, NULL, NULL, 'fatyy', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
-(16, 'investisseur@gmail..com', '$2a$12$Z/Nkf6fjOW2AuewOxre9neXiKKjc7ZfxmpucUBJnOH3wPJWt099N.', 'investisseur', '2026-03-02 23:34:35', 1, 'fatou', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'fatouu', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
-(29, 'selmi.skan@gmail.com', '$2y$13$7MhujAJgyPs.yBNehKFxY.VcZBzLDGl8QOG8pohRi0wQVABY.3PhK', 'formateur', '2026-04-04 21:04:31', 0, 'bobo', NULL, NULL, NULL, '/assets/images/avatars/2AOqvyd4-69d1a85b286e9.jpg', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 24, NULL, 'yourmom', NULL, NULL, NULL, NULL, NULL, 0, NULL),
-(34, 'boughoula.fatma@esprit.tn', '$2y$13$cRTrjwUsXD4xByq4cq0bzurHtcsqRjOPeoS4AwPO/FsPQ7/svzLwC', 'investisseur', '2026-04-06 16:38:03', 1, 'boughoula fatma ezahra', '+21629523310', 'araian', 'faty', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
-(36, 'fatma2@gmail.com', '$2y$13$JWtohAldIaph8E0wIW4N3u5hp4O6Zr3QqGSUkOW.t0Qric43DXbaG', 'investisseur', '2026-04-06 16:40:25', 1, 'boughoula fatma ezahra', '+21629523310', 'araian', 'faty', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
-(37, 'fatma3@gmail.com', '$2y$13$kTRwwnAb3LaEW14DnfOGTOMu.SDttqFzZWDIQ5m/JXE9.rTRtxYpW', 'startup', '2026-04-06 23:46:10', 1, 'iram trabelsi', '+21629523310', 'ariana', 'fatyy', '/assets/images/avatars/638357820-930737542806290-4707335109899648181-n-69d520210d5ea.png', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
-(38, 'boutique@bizhub.tn', '$2y$13$demo.hash.not.real.login', 'fournisseur', '2026-04-07 22:02:23', 1, 'BizHub Store', '22333444', NULL, NULL, NULL, 'BizHub Commerce', 'Informatique', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
-(39, 'ffet.gre@gmail.com', '$2y$13$Mpc6TcJJDiaOZOcdkl6bm.iAixjqlEt668S825/XOarkzA0aQcliC', 'admin', '2026-04-08 10:27:29', 1, 'selmi skan', '33596478', NULL, '874', '/assets/images/avatars/cHNhbGN-removebg-preview-69d62dd8b8e30.png', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
-(58, 'selmiskander0.8@gmail.com', '$2y$13$3OHrajXRrhIeUvq7T.rFXea5qGtqhH9uS5ro8rLWOgJLAz.SB754m', 'startup', '2026-04-11 13:45:41', 1, 'selmi skan', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'd0716882b774c523ec0e782ee5708046', 0, '2026-04-11 14:17:50'),
-(59, 'selmiskander92@gmail.com', '$2y$13$d/egnlpge2YIv.CAjnOhxe3tXsTam/ZZiFwOv0VWAtJzmmytwToEy', 'startup', '2026-04-11 14:33:58', 1, 'selmi skan', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
-(62, 'iramtrabelsi30@gmail.com', '$2y$13$1ySEnKL0oADBhthzSjlZY..a5Oyyfv0jP7EIeaZxVoEqM7nZa3nRG', 'startup', '2026-04-14 11:13:27', 1, 'iram trabelsi', '24132420', '4726 Rue de la Roche', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL);
-
--- --------------------------------------------------------
-
---
--- Structure de la table `user_auth_state`
+-- Table structure for table `user_auth_state`
 --
 
 CREATE TABLE `user_auth_state` (
@@ -6541,93 +6893,99 @@ CREATE TABLE `user_auth_state` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Déchargement des données de la table `user_auth_state`
+-- Dumping data for table `user_auth_state`
 --
 
 INSERT INTO `user_auth_state` (`id`, `user_id`, `is_verified`, `verification_token`, `verification_token_expires_at`, `password_reset_token`, `password_reset_token_expires_at`, `mfa_enabled`, `mfa_enrollment_id`, `oauth_provider`, `oauth_provider_id`) VALUES
-(18, 58, 1, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL),
-(19, 59, 1, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL),
-(22, 62, 0, 'D6unEtEbxk66Qa1NWUIMHDXAu8cgJx1QDys7XvrwZhwRDVyQap5ZoKaMB3as9Ybm', '2026-04-14 11:28:27', NULL, NULL, 0, NULL, NULL, NULL);
+(22, 62, 0, 'D6unEtEbxk66Qa1NWUIMHDXAu8cgJx1QDys7XvrwZhwRDVyQap5ZoKaMB3as9Ybm', '2026-04-14 11:28:27', NULL, NULL, 0, NULL, NULL, NULL),
+(24, 64, 1, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL),
+(26, 66, 1, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL),
+(28, 36, 1, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL);
 
 --
--- Index pour les tables déchargées
+-- Indexes for dumped tables
 --
 
 --
--- Index pour la table `ai_analysis`
+-- Indexes for table `ai_analysis`
 --
 ALTER TABLE `ai_analysis`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_1FD54150166D1F9C` (`project_id`);
 
 --
--- Index pour la table `application`
+-- Indexes for table `application`
 --
 ALTER TABLE `application`
   ADD PRIMARY KEY (`id`);
 
 --
--- Index pour la table `auto_confirm_notification`
+-- Indexes for table `app_user`
+--
+ALTER TABLE `app_user`
+  ADD PRIMARY KEY (`user_id`),
+  ADD UNIQUE KEY `email` (`email`),
+  ADD KEY `idx_user_email` (`email`),
+  ADD KEY `idx_user_type` (`user_type`),
+  ADD KEY `idx_user_company` (`company_name`),
+  ADD KEY `idx_user_sector` (`sector`);
+
+--
+-- Indexes for table `auto_confirm_notification`
 --
 ALTER TABLE `auto_confirm_notification`
   ADD PRIMARY KEY (`id`);
 
 --
--- Index pour la table `avis`
+-- Indexes for table `avis`
 --
 ALTER TABLE `avis`
   ADD PRIMARY KEY (`avis_id`),
-  ADD UNIQUE KEY `unique_user_formation` (`reviewer_id`,`formation_id`),
-  ADD KEY `idx_avis_reviewer` (`reviewer_id`),
-  ADD KEY `idx_avis_formation` (`formation_id`),
-  ADD KEY `idx_avis_rating` (`rating`);
+  ADD KEY `IDX_8F91ABF070574616` (`reviewer_id`),
+  ADD KEY `IDX_8F91ABF05200282E` (`formation_id`);
 
 --
--- Index pour la table `avis_produit`
+-- Indexes for table `avis_produit`
 --
 ALTER TABLE `avis_produit`
   ADD PRIMARY KEY (`avis_produit_id`),
-  ADD UNIQUE KEY `unique_buyer_product` (`buyer_id`,`product_id`),
-  ADD KEY `idx_avis_produit_buyer` (`buyer_id`),
-  ADD KEY `idx_avis_produit_product` (`product_id`),
-  ADD KEY `idx_avis_produit_rating` (`rating`);
+  ADD KEY `IDX_2A67C216C755722` (`buyer_id`),
+  ADD KEY `IDX_2A67C214584665A` (`product_id`);
 
 --
--- Index pour la table `chatbot_conversation`
+-- Indexes for table `chatbot_conversation`
 --
 ALTER TABLE `chatbot_conversation`
   ADD PRIMARY KEY (`id`);
 
 --
--- Index pour la table `commande`
+-- Indexes for table `commande`
 --
 ALTER TABLE `commande`
-  ADD PRIMARY KEY (`id_commande`),
-  ADD KEY `idx_cmd_client` (`id_client`),
-  ADD KEY `idx_cmd_produit` (`id_produit`);
+  ADD PRIMARY KEY (`commande_id`);
 
 --
--- Index pour la table `commande_ligne`
+-- Indexes for table `commande_ligne`
 --
 ALTER TABLE `commande_ligne`
   ADD PRIMARY KEY (`id_ligne`),
-  ADD KEY `idx_cmd` (`id_commande`),
-  ADD KEY `idx_prod` (`id_produit`);
+  ADD KEY `FK_commande_ligne_commande` (`commande_id`);
 
 --
--- Index pour la table `commande_status_history`
+-- Indexes for table `commande_status_history`
 --
 ALTER TABLE `commande_status_history`
   ADD PRIMARY KEY (`id`),
   ADD KEY `IDX_history_commande` (`commande_id`);
 
 --
--- Index pour la table `commentaire`
+-- Indexes for table `commentaire`
 --
 ALTER TABLE `commentaire`
   ADD PRIMARY KEY (`comment_id`);
 
 --
--- Index pour la table `deal`
+-- Indexes for table `deal`
 --
 ALTER TABLE `deal`
   ADD PRIMARY KEY (`deal_id`),
@@ -6638,13 +6996,13 @@ ALTER TABLE `deal`
   ADD KEY `idx_deal_status` (`status`);
 
 --
--- Index pour la table `doctrine_migration_versions`
+-- Indexes for table `doctrine_migration_versions`
 --
 ALTER TABLE `doctrine_migration_versions`
   ADD PRIMARY KEY (`version`);
 
 --
--- Index pour la table `facture`
+-- Indexes for table `facture`
 --
 ALTER TABLE `facture`
   ADD PRIMARY KEY (`id`),
@@ -6652,14 +7010,22 @@ ALTER TABLE `facture`
   ADD UNIQUE KEY `uniq_facture_numero` (`numero_facture`);
 
 --
--- Index pour la table `formation`
+-- Indexes for table `formation`
 --
 ALTER TABLE `formation`
   ADD PRIMARY KEY (`formation_id`),
   ADD KEY `idx_formation_trainer` (`trainer_id`);
 
 --
--- Index pour la table `fraud_alert`
+-- Indexes for table `formation_recommendation_event`
+--
+ALTER TABLE `formation_recommendation_event`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_fre_formation` (`formation_id`),
+  ADD KEY `idx_fre_user_created` (`user_id`,`created_at`);
+
+--
+-- Indexes for table `fraud_alert`
 --
 ALTER TABLE `fraud_alert`
   ADD PRIMARY KEY (`alert_id`),
@@ -6669,7 +7035,7 @@ ALTER TABLE `fraud_alert`
   ADD KEY `idx_fraud_alert_date` (`created_at`);
 
 --
--- Index pour la table `fraud_analysis`
+-- Indexes for table `fraud_analysis`
 --
 ALTER TABLE `fraud_analysis`
   ADD PRIMARY KEY (`analysis_id`),
@@ -6679,7 +7045,7 @@ ALTER TABLE `fraud_analysis`
   ADD KEY `idx_fraud_analysis_risk_level` (`risk_level`);
 
 --
--- Index pour la table `investment`
+-- Indexes for table `investment`
 --
 ALTER TABLE `investment`
   ADD PRIMARY KEY (`investment_id`),
@@ -6688,14 +7054,14 @@ ALTER TABLE `investment`
   ADD KEY `idx_investment_date` (`investment_date`);
 
 --
--- Index pour la table `messenger_messages`
+-- Indexes for table `messenger_messages`
 --
 ALTER TABLE `messenger_messages`
   ADD PRIMARY KEY (`id`),
   ADD KEY `IDX_75EA56E0FB7336F0E3BD61CE16BA31DBBF396750` (`queue_name`,`available_at`,`delivered_at`,`id`);
 
 --
--- Index pour la table `negotiation`
+-- Indexes for table `negotiation`
 --
 ALTER TABLE `negotiation`
   ADD PRIMARY KEY (`negotiation_id`),
@@ -6705,7 +7071,7 @@ ALTER TABLE `negotiation`
   ADD KEY `idx_negotiation_status` (`status`);
 
 --
--- Index pour la table `negotiation_message`
+-- Indexes for table `negotiation_message`
 --
 ALTER TABLE `negotiation_message`
   ADD PRIMARY KEY (`message_id`),
@@ -6713,15 +7079,15 @@ ALTER TABLE `negotiation_message`
   ADD KEY `idx_neg_msg_negotiation` (`negotiation_id`);
 
 --
--- Index pour la table `order`
+-- Indexes for table `orders`
 --
-ALTER TABLE `order`
+ALTER TABLE `orders`
   ADD PRIMARY KEY (`order_id`),
   ADD KEY `buyer_id` (`buyer_id`),
   ADD KEY `product_id` (`product_id`);
 
 --
--- Index pour la table `panier`
+-- Indexes for table `panier`
 --
 ALTER TABLE `panier`
   ADD PRIMARY KEY (`id_panier`),
@@ -6729,7 +7095,7 @@ ALTER TABLE `panier`
   ADD KEY `id_produit` (`id_produit`);
 
 --
--- Index pour la table `participation`
+-- Indexes for table `participation`
 --
 ALTER TABLE `participation`
   ADD PRIMARY KEY (`id_candidature`),
@@ -6737,20 +7103,20 @@ ALTER TABLE `participation`
   ADD KEY `fk_participation_formation` (`formation_id`);
 
 --
--- Index pour la table `payment`
+-- Indexes for table `payment`
 --
 ALTER TABLE `payment`
   ADD PRIMARY KEY (`payment_id`),
   ADD KEY `investment_id` (`investment_id`);
 
 --
--- Index pour la table `post`
+-- Indexes for table `post`
 --
 ALTER TABLE `post`
   ADD PRIMARY KEY (`post_id`);
 
 --
--- Index pour la table `product_service`
+-- Indexes for table `product_service`
 --
 ALTER TABLE `product_service`
   ADD PRIMARY KEY (`product_id`),
@@ -6760,14 +7126,14 @@ ALTER TABLE `product_service`
   ADD KEY `idx_product_stock` (`stock`);
 
 --
--- Index pour la table `produit_service`
+-- Indexes for table `produit_service`
 --
 ALTER TABLE `produit_service`
   ADD PRIMARY KEY (`id_produit`),
   ADD KEY `idx_produit_profile` (`id_profile`);
 
 --
--- Index pour la table `project`
+-- Indexes for table `project`
 --
 ALTER TABLE `project`
   ADD PRIMARY KEY (`project_id`),
@@ -6776,39 +7142,38 @@ ALTER TABLE `project`
   ADD KEY `idx_project_budget` (`required_budget`);
 
 --
--- Index pour la table `reaction`
+-- Indexes for table `promo_code`
+--
+ALTER TABLE `promo_code`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uniq_promo_code` (`code`),
+  ADD KEY `idx_promo_code_user` (`user_id`),
+  ADD KEY `FK_PROMO_PARTICIPATION_SOURCE` (`participation_source_id`);
+
+--
+-- Indexes for table `reaction`
 --
 ALTER TABLE `reaction`
   ADD PRIMARY KEY (`reaction_id`);
 
 --
--- Index pour la table `recommendation_analytic`
+-- Indexes for table `recommendation_analytic`
 --
 ALTER TABLE `recommendation_analytic`
   ADD PRIMARY KEY (`id`);
 
 --
--- Index pour la table `training_request`
+-- Indexes for table `training_request`
 --
 ALTER TABLE `training_request`
   ADD PRIMARY KEY (`request_id`),
+  ADD UNIQUE KEY `uq_training_request_user_formation` (`startup_id`,`formation_id`),
   ADD KEY `idx_request_startup` (`startup_id`),
   ADD KEY `idx_request_formation` (`formation_id`),
   ADD KEY `idx_request_status` (`status`);
 
 --
--- Index pour la table `user`
---
-ALTER TABLE `user`
-  ADD PRIMARY KEY (`user_id`),
-  ADD UNIQUE KEY `email` (`email`),
-  ADD KEY `idx_user_email` (`email`),
-  ADD KEY `idx_user_type` (`user_type`),
-  ADD KEY `idx_user_company` (`company_name`),
-  ADD KEY `idx_user_sector` (`sector`);
-
---
--- Index pour la table `user_auth_state`
+-- Indexes for table `user_auth_state`
 --
 ALTER TABLE `user_auth_state`
   ADD PRIMARY KEY (`id`),
@@ -6818,290 +7183,328 @@ ALTER TABLE `user_auth_state`
   ADD KEY `idx_user_auth_state_password_reset_token` (`password_reset_token`);
 
 --
--- AUTO_INCREMENT pour les tables déchargées
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT pour la table `ai_analysis`
+-- AUTO_INCREMENT for table `ai_analysis`
 --
 ALTER TABLE `ai_analysis`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT pour la table `application`
+-- AUTO_INCREMENT for table `application`
 --
 ALTER TABLE `application`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT pour la table `auto_confirm_notification`
+-- AUTO_INCREMENT for table `app_user`
+--
+ALTER TABLE `app_user`
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
+
+--
+-- AUTO_INCREMENT for table `auto_confirm_notification`
 --
 ALTER TABLE `auto_confirm_notification`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
--- AUTO_INCREMENT pour la table `avis`
+-- AUTO_INCREMENT for table `avis`
 --
 ALTER TABLE `avis`
-  MODIFY `avis_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `avis_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
--- AUTO_INCREMENT pour la table `avis_produit`
+-- AUTO_INCREMENT for table `avis_produit`
 --
 ALTER TABLE `avis_produit`
   MODIFY `avis_produit_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT pour la table `chatbot_conversation`
+-- AUTO_INCREMENT for table `chatbot_conversation`
 --
 ALTER TABLE `chatbot_conversation`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
--- AUTO_INCREMENT pour la table `commande`
+-- AUTO_INCREMENT for table `commande`
 --
 ALTER TABLE `commande`
-  MODIFY `id_commande` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=102;
+  MODIFY `commande_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=121;
 
 --
--- AUTO_INCREMENT pour la table `commande_ligne`
+-- AUTO_INCREMENT for table `commande_ligne`
 --
 ALTER TABLE `commande_ligne`
-  MODIFY `id_ligne` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+  MODIFY `id_ligne` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
--- AUTO_INCREMENT pour la table `commande_status_history`
+-- AUTO_INCREMENT for table `commande_status_history`
 --
 ALTER TABLE `commande_status_history`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
--- AUTO_INCREMENT pour la table `commentaire`
+-- AUTO_INCREMENT for table `commentaire`
 --
 ALTER TABLE `commentaire`
-  MODIFY `comment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `comment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
--- AUTO_INCREMENT pour la table `deal`
+-- AUTO_INCREMENT for table `deal`
 --
 ALTER TABLE `deal`
-  MODIFY `deal_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `deal_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
--- AUTO_INCREMENT pour la table `facture`
+-- AUTO_INCREMENT for table `facture`
 --
 ALTER TABLE `facture`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
--- AUTO_INCREMENT pour la table `formation`
+-- AUTO_INCREMENT for table `formation`
 --
 ALTER TABLE `formation`
-  MODIFY `formation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `formation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
--- AUTO_INCREMENT pour la table `fraud_alert`
+-- AUTO_INCREMENT for table `formation_recommendation_event`
+--
+ALTER TABLE `formation_recommendation_event`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=151;
+
+--
+-- AUTO_INCREMENT for table `fraud_alert`
 --
 ALTER TABLE `fraud_alert`
   MODIFY `alert_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2271;
 
 --
--- AUTO_INCREMENT pour la table `fraud_analysis`
+-- AUTO_INCREMENT for table `fraud_analysis`
 --
 ALTER TABLE `fraud_analysis`
   MODIFY `analysis_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3127;
 
 --
--- AUTO_INCREMENT pour la table `investment`
+-- AUTO_INCREMENT for table `investment`
 --
 ALTER TABLE `investment`
   MODIFY `investment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
--- AUTO_INCREMENT pour la table `messenger_messages`
+-- AUTO_INCREMENT for table `messenger_messages`
 --
 ALTER TABLE `messenger_messages`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
--- AUTO_INCREMENT pour la table `negotiation`
+-- AUTO_INCREMENT for table `negotiation`
 --
 ALTER TABLE `negotiation`
-  MODIFY `negotiation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `negotiation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
--- AUTO_INCREMENT pour la table `negotiation_message`
+-- AUTO_INCREMENT for table `negotiation_message`
 --
 ALTER TABLE `negotiation_message`
-  MODIFY `message_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `message_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
 
 --
--- AUTO_INCREMENT pour la table `order`
+-- AUTO_INCREMENT for table `orders`
 --
-ALTER TABLE `order`
+ALTER TABLE `orders`
   MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT pour la table `panier`
+-- AUTO_INCREMENT for table `panier`
 --
 ALTER TABLE `panier`
-  MODIFY `id_panier` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
+  MODIFY `id_panier` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
 
 --
--- AUTO_INCREMENT pour la table `participation`
+-- AUTO_INCREMENT for table `participation`
 --
 ALTER TABLE `participation`
-  MODIFY `id_candidature` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id_candidature` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
--- AUTO_INCREMENT pour la table `payment`
+-- AUTO_INCREMENT for table `payment`
 --
 ALTER TABLE `payment`
   MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- AUTO_INCREMENT pour la table `post`
+-- AUTO_INCREMENT for table `post`
 --
 ALTER TABLE `post`
-  MODIFY `post_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `post_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
--- AUTO_INCREMENT pour la table `product_service`
+-- AUTO_INCREMENT for table `product_service`
 --
 ALTER TABLE `product_service`
   MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
--- AUTO_INCREMENT pour la table `produit_service`
+-- AUTO_INCREMENT for table `produit_service`
 --
 ALTER TABLE `produit_service`
-  MODIFY `id_produit` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id_produit` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
--- AUTO_INCREMENT pour la table `project`
+-- AUTO_INCREMENT for table `project`
 --
 ALTER TABLE `project`
-  MODIFY `project_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `project_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
--- AUTO_INCREMENT pour la table `reaction`
+-- AUTO_INCREMENT for table `promo_code`
+--
+ALTER TABLE `promo_code`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `reaction`
 --
 ALTER TABLE `reaction`
-  MODIFY `reaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `reaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
--- AUTO_INCREMENT pour la table `recommendation_analytic`
+-- AUTO_INCREMENT for table `recommendation_analytic`
 --
 ALTER TABLE `recommendation_analytic`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT pour la table `training_request`
+-- AUTO_INCREMENT for table `training_request`
 --
 ALTER TABLE `training_request`
   MODIFY `request_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT pour la table `user`
---
-ALTER TABLE `user`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
-
---
--- AUTO_INCREMENT pour la table `user_auth_state`
+-- AUTO_INCREMENT for table `user_auth_state`
 --
 ALTER TABLE `user_auth_state`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
--- Contraintes pour les tables déchargées
+-- Constraints for dumped tables
 --
 
 --
--- Contraintes pour la table `avis`
+-- Constraints for table `ai_analysis`
+--
+ALTER TABLE `ai_analysis`
+  ADD CONSTRAINT `FK_1FD54150166D1F9C` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `avis`
 --
 ALTER TABLE `avis`
-  ADD CONSTRAINT `avis_ibfk_1` FOREIGN KEY (`reviewer_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `avis_ibfk_2` FOREIGN KEY (`formation_id`) REFERENCES `formation` (`formation_id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `FK_8F91ABF05200282E` FOREIGN KEY (`formation_id`) REFERENCES `formation` (`formation_id`),
+  ADD CONSTRAINT `FK_8F91ABF070574616` FOREIGN KEY (`reviewer_id`) REFERENCES `app_user` (`user_id`);
 
 --
--- Contraintes pour la table `avis_produit`
+-- Constraints for table `avis_produit`
 --
 ALTER TABLE `avis_produit`
-  ADD CONSTRAINT `avis_produit_ibfk_1` FOREIGN KEY (`buyer_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `avis_produit_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `product_service` (`product_id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `FK_2A67C214584665A` FOREIGN KEY (`product_id`) REFERENCES `produit_service` (`id_produit`),
+  ADD CONSTRAINT `FK_2A67C216C755722` FOREIGN KEY (`buyer_id`) REFERENCES `app_user` (`user_id`);
 
 --
--- Contraintes pour la table `commande_status_history`
+-- Constraints for table `commande_ligne`
+--
+ALTER TABLE `commande_ligne`
+  ADD CONSTRAINT `FK_commande_ligne_commande` FOREIGN KEY (`commande_id`) REFERENCES `commande` (`commande_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `commande_status_history`
 --
 ALTER TABLE `commande_status_history`
-  ADD CONSTRAINT `FK_commande_history` FOREIGN KEY (`commande_id`) REFERENCES `commande` (`id_commande`) ON DELETE CASCADE;
+  ADD CONSTRAINT `FK_commande_history` FOREIGN KEY (`commande_id`) REFERENCES `commande` (`commande_id`) ON DELETE CASCADE;
 
 --
--- Contraintes pour la table `facture`
+-- Constraints for table `facture`
 --
 ALTER TABLE `facture`
-  ADD CONSTRAINT `fk_facture_commande` FOREIGN KEY (`commande_id`) REFERENCES `commande` (`id_commande`) ON DELETE CASCADE;
+  ADD CONSTRAINT `fk_facture_commande` FOREIGN KEY (`commande_id`) REFERENCES `commande` (`commande_id`) ON DELETE CASCADE;
 
 --
--- Contraintes pour la table `formation`
+-- Constraints for table `formation`
 --
 ALTER TABLE `formation`
-  ADD CONSTRAINT `FK_404021BFFB08EDF6` FOREIGN KEY (`trainer_id`) REFERENCES `user` (`user_id`);
+  ADD CONSTRAINT `FK_404021BFFB08EDF6` FOREIGN KEY (`trainer_id`) REFERENCES `app_user` (`user_id`);
 
 --
--- Contraintes pour la table `investment`
+-- Constraints for table `formation_recommendation_event`
+--
+ALTER TABLE `formation_recommendation_event`
+  ADD CONSTRAINT `FK_FRE_FORMATION` FOREIGN KEY (`formation_id`) REFERENCES `formation` (`formation_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `FK_FRE_USER` FOREIGN KEY (`user_id`) REFERENCES `app_user` (`user_id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `investment`
 --
 ALTER TABLE `investment`
   ADD CONSTRAINT `investment_ibfk_1` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `investment_ibfk_2` FOREIGN KEY (`investor_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `investment_ibfk_2` FOREIGN KEY (`investor_id`) REFERENCES `app_user` (`user_id`) ON DELETE CASCADE;
 
 --
--- Contraintes pour la table `negotiation`
+-- Constraints for table `negotiation`
 --
 ALTER TABLE `negotiation`
   ADD CONSTRAINT `negotiation_ibfk_1` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `negotiation_ibfk_2` FOREIGN KEY (`investor_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `negotiation_ibfk_3` FOREIGN KEY (`startup_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `negotiation_ibfk_2` FOREIGN KEY (`investor_id`) REFERENCES `app_user` (`user_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `negotiation_ibfk_3` FOREIGN KEY (`startup_id`) REFERENCES `app_user` (`user_id`) ON DELETE CASCADE;
 
 --
--- Contraintes pour la table `negotiation_message`
+-- Constraints for table `negotiation_message`
 --
 ALTER TABLE `negotiation_message`
   ADD CONSTRAINT `negotiation_message_ibfk_1` FOREIGN KEY (`negotiation_id`) REFERENCES `negotiation` (`negotiation_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `negotiation_message_ibfk_2` FOREIGN KEY (`sender_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `negotiation_message_ibfk_2` FOREIGN KEY (`sender_id`) REFERENCES `app_user` (`user_id`) ON DELETE CASCADE;
 
 --
--- Contraintes pour la table `order`
+-- Constraints for table `orders`
 --
-ALTER TABLE `order`
-  ADD CONSTRAINT `order_ibfk_1` FOREIGN KEY (`buyer_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `order_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `product_service` (`product_id`) ON DELETE CASCADE;
+ALTER TABLE `orders`
+  ADD CONSTRAINT `FK_orders_buyer` FOREIGN KEY (`buyer_id`) REFERENCES `app_user` (`user_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `FK_orders_product` FOREIGN KEY (`product_id`) REFERENCES `product_service` (`product_id`) ON DELETE CASCADE;
 
 --
--- Contraintes pour la table `product_service`
+-- Constraints for table `product_service`
 --
 ALTER TABLE `product_service`
-  ADD CONSTRAINT `product_service_ibfk_1` FOREIGN KEY (`seller_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `product_service_ibfk_1` FOREIGN KEY (`seller_id`) REFERENCES `app_user` (`user_id`) ON DELETE CASCADE;
 
 --
--- Contraintes pour la table `project`
+-- Constraints for table `project`
 --
 ALTER TABLE `project`
-  ADD CONSTRAINT `project_ibfk_1` FOREIGN KEY (`startup_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `project_ibfk_1` FOREIGN KEY (`startup_id`) REFERENCES `app_user` (`user_id`) ON DELETE CASCADE;
 
 --
--- Contraintes pour la table `training_request`
+-- Constraints for table `promo_code`
+--
+ALTER TABLE `promo_code`
+  ADD CONSTRAINT `FK_PROMO_PARTICIPATION_SOURCE` FOREIGN KEY (`participation_source_id`) REFERENCES `participation` (`id_candidature`) ON DELETE SET NULL,
+  ADD CONSTRAINT `FK_PROMO_USER` FOREIGN KEY (`user_id`) REFERENCES `app_user` (`user_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `training_request`
 --
 ALTER TABLE `training_request`
-  ADD CONSTRAINT `training_request_ibfk_1` FOREIGN KEY (`startup_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `training_request_ibfk_1` FOREIGN KEY (`startup_id`) REFERENCES `app_user` (`user_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `training_request_ibfk_2` FOREIGN KEY (`formation_id`) REFERENCES `formation` (`formation_id`) ON DELETE CASCADE;
 
 --
--- Contraintes pour la table `user_auth_state`
+-- Constraints for table `user_auth_state`
 --
 ALTER TABLE `user_auth_state`
-  ADD CONSTRAINT `FK_user_auth_state_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `FK_user_auth_state_user` FOREIGN KEY (`user_id`) REFERENCES `app_user` (`user_id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

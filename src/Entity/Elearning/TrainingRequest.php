@@ -26,12 +26,12 @@ class TrainingRequest
     #[ORM\Column(type: 'string', length: 50, options: ['default' => 'pending'])]
     private string $status = 'pending';
 
-    #[ORM\Column(name: 'request_date', type: 'datetime', nullable: true)]
-    private ?\DateTimeInterface $created_at = null;
+    #[ORM\Column(name: 'request_date', type: 'datetime_immutable', nullable: false)]
+    private \DateTimeImmutable $created_at;
 
     public function __construct()
     {
-        $this->created_at = new \DateTime();
+        $this->created_at = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -72,12 +72,12 @@ class TrainingRequest
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->created_at;
     }
 
-    public function setCreatedAt(\DateTimeInterface $created_at): self
+    public function setCreatedAt(\DateTimeImmutable $created_at): self
     {
         $this->created_at = $created_at;
         return $this;

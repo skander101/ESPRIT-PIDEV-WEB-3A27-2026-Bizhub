@@ -34,7 +34,7 @@ class ContractPdfService
             mkdir($this->contractDir, 0755, true);
         }
 
-        $project = $this->projectRepository->find($deal->getProject_id());
+        $project = $deal->getProject();
 
         $filename  = sprintf('contract_deal_%d_%s.pdf', $deal->getDeal_id(), date('Ymd_His'));
         $filePath  = $this->contractDir . '/' . $filename;
@@ -60,7 +60,7 @@ class ContractPdfService
     {
         $date      = (new \DateTime())->format('d/m/Y');
         $amount    = number_format((float) $deal->getAmount(), 2, ',', ' ');
-        $projectTitle = $project ? htmlspecialchars($project->getTitle()) : 'Projet #' . $deal->getProject_id();
+        $projectTitle = $project ? htmlspecialchars($project->getTitle()) : 'Projet #' . $deal->getProject()->getProject_id();
         $buyerName    = htmlspecialchars($buyer->getFullName() ?? 'Investisseur');
         $sellerName   = htmlspecialchars($seller->getFullName() ?? 'Startup');
         $buyerEmail   = htmlspecialchars($buyer->getEmail() ?? '');

@@ -50,13 +50,12 @@ class DealWorkflowService
     public function createDealFromNegotiation(Negotiation $negotiation): Deal
     {
         $deal = new Deal();
-        $deal->setNegotiation_id($negotiation->getNegotiation_id());
-        $deal->setProject_id($negotiation->getProject()->getProject_id());
-        $deal->setBuyer_id($negotiation->getInvestor()->getUserId());
-        $deal->setSeller_id($negotiation->getStartup()->getUserId());
+        $deal->setNegotiation($negotiation);
+        $deal->setProject($negotiation->getProject());
+        $deal->setBuyer($negotiation->getInvestor());
+        $deal->setSeller($negotiation->getStartup());
         $deal->setAmount($negotiation->getFinal_amount() ?? $negotiation->getProposed_amount() ?? 0);
         $deal->setStatus(Deal::STATUS_PENDING_PAYMENT);
-        $deal->setCreated_at(new \DateTime());
 
         $this->em->persist($deal);
         $this->em->flush();
@@ -193,15 +192,15 @@ class DealWorkflowService
     public function findDealByNegotiation(Negotiation $negotiation): ?Deal
     {
         return $this->dealRepository->findOneBy([
-            'negotiation_id' => $negotiation->getNegotiation_id(),
+            'negotiation' => $negotiation,
         ]);
     }
 
     public function findDealByInvestment(Investment $investment): ?Deal
     {
         return $this->dealRepository->findOneBy([
-            'project_id' => $investment->getProject()?->getProject_id(),
-            'buyer_id'   => $investment->getUser()?->getUserId(),
+            'project' => $investment->getProject(),
+            'buyer'   => $investment->getUser(),
         ]);
     }
 
@@ -232,8 +231,8 @@ class DealWorkflowService
     private function syncInvestmentByDeal(Deal $deal, string $statut): void
     {
         $investment = $this->investmentRepo->findOneByProjectIdAndBuyerId(
-            $deal->getProject_id(),
-            $deal->getBuyer_id()
+            $deal->getProject()?->getProject_id(),
+            $deal->getBuyer()?->getUserId()
         );
 
         if ($investment !== null && $investment->getStatut() !== $statut) {

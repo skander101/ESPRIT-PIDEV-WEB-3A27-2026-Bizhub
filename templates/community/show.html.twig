@@ -224,10 +224,30 @@
               <div class="meta-line">
                 <span>{{ post.created_at ? (post.created_at|date('d/m/Y H:i')) : '' }}</span>
                 {% if post.category %}<span class="badge badge-pending">{{ post.category }}</span>{% endif %}
-                {% if post.location %}
-                  <a class="text-muted" href="https://www.openstreetmap.org/?mlat={{ post.location_lat }}&mlon={{ post.location_lon }}" target="_blank" rel="noopener noreferrer">
-                    📍 {{ post.location }}
-                  </a>
+                {% if post.location is defined and post.location %}
+                  {% if post.location_lat is defined and post.location_lat and post.location_lon is defined and post.location_lon %}
+                    <a href="https://www.openstreetmap.org/?mlat={{ post.location_lat }}&mlon={{ post.location_lon }}#map=12/{{ post.location_lat }}/{{ post.location_lon }}"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       title="View on map"
+                       style="display:inline-flex; align-items:center; gap:4px;
+                              font-size:0.78rem; color:#16a34a; text-decoration:none;
+                              background:#f0fdf4; padding:2px 8px; border-radius:999px;
+                              border:1px solid #bbf7d0; margin-top:4px;">
+                      📍 {{ post.location }}
+                    </a>
+                  {% else %}
+                    <a href="https://www.openstreetmap.org/search?query={{ post.location|url_encode }}"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       title="Search on map"
+                       style="display:inline-flex; align-items:center; gap:4px;
+                              font-size:0.78rem; color:#16a34a; text-decoration:none;
+                              background:#f0fdf4; padding:2px 8px; border-radius:999px;
+                              border:1px solid #bbf7d0; margin-top:4px;">
+                      📍 {{ post.location }}
+                    </a>
+                  {% endif %}
                 {% endif %}
               </div>
             </div>
@@ -245,6 +265,20 @@
 
         <div class="card-title">{{ post.title }}</div>
         <div class="card-text">{{ post.content }}</div>
+        {% if post.media_url %}
+          <div style="margin-top:10px;">
+            {% if post.media_type is defined and post.media_type and post.media_type starts with 'video/' %}
+              <video controls preload="metadata" style="max-width:100%; border-radius:12px; border:1px solid var(--border); display:block;">
+                <source src="{{ asset(post.media_url) }}" type="{{ post.media_type }}">
+                Votre navigateur ne supporte pas la lecture video.
+              </video>
+            {% else %}
+              <img src="{{ asset(post.media_url) }}"
+                   alt="Post image"
+                   style="max-width:100%; border-radius:12px; border:1px solid var(--border); display:block;">
+            {% endif %}
+          </div>
+        {% endif %}
 
         <div class="react-row" data-react-post="{{ post.post_id }}">
           <div class="react-wrap">
@@ -320,10 +354,18 @@
 
           <div class="divider"></div>
 
-          <div id="comment-content-{{ comment.comment_id }}" class="comment-text">{{ comment.content }}</div>
+          <div id="comment-content-{{ comment.comment_id }}" class="comment-text">{{ comment.content_text ?? comment.content }}</div>
+          {% if comment.image_url %}
+            <div style="margin-top:10px;">
+              <img src="{{ asset(comment.image_url) }}"
+                   alt="Comment image"
+                   style="max-width:320px; width:100%; border-radius:10px; border:1px solid var(--border); display:block;">
+            </div>
+          {% endif %}
           <div id="comment-edit-{{ comment.comment_id }}" style="display:none; margin-top:10px;">
-            <form method="post" action="{{ path('community_comment_edit', {id: comment.comment_id}) }}">
-              <textarea name="content" class="form-control comment-text" rows="3">{{ comment.content }}</textarea>
+            <form method="post" action="{{ path('community_comment_edit', {id: comment.comment_id}) }}" enctype="multipart/form-data">
+              <textarea name="content" class="form-control comment-text" rows="3">{{ comment.content_text ?? comment.content }}</textarea>
+              <input type="file" name="image" accept="image/*" class="form-control" style="margin-top:10px;">
               <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
                 <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Enregistrer</button>
                 <button type="button" class="btn btn-secondary" onclick="cancelEdit({{ comment.comment_id }})">Annuler</button>
@@ -344,8 +386,9 @@
       <div class="card mt-4 shadow-sm">
         <div class="card-body">
           <span class="section-label">Ajouter un commentaire</span>
-          <form method="post" action="{{ path('community_comment_new', {postId: post.post_id}) }}">
+          <form method="post" action="{{ path('community_comment_new', {postId: post.post_id}) }}" enctype="multipart/form-data">
             <textarea name="content" class="form-control comment-text" rows="3" placeholder="Écrire un commentaire…"></textarea>
+            <input type="file" name="image" accept="image/*" class="form-control" style="margin-top:10px;">
             <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
               <button type="submit" class="btn btn-primary"><i class="fa fa-paper-plane"></i> Publier</button>
               <a href="{{ path('community_index') }}" class="btn btn-secondary"><i class="fa fa-arrow-left"></i> Retour au feed</a>

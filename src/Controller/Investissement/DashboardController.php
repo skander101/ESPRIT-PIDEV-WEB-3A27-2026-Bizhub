@@ -67,7 +67,10 @@ class DashboardController extends AbstractController
         $nbDeals    = count($deals);
         $dealsByNeg = [];
         foreach ($deals as $deal) {
-            $dealsByNeg[$deal->getNegotiation_id()] = $deal;
+            $negotiation = $deal->getNegotiation();
+            if ($negotiation) {
+                $dealsByNeg[$negotiation->getNegotiation_id()] = $deal;
+            }
         }
 
         // Negotiations for this investor

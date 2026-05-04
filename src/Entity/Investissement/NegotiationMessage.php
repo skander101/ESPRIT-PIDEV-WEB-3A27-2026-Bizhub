@@ -15,7 +15,7 @@ class NegotiationMessage
 {
     public function __construct()
     {
-        $this->created_at = new \DateTime();
+        $this->created_at = new \DateTimeImmutable();
     }
 
     #[ORM\Id]
@@ -78,7 +78,7 @@ class NegotiationMessage
         return $this;
     }
 
-    #[ORM\Column(type: 'string', length: 32, options: ['default' => 'text'])]
+    #[ORM\Column(type: 'string', length: 32, nullable: true, options: ['default' => 'text'])]
     private ?string $message_type = 'text';
 
     public function getMessage_type(): ?string
@@ -88,7 +88,7 @@ class NegotiationMessage
 
     public function setMessage_type(?string $message_type): self
     {
-        $this->message_type = $message_type;
+        $this->message_type = $message_type ?? 'text';
         return $this;
     }
 
@@ -120,15 +120,15 @@ class NegotiationMessage
         return $this;
     }
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?\DateTimeInterface $created_at = null;
+    #[ORM\Column(type: 'datetime_immutable', nullable: false)]
+    private \DateTimeImmutable $created_at;
 
-    public function getCreated_at(): ?\DateTimeInterface
+    public function getCreated_at(): \DateTimeImmutable
     {
         return $this->created_at;
     }
 
-    protected function setCreated_at(\DateTimeInterface $created_at): self
+    protected function setCreated_at(\DateTimeImmutable $created_at): self
     {
         $this->created_at = $created_at;
         return $this;

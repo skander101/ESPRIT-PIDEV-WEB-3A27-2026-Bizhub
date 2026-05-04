@@ -17,7 +17,7 @@ class DealRepository extends ServiceEntityRepository
     public function findByBuyerId(int $buyerId): array
     {
         return $this->createQueryBuilder('d')
-            ->andWhere('d.buyer_id = :bid')
+            ->andWhere('IDENTITY(d.buyer) = :bid')
             ->setParameter('bid', $buyerId)
             ->orderBy('d.created_at', 'DESC')
             ->getQuery()
@@ -29,7 +29,7 @@ class DealRepository extends ServiceEntityRepository
     {
         return (int) $this->createQueryBuilder('d')
             ->select('COUNT(d.deal_id)')
-            ->andWhere('d.buyer_id = :bid')
+            ->andWhere('IDENTITY(d.buyer) = :bid')
             ->andWhere('d.status IN (:statuses)')
             ->setParameter('bid', $buyerId)
             ->setParameter('statuses', ['paid', 'pending_signature', 'signed', 'completed'])

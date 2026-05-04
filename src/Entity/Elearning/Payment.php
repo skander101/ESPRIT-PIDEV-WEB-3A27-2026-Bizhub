@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 use App\Repository\Elearning\PaymentRepository;
+use App\Entity\Investissement\Investment;
 
 #[ORM\Entity(repositoryClass: PaymentRepository::class)]
 #[ORM\Table(name: 'payment')]
@@ -28,17 +29,18 @@ class Payment
         return $this;
     }
 
-    #[ORM\Column(type: 'integer', nullable: false)]
-    private int $investment_id;
+    #[ORM\ManyToOne(targetEntity: Investment::class)]
+    #[ORM\JoinColumn(name: 'investment_id', referencedColumnName: 'investment_id', nullable: false)]
+    private ?Investment $investment = null;
 
-    public function getInvestment_id(): int
+    public function getInvestment(): ?Investment
     {
-        return $this->investment_id;
+        return $this->investment;
     }
 
-public function setInvestment_id(int $investment_id): self
+    public function setInvestment(?Investment $investment): self
     {
-        $this->investment_id = $investment_id;
+        $this->investment = $investment;
         return $this;
     }
 

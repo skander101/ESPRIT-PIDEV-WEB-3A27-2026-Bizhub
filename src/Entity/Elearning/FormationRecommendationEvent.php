@@ -45,8 +45,8 @@ class FormationRecommendationEvent
     #[ORM\Column(type: 'string', length: 32)]
     private string $section = self::SECTION_PERSONALIZED;
 
-    #[ORM\Column(name: 'event_type', type: 'string', enumType: FormationRecommendationEventType::class, length: 24, nullable: true)]
-    private ?FormationRecommendationEventType $eventType = null;
+    #[ORM\Column(name: 'event_type', type: 'string', enumType: FormationRecommendationEventType::class, length: 24, nullable: false)]
+    private FormationRecommendationEventType $eventType;
 
     #[ORM\Column(name: 'created_at', type: 'datetime_immutable', nullable: false)]
     private \DateTimeImmutable $createdAt;
@@ -92,12 +92,12 @@ class FormationRecommendationEvent
         return $this;
     }
 
-    public function getEventType(): ?FormationRecommendationEventType
+    public function getEventType(): FormationRecommendationEventType
     {
         return $this->eventType;
     }
 
-    public function setEventType(?FormationRecommendationEventType $eventType): self
+    public function setEventType(FormationRecommendationEventType $eventType): self
     {
         $this->eventType = $eventType;
         return $this;

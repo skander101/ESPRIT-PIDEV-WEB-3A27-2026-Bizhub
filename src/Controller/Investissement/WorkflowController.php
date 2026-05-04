@@ -63,8 +63,8 @@ class WorkflowController extends AbstractController
         $buyer  = null;
         $seller = null;
         if ($deal) {
-            $buyer  = $this->em->getRepository(User::class)->find($deal->getBuyer_id());
-            $seller = $this->em->getRepository(User::class)->find($deal->getSeller_id());
+            $buyer  = $deal->getBuyer();
+            $seller = $deal->getSeller();
         }
 
         // ── Compute workflow stage ────────────────────────────────────────────

@@ -36,13 +36,13 @@ class PromoCode
     private bool $isActive = true;
 
     #[ORM\Column(type: 'datetime_immutable')]
-    private \DateTimeInterface $createdAt;
+    private \DateTimeImmutable $createdAt;
 
     #[ORM\Column(type: 'datetime_immutable')]
-    private \DateTimeInterface $expiresAt;
+    private \DateTimeImmutable $expiresAt;
 
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
-    private ?\DateTimeInterface $usedAt = null;
+    private ?\DateTimeImmutable $usedAt = null;
 
     #[ORM\ManyToOne(targetEntity: Participation::class)]
     #[ORM\JoinColumn(name: 'participation_source_id', referencedColumnName: 'id_candidature', nullable: true, onDelete: 'SET NULL')]
@@ -118,7 +118,7 @@ class PromoCode
         return $this->createdAt;
     }
 
-    private function setCreatedAt(\DateTimeInterface $createdAt): self
+    private function setCreatedAt(\DateTimeImmutable $createdAt): self
     {
         $this->createdAt = $createdAt;
         return $this;
@@ -129,7 +129,7 @@ class PromoCode
         return $this->expiresAt;
     }
 
-    public function setExpiresAt(\DateTimeInterface $expiresAt): self
+    public function setExpiresAt(\DateTimeImmutable $expiresAt): self
     {
         $this->expiresAt = $expiresAt;
 
@@ -141,7 +141,7 @@ class PromoCode
         return $this->usedAt;
     }
 
-    public function setUsedAt(?\DateTimeInterface $usedAt): self
+    public function setUsedAt(?\DateTimeImmutable $usedAt): self
     {
         $this->usedAt = $usedAt;
 
@@ -160,14 +160,14 @@ class PromoCode
         return $this;
     }
 
-    public function markUsed(\DateTimeInterface $at): void
+    public function markUsed(\DateTimeImmutable $at): void
     {
         $this->isUsed = true;
         $this->isActive = false;
         $this->usedAt = $at;
     }
 
-    public function isUsableNow(\DateTimeInterface $now): bool
+    public function isUsableNow(\DateTimeImmutable $now): bool
     {
         return $this->isActive
             && !$this->isUsed

@@ -84,14 +84,14 @@ class Investment
     #[Assert\Length(max: 500, maxMessage: "L'URL du contrat ne peut pas dépasser {{ limit }} caractères.")]
     private ?string $contract_url = null;
 
-    #[ORM\Column(type: 'string', length: 50, options: ['default' => 'virement'])]
+    #[ORM\Column(type: 'string', length: 50, nullable: true, options: ['default' => 'virement'])]
     #[Assert\Choice(
         choices: ['virement', 'cheque', 'especes', 'carte', 'crypto'],
         message: 'Mode de paiement invalide.'
     )]
     private ?string $payment_mode = 'virement';
 
-    #[ORM\Column(type: 'string', length: 30, options: ['default' => 'en_attente'])]
+    #[ORM\Column(type: 'string', length: 30, nullable: true, options: ['default' => 'en_attente'])]
     #[Assert\Choice(
         choices: ['en_attente', 'en_negociation', 'accepte', 'refuse', 'contrat_genere', 'signe', 'termine'],
         message: 'Statut invalide.'
@@ -120,12 +120,12 @@ class Investment
     #[Assert\Length(max: 800, maxMessage: 'Les conditions ne peuvent pas dépasser {{ limit }} caractères.')]
     private ?string $conditions_particulieres = null;
 
-    #[ORM\Column(type: 'datetime', nullable: false)]
-    private \DateTimeInterface $created_at;
+    #[ORM\Column(type: 'datetime_immutable', nullable: false)]
+    private \DateTimeImmutable $created_at;
 
     public function __construct()
     {
-        $this->created_at = new \DateTime();
+        $this->created_at = new \DateTimeImmutable();
     }
 
     public function getInvestment_id(): ?int { return $this->investment_id; }
@@ -169,10 +169,10 @@ class Investment
     public function setContractUrl(?string $contract_url): self { $this->contract_url = $contract_url; return $this; }
 
     public function getPaymentMode(): ?string { return $this->payment_mode; }
-    public function setPaymentMode(?string $payment_mode): self { $this->payment_mode = $payment_mode; return $this; }
+    public function setPaymentMode(?string $payment_mode): self { $this->payment_mode = $payment_mode ?? 'virement'; return $this; }
 
     public function getStatut(): ?string { return $this->statut; }
-    public function setStatut(?string $statut): self { $this->statut = $statut; return $this; }
+    public function setStatut(?string $statut): self { $this->statut = $statut ?? 'en_attente'; return $this; }
 
     public function getCommentaire(): ?string { return $this->commentaire; }
     public function setCommentaire(?string $commentaire): self { $this->commentaire = $commentaire; return $this; }
@@ -186,8 +186,8 @@ class Investment
     public function getConditionsParticulieres(): ?string { return $this->conditions_particulieres; }
     public function setConditionsParticulieres(?string $conditions_particulieres): self { $this->conditions_particulieres = $conditions_particulieres; return $this; }
 
-    public function getCreated_at(): ?\DateTimeInterface { return $this->created_at; }
-    public function getCreatedAt(): ?\DateTimeInterface { return $this->created_at; }
-    protected function setCreated_at(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
-    protected function setCreatedAt(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
+    public function getCreated_at(): \DateTimeImmutable { return $this->created_at; }
+    public function getCreatedAt(): \DateTimeImmutable { return $this->created_at; }
+    protected function setCreated_at(\DateTimeImmutable $created_at): self { $this->created_at = $created_at; return $this; }
+    protected function setCreatedAt(\DateTimeImmutable $created_at): self { $this->created_at = $created_at; return $this; }
 }

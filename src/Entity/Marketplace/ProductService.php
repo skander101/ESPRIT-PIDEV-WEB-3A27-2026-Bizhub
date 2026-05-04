@@ -85,8 +85,8 @@ class ProductService
     #[ORM\Column(type: 'string', length: 20, options: ['default' => 'active'])]
     private string $status = self::STATUS_ACTIVE;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?\DateTimeInterface $created_at = null;
+    #[ORM\Column(type: 'datetime_immutable', nullable: false)]
+    private \DateTimeImmutable $created_at;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'seller_id', referencedColumnName: 'user_id', nullable: true, onDelete: 'SET NULL')]
@@ -99,7 +99,7 @@ class ProductService
     public function __construct()
     {
         $this->orders     = new ArrayCollection();
-        $this->created_at = new \DateTime();
+        $this->created_at = new \DateTimeImmutable();
     }
 
     public function getProductId(): ?int { return $this->product_id; }
@@ -126,8 +126,8 @@ class ProductService
     public function setStatus(string $status): self { $this->status = $status; return $this; }
     public function isActive(): bool { return $this->status === self::STATUS_ACTIVE; }
 
-    public function getCreatedAt(): ?\DateTimeInterface { return $this->created_at; }
-    public function setCreatedAt(?\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
+    public function getCreatedAt(): \DateTimeImmutable { return $this->created_at; }
+    public function setCreatedAt(\DateTimeImmutable $created_at): self { $this->created_at = $created_at; return $this; }
 
     public function getSeller(): ?User { return $this->seller; }
     public function setSeller(?User $seller): self { $this->seller = $seller; return $this; }

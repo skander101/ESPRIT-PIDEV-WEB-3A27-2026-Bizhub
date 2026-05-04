@@ -74,7 +74,7 @@ class CommandeConfirmeeListener
                 // Notification toast en base (affichée côté investisseur à la prochaine visite)
                 $notif = (new AutoConfirmNotification())
                     ->setInvestisseurId($ownerId)
-                    ->setCommandeId($commande->getIdCommande())
+                    ->setOrder($commande)
                     ->setStartupName($startup->getFullName() ?? $startup->getEmail())
                     ->setMontantTtc($commande->getTotalTtc())
                     ->setScoreAuto($commande->getScoreAuto() ?? 0);

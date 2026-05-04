@@ -10,6 +10,7 @@ use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Security\Util\SensitiveParameter;
 
 use App\Repository\Investissement\DealRepository;
+use App\Entity\UsersAvis\User;
 
 #[ORM\Entity(repositoryClass: DealRepository::class)]
 #[ORM\Table(name: 'deal')]
@@ -36,24 +37,21 @@ class Deal
     #[ORM\Column(type: 'integer')]
     private ?int $deal_id = null;
 
-    #[ORM\Column(type: 'integer', nullable: true)]
-    #[Assert\Positive(message: 'ID négociation invalide.')]
-    private ?int $negotiation_id = null;
+    #[ORM\ManyToOne(targetEntity: Negotiation::class)]
+    #[ORM\JoinColumn(name: 'negotiation_id', referencedColumnName: 'negotiation_id', nullable: true)]
+    private ?Negotiation $negotiation = null;
 
-    #[ORM\Column(type: 'integer')]
-    #[Assert\NotNull(message: 'Le projet est obligatoire.')]
-    #[Assert\Positive(message: 'ID projet invalide.')]
-    private int $project_id = 0;
+    #[ORM\ManyToOne(targetEntity: Project::class)]
+    #[ORM\JoinColumn(name: 'project_id', referencedColumnName: 'project_id', nullable: false)]
+    private ?Project $project = null;
 
-    #[ORM\Column(type: 'integer')]
-    #[Assert\NotNull(message: 'L\'acheteur est obligatoire.')]
-    #[Assert\Positive(message: 'ID acheteur invalide.')]
-    private int $buyer_id = 0;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'buyer_id', referencedColumnName: 'user_id', nullable: false)]
+    private ?User $buyer = null;
 
-    #[ORM\Column(type: 'integer')]
-    #[Assert\NotNull(message: 'Le vendeur est obligatoire.')]
-    #[Assert\Positive(message: 'ID vendeur invalide.')]
-    private int $seller_id = 0;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'seller_id', referencedColumnName: 'user_id', nullable: false)]
+    private ?User $seller = null;
 
     #[ORM\Column(type: 'decimal', precision: 15, scale: 2)]
     #[Assert\NotNull(message: 'Le montant est obligatoire.')]
@@ -64,7 +62,7 @@ class Deal
     #[Assert\Length(max: 255, maxMessage: 'L\'ID Stripe ne peut pas dépasser {{ limit }} caractères.')]
     private ?string $stripe_payment_intent_id = null;
 
-    #[ORM\Column(type: 'string', length: 50, options: ['default' => 'pending'])]
+    #[ORM\Column(type: 'string', length: 50, nullable: true, options: ['default' => 'pending'])]
     #[Assert\Length(max: 50, maxMessage: 'Le statut Stripe ne peut pas dépasser {{ limit }} caractères.')]
     private ?string $stripe_payment_status = 'pending';
 
@@ -80,11 +78,11 @@ class Deal
     #[Assert\Length(max: 255, maxMessage: 'L\'ID YouSign ne peut pas dépasser {{ limit }} caractères.')]
     private ?string $yousign_signature_request_id = null;
 
-    #[ORM\Column(type: 'string', length: 50, options: ['default' => 'pending'])]
+    #[ORM\Column(type: 'string', length: 50, nullable: true, options: ['default' => 'pending'])]
     #[Assert\Length(max: 50, maxMessage: 'Le statut YouSign ne peut pas dépasser {{ limit }} caractères.')]
     private ?string $yousign_status = 'pending';
 
-    #[ORM\Column(type: 'boolean', options: ['default' => 0])]
+    #[ORM\Column(type: 'boolean', nullable: true, options: ['default' => 0])]
     private ?bool $email_sent = false;
 
     #[ORM\Column(type: 'string', length: 64, options: ['default' => 'pending_payment'])]
@@ -95,8 +93,8 @@ class Deal
     )]
     private string $status = self::STATUS_PENDING_PAYMENT;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?\DateTimeInterface $created_at = null;
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $completed_at = null;
@@ -113,23 +111,23 @@ class Deal
 
     public function __construct()
     {
-        $this->created_at = new \DateTime();
+        $this->created_at = new \DateTimeImmutable();
     }
 
     public function getDeal_id(): ?int { return $this->deal_id; }
     public function setDeal_id(int $deal_id): self { $this->deal_id = $deal_id; return $this; }
 
-    public function getNegotiation_id(): ?int { return $this->negotiation_id; }
-    public function setNegotiation_id(?int $negotiation_id): self { $this->negotiation_id = $negotiation_id; return $this; }
+    public function getNegotiation(): ?Negotiation { return $this->negotiation; }
+    public function setNegotiation(?Negotiation $negotiation): self { $this->negotiation = $negotiation; return $this; }
 
-    public function getProject_id(): int { return $this->project_id; }
-    public function setProject_id(int $project_id): self { $this->project_id = $project_id; return $this; }
+    public function getProject(): ?Project { return $this->project; }
+    public function setProject(?Project $project): self { $this->project = $project; return $this; }
 
-    public function getBuyer_id(): int { return $this->buyer_id; }
-    public function setBuyer_id(int $buyer_id): self { $this->buyer_id = $buyer_id; return $this; }
+    public function getBuyer(): ?User { return $this->buyer; }
+    public function setBuyer(?User $buyer): self { $this->buyer = $buyer; return $this; }
 
-    public function getSeller_id(): int { return $this->seller_id; }
-    public function setSeller_id(int $seller_id): self { $this->seller_id = $seller_id; return $this; }
+    public function getSeller(): ?User { return $this->seller; }
+    public function setSeller(?User $seller): self { $this->seller = $seller; return $this; }
 
     public function getAmount(): string { return $this->amount; }
     public function setAmount(string $amount): self { $this->amount = $amount; return $this; }
@@ -138,7 +136,7 @@ class Deal
     public function setStripe_payment_intent_id(?string $stripe_payment_intent_id): self { $this->stripe_payment_intent_id = $stripe_payment_intent_id; return $this; }
 
     public function getStripe_payment_status(): ?string { return $this->stripe_payment_status; }
-    public function setStripe_payment_status(?string $stripe_payment_status): self { $this->stripe_payment_status = $stripe_payment_status; return $this; }
+    public function setStripe_payment_status(?string $stripe_payment_status): self { $this->stripe_payment_status = $stripe_payment_status ?? 'pending'; return $this; }
 
     public function getStripe_checkout_session_id(): ?string { return $this->stripe_checkout_session_id; }
     public function setStripe_checkout_session_id(?string $stripe_checkout_session_id): self { $this->stripe_checkout_session_id = $stripe_checkout_session_id; return $this; }
@@ -150,7 +148,7 @@ class Deal
     public function setYousign_signature_request_id(?string $yousign_signature_request_id): self { $this->yousign_signature_request_id = $yousign_signature_request_id; return $this; }
 
     public function getYousign_status(): ?string { return $this->yousign_status; }
-    public function setYousign_status(?string $yousign_status): self { $this->yousign_status = $yousign_status; return $this; }
+    public function setYousign_status(?string $yousign_status): self { $this->yousign_status = $yousign_status ?? 'pending'; return $this; }
 
     public function getSignature_token(): ?string { return $this->signature_token; }
     public function setSignature_token(#[SensitiveParameter] ?string $signature_token): self { $this->signature_token = $signature_token; return $this; }
@@ -161,14 +159,14 @@ class Deal
     public function getSignature_sent_at(): ?\DateTimeInterface { return $this->signature_sent_at; }
     protected function setSignature_sent_at(?\DateTimeInterface $signature_sent_at): self { $this->signature_sent_at = $signature_sent_at; return $this; }
 
-    public function isEmail_sent(): ?bool { return $this->email_sent; }
-    public function setEmail_sent(?bool $email_sent): self { $this->email_sent = $email_sent; return $this; }
+    public function isEmail_sent(): bool { return $this->email_sent ?? false; }
+    public function setEmail_sent(?bool $email_sent): self { $this->email_sent = $email_sent ?? false; return $this; }
 
     public function getStatus(): string { return $this->status; }
     public function setStatus(string $status): self { $this->status = $status; return $this; }
 
-    public function getCreated_at(): ?\DateTimeInterface { return $this->created_at; }
-    protected function setCreated_at(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
+    public function getCreated_at(): ?\DateTimeImmutable { return $this->created_at; }
+    protected function setCreated_at(?\DateTimeImmutable $created_at): self { $this->created_at = $created_at; return $this; }
 
     public function getCompleted_at(): ?\DateTimeInterface { return $this->completed_at; }
     protected function setCompleted_at(?\DateTimeInterface $completed_at): self { $this->completed_at = $completed_at; return $this; }

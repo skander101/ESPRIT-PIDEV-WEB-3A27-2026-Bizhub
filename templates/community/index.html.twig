@@ -329,7 +329,7 @@
       <div class="card mb-4 shadow-sm">
         <div class="card-body">
         <span class="section-label">Quoi de neuf ?</span>
-        <form method="post" action="{{ path('community_new') }}">
+        <form method="post" action="{{ path('community_new') }}" enctype="multipart/form-data">
           <div class="row">
             <div class="form-group" style="margin-bottom:0;">
               <input type="text" name="title" class="form-control" placeholder="Titre">
@@ -337,7 +337,7 @@
             <div class="form-group" style="margin-bottom:0;">
               <textarea name="content" class="form-control" rows="3" placeholder="Partagez quelque chose..."></textarea>
             </div>
-            <div class="form-row" style="grid-template-columns: 1fr 220px; align-items:end;">
+            <div class="form-row" style="grid-template-columns: 1fr; align-items:end;">
               <div class="form-group" style="margin-bottom:0;">
                 <label>Catégorie</label>
                 <select name="category" class="form-select">
@@ -347,12 +347,31 @@
                   <option value="Other">Other</option>
                 </select>
               </div>
-              <div class="form-group" style="margin-bottom:0; position:relative;">
-                <label>📍 Lieu (optionnel)</label>
-                <input type="text" name="location" class="form-control" placeholder="Ex: Tunis, Sousse..." autocomplete="off" data-location-input>
-                <input type="hidden" name="location_lat" data-location-lat>
-                <input type="hidden" name="location_lon" data-location-lon>
-                <div data-location-suggest style="position:absolute;left:0;right:0;top: calc(100% + 6px); z-index:60; display:none;"></div>
+              <div style="position:relative; margin-bottom:12px;">
+                <input
+                    type="text"
+                    id="locationInput"
+                    name="location"
+                    placeholder="📍 Add a location (optional)..."
+                    autocomplete="off"
+                    value=""
+                    style="width:100%; padding:10px 14px; border:1px solid #ddd;
+                           border-radius:8px; font-size:0.9rem; box-sizing:border-box;"
+                >
+                <input type="hidden" id="locationLat" name="location_lat">
+                <input type="hidden" id="locationLon" name="location_lon">
+
+                <div id="locationDropdown"
+                     style="display:none; position:absolute; top:100%; left:0; right:0;
+                            background:white; border:1px solid #ddd; border-top:none;
+                            border-radius:0 0 8px 8px;
+                            box-shadow:0 4px 12px rgba(0,0,0,0.15);
+                            z-index:1000; max-height:200px; overflow-y:auto;">
+                </div>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label>Media (image/video, optionnel)</label>
+                <input type="file" name="media" accept="image/*,video/*" class="form-control">
               </div>
               <div class="form-group" style="margin-bottom:0;">
                 <button type="submit" class="btn btn-primary w-100"><i class="fa fa-paper-plane"></i> Publier</button>
@@ -367,6 +386,32 @@
     <div id="communityPosts" data-posts-container>
       {% include 'community/_posts.html.twig' with { posts: posts } %}
     </div>
+
+    {% if total_pages > 1 %}
+    <nav aria-label="Pagination" style="display:flex; justify-content:center; gap:8px; margin:20px 0;">
+      {% set qParams = {} %}
+      {% if search is not empty %}{% set qParams = qParams|merge({search: search}) %}{% endif %}
+      {% if category is not empty %}{% set qParams = qParams|merge({category: category}) %}{% endif %}
+
+      {% if page > 1 %}
+        <a href="{{ path('community_index', qParams|merge({page: page - 1})) }}" class="btn btn-secondary" data-page="{{ page - 1 }}">← Précédent</a>
+      {% endif %}
+
+      {% for p in 1..total_pages %}
+        {% if p == page %}
+          <span class="btn btn-primary" style="pointer-events:none;">{{ p }}</span>
+        {% elseif p == 1 or p == total_pages or (p >= page - 2 and p <= page + 2) %}
+          <a href="{{ path('community_index', qParams|merge({page: p})) }}" class="btn btn-secondary" data-page="{{ p }}">{{ p }}</a>
+        {% elseif p == page - 3 or p == page + 3 %}
+          <span style="color:var(--text-muted);">…</span>
+        {% endif %}
+      {% endfor %}
+
+      {% if page < total_pages %}
+        <a href="{{ path('community_index', qParams|merge({page: page + 1})) }}" class="btn btn-secondary" data-page="{{ page + 1 }}">Suivant →</a>
+      {% endif %}
+    </nav>
+    {% endif %}
 </div>
 {% endblock %}
 
@@ -532,7 +577,25 @@
         fetchPosts();
       });
 
-      // Prevent empty post submit -> show message immediately
+      // Handle pagination clicks via AJAX
+  document.addEventListener('click', async function(e) {
+    const paginationLink = e.target.closest('nav a[data-page]');
+    if (!paginationLink) return;
+    e.preventDefault();
+    const url = new URL(paginationLink.href);
+    url.searchParams.set('search', searchInput?.value || '');
+    url.searchParams.set('category', categorySelect?.value || '');
+    const res = await fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+    if (!res.ok) return;
+    const html = await res.text();
+    if (postsContainer) {
+      postsContainer.innerHTML = html;
+      attachReactions(postsContainer);
+    }
+    window.history.replaceState({}, '', paginationLink.href);
+  });
+
+  // Prevent empty post submit -> show message immediately
       const createForm = document.querySelector('form[action*="/community/new"]');
       if (createForm){
         createForm.addEventListener('submit', (e) => {
@@ -558,79 +621,107 @@
         btn.addEventListener('click', () => btn.closest('.alert')?.remove());
       });
 
-      // Nominatim location autocomplete (server proxy)
-      const input = document.querySelector('[data-location-input]');
-      const latEl = document.querySelector('[data-location-lat]');
-      const lonEl = document.querySelector('[data-location-lon]');
-      const suggest = document.querySelector('[data-location-suggest]');
-      let debounceTimer = null;
-      let lastQuery = '';
+      (function() {
+        var input = document.getElementById('locationInput');
+        var dropdown = document.getElementById('locationDropdown');
+        var latField = document.getElementById('locationLat');
+        var lonField = document.getElementById('locationLon');
 
-      function closeSuggest(){
-        if (!suggest) return;
-        suggest.style.display = 'none';
-        suggest.innerHTML = '';
-      }
-      function renderSuggest(items){
-        if (!suggest) return;
-        if (!items || items.length === 0) { closeSuggest(); return; }
-        suggest.style.display = 'block';
-        suggest.innerHTML = '';
-        const card = document.createElement('div');
-        card.className = 'card shadow-sm';
-        const body = document.createElement('div');
-        body.className = 'card-body';
-        body.style.padding = '10px';
-        body.style.display = 'grid';
-        body.style.gap = '6px';
-        items.forEach(it => {
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'btn btn-secondary';
-          btn.style.justifyContent = 'flex-start';
-          btn.style.textTransform = 'none';
-          btn.style.letterSpacing = 'normal';
-          btn.style.fontFamily = 'Inter, sans-serif';
-          btn.style.fontWeight = '700';
-          btn.textContent = it.display_name;
-          btn.addEventListener('click', () => {
-            input.value = it.display_name;
-            latEl.value = it.lat;
-            lonEl.value = it.lon;
-            closeSuggest();
-          });
-          body.appendChild(btn);
-        });
-        card.appendChild(body);
-        suggest.appendChild(card);
-      }
+        if (!input) return;
 
-      async function fetchLocations(q){
-        const res = await fetch(`/community/location-search?q=${encodeURIComponent(q)}`, {
-          headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        });
-        if (!res.ok) return [];
-        return await res.json();
-      }
+        var debounceTimer;
 
-      if (input && suggest && latEl && lonEl){
-        input.addEventListener('input', () => {
-          latEl.value = '';
-          lonEl.value = '';
-          const q = input.value.trim();
-          if (q.length < 3){ closeSuggest(); return; }
-          lastQuery = q;
+        input.addEventListener('input', function() {
           clearTimeout(debounceTimer);
-          debounceTimer = setTimeout(async () => {
-            const data = await fetchLocations(q);
-            if (input.value.trim() !== lastQuery) return;
-            renderSuggest(data);
-          }, 300);
+          var q = this.value.trim();
+
+          // Reset coords when user types again
+          latField.value = '';
+          lonField.value = '';
+
+          if (q.length < 2) {
+            dropdown.style.display = 'none';
+            dropdown.innerHTML = '';
+            return;
+          }
+
+          debounceTimer = setTimeout(function() {
+            function fetchFromBackend(query) {
+              return fetch('{{ path("community_location_search") }}?q=' + encodeURIComponent(query), {
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+              }).then(function(r) {
+                if (!r.ok) {
+                  throw new Error('backend location-search failed');
+                }
+                return r.json();
+              });
+            }
+
+            function fetchFromNominatim(query) {
+              var url = 'https://nominatim.openstreetmap.org/search?format=json&limit=5&q=' + encodeURIComponent(query);
+              return fetch(url, { headers: { 'Accept': 'application/json' } })
+                .then(function(r) { return r.ok ? r.json() : []; });
+            }
+
+            fetchFromBackend(q)
+              .catch(function() {
+                // Frontend fallback if Symfony proxy returns 500.
+                return fetchFromNominatim(q);
+              })
+              .then(function(data) {
+                dropdown.innerHTML = '';
+
+                if (!data || data.length === 0) {
+                  dropdown.style.display = 'none';
+                  return;
+                }
+
+                data.forEach(function(item) {
+                  var div = document.createElement('div');
+                  div.style.cssText = 'padding:10px 14px; cursor:pointer; ' +
+                    'font-size:0.88rem; border-bottom:1px solid #f0f0f0; ' +
+                    'background:white;';
+                  div.textContent = '📍 ' + item.display_name;
+
+                  div.addEventListener('mouseenter', function() {
+                    this.style.background = '#f5f5f5';
+                  });
+                  div.addEventListener('mouseleave', function() {
+                    this.style.background = 'white';
+                  });
+
+                  div.addEventListener('click', function() {
+                    // Shorten display: take first part + last part
+                    var parts = item.display_name.split(', ');
+                    var shortName = parts.length >= 2
+                      ? parts[0] + ', ' + parts[parts.length - 1]
+                      : item.display_name;
+
+                    input.value = shortName;
+                    latField.value = item.lat;
+                    lonField.value = item.lon;
+                    dropdown.style.display = 'none';
+                    dropdown.innerHTML = '';
+                  });
+
+                  dropdown.appendChild(div);
+                });
+
+                dropdown.style.display = 'block';
+              })
+              .catch(function() {
+                dropdown.style.display = 'none';
+              });
+          }, 350);
         });
-        document.addEventListener('click', (e) => {
-          if (!suggest.contains(e.target) && e.target !== input) closeSuggest();
+
+        // Hide dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+          if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.style.display = 'none';
+          }
         });
-      }
+      })();
     })();
   </script>
 {% endblock %}

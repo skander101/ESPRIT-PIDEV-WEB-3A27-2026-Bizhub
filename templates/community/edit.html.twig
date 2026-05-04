@@ -87,7 +87,7 @@
     <div class="card shadow-sm">
         <div class="card-body">
             <h2 style="font-family:'Josefin Sans',sans-serif;margin-bottom:14px;">Modifier le post</h2>
-            <form method="post">
+            <form method="post" enctype="multipart/form-data">
                 <div class="mb-3">
                     <label class="form-label">Titre</label>
                     <input type="text" name="title" class="form-control" value="{{ post.title }}">
@@ -111,6 +111,22 @@
                     <input type="hidden" name="location_lat" value="{{ post.locationLat ?? '' }}" data-location-lat>
                     <input type="hidden" name="location_lon" value="{{ post.locationLon ?? '' }}" data-location-lon>
                     <div data-location-suggest style="position:absolute;left:0;right:0;top: calc(100% + 6px); z-index:60; display:none;"></div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Media (image/video, optionnel)</label>
+                    {% if post.mediaUrl %}
+                      <div style="margin-bottom:8px;">
+                        {% if post.mediaType and post.mediaType starts with 'video/' %}
+                          <video controls preload="metadata" style="max-width:320px; border-radius:10px; border:1px solid var(--border); display:block;">
+                            <source src="{{ asset(post.mediaUrl) }}" type="{{ post.mediaType }}">
+                            Votre navigateur ne supporte pas la lecture video.
+                          </video>
+                        {% else %}
+                          <img src="{{ asset(post.mediaUrl) }}" alt="Post image" style="max-width:220px; border-radius:10px; border:1px solid var(--border); display:block;">
+                        {% endif %}
+                      </div>
+                    {% endif %}
+                    <input type="file" name="media" accept="image/*,video/*" class="form-control">
                 </div>
                 <div style="display:flex; gap:10px; flex-wrap:wrap;">
                   <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Enregistrer</button>

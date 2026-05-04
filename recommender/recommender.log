@@ -9,3 +9,10 @@ INFO:     127.0.0.1:42988 - "POST /recommendations/36 HTTP/1.1" 200 OK
 INFO:     127.0.0.1:43448 - "POST /recommendations/36 HTTP/1.1" 200 OK
 INFO:     127.0.0.1:40624 - "GET /health HTTP/1.1" 200 OK
 INFO:     127.0.0.1:60556 - "POST /recommendations/36 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58564 - "POST /recommendations/36 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46272 - "POST /recommendations/36 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51912 - "POST /recommendations/36 HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [85497]
