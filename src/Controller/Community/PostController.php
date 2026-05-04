@@ -12,6 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -22,6 +23,8 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 #[IsGranted('IS_AUTHENTICATED_FULLY')]
 class PostController extends AbstractController
 {
+    private const COMMUNITY_UPLOAD_DIR = 'uploads/community';
+
     #[Route('/', name: 'community_index', methods: ['GET'])]
     public function index(Request $request, PostRepository $postRepo, CommentaireRepository $commentRepo, ReactionManager $reactionManager): Response
     {
@@ -99,6 +102,8 @@ class PostController extends AbstractController
             return $this->redirectToRoute('community_index');
         }
 
+        $postMedia = $request->files->get('media') ?? $request->files->get('image') ?? $request->files->get('video');
+
         $post = new Post();
         $post->setUserId($this->getUser()->getUserId());
         $post->setTitle($title);
@@ -108,6 +113,13 @@ class PostController extends AbstractController
         $post->setLocation($location ? trim((string) $location) : null);
         $post->setLocationLat($locationLat !== null && $locationLat !== '' ? (float) $locationLat : null);
         $post->setLocationLon($locationLon !== null && $locationLon !== '' ? (float) $locationLon : null);
+        if ($postMedia instanceof UploadedFile) {
+            $publicPath = $this->storeCommunityMedia($postMedia);
+            if ($publicPath !== null) {
+                $post->setMediaUrl($publicPath);
+                $post->setMediaType((string) ($postMedia->getClientMimeType() ?: 'application/octet-stream'));
+            }
+        }
 
         $em->persist($post);
         $em->flush();
@@ -151,6 +163,14 @@ class PostController extends AbstractController
             $post->setLocation($location ? trim((string) $location) : null);
             $post->setLocationLat($locationLat !== null && $locationLat !== '' ? (float) $locationLat : null);
             $post->setLocationLon($locationLon !== null && $locationLon !== '' ? (float) $locationLon : null);
+            $postMedia = $request->files->get('media') ?? $request->files->get('image') ?? $request->files->get('video');
+            if ($postMedia instanceof UploadedFile) {
+                $publicPath = $this->storeCommunityMedia($postMedia);
+                if ($publicPath !== null) {
+                    $post->setMediaUrl($publicPath);
+                    $post->setMediaType((string) ($postMedia->getClientMimeType() ?: 'application/octet-stream'));
+                }
+            }
             $em->flush();
 
             $this->addFlash('success', 'Post modifié avec succès.');
@@ -201,6 +221,12 @@ class PostController extends AbstractController
             throw $this->createNotFoundException('Post non trouvé');
         }
         $comments = $commentRepo->findByPostIdWithAuthor($id);
+        foreach ($comments as &$comment) {
+            $parsedComment = $this->extractCommentImage((string) ($comment['content'] ?? ''));
+            $comment['content_text'] = $parsedComment['text'];
+            $comment['image_url'] = $parsedComment['image'];
+        }
+        unset($comment);
 
         $reactionEmojis = [
             'LIKE' => '👍',
@@ -239,10 +265,18 @@ class PostController extends AbstractController
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function commentNew(int $postId, Request $request, EntityManagerInterface $em): Response
     {
-        $content = $request->request->get('content');
-        if (empty($content)) {
-            $this->addFlash('error', 'Le commentaire ne peut pas être vide.');
+        $content = trim((string) $request->request->get('content', ''));
+        $commentImage = $request->files->get('image');
+        if ($content === '' && !($commentImage instanceof UploadedFile)) {
+            $this->addFlash('error', 'Le commentaire ou une image est obligatoire.');
             return $this->redirectToRoute('community_show', ['id' => $postId]);
+        }
+
+        if ($commentImage instanceof UploadedFile) {
+            $publicPath = $this->storeCommunityMedia($commentImage, false);
+            if ($publicPath !== null) {
+                $content = $this->injectCommentImage($content, $publicPath);
+            }
         }
 
         $comment = new Commentaire();
@@ -273,13 +307,24 @@ class PostController extends AbstractController
             return $this->redirectToRoute('community_show', ['id' => $comment->getPostId()]);
         }
 
-        $newContent = $request->request->get('content');
-        if (empty($newContent)) {
-            $this->addFlash('error', 'Le commentaire ne peut pas être vide.');
+        $newContent = trim((string) $request->request->get('content', ''));
+        $commentImage = $request->files->get('image');
+        $existingParsed = $this->extractCommentImage((string) $comment->getContent());
+        $existingImage = $existingParsed['image'];
+
+        if ($commentImage instanceof UploadedFile) {
+            $newImagePath = $this->storeCommunityMedia($commentImage, false);
+            if ($newImagePath !== null) {
+                $existingImage = $newImagePath;
+            }
+        }
+
+        if ($newContent === '' && $existingImage === null) {
+            $this->addFlash('error', 'Le commentaire ou une image est obligatoire.');
             return $this->redirectToRoute('community_show', ['id' => $comment->getPostId()]);
         }
 
-        $comment->setContent($newContent);
+        $comment->setContent($this->injectCommentImage($newContent, $existingImage));
         $em->flush();
 
         $this->addFlash('success', 'Commentaire modifié.');
@@ -355,5 +400,58 @@ class PostController extends AbstractController
         ]);
 
         return new JsonResponse($resp->toArray(false));
+    }
+
+    private function storeCommunityMedia(UploadedFile $file, bool $allowVideo = true): ?string
+    {
+        $mime = (string) $file->getClientMimeType();
+        $isImage = strpos($mime, 'image/') === 0;
+        $isVideo = strpos($mime, 'video/') === 0;
+        if (!$isImage && !($allowVideo && $isVideo)) {
+            return null;
+        }
+
+        $ext = strtolower((string) $file->guessExtension());
+        if ($isImage && !in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'], true)) {
+            $ext = 'jpg';
+        }
+        if ($isVideo && !in_array($ext, ['mp4', 'webm', 'ogg'], true)) {
+            $ext = 'mp4';
+        }
+
+        $uploadDir = $this->getParameter('kernel.project_dir') . '/public/' . self::COMMUNITY_UPLOAD_DIR;
+        if (!is_dir($uploadDir)) {
+            @mkdir($uploadDir, 0775, true);
+        }
+
+        $name = 'community_' . bin2hex(random_bytes(8)) . '.' . $ext;
+        $file->move($uploadDir, $name);
+
+        return '/' . self::COMMUNITY_UPLOAD_DIR . '/' . $name;
+    }
+
+    private function extractCommentImage(string $content): array
+    {
+        $image = null;
+        if (preg_match('/\[img\](.*?)\[\/img\]/s', $content, $m) === 1) {
+            $image = trim((string) ($m[1] ?? '')) ?: null;
+        }
+
+        $text = trim((string) preg_replace('/\[img\].*?\[\/img\]/s', '', $content));
+        return ['text' => $text, 'image' => $image];
+    }
+
+    private function injectCommentImage(string $text, ?string $image): string
+    {
+        $clean = trim((string) preg_replace('/\[img\].*?\[\/img\]/s', '', $text));
+        if ($image === null || trim($image) === '') {
+            return $clean;
+        }
+
+        if ($clean === '') {
+            return '[img]' . $image . '[/img]';
+        }
+
+        return $clean . "\n\n" . '[img]' . $image . '[/img]';
     }
 }
