@@ -23,6 +23,16 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Entity'
                 prefix: 'App\Entity'
                 alias: App
+            AppEmbeddable:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Embeddable'
+                prefix: 'App\Embeddable'
+            AppEnum:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Enum'
+                prefix: 'App\Enum'
         controller_resolver:
             auto_mapping: false
 

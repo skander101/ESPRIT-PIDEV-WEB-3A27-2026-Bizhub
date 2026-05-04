@@ -19,7 +19,7 @@ class PostRepository extends ServiceEntityRepository
         $sql = '
             SELECT p.*, u.full_name as author_name, u.avatar_url
             FROM post p
-            LEFT JOIN user u ON p.user_id = u.user_id
+            LEFT JOIN app_user u ON p.user_id = u.user_id
             ORDER BY p.created_at DESC
         ';
         return $conn->fetchAllAssociative($sql);
@@ -46,7 +46,7 @@ class PostRepository extends ServiceEntityRepository
         $sql = '
             SELECT p.*, u.full_name as author_name, u.avatar_url
             FROM post p
-            LEFT JOIN user u ON p.user_id = u.user_id
+            LEFT JOIN app_user u ON p.user_id = u.user_id
         ';
         if ($where) {
             $sql .= ' WHERE ' . implode(' AND ', $where);
@@ -62,7 +62,7 @@ class PostRepository extends ServiceEntityRepository
         $sql = '
             SELECT p.*, u.full_name as author_name, u.avatar_url
             FROM post p
-            LEFT JOIN user u ON p.user_id = u.user_id
+            LEFT JOIN app_user u ON p.user_id = u.user_id
             WHERE p.post_id = :id
         ';
         $result = $conn->fetchAllAssociative($sql, ['id' => $id]);

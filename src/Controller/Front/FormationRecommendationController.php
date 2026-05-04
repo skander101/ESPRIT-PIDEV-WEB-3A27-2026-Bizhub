@@ -7,6 +7,7 @@ namespace App\Controller\Front;
 use App\Entity\Elearning\Formation;
 use App\Entity\Elearning\FormationRecommendationEvent;
 use App\Entity\UsersAvis\User;
+use App\Enum\FormationRecommendationEventType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -56,7 +57,7 @@ final class FormationRecommendationController extends AbstractController
 
         $formationId = (int) ($payload['formation_id'] ?? 0);
         $section = (string) ($payload['section'] ?? '');
-        $eventType = (string) ($payload['event'] ?? FormationRecommendationEvent::EVENT_IMPRESSION);
+        $eventType = FormationRecommendationEventType::tryFrom((string) ($payload['event'] ?? '')) ?? FormationRecommendationEventType::IMPRESSION;
 
         if ($formationId <= 0) {
             return new JsonResponse(['ok' => false, 'error' => 'formation_id'], 422);
@@ -67,9 +68,9 @@ final class FormationRecommendationController extends AbstractController
         }
 
         $allowedEvents = [
-            FormationRecommendationEvent::EVENT_IMPRESSION,
-            FormationRecommendationEvent::EVENT_CLICK,
-            FormationRecommendationEvent::EVENT_ENROLL,
+            FormationRecommendationEventType::IMPRESSION,
+            FormationRecommendationEventType::CLICK,
+            FormationRecommendationEventType::ENROLL,
         ];
         if (!in_array($eventType, $allowedEvents, true)) {
             return new JsonResponse(['ok' => false, 'error' => 'event'], 422);
@@ -85,7 +86,6 @@ final class FormationRecommendationController extends AbstractController
         $ev->setFormation($formation);
         $ev->setSection($section);
         $ev->setEventType($eventType);
-        $ev->setCreatedAt(new \DateTimeImmutable());
         $this->entityManager->persist($ev);
         $this->entityManager->flush();
 

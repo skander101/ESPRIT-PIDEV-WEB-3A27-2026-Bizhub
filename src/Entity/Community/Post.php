@@ -4,6 +4,7 @@ namespace App\Entity\Community;
 
 use App\Repository\Community\PostRepository;
 use Doctrine\DBAL\Types\Types;
+use App\Entity\UsersAvis\User;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
@@ -15,53 +16,59 @@ class Post
     #[ORM\Column(name: 'post_id')]
     private ?int $id = null;
 
-    #[ORM\Column(name: 'user_id')]
-    private ?int $userId = null;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'user_id', nullable: false)]
+    private ?User $user = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $title = null;
+    private string $title = '';
 
     #[ORM\Column(type: Types::TEXT)]
-    private ?string $content = null;
+    private string $content = '';
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $category = null;
 
-    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $createdAt = null;
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE, nullable: false)]
+    private \DateTimeInterface $createdAt;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime();
+    }
 
     #[ORM\Column(name: 'media_url', length: 255, nullable: true)]
     private ?string $mediaUrl = null;
 
-    #[ORM\Column(name: 'media_type', length: 50, nullable: true)]
+    #[ORM\Column(name: 'media_type', length: 255, nullable: true)]
     private ?string $mediaType = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $location = null;
 
-    #[ORM\Column(name: 'location_lat', type: Types::FLOAT, nullable: true)]
-    private ?float $locationLat = null;
+    #[ORM\Column(name: 'location_lat', type: Types::DECIMAL, precision: 10, scale: 7, nullable: true)]
+    private ?string $locationLat = null;
 
-    #[ORM\Column(name: 'location_lon', type: Types::FLOAT, nullable: true)]
-    private ?float $locationLon = null;
+    #[ORM\Column(name: 'location_lon', type: Types::DECIMAL, precision: 10, scale: 7, nullable: true)]
+    private ?string $locationLon = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getUserId(): ?int
+    public function getUser(): ?User
     {
-        return $this->userId;
+        return $this->user;
     }
 
-    public function setUserId(int $userId): static
+    public function setUser(?User $user): static
     {
-        $this->userId = $userId;
+        $this->user = $user;
         return $this;
     }
 
-    public function getTitle(): ?string
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -72,7 +79,7 @@ class Post
         return $this;
     }
 
-    public function getContent(): ?string
+    public function getContent(): string
     {
         return $this->content;
     }
@@ -94,12 +101,12 @@ class Post
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getCreatedAt(): \DateTimeInterface
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTimeInterface $createdAt): static
+    private function setCreatedAt(\DateTimeInterface $createdAt): static
     {
         $this->createdAt = $createdAt;
         return $this;
@@ -138,23 +145,23 @@ class Post
         return $this;
     }
 
-    public function getLocationLat(): ?float
+    public function getLocationLat(): ?string
     {
         return $this->locationLat;
     }
 
-    public function setLocationLat(?float $locationLat): static
+    public function setLocationLat(?string $locationLat): static
     {
         $this->locationLat = $locationLat;
         return $this;
     }
 
-    public function getLocationLon(): ?float
+    public function getLocationLon(): ?string
     {
         return $this->locationLon;
     }
 
-    public function setLocationLon(?float $locationLon): static
+    public function setLocationLon(?string $locationLon): static
     {
         $this->locationLon = $locationLon;
         return $this;

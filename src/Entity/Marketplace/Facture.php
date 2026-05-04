@@ -31,14 +31,14 @@ class Facture
     #[ORM\Column(name: 'date_facture', type: 'datetime', nullable: false)]
     private \DateTimeInterface $dateFacture;
 
-    #[ORM\Column(name: 'total_ht', type: 'decimal', precision: 10, scale: 2, nullable: false)]
-    private string $totalHt = '0.00';
+    #[ORM\Column(name: 'total_ht', type: 'decimal', precision: 10, scale: 3, nullable: false)]
+    private string $totalHt = '0.000';
 
-    #[ORM\Column(name: 'total_tva', type: 'decimal', precision: 10, scale: 2, nullable: false)]
-    private string $totalTva = '0.00';
+    #[ORM\Column(name: 'total_tva', type: 'decimal', precision: 10, scale: 3, nullable: false)]
+    private string $totalTva = '0.000';
 
-    #[ORM\Column(name: 'total_ttc', type: 'decimal', precision: 10, scale: 2, nullable: false)]
-    private string $totalTtc = '0.00';
+    #[ORM\Column(name: 'total_ttc', type: 'decimal', precision: 10, scale: 3, nullable: false)]
+    private string $totalTtc = '0.000';
 
     /**
      * Référence Stripe (session ID ou payment_intent ID).
@@ -70,7 +70,7 @@ class Facture
     public function getNumeroFacture(): string { return $this->numeroFacture; }
     public function setNumeroFacture(string $v): self { $this->numeroFacture = $v; return $this; }
 
-public function getDateFacture(): \DateTimeInterface { return $this->dateFacture; }
+    public function getDateFacture(): \DateTimeInterface { return $this->dateFacture; }
     protected function setDateFacture(\DateTimeInterface $v): self { $this->dateFacture = $v; return $this; }
 
     public function getCreatedAt(): \DateTimeInterface { return $this->createdAt; }

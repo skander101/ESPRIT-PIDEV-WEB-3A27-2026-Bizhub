@@ -82,7 +82,6 @@ class InvestissementFrontController extends AbstractController
         $investment = new Investment();
         $investment->setProject($projet);
         $investment->setUser($user);
-        $investment->setCreatedAt(new \DateTime());
         $investment->setInvestmentDate(new \DateTime());
 
         $form = $this->createForm(InvestissementFrontType::class, $investment);

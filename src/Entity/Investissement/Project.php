@@ -73,21 +73,20 @@ class Project
     private ?int $project_id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(name: 'startup_id', referencedColumnName: 'user_id', nullable: true)]
+    #[ORM\JoinColumn(name: 'startup_id', referencedColumnName: 'user_id', nullable: false)]
     private ?User $user = null;
 
-    #[ORM\Column(type: 'string', nullable: false)]
+    #[ORM\Column(type: 'string', length: 200)]
     #[Assert\NotBlank(message: 'Le titre est obligatoire.')]
     #[Assert\Length(
         min: 3,
-        max: 255,
+        max: 200,
         minMessage: 'Le titre doit contenir au moins {{ limit }} caractères.',
         maxMessage: 'Le titre ne peut pas dépasser {{ limit }} caractères.'
     )]
     private string $title = '';
 
     #[ORM\Column(type: 'text', nullable: true)]
-    #[Assert\NotBlank(message: 'La description est obligatoire.', normalizer: 'trim')]
     #[Assert\Length(
         min: 20,
         max: 5000,
@@ -96,10 +95,10 @@ class Project
     )]
     private ?string $description = null;
 
-    #[ORM\Column(type: 'float', nullable: false)]
+    #[ORM\Column(type: 'decimal', precision: 15, scale: 2)]
     #[Assert\NotBlank(message: 'Le budget est obligatoire.')]
     #[Assert\Positive(message: 'Le budget doit être positif.')]
-    private float $required_budget = 0.0;
+    private string $required_budget = '0.00';
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
     #[Assert\NotBlank(message: 'Veuillez sélectionner un secteur.')]
@@ -109,18 +108,16 @@ class Project
     )]
     private ?string $secteur = null;
 
-    #[ORM\Column(type: 'string', length: 30, nullable: true, options: ['default' => 'pending'])]
+    #[ORM\Column(type: 'string', length: 30, options: ['default' => 'brouillon'])]
     #[Assert\NotBlank(message: 'Veuillez choisir un statut.')]
     #[Assert\Choice(
-        choices: ['pending', 'in_progress', 'funded', 'completed'],
+        choices: ['brouillon', 'pending', 'in_progress', 'funded', 'completed'],
         message: 'Veuillez choisir un statut valide.'
     )]
-    private ?string $status = self::STATUS_BROUILLON;
+    private ?string $status = 'brouillon';
 
-    #[ORM\Column(type: 'datetime', nullable: false)]
-    private \DateTimeInterface $created_at;
-
-    // ── Champs métier enrichis ───────────────────────────────────────────────
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $created_at = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
     #[Assert\Length(
@@ -140,10 +137,10 @@ class Project
     )]
     private ?string $solution_description = null;
 
-    #[ORM\Column(type: 'text', nullable: true)]
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Assert\Length(
         min: 10,
-        max: 1000,
+        max: 255,
         minMessage: 'Décrivez le public cible en au moins {{ limit }} caractères.',
         maxMessage: 'Le champ ne peut pas dépasser {{ limit }} caractères.'
     )]
@@ -156,7 +153,7 @@ class Project
     )]
     private ?string $business_model = null;
 
-    #[ORM\Column(type: 'string', length: 30, nullable: true)]
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
     #[Assert\Choice(
         choices: ['local', 'national', 'regional', 'international'],
         message: 'Veuillez choisir un marché valide.'
@@ -172,7 +169,7 @@ class Project
     )]
     private ?string $competitive_advantage = null;
 
-    #[ORM\Column(type: 'string', length: 30, nullable: true)]
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
     #[Assert\Choice(
         choices: ['idee', 'prototype', 'developpement', 'lance', 'commercialise'],
         message: 'Veuillez choisir un stade valide.'
@@ -190,14 +187,14 @@ class Project
 
     #[ORM\Column(type: 'text', nullable: true)]
     #[Assert\Length(
-        max: 1000,
+        max: 65535,
         maxMessage: 'Le champ ne peut pas dépasser {{ limit }} caractères.'
     )]
     private ?string $financial_forecast = null;
 
-    #[ORM\Column(type: 'string', length: 500, nullable: true)]
+    #[ORM\Column(type: 'text', nullable: true)]
     #[Assert\Length(
-        max: 500,
+        max: 65535,
         maxMessage: 'Le champ ne peut pas dépasser {{ limit }} caractères.'
     )]
     private ?string $team_description = null;
@@ -231,10 +228,10 @@ class Project
     public function getDescription(): ?string { return $this->description; }
     public function setDescription(?string $description): self { $this->description = $description; return $this; }
 
-    public function getRequired_budget(): ?float { return $this->required_budget; }
-    public function getRequiredBudget(): ?float { return $this->required_budget; }
-    public function setRequired_budget(float $required_budget): self { $this->required_budget = $required_budget; return $this; }
-    public function setRequiredBudget(float $required_budget): self { $this->required_budget = $required_budget; return $this; }
+    public function getRequired_budget(): ?string { return $this->required_budget; }
+    public function getRequiredBudget(): ?string { return $this->required_budget; }
+    public function setRequired_budget(string $required_budget): self { $this->required_budget = $required_budget; return $this; }
+    public function setRequiredBudget(string $required_budget): self { $this->required_budget = $required_budget; return $this; }
 
     public function getSecteur(): ?string { return $this->secteur; }
     public function setSecteur(?string $secteur): self { $this->secteur = $secteur; return $this; }
@@ -242,8 +239,8 @@ class Project
     public function getStatus(): ?string { return $this->status; }
     public function setStatus(?string $status): self { $this->status = $status; return $this; }
 
-    public function getCreated_at(): \DateTimeInterface { return $this->created_at; }
-    public function getCreatedAt(): \DateTimeInterface { return $this->created_at; }
+    public function getCreated_at(): ?\DateTimeInterface { return $this->created_at; }
+    public function getCreatedAt(): ?\DateTimeInterface { return $this->created_at; }
     protected function setCreated_at(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
     protected function setCreatedAt(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
 

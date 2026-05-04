@@ -51,7 +51,6 @@ class UserManagerTest extends TestCase
         $user = new User();
         $user->setEmail('user@gmail.com');
         $user->setUserType('admin');
-
         $this->expectException(\InvalidArgumentException::class);
         $this->manager->validate($user);
     }

@@ -4,6 +4,8 @@ namespace App\Entity\Community;
 
 use App\Repository\Community\ReactionRepository;
 use Doctrine\DBAL\Types\Types;
+use App\Entity\Community\Post;
+use App\Entity\UsersAvis\User;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ReactionRepository::class)]
@@ -15,46 +17,53 @@ class Reaction
     #[ORM\Column(name: 'reaction_id', type: Types::INTEGER)]
     private ?int $id = null;
 
-    #[ORM\Column(name: 'post_id', type: Types::INTEGER)]
-    private ?int $postId = null;
+    #[ORM\ManyToOne(targetEntity: Post::class)]
+    #[ORM\JoinColumn(name: 'post_id', referencedColumnName: 'post_id', nullable: false)]
+    private ?Post $post = null;
 
-    #[ORM\Column(name: 'user_id', type: Types::INTEGER)]
-    private ?int $userId = null;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'user_id', nullable: false)]
+    private ?User $user = null;
 
-    #[ORM\Column(type: Types::STRING, length: 50)]
-    private ?string $type = null;
+    #[ORM\Column(type: Types::STRING, length: 255)]
+    private string $type = '';
 
-    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $createdAt = null;
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE, nullable: false)]
+    private \DateTimeInterface $createdAt;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime();
+    }
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getPostId(): ?int
+    public function getPost(): ?Post
     {
-        return $this->postId;
+        return $this->post;
     }
 
-    public function setPostId(int $postId): static
+    public function setPost(?Post $post): static
     {
-        $this->postId = $postId;
+        $this->post = $post;
         return $this;
     }
 
-    public function getUserId(): ?int
+    public function getUser(): ?User
     {
-        return $this->userId;
+        return $this->user;
     }
 
-    public function setUserId(int $userId): static
+    public function setUser(?User $user): static
     {
-        $this->userId = $userId;
+        $this->user = $user;
         return $this;
     }
 
-    public function getType(): ?string
+    public function getType(): string
     {
         return $this->type;
     }
@@ -65,14 +74,8 @@ class Reaction
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getCreatedAt(): \DateTimeInterface
     {
         return $this->createdAt;
-    }
-
-    public function setCreatedAt(?\DateTimeInterface $createdAt): static
-    {
-        $this->createdAt = $createdAt;
-        return $this;
     }
 }

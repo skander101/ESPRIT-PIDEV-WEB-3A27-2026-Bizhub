@@ -15,6 +15,7 @@ use App\Repository\Elearning\ParticipationRepository;
 use App\Repository\TrainingRequestRepository;
 use App\Repository\UsersAvis\AvisRepository;
 use App\Entity\Elearning\FormationRecommendationEvent;
+use App\Enum\FormationRecommendationEventType;
 use App\Service\Elearning\FormationAiBestPickService;
 use App\Service\Elearning\FormationLocationPresentationService;
 use App\Service\Elearning\FormationRecommendationService;
@@ -255,7 +256,6 @@ class FormationController extends AbstractController
         if ($existing === null) {
             $avis->setUser($user);
             $avis->setFormation($formation);
-            $avis->setCreatedAt(new \DateTime());
             $avis->setIsRemoved(false);
             $avis->setIsEdited(false);
             $avis->setIsVerified(false);
@@ -330,8 +330,7 @@ class FormationController extends AbstractController
                 $ev->setUser($user);
                 $ev->setFormation($formation);
                 $ev->setSection($recoSection);
-                $ev->setEventType(FormationRecommendationEvent::EVENT_ENROLL);
-                $ev->setCreatedAt(new \DateTimeImmutable());
+                $ev->setEventType(FormationRecommendationEventType::ENROLL);
                 $this->entityManager->persist($ev);
                 $this->entityManager->flush();
             }

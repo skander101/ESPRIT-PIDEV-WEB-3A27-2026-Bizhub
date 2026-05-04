@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity\Elearning;
 
 use App\Entity\UsersAvis\User;
+use App\Enum\FormationRecommendationEventType;
 use App\Repository\Elearning\FormationRecommendationEventRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -44,8 +45,8 @@ class FormationRecommendationEvent
     #[ORM\Column(type: 'string', length: 32)]
     private string $section = self::SECTION_PERSONALIZED;
 
-    #[ORM\Column(name: 'event_type', type: 'string', length: 24)]
-    private string $eventType = self::EVENT_IMPRESSION;
+    #[ORM\Column(name: 'event_type', type: 'string', enumType: FormationRecommendationEventType::class, length: 24, nullable: true)]
+    private ?FormationRecommendationEventType $eventType = null;
 
     #[ORM\Column(name: 'created_at', type: 'datetime_immutable', nullable: false)]
     private \DateTimeImmutable $createdAt;
@@ -91,15 +92,14 @@ class FormationRecommendationEvent
         return $this;
     }
 
-    public function getEventType(): string
+    public function getEventType(): ?FormationRecommendationEventType
     {
         return $this->eventType;
     }
 
-    public function setEventType(string $eventType): self
+    public function setEventType(?FormationRecommendationEventType $eventType): self
     {
         $this->eventType = $eventType;
-
         return $this;
     }
 

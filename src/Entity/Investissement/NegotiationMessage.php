@@ -35,7 +35,7 @@ class NegotiationMessage
     }
 
     #[ORM\ManyToOne(targetEntity: Negotiation::class, inversedBy: 'negotiationMessages')]
-    #[ORM\JoinColumn(name: 'negotiation_id', referencedColumnName: 'negotiation_id')]
+    #[ORM\JoinColumn(name: 'negotiation_id', referencedColumnName: 'negotiation_id', nullable: false)]
     private ?Negotiation $negotiation = null;
 
     public function getNegotiation(): ?Negotiation
@@ -50,7 +50,7 @@ class NegotiationMessage
     }
 
     #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(name: 'sender_id', referencedColumnName: 'user_id', nullable: true)]
+    #[ORM\JoinColumn(name: 'sender_id', referencedColumnName: 'user_id', nullable: false)]
     private ?User $user = null;
 
     public function getUser(): ?User
@@ -64,7 +64,7 @@ class NegotiationMessage
         return $this;
     }
 
-    #[ORM\Column(type: 'text', nullable: false)]
+    #[ORM\Column(type: 'text')]
     private string $message;
 
     public function getMessage(): ?string
@@ -78,8 +78,8 @@ class NegotiationMessage
         return $this;
     }
 
-    #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $message_type = null;
+    #[ORM\Column(type: 'string', length: 32, options: ['default' => 'text'])]
+    private ?string $message_type = 'text';
 
     public function getMessage_type(): ?string
     {
@@ -92,7 +92,7 @@ class NegotiationMessage
         return $this;
     }
 
-    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
+    #[ORM\Column(type: 'decimal', precision: 15, scale: 2, nullable: true)]
     private ?string $proposed_amount = null;
 
     public function getProposed_amount(): ?string
@@ -106,7 +106,7 @@ class NegotiationMessage
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: true)]
+    #[ORM\Column(type: 'string', length: 20, nullable: true)]
     private ?string $sentiment = null;
 
     public function getSentiment(): ?string
@@ -120,10 +120,10 @@ class NegotiationMessage
         return $this;
     }
 
-    #[ORM\Column(type: 'datetime', nullable: false)]
-    private \DateTimeInterface $created_at;
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $created_at = null;
 
-    public function getCreated_at(): \DateTimeInterface
+    public function getCreated_at(): ?\DateTimeInterface
     {
         return $this->created_at;
     }

@@ -20,22 +20,76 @@ class Participation
     public const STATUS_REFUNDED = 'REFUNDED';
     public const STATUS_AWAITING_PAYMENT = 'AWAITING_PAYMENT';
 
-    #[ORM\Column(type: 'integer', nullable: false)]
-    private int $user_id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id_candidature = null;
 
-    public function getUser_id(): int
-    {
-        return $this->user_id;
-    }
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'user_id')]
+    private ?User $user = null;
 
-    public function setUser_id(int $user_id): self
-    {
-        $this->user_id = $user_id;
-        return $this;
-    }
+    #[ORM\ManyToOne(targetEntity: Formation::class)]
+    #[ORM\JoinColumn(name: 'formation_id', referencedColumnName: 'formation_id')]
+    private ?Formation $formation = null;
+
+    #[ORM\Column(type: 'datetime', nullable: false)]
+    private \DateTimeInterface $created_at;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $date_affectation = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $remarques = null;
+
+    #[ORM\Column(type: 'string', length: 20, options: ['default' => 'PENDING'])]
+    private string $payment_status = 'PENDING';
+
+    #[ORM\Column(name: 'participation_status', type: 'string', length: 32, options: ['default' => 'AWAITING_PAYMENT'])]
+    private string $lifecycleStatus = 'AWAITING_PAYMENT';
+
+    #[ORM\Column(type: 'string', length: 30, nullable: true)]
+    private ?string $payment_provider = null;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $payment_ref = null;
+
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, options: ['default' => '0.00'])]
+    private string $amount = '0.00';
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $paid_at = null;
+
+    #[ORM\Column(type: 'string', length: 80, nullable: true)]
+    private ?string $transactionId = null;
+
+    #[ORM\Column(type: 'string', length: 500, nullable: true)]
+    private ?string $certificatePath = null;
+
+    public function getId_candidature(): ?int
+    {
+        return $this->id_candidature;
+    }
+
+    public function setId_candidature(int $id_candidature): self
+    {
+        $this->id_candidature = $id_candidature;
+        return $this;
+    }
+
+    public function getUser(): ?User { return $this->user; }
+    public function setUser(?User $v): self { $this->user = $v; return $this; }
+
+    public function getFormation(): ?Formation { return $this->formation; }
+    public function setFormation(?Formation $v): self { $this->formation = $v; return $this; }
+
+    #[ORM\PrePersist]
+    public function setCreatedAtValue(): void
+    {
+        $this->created_at = new \DateTime();
+    }
+
+    public function getCreated_at(): ?\DateTimeInterface { return $this->created_at; }
 
     public function getDate_affectation(): ?\DateTimeInterface
     {
@@ -47,14 +101,11 @@ class Participation
         return $this->date_affectation;
     }
 
-    public function setDate_affectation(?\DateTimeInterface $date_affectation): self
+    protected function setDate_affectation(?\DateTimeInterface $date_affectation): self
     {
         $this->date_affectation = $date_affectation;
         return $this;
     }
-
-    #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $remarques = null;
 
     public function getRemarques(): ?string
     {
@@ -66,12 +117,6 @@ class Participation
         $this->remarques = $remarques;
         return $this;
     }
-
-    #[ORM\Column(type: 'string', nullable: false)]
-    private string $payment_status = '';
-
-    #[ORM\Column(name: 'participation_status', type: 'string', nullable: false)]
-    private string $lifecycleStatus = 'PENDING';
 
     public function getPayment_status(): ?string
     {
@@ -107,9 +152,6 @@ class Participation
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $payment_provider = null;
-
     public function getPayment_provider(): ?string
     {
         return $this->payment_provider;
@@ -132,9 +174,6 @@ class Participation
 
         return $this;
     }
-
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $payment_ref = null;
 
     public function getPayment_ref(): ?string
     {
@@ -159,15 +198,9 @@ class Participation
         return $this;
     }
 
-    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: false)]
-    private string $amount = '0.00';
-
     public function getAmount(): ?string { return $this->amount; }
 
     public function setAmount(string $amount): self { $this->amount = $amount; return $this; }
-
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?\DateTimeInterface $paid_at = null;
 
     public function getPaid_at(): ?\DateTimeInterface
     {
@@ -185,74 +218,6 @@ class Participation
         return $this;
     }
 
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private ?int $id_candidature = null;
-
-    public function getId_candidature(): ?int
-    {
-        return $this->id_candidature;
-    }
-
-    public function setId_candidature(int $id_candidature): self
-    {
-        $this->id_candidature = $id_candidature;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'integer', nullable: false)]
-    private int $formation_id;
-
-    #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'user_id')]
-    private ?User $user = null;
-
-    #[ORM\ManyToOne(targetEntity: Formation::class)]
-    #[ORM\JoinColumn(name: 'formation_id', referencedColumnName: 'formation_id')]
-    private ?Formation $formation = null;
-
-    public function getUser(): ?User { return $this->user; }
-    public function setUser(?User $v): self { $this->user = $v; return $this; }
-
-    public function getFormation(): ?Formation { return $this->formation; }
-    public function setFormation(?Formation $v): self { $this->formation = $v; return $this; }
-
-    public function getFormation_id(): ?int
-    {
-        return $this->formation_id;
-    }
-
-    public function setFormation_id(int $formation_id): self
-    {
-        $this->formation_id = $formation_id;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'datetime', nullable: false)]
-    private \DateTimeInterface $created_at;
-
-    #[ORM\PrePersist]
-    public function setCreatedAt(): void
-    {
-        $this->created_at = new \DateTime();
-    }
-
-    public function getCreated_at(): ?\DateTimeInterface { return $this->created_at; }
-
-    public function setStatus(string $status): self
-    {
-        return $this->setLifecycleStatus($status);
-    }
-
-    public function getStatus(): string
-    {
-        return $this->lifecycleStatus;
-    }
-
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $transactionId = null;
-
     public function getTransactionId(): ?string
     {
         return $this->transactionId;
@@ -268,9 +233,6 @@ class Participation
     {
         return $this->setPaid_at($paidAt);
     }
-
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $certificatePath = null;
 
     public function getCertificatePath(): ?string
     {
@@ -293,4 +255,13 @@ class Participation
         return $this->lifecycleStatus === self::STATUS_AWAITING_PAYMENT && $this->payment_status === 'PENDING';
     }
 
+    public function setStatus(string $status): self
+    {
+        return $this->setLifecycleStatus($status);
+    }
+
+    public function getStatus(): string
+    {
+        return $this->lifecycleStatus;
+    }
 }

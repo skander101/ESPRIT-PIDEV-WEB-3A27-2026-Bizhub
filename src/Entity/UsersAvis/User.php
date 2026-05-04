@@ -17,7 +17,8 @@ use Symfony\Component\Security\Util\SensitiveParameter;
 use App\Repository\UsersAvis\UserRepository;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Table(name: 'user')]
+#[ORM\Table(name: 'app_user')]
+#[ORM\HasLifecycleCallbacks]
 #[UniqueConstraint(name: 'email_unique', columns: ['email'])]
 #[UniqueEntity(fields: ['email'], message: 'This email is already used.')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFactorInterface
@@ -29,45 +30,42 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         'investisseur' => 'investisseur',
     ];
 
-public function __construct()
-    {
-        $this->avis = new ArrayCollection();
-        $this->created_at = new \DateTime();
-        $this->full_name = '';
-        $this->email = '';
-        $this->password_hash = '';
-        $this->user_type = '';
-        $this->is_active = true;
-    }
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private ?int $user_id = null;
 
-    #[ORM\Column(type: 'string', nullable: false)]
-    #[Assert\NotBlank(message: 'Email is required')]
-    #[Assert\Email(message: 'Please enter a valid email')]
-    private string $email;
-
-    #[ORM\Column(type: 'string', nullable: false)]
-    private string $password_hash;
-
-    #[ORM\Column(type: 'string', nullable: false)]
-    #[Assert\NotBlank(message: 'Please select a user type')]
-    #[Assert\Choice(choices: ['startup', 'fournisseur', 'formateur', 'investisseur'], message: 'Invalid user type')]
-    private string $user_type;
-
     #[ORM\Column(type: 'datetime', nullable: false)]
     private \DateTimeInterface $created_at;
 
-    #[ORM\Column(type: 'boolean', nullable: true)]
-    private ?bool $is_active = null;
+    #[ORM\Column(type: 'string', nullable: true)]
+    private ?string $full_name = null;
 
-    #[ORM\Column(type: 'string', nullable: false)]
-    #[Assert\NotBlank(message: 'Full name is required')]
-    #[Assert\Length(min: 2, max: 255, minMessage: 'Name must be at least 2 characters', maxMessage: 'Name must not exceed 255 characters')]
-    private string $full_name;
+    #[ORM\Column(type: 'string', nullable: true)]
+    private ?string $email = null;
+
+    #[ORM\Column(name: 'password_hash', type: 'string', length: 255)]
+    private ?string $password_hash = null;
+
+    #[ORM\Column(type: 'string', nullable: true)]
+    private ?string $user_type = null;
+
+    #[ORM\Column(name: 'updated_at', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $updatedAt = null;
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    #[ORM\PreUpdate]
+    private function setUpdatedAt(): void
+    {
+        $this->updatedAt = new \DateTime();
+    }
+
+    #[ORM\Column(type: 'boolean', nullable: false)]
+    private bool $is_active = true;
 
     #[ORM\Column(type: 'string', nullable: true)]
     #[Assert\Regex(
@@ -177,6 +175,17 @@ public function __construct()
     #[ORM\OneToMany(targetEntity: Avis::class, mappedBy: 'user')]
     private Collection $avis;
 
+    public function __construct()
+    {
+        $this->avis = new ArrayCollection();
+        $this->created_at = new \DateTime();
+        $this->full_name = '';
+        $this->email = '';
+        $this->password_hash = '';
+        $this->user_type = '';
+        $this->is_active = true;
+    }
+
     public function getUser_id(): ?int { return $this->user_id; }
     public function getUserId(): ?int { return $this->user_id; }
     public function setUser_id(int $user_id): self { $this->user_id = $user_id; return $this; }
@@ -186,8 +195,8 @@ public function __construct()
 
     public function getPasswordHash(): ?string { return $this->password_hash; }
     public function getPassword_hash(): ?string { return $this->password_hash; }
-    public function setPasswordHash(string $password_hash): self { $this->password_hash = $password_hash; return $this; }
-    public function setPassword_hash(string $password_hash): self { $this->password_hash = $password_hash; return $this; }
+    public function setPasswordHash(?string $password_hash): self { $this->password_hash = $password_hash; return $this; }
+    public function setPassword_hash(?string $password_hash): self { $this->password_hash = $password_hash; return $this; }
 
     public function getUserType(): ?string { return $this->user_type; }
     public function getUser_type(): ?string { return $this->user_type; }
@@ -197,7 +206,6 @@ public function __construct()
     public function getCreatedAt(): \DateTimeInterface { return $this->created_at; }
     public function getCreated_at(): \DateTimeInterface { return $this->created_at; }
     public function setCreatedAt(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
-    public function setCreated_at(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
 
     public function getIsActive(): ?bool { return $this->is_active; }
     public function is_active(): ?bool { return $this->is_active; }
@@ -214,7 +222,6 @@ public function __construct()
     {
         $phone = $phone !== null ? trim($phone) : null;
         $this->phone = $phone === '' ? null : $phone;
-
         return $this;
     }
 

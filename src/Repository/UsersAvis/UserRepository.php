@@ -157,7 +157,7 @@ class UserRepository extends ServiceEntityRepository
 
         $sql = <<<'SQL'
 SELECT DATE_FORMAT(created_at, '%Y-%m') AS period, COUNT(user_id) AS total
-FROM user
+FROM app_user
 WHERE created_at IS NOT NULL
   AND created_at >= DATE_SUB(CURDATE(), INTERVAL :months MONTH)
 GROUP BY DATE_FORMAT(created_at, '%Y-%m')

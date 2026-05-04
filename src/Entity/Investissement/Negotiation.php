@@ -12,6 +12,7 @@ use App\Entity\UsersAvis\User;
 
 #[ORM\Entity(repositoryClass: NegotiationRepository::class)]
 #[ORM\Table(name: 'negotiation')]
+#[ORM\HasLifecycleCallbacks]
 class Negotiation
 {
     const STATUS_OPEN     = 'open';
@@ -37,34 +38,34 @@ class Negotiation
     private ?Project $project = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(name: 'investor_id', referencedColumnName: 'user_id', nullable: true)]
+    #[ORM\JoinColumn(name: 'investor_id', referencedColumnName: 'user_id', nullable: false)]
     #[Assert\NotNull(message: 'L\'investisseur est obligatoire.')]
     private ?User $investor = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(name: 'startup_id', referencedColumnName: 'user_id', nullable: true)]
+    #[ORM\JoinColumn(name: 'startup_id', referencedColumnName: 'user_id', nullable: false)]
     #[Assert\NotNull(message: 'La startup est obligatoire.')]
     private ?User $startup = null;
 
-    #[ORM\Column(type: 'string', nullable: true)]
+    #[ORM\Column(type: 'string', length: 30, options: ['default' => 'open'])]
     #[Assert\NotBlank(message: 'Le statut est obligatoire.')]
     #[Assert\Choice(
         choices: [self::STATUS_OPEN, self::STATUS_ACCEPTED, self::STATUS_REJECTED, self::STATUS_EXPIRED],
         message: 'Statut de négociation invalide.'
     )]
-    private ?string $status = null;
+    private ?string $status = self::STATUS_OPEN;
 
-    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
+    #[ORM\Column(type: 'decimal', precision: 15, scale: 2, nullable: true)]
     #[Assert\Positive(message: 'Le montant proposé doit être positif.')]
     private ?string $proposed_amount = null;
 
-    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
+    #[ORM\Column(type: 'decimal', precision: 15, scale: 2, nullable: true)]
     #[Assert\Positive(message: 'Le montant final doit être positif.')]
     private ?string $final_amount = null;
 
-    #[ORM\Column(type: 'datetime', nullable: false)]
+    #[ORM\Column(type: 'datetime', nullable: true)]
     #[Assert\LessThanOrEqual(value: 'now', message: 'La date de création ne peut pas être dans le futur.')]
-    private \DateTimeInterface $created_at;
+    private ?\DateTimeInterface $created_at = null;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     #[Assert\LessThanOrEqual(value: 'now', message: 'La date de mise à jour ne peut pas être dans le futur.')]
@@ -77,6 +78,12 @@ class Negotiation
     {
         $this->negotiationMessages = new ArrayCollection();
         $this->created_at = new \DateTime();
+    }
+
+    #[ORM\PreUpdate]
+    public function onPreUpdate(): void
+    {
+        $this->updated_at = new \DateTime();
     }
 
     public function getNegotiation_id(): ?int { return $this->negotiation_id; }

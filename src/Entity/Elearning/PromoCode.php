@@ -35,13 +35,13 @@ class PromoCode
     #[ORM\Column(type: 'boolean', options: ['default' => true])]
     private bool $isActive = true;
 
-#[ORM\Column(type: 'datetime')]
+    #[ORM\Column(type: 'datetime_immutable')]
     private \DateTimeInterface $createdAt;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?\DateTimeInterface $expiresAt = null;
+    #[ORM\Column(type: 'datetime_immutable')]
+    private \DateTimeInterface $expiresAt;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     private ?\DateTimeInterface $usedAt = null;
 
     #[ORM\ManyToOne(targetEntity: Participation::class)]
@@ -118,10 +118,9 @@ class PromoCode
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    private function setCreatedAt(\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
-
         return $this;
     }
 

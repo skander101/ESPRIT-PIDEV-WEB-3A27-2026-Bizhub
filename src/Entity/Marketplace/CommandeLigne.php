@@ -17,7 +17,7 @@ class CommandeLigne
 
     // Relation ManyToOne vers Commande
     #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: 'lignes')]
-    #[ORM\JoinColumn(name: 'commande_id', referencedColumnName: 'commande_id', nullable: false)]
+    #[ORM\JoinColumn(name: 'commande_id', referencedColumnName: 'commande_id', nullable: false, onDelete: 'CASCADE')]
     private ?Commande $commande = null;
 
     #[ORM\Column(name: 'id_produit', type: 'integer', nullable: false)]

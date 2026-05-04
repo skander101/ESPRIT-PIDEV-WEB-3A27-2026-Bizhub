@@ -33,7 +33,7 @@ class ProductService
     #[ORM\Column(type: 'integer')]
     private ?int $product_id = null;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: 'string', length: 200)]
     #[Assert\NotBlank(message: 'Le nom est obligatoire.')]
     #[Assert\Length(
         min: 2,
@@ -73,7 +73,7 @@ class ProductService
     )]
     private ?string $category = null;
 
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: 'integer', options: ['default' => 0])]
     #[Assert\NotBlank(message: 'La quantité est obligatoire.')]
     #[Assert\PositiveOrZero(message: 'La quantité doit être ≥ 0.')]
     #[Assert\LessThanOrEqual(value: 999999, message: 'Max 999 999 unités.')]
@@ -82,11 +82,11 @@ class ProductService
     #[ORM\Column(type: 'string', length: 500, nullable: true)]
     private ?string $image_url = null;
 
-    #[ORM\Column(type: 'string', length: 20)]
+    #[ORM\Column(type: 'string', length: 20, options: ['default' => 'active'])]
     private string $status = self::STATUS_ACTIVE;
 
-    #[ORM\Column(type: 'datetime')]
-    private \DateTimeInterface $created_at;
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $created_at = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'seller_id', referencedColumnName: 'user_id', nullable: true, onDelete: 'SET NULL')]
@@ -126,8 +126,8 @@ class ProductService
     public function setStatus(string $status): self { $this->status = $status; return $this; }
     public function isActive(): bool { return $this->status === self::STATUS_ACTIVE; }
 
-    public function getCreatedAt(): \DateTimeInterface { return $this->created_at; }
-    public function setCreatedAt(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
+    public function getCreatedAt(): ?\DateTimeInterface { return $this->created_at; }
+    public function setCreatedAt(?\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
 
     public function getSeller(): ?User { return $this->seller; }
     public function setSeller(?User $seller): self { $this->seller = $seller; return $this; }

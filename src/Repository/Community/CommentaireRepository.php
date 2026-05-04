@@ -19,7 +19,7 @@ class CommentaireRepository extends ServiceEntityRepository
         $sql = '
             SELECT c.*, u.full_name as author_name, u.avatar_url
             FROM commentaire c
-            LEFT JOIN user u ON c.user_id = u.user_id
+            LEFT JOIN app_user u ON c.user_id = u.user_id
             WHERE c.post_id = :postId
             ORDER BY c.created_at ASC
         ';

@@ -4,6 +4,7 @@ namespace App\Controller\Community;
 
 use App\Entity\Community\Post;
 use App\Entity\Community\Commentaire;
+use App\Entity\UsersAvis\User;
 use App\Repository\Community\PostRepository;
 use App\Repository\Community\CommentaireRepository;
 use App\Service\Community\ReactionManager;
@@ -100,11 +101,10 @@ class PostController extends AbstractController
         }
 
         $post = new Post();
-        $post->setUserId($this->getUser()->getUserId());
+        $post->setUser($this->getUser());
         $post->setTitle($title);
         $post->setContent($content);
         $post->setCategory($category ?: 'General');
-        $post->setCreatedAt(new \DateTime());
         $post->setLocation($location ? trim((string) $location) : null);
         $post->setLocationLat($locationLat !== null && $locationLat !== '' ? (float) $locationLat : null);
         $post->setLocationLon($locationLon !== null && $locationLon !== '' ? (float) $locationLon : null);
@@ -245,11 +245,15 @@ class PostController extends AbstractController
             return $this->redirectToRoute('community_show', ['id' => $postId]);
         }
 
+        $post = $em->getRepository(Post::class)->find($postId);
+        if (!$post) {
+            throw $this->createNotFoundException('Post non trouvé');
+        }
+
         $comment = new Commentaire();
-        $comment->setPostId($postId);
-        $comment->setUserId($this->getUser()->getUserId());
+        $comment->setPost($post);
+        $comment->setUser($this->getUser());
         $comment->setContent($content);
-        $comment->setCreatedAt(new \DateTime());
 
         $em->persist($comment);
         $em->flush();

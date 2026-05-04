@@ -104,7 +104,6 @@ class Commande
     private ?string $totalTtc = null;
 
     #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeLigne::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
-    #[ORM\JoinColumn(name: 'commande_id', referencedColumnName: 'commande_id', onDelete: 'CASCADE')]
     private Collection $lignes;
 
     public function __construct()

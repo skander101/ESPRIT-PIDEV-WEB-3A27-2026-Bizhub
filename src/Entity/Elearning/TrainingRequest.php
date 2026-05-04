@@ -23,11 +23,11 @@ class TrainingRequest
     #[ORM\JoinColumn(name: 'formation_id', referencedColumnName: 'formation_id', nullable: false)]
     private ?Formation $formation = null;
 
-    #[ORM\Column(type: 'string', length: 50, nullable: false)]
-    private string $status = 'pending'; // pending, accepted, rejected, completed
+    #[ORM\Column(type: 'string', length: 50, options: ['default' => 'pending'])]
+    private string $status = 'pending';
 
-    #[ORM\Column(name: 'request_date', type: 'datetime', nullable: false)]
-    private \DateTimeInterface $created_at;
+    #[ORM\Column(name: 'request_date', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $created_at = null;
 
     public function __construct()
     {

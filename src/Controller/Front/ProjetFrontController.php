@@ -64,7 +64,6 @@ class ProjetFrontController extends AbstractController
 
         $projet = new Project();
         $projet->setUser($user);
-        $projet->setCreatedAt(new \DateTime());
         $projet->setStatus('pending');
 
         $form = $this->createForm(ProjetFrontType::class, $projet);

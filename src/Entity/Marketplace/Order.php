@@ -8,9 +8,10 @@ use Doctrine\Common\Collections\Collection;
 
 use App\Repository\OrderRepository;
 use App\Entity\UsersAvis\User;
+use App\Enum\PaymentMethod;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
-#[ORM\Table(name: '`order`')]
+#[ORM\Table(name: 'orders')]
 class Order
 {
     #[ORM\Id]
@@ -30,7 +31,7 @@ class Order
     }
 
     #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(name: 'buyer_id', referencedColumnName: 'user_id')]
+    #[ORM\JoinColumn(name: 'buyer_id', referencedColumnName: 'user_id', nullable: false)]
     private ?User $user = null;
 
     public function getUser(): ?User
@@ -45,7 +46,7 @@ class Order
     }
 
     #[ORM\ManyToOne(targetEntity: ProductService::class, inversedBy: 'orders')]
-    #[ORM\JoinColumn(name: 'product_id', referencedColumnName: 'product_id')]
+    #[ORM\JoinColumn(name: 'product_id', referencedColumnName: 'product_id', nullable: false)]
     private ?ProductService $productService = null;
 
     public function getProductService(): ?ProductService
@@ -59,8 +60,8 @@ class Order
         return $this;
     }
 
-    #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $quantity = null;
+    #[ORM\Column(type: 'integer', options: ['default' => 1])]
+    private ?int $quantity = 1;
 
     public function getQuantity(): ?int
     {
@@ -87,18 +88,12 @@ class Order
         return $this;
     }
 
-    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, insertable: false, updatable: false, generated: 'ALWAYS')]
     private ?string $total_price = null;
 
     public function getTotal_price(): ?string
     {
         return $this->total_price;
-    }
-
-    public function setTotal_price(?string $total_price): self
-    {
-        $this->total_price = $total_price;
-        return $this;
     }
 
     #[ORM\Column(type: 'datetime', nullable: true)]
@@ -115,7 +110,7 @@ class Order
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: true)]
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $delivery_address = null;
 
     public function getDelivery_address(): ?string
@@ -129,8 +124,8 @@ class Order
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $status = null;
+    #[ORM\Column(type: 'string', length: 30, options: ['default' => 'en_attente'])]
+    private ?string $status = 'en_attente';
 
     public function getStatus(): ?string
     {

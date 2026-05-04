@@ -28,8 +28,8 @@ class Avis
     #[ORM\JoinColumn(name: 'reviewer_id', referencedColumnName: 'user_id', nullable: false)]
     private ?User $user = null;
 
-        #[ORM\ManyToOne(targetEntity: Formation::class, inversedBy: 'avis')]
-        #[ORM\JoinColumn(name: 'formation_id', referencedColumnName: 'formation_id', nullable: false)]
+    #[ORM\ManyToOne(targetEntity: Formation::class, inversedBy: 'avis')]
+    #[ORM\JoinColumn(name: 'formation_id', referencedColumnName: 'formation_id', nullable: false)]
     #[Assert\NotNull(message: 'Please select a formation.')]
     private ?Formation $formation = null;
 
@@ -74,7 +74,6 @@ class Avis
     public function getCreatedAt(): \DateTimeInterface { return $this->created_at; }
     public function getCreated_at(): \DateTimeInterface { return $this->created_at; }
     public function setCreatedAt(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
-    public function setCreated_at(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
 
     public function getIsVerified(): ?bool { return $this->is_verified; }
     public function is_verified(): ?bool { return $this->is_verified; }

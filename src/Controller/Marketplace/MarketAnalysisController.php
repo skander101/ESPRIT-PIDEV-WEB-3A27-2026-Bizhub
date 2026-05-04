@@ -4,7 +4,7 @@ namespace App\Controller\Marketplace;
 
 use App\Entity\UsersAvis\User;
 use App\Repository\Marketplace\CommandeRepository;
-use App\Repository\Marketplace\ProduitRepository;
+use App\Repository\Marketplace\ProduitServiceRepository;
 use App\Service\Marketplace\GrokService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,7 +31,7 @@ class MarketAnalysisController extends AbstractController
     #[Route('/produit/{id}', name: 'produit', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function produit(
         int                      $id,
-        ProduitServiceRepository $produitRepo,
+        ProduitServiceRepository  $produitRepo,
         GrokService              $grok,
     ): Response {
         if ($r = $this->requireLogin()) return $r;
@@ -43,7 +43,7 @@ class MarketAnalysisController extends AbstractController
 
         $analysis = $grok->generateMarketAnalysis(
             $produit->getNom(),
-            method_exists($produit, 'getCategorie') ? $produit->getCategorie() : null,
+            $produit->getCategorie(),
             (float) $produit->getPrix()
         );
 
@@ -85,17 +85,24 @@ class MarketAnalysisController extends AbstractController
         }
 
         // Récupérer le premier produit de la commande
-        $ligne   = $commande->getLignes()->first();
-        $produit = $ligne ? $produitRepo->find($ligne->getIdProduit()) : null;
+        $lignes  = $commande->getLignes();
+        if ($lignes->isEmpty()) {
+            $this->addFlash('warning', 'Cette commande ne contient aucun produit.');
+            return $this->redirectToRoute('commande_show', ['id' => $id]);
+        }
+        
+        $ligne   = $lignes->first();
+        $produitId = $ligne ? $ligne->getIdProduit() : null;
+        $produit = $produitId ? $produitRepo->find($produitId) : null;
 
         if (!$produit) {
-            $this->addFlash('warning', 'Aucun produit associé à cette commande.');
+            $this->addFlash('warning', 'Produit #' . $produitId . ' introuvable pour cette commande.');
             return $this->redirectToRoute('commande_show', ['id' => $id]);
         }
 
         $analysis = $grok->generateMarketAnalysis(
             $produit->getNom(),
-            method_exists($produit, 'getCategorie') ? $produit->getCategorie() : null,
+            $produit->getCategorie(),
             (float) $produit->getPrix()
         );
 

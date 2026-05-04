@@ -61,37 +61,37 @@ class Investment
     private ?int $investment_id = null;
 
     #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'investments')]
-    #[ORM\JoinColumn(name: 'project_id', referencedColumnName: 'project_id')]
+    #[ORM\JoinColumn(name: 'project_id', referencedColumnName: 'project_id', nullable: false)]
     #[Assert\NotNull(message: 'Le projet est obligatoire.')]
     private ?Project $project = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(name: 'investor_id', referencedColumnName: 'user_id', nullable: true)]
+    #[ORM\JoinColumn(name: 'investor_id', referencedColumnName: 'user_id', nullable: false)]
     #[Assert\NotNull(message: 'L\'investisseur est obligatoire.')]
     private ?User $user = null;
 
-    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: false)]
+    #[ORM\Column(type: 'decimal', precision: 15, scale: 2)]
     #[Assert\NotNull(message: 'Le montant est obligatoire.')]
     #[Assert\Positive(message: 'Le montant doit être positif.')]
     private string $amount = '0.00';
 
-    #[ORM\Column(type: 'datetime', nullable: false)]
+    #[ORM\Column(type: 'datetime', nullable: true)]
     #[Assert\LessThanOrEqual(value: 'now', message: "La date d'investissement ne peut pas être dans le futur.")]
-    private \DateTimeInterface $investment_date;
+    private ?\DateTimeInterface $investment_date = null;
 
-    #[ORM\Column(type: 'string', nullable: true)]
+    #[ORM\Column(type: 'string', length: 500, nullable: true)]
     #[Assert\Url(message: "L'URL du contrat n'est pas valide.")]
     #[Assert\Length(max: 500, maxMessage: "L'URL du contrat ne peut pas dépasser {{ limit }} caractères.")]
     private ?string $contract_url = null;
 
-    #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[ORM\Column(type: 'string', length: 50, options: ['default' => 'virement'])]
     #[Assert\Choice(
         choices: ['virement', 'cheque', 'especes', 'carte', 'crypto'],
         message: 'Mode de paiement invalide.'
     )]
     private ?string $payment_mode = 'virement';
 
-    #[ORM\Column(type: 'string', length: 30, nullable: true)]
+    #[ORM\Column(type: 'string', length: 30, options: ['default' => 'en_attente'])]
     #[Assert\Choice(
         choices: ['en_attente', 'en_negociation', 'accepte', 'refuse', 'contrat_genere', 'signe', 'termine'],
         message: 'Statut invalide.'
@@ -140,15 +140,8 @@ class Investment
     public function getAmount(): ?string { return $this->amount; }
     public function setAmount(string $amount): self { $this->amount = $amount; return $this; }
 
-    /**
-     * Retourne le montant sous forme d'objet Money (précision garantie).
-     * La devise TND est la devise par défaut de BizHub.
-     * L'objet Money stocke en millimes pour éviter les erreurs de float.
-     */
     public function getAmountMoney(string $currency = 'TND'): Money
     {
-        // moneyphp stocke en entiers (millimes pour TND = ×1000, centimes pour EUR/USD = ×100)
-        // On passe par le format décimal pour respecter la précision ISO 4217 de chaque devise
         $currencies = new \Money\Currencies\ISOCurrencies();
         $parser     = new \Money\Parser\DecimalMoneyParser($currencies);
         return $parser->parse(
@@ -157,10 +150,6 @@ class Investment
         );
     }
 
-    /**
-     * Applique un objet Money comme montant (reconvertit en float pour la DB).
-     * Permet d'utiliser Money dans les services sans changer la structure DB.
-     */
     public function setAmountFromMoney(Money $money): self
     {
         $currencies = new \Money\Currencies\ISOCurrencies();
