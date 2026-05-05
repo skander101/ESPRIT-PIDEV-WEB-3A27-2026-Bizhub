@@ -3,10 +3,8 @@
 namespace App\EventListener;
 
 use App\Entity\UsersAvis\User;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 
 class MfaEnforcementListener
@@ -37,8 +35,6 @@ class MfaEnforcementListener
 
     public function __construct(
         private readonly Security $security,
-        private readonly UrlGeneratorInterface $urlGenerator,
-        private readonly LoggerInterface $logger,
     ) {
     }
 

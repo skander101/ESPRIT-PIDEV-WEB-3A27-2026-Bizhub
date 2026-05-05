@@ -99,8 +99,6 @@ class FrontInvestissementController extends AbstractController
         $investment = new Investment();
         $investment->setProject($projet);
         $investment->setUser($user);
-        $investment->setCreated_at(new \DateTime());
-        $investment->setInvestment_date(new \DateTime());
         $investment->setStatut('en_attente');
 
         $form = $this->createForm(InvestisseurType::class, $investment);
@@ -116,7 +114,7 @@ class FrontInvestissementController extends AbstractController
 
         $totalInvesti = $this->investmentRepository->getTotalInvestedByProject($projet);
         $pourcentage  = $projet->getRequiredBudget() > 0
-            ? min(100, round(($totalInvesti / $projet->getRequiredBudget()) * 100, 1))
+            ? min(100, round(((float)$totalInvesti / (float)$projet->getRequiredBudget()) * 100, 1))
             : 0;
 
         return $this->render('front/investissement/invest.html.twig', [

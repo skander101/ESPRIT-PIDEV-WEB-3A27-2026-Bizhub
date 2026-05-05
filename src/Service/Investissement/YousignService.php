@@ -123,9 +123,17 @@ class YousignService
 
         if ($status === 'done' && $deal->getStatus() === Deal::STATUS_PENDING_SIGNATURE) {
             $deal->setStatus(Deal::STATUS_SIGNED);
-            $deal->setCompleted_at(new \DateTime());
             $deal->setSignature_token(null);
-            $deal->setSignature_token_expires_at(null);
+
+            $reflection = new \ReflectionClass($deal);
+            $completedProp = $reflection->getProperty('completed_at');
+            $completedProp->setAccessible(true);
+            $completedProp->setValue($deal, new \DateTime());
+
+            $expiresAtProp = $reflection->getProperty('signature_token_expires_at');
+            $expiresAtProp->setAccessible(true);
+            $expiresAtProp->setValue($deal, null);
+
             $this->em->flush();
             return true;
         }
@@ -201,9 +209,17 @@ class YousignService
         if ($status === 'done' || in_array($event, ['signature_request.done', 'signer.done'], true)) {
             if ($deal->getStatus() === Deal::STATUS_PENDING_SIGNATURE) {
                 $deal->setStatus(Deal::STATUS_SIGNED);
-                $deal->setCompleted_at(new \DateTime());
                 $deal->setSignature_token(null);
-                $deal->setSignature_token_expires_at(null);
+
+                $reflection = new \ReflectionClass($deal);
+                $completedProp = $reflection->getProperty('completed_at');
+                $completedProp->setAccessible(true);
+                $completedProp->setValue($deal, new \DateTime());
+
+                $expiresAtProp = $reflection->getProperty('signature_token_expires_at');
+                $expiresAtProp->setAccessible(true);
+                $expiresAtProp->setValue($deal, null);
+
                 $signed = true;
             }
         }

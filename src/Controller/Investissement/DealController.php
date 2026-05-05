@@ -3,10 +3,8 @@
 namespace App\Controller\Investissement;
 
 use App\Entity\Investissement\Deal;
-use App\Entity\Investissement\Negotiation;
 use App\Entity\UsersAvis\User;
 use App\Repository\Investissement\DealRepository;
-use App\Repository\NegotiationRepository;
 use App\Service\Investissement\ContractPdfService;
 use App\Service\Investissement\DealWorkflowService;
 use App\Service\Investissement\SignatureEmailService;
@@ -28,7 +26,6 @@ class DealController extends AbstractController
     public function __construct(
         private EntityManagerInterface $em,
         private DealRepository         $dealRepo,
-        private NegotiationRepository  $negotiationRepo,
         private DealWorkflowService    $workflow,
         private ContractPdfService     $pdfService,
         private SignatureEmailService  $signatureEmailService,
@@ -164,7 +161,7 @@ class DealController extends AbstractController
                     } catch (\Exception $yousignEx) {
                         // Yousign failed — fallback to token-based email
                         try {
-                            $this->signatureEmailService->sendSignatureEmail($deal, $buyer);
+                            $this->signatureEmailService->sendSignatureEmail($deal, $deal->getBuyer());
                             $this->addFlash('warning', '✅ Paiement reçu ! (Yousign indisponible — email de signature classique envoyé.)');
                         } catch (\Exception $mailEx) {
                             $this->addFlash('warning', '✅ Paiement reçu ! Contrat généré. Utilisez « Envoyer la signature » depuis la page du deal.');
@@ -246,8 +243,8 @@ class DealController extends AbstractController
                     'token_valid'   => false,
                     'error_message' => $errorMessage,
                     'signed'        => false,
-                    'buyer'         => $buyer,
-                    'seller'        => $seller,
+                    'buyer'         => $deal->getBuyer(),
+                    'seller'        => $deal->getSeller(),
                 ]);
             }
 
@@ -258,8 +255,8 @@ class DealController extends AbstractController
                     'token'       => $token,
                     'token_valid' => true,
                     'signed'      => true,
-                    'buyer'       => $buyer,
-                    'seller'      => $seller,
+                    'buyer'       => $deal->getBuyer(),
+                    'seller'      => $deal->getSeller(),
                 ]);
             } catch (\LogicException $e) {
                 return $this->render('front/deal/sign_confirm.html.twig', [
@@ -268,8 +265,8 @@ class DealController extends AbstractController
                     'token_valid'   => false,
                     'error_message' => $e->getMessage(),
                     'signed'        => false,
-                    'buyer'         => $buyer,
-                    'seller'        => $seller,
+                    'buyer'         => $deal->getBuyer(),
+                    'seller'        => $deal->getSeller(),
                 ]);
             }
         }
@@ -281,8 +278,8 @@ class DealController extends AbstractController
             'token_valid'   => $tokenValid,
             'error_message' => $errorMessage,
             'signed'        => false,
-            'buyer'         => $buyer,
-            'seller'        => $seller,
+            'buyer'         => $deal->getBuyer(),
+            'seller'        => $deal->getSeller(),
         ]);
     }
 
@@ -363,7 +360,7 @@ class DealController extends AbstractController
 
         try {
             $this->yousignService->sendSignatureRequest($deal, $deal->getBuyer());
-            $this->addFlash('success', '✅ Demande de signature envoyée via Yousign à ' . $buyer->getEmail() . '.');
+            $this->addFlash('success', '✅ Demande de signature envoyée via Yousign à ' . $deal->getBuyer()->getEmail() . '.');
         } catch (\Exception $e) {
             $this->addFlash('error', 'Erreur Yousign : ' . $e->getMessage());
         }

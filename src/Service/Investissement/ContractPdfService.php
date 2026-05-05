@@ -5,7 +5,6 @@ namespace App\Service\Investissement;
 use App\Entity\Investissement\Deal;
 use App\Entity\Investissement\Negotiation;
 use App\Entity\UsersAvis\User;
-use App\Repository\ProjectRepository;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 
@@ -18,7 +17,6 @@ class ContractPdfService
     private string $contractDir;
 
     public function __construct(
-        private ProjectRepository $projectRepository,
         string $projectDir,
     ) {
         $this->contractDir = $projectDir . '/public/contracts';

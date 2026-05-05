@@ -106,8 +106,6 @@ class NegociationController extends AbstractController
         $negociation->setStartup($startup);
         $negociation->setStatus(Negotiation::STATUS_OPEN);
         $negociation->setProposed_amount($investment->getAmount());
-        $negociation->setCreated_at(new \DateTime());
-        $negociation->setUpdated_at(new \DateTime());
 
         $this->em->persist($negociation);
 
@@ -118,7 +116,6 @@ class NegociationController extends AbstractController
         $msg->setMessage('Bonjour, je souhaite investir ' . number_format((float)$investment->getAmount(), 0, ',', ' ') . ' TND dans votre projet.');
         $msg->setMessage_type('offer');
         $msg->setProposed_amount($investment->getAmount());
-        $msg->setCreated_at(new \DateTime());
 
         $this->em->persist($msg);
         $this->em->flush();
@@ -178,8 +175,6 @@ class NegociationController extends AbstractController
         $negociation->setStartup($startup);
         $negociation->setStatus(Negotiation::STATUS_OPEN);
         $negociation->setProposed_amount(0);
-        $negociation->setCreated_at(new \DateTime());
-        $negociation->setUpdated_at(new \DateTime());
 
         $this->em->persist($negociation);
 
@@ -189,7 +184,6 @@ class NegociationController extends AbstractController
         $msg->setUser($user);
         $msg->setMessage('Bonjour, je suis intéressé par votre projet et souhaite discuter des conditions d\'investissement.');
         $msg->setMessage_type('text');
-        $msg->setCreated_at(new \DateTime());
 
         $this->em->persist($msg);
         $this->em->flush();
@@ -273,16 +267,13 @@ class NegociationController extends AbstractController
         $msg->setUser($user);
         $msg->setMessage($text);
         $msg->setMessage_type($amount ? 'offer' : 'text');
-        $msg->setCreated_at(new \DateTime());
+            if ($amount && is_numeric($amount) && (float)$amount > 0) {
+                $msg->setProposed_amount((float)$amount);
+                $negociation->setProposed_amount((float)$amount);
+            }
 
-        if ($amount && is_numeric($amount) && (float)$amount > 0) {
-            $msg->setProposed_amount((float)$amount);
-            $negociation->setProposed_amount((float)$amount);
-        }
-
-        $negociation->setUpdated_at(new \DateTime());
-        $this->em->persist($msg);
-        $this->em->flush();
+            $this->em->persist($msg);
+            $this->em->flush();
 
         return $this->redirectToRoute('app_negociation_show', ['id' => $negociation->getNegotiation_id()]);
     }
@@ -320,7 +311,6 @@ class NegociationController extends AbstractController
         }
 
         $negociation->setStatus(Negotiation::STATUS_ACCEPTED);
-        $negociation->setUpdated_at(new \DateTime());
         $this->em->flush();
 
         // Créer le Deal et synchroniser le statut de l'investissement → 'accepte'
@@ -332,7 +322,6 @@ class NegociationController extends AbstractController
         $msg->setUser($user);
         $msg->setMessage('✅ Accord validé ! Le montant final est de ' . number_format((float)$negociation->getFinal_amount(), 0, ',', ' ') . ' TND. Passez maintenant au paiement.');
         $msg->setMessage_type('ai_suggestion');
-        $msg->setCreated_at(new \DateTime());
         $this->em->persist($msg);
         $this->em->flush();
 
@@ -361,14 +350,12 @@ class NegociationController extends AbstractController
         }
 
         $negociation->setStatus(Negotiation::STATUS_REJECTED);
-        $negociation->setUpdated_at(new \DateTime());
 
         $msg = new NegotiationMessage();
         $msg->setNegotiation($negociation);
         $msg->setUser($user);
         $msg->setMessage('❌ La négociation a été refusée.');
         $msg->setMessage_type('ai_suggestion');
-        $msg->setCreated_at(new \DateTime());
         $this->em->persist($msg);
         $this->em->flush();
 

@@ -394,13 +394,13 @@
           <span class="inv-ref-label">Session Stripe</span>
           <code style="font-size:0.68rem; background:#f8fafc; padding:2px 8px; border-radius:4px; color:#1e293b; max-width:170px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:inline-block;">{{ commande.paymentRef|slice(0, 24) }}…</code>
         </div>
-        {% endif %}
-        {% if facture.stripeRef %}
-        <div class="inv-ref-row">
-          <span class="inv-ref-label">Réf. Stripe</span>
-          <code style="font-size:0.68rem; background:#f8fafc; padding:2px 8px; border-radius:4px; color:#1e293b; max-width:170px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:inline-block;">{{ facture.stripeRef|slice(0, 24) }}…</code>
-        </div>
-        {% endif %}
+            {% endif %}
+            {% if commande.stripePaymentIntentId or commande.stripeSessionId %}
+            <div class="inv-ref-row">
+              <span class="inv-ref-label">Réf. Stripe</span>
+              <code style="font-size:0.68rem; background:#f8fafc; padding:2px 8px; border-radius:4px; color:#1e293b; max-width:170px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:inline-block;">{{ (commande.stripePaymentIntentId ?: commande.stripeSessionId)|slice(0, 24) }}…</code>
+            </div>
+            {% endif %}
       </div>
     </div>
 
@@ -429,17 +429,17 @@
               {% endif %}
             </td>
             <td class="center">{{ ligne ? ligne.quantite : 1 }}</td>
-            <td class="right">{{ ligne ? ligne.prixHtUnitaire|number_format(3, '.', ' ') : facture.totalHt }} TND</td>
+            <td class="right">{{ ligne ? ligne.prixHtUnitaire|number_format(3, '.', ' ') : commande.totalHt }} TND</td>
             <td class="right" style="color:#64748b;">{{ ligne ? ligne.tvaRate : '19.00' }}%</td>
             <td class="right" style="color:#64748b;">
               {% if ligne %}
                 {{ (ligne.prixHtUnitaire * ligne.quantite)|number_format(3, '.', ' ') }}
               {% else %}
-                {{ facture.totalHt }}
+                {{ commande.totalHt }}
               {% endif %}
               TND
             </td>
-            <td class="right">{{ ligne ? ligne.totalTtc|number_format(3, '.', ' ') : facture.totalTtc }} TND</td>
+            <td class="right">{{ ligne ? ligne.totalTtc|number_format(3, '.', ' ') : commande.totalTtc }} TND</td>
           </tr>
         {% endfor %}
       </tbody>
@@ -450,15 +450,15 @@
       <div class="totaux-inner">
         <div class="totaux-row">
           <span class="lbl">Sous-total HT</span>
-          <span class="val">{{ facture.totalHt }} TND</span>
+          <span class="val">{{ commande.totalHt }} TND</span>
         </div>
         <div class="totaux-row">
           <span class="lbl">TVA (19%)</span>
-          <span class="val">{{ facture.totalTva }} TND</span>
+          <span class="val">{{ commande.totalTva }} TND</span>
         </div>
         <div class="totaux-grand">
           <span class="lbl">Total TTC</span>
-          <span class="val">{{ facture.totalTtc }} <span class="cur">TND</span></span>
+          <span class="val">{{ commande.totalTtc }} <span class="cur">TND</span></span>
         </div>
       </div>
     </div>

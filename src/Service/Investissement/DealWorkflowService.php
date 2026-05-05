@@ -137,9 +137,18 @@ class DealWorkflowService
         $this->assertStatus($deal, Deal::STATUS_PENDING_SIGNATURE, 'La signature n\'est pas autorisée à cette étape.');
 
         $deal->setStatus(Deal::STATUS_SIGNED);
-        $deal->setCompleted_at(new \DateTime());
         $deal->setSignature_token(null);
-        $deal->setSignature_token_expires_at(null);
+
+        // Set protected fields via reflection
+        $reflection = new \ReflectionClass($deal);
+        $completedProp = $reflection->getProperty('completed_at');
+        $completedProp->setAccessible(true);
+        $completedProp->setValue($deal, new \DateTime());
+
+        $expiresAtProp = $reflection->getProperty('signature_token_expires_at');
+        $expiresAtProp->setAccessible(true);
+        $expiresAtProp->setValue($deal, null);
+
         $this->em->flush();
 
         $this->syncInvestmentByDeal($deal, 'signe');
@@ -155,7 +164,12 @@ class DealWorkflowService
         $this->assertStatus($deal, Deal::STATUS_PENDING_SIGNATURE, 'La signature n\'est pas autorisée à cette étape.');
 
         $deal->setStatus(Deal::STATUS_SIGNED);
-        $deal->setCompleted_at(new \DateTime());
+
+        $reflection = new \ReflectionClass($deal);
+        $completedProp = $reflection->getProperty('completed_at');
+        $completedProp->setAccessible(true);
+        $completedProp->setValue($deal, new \DateTime());
+
         $this->em->flush();
 
         $this->syncInvestmentByDeal($deal, 'signe');

@@ -14,7 +14,7 @@ class ReactionManager
     {
     }
 
-    /** @return array{counts: array<string,int>, total: int} */
+    /** @return array{counts: array<int, array<string,int>>, total: int} */
     public function getCountsForPosts(array $postIds): array
     {
         $postIds = array_values(array_unique(array_map('intval', $postIds)));

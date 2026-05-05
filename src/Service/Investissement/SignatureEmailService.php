@@ -30,8 +30,17 @@ class SignatureEmailService
         $expiresAt = new \DateTime('+48 hours');
 
         $deal->setSignature_token($token);
-        $deal->setSignature_token_expires_at($expiresAt);
-        $deal->setSignature_sent_at(new \DateTime());
+
+        // Set protected fields via reflection
+        $reflection = new \ReflectionClass($deal);
+        $expiresAtProp = $reflection->getProperty('signature_token_expires_at');
+        $expiresAtProp->setAccessible(true);
+        $expiresAtProp->setValue($deal, $expiresAt);
+
+        $sentAtProp = $reflection->getProperty('signature_sent_at');
+        $sentAtProp->setAccessible(true);
+        $sentAtProp->setValue($deal, new \DateTime());
+
         $this->em->flush();
 
         $signingUrl = $this->urlGenerator->generate(

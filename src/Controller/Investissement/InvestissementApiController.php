@@ -364,7 +364,7 @@ class InvestissementApiController extends AbstractController
 
         $totalInvesti = $this->investmentRepo->getTotalInvestedByProject($projet);
         $budget       = $projet->getRequiredBudget() ?? 0;
-        $pourcentage  = $budget > 0 ? min(100, round(($totalInvesti / $budget) * 100, 1)) : 0;
+        $pourcentage  = $budget > 0 ? min(100, round(((float)$totalInvesti / (float)$budget) * 100, 1)) : 0;
 
         $negCount = count($this->negRepo->findBy([
             'project' => $projet,

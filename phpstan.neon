@@ -5,7 +5,15 @@ parameters:
     level: 5
     paths:
         - src
-    excludePaths:
-        - src/Entity/Community
-        - src/Service/Community
-        - src/Controller/Community
+    ignoreErrors:
+        # Strict Symfony typing - UserInterface doesn't have getUserId but our User entity does
+        -
+            message: '#Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface::getUserId\(\)\.#'
+            paths:
+                - src/Controller/Community/PostController.php
+
+        # Entity lifecycle callback methods (called by Doctrine or via reflection)
+        -
+            message: '#Method App\\Entity\\Elearning\\PromoCode::setCreatedAt\(\) is unused\.#'
+        -
+            message: '#Method App\\Entity\\UsersAvis\\User::setUpdatedAt\(\) is unused\.#'

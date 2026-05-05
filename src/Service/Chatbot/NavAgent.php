@@ -3,7 +3,6 @@
 namespace App\Service\Chatbot;
 
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class NavAgent
@@ -18,7 +17,6 @@ class NavAgent
         private readonly CloudflareClient $cloudflareClient,
         private readonly ConversationHistory $history,
         private readonly RouterInterface $router,
-        private readonly KernelInterface $kernel,
         private readonly RequestStack $requestStack,
     ) {
         $this->routeList = $this->buildRouteList();

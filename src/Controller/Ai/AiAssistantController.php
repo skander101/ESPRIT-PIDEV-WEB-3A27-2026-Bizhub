@@ -3,8 +3,6 @@
 namespace App\Controller\Ai;
 
 use App\Model\Ai\ChatMessageInput;
-use App\Service\AI\AiDatabaseAssistantService;
-use App\Service\AI\AiNavigationBotService;
 use App\Service\AI\CloudflareAiService;
 use App\Service\Chatbot\RouterAgent;
 use App\Service\Chatbot\NavAgent;
@@ -30,8 +28,6 @@ class AiAssistantController extends AbstractController
     private const CSRF_CLEAR_ID = 'ai_chat_clear';
 
     public function __construct(
-        private readonly AiNavigationBotService $navigationBotService,
-        private readonly AiDatabaseAssistantService $databaseAssistantService,
         private readonly CloudflareAiService $cloudflareAiService,
         private readonly RouterAgent $routerAgent,
         private readonly NavAgent $navAgent,
@@ -121,31 +117,6 @@ class AiAssistantController extends AbstractController
             'success' => true,
             'message' => 'Chat cleared.',
         ]);
-    }
-
-    /**
-     * @return array{0: string, 1: string|null}
-     */
-    private function resolveNavigationReply(string $intent): array
-    {
-        $routeMap = [
-            AiNavigationBotService::GO_TO_LOGIN => ['route' => 'app_login', 'label' => 'Login page'],
-            AiNavigationBotService::GO_TO_SIGNUP => ['route' => 'app_register', 'label' => 'Signup page'],
-            AiNavigationBotService::GO_TO_PROFILE => ['route' => 'app_user_profile', 'label' => 'Profile page'],
-            AiNavigationBotService::GO_TO_USER_MANAGEMENT => ['route' => 'app_admin_user_index', 'label' => 'User management'],
-            AiNavigationBotService::GO_TO_FORMATIONS => ['route' => 'app_front_formations_index', 'label' => 'Formations page'],
-            AiNavigationBotService::GO_TO_REVIEWS => ['route' => 'app_avis_list', 'label' => 'Reviews page'],
-            AiNavigationBotService::GO_BACK => ['route' => 'app_user_dashboard', 'label' => 'Dashboard'],
-        ];
-
-        if (!isset($routeMap[$intent])) {
-            return ["I can help with navigation or data questions.", null];
-        }
-
-        $route = $routeMap[$intent]['route'];
-        $url = $this->generateUrl($route);
-
-        return [sprintf('Taking you to %s.', $routeMap[$intent]['label']), $url];
     }
 
     /**

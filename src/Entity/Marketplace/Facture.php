@@ -52,10 +52,10 @@ class Facture
     #[ORM\PrePersist]
     public function onPrePersist(): void
     {
-        if ($this->createdAt === null) {
+        if (!isset($this->createdAt)) {
             $this->createdAt = new \DateTime();
         }
-        if ($this->dateFacture === null) {
+        if (!isset($this->dateFacture)) {
             $this->dateFacture = new \DateTime();
         }
     }

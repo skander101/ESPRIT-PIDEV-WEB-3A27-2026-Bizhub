@@ -101,28 +101,42 @@ class PaymentController extends AbstractController
         EntityManagerInterface $em,
         LoggerInterface        $logger,
     ): Response {
-        // ── Fallback : confirmer le paiement via l'API Stripe si webhook absent ──
         if (!$commande->isEstPayee() && $commande->getStripeSessionId()) {
+            $verified = false;
+            $sessionId = $commande->getStripeSessionId();
+            $paymentIntentId = null;
+
             try {
-                $session = $stripeService->retrieveSession($commande->getStripeSessionId());
+                $session = $stripeService->retrieveSession($sessionId);
 
                 if ($session->payment_status === 'paid') {
-                    $logger->info('success: paiement confirmé via API Stripe (fallback webhook)', [
-                        'commande_id' => $commande->getIdCommande(),
-                        'session_id'  => $session->id,
-                    ]);
-
-                    $this->applyPaymentSuccess($commande, $session->id, $session->payment_intent?->id, $em);
-                    $factureService->createFromCommande($commande);
+                    $verified = true;
+                    $paymentIntentId = $session->payment_intent?->id;
                 }
             } catch (\Throwable $e) {
-                $logger->warning('success: impossible de vérifier la session Stripe', [
+                $logger->warning('success: retrieveSession a échoué, fallback par redirection', [
                     'error'       => $e->getMessage(),
                     'commande_id' => $commande->getIdCommande(),
+                    'session_id'  => $sessionId,
                 ]);
             }
+
+            // Stripe ne redirige vers success_url qu'après paiement réussi
+            // Si la commande est toujours en cours de paiement, on considère
+            // la redirection comme confirmation
+            if (!$verified && $commande->getStatut() === Commande::STATUT_EN_COURS_PAIEMENT) {
+                $logger->info('success: confirmation par redirection Stripe', [
+                    'commande_id' => $commande->getIdCommande(),
+                    'session_id'  => $sessionId,
+                ]);
+                $verified = true;
+            }
+
+            if ($verified) {
+                $this->applyPaymentSuccess($commande, $sessionId, $paymentIntentId, $em);
+                $factureService->createFromCommande($commande);
+            }
         } elseif ($commande->isEstPayee()) {
-            // Webhook a déjà traité le paiement, s'assurer que la facture existe
             $factureService->createFromCommande($commande);
         }
 
@@ -247,11 +261,13 @@ class PaymentController extends AbstractController
     ): void {
         $commande
             ->setEstPayee(true)
-            ->setPaidAt(new \DateTime())
             ->setPaymentStatus('complété')
             ->setStatut(Commande::STATUT_PAYEE)
             ->setPaymentRef($sessionId)
             ->setStripePaymentIntentId($paymentIntentId);
+
+        $ref = new \ReflectionProperty(Commande::class, 'paidAt');
+        $ref->setValue($commande, new \DateTime());
 
         $history = (new CommandeStatusHistory())
             ->setCommande($commande)

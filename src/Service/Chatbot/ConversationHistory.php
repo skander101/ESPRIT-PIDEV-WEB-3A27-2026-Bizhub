@@ -19,9 +19,6 @@ class ConversationHistory
         return $this->cache->get($key, fn() => []);
     }
 
-    /**
-     * @param array<int, array{role: string, content: string}> $history
-     */
     public function appendAndSave(string $agentName, string $sessionId, string $role, string $content, int $maxTurns): void
     {
         $key = sprintf('chatbot_%s_%s', $agentName, $sessionId);

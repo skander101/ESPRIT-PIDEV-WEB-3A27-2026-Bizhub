@@ -101,7 +101,7 @@ class ProjetFrontController extends AbstractController
         $investissements = $this->investmentRepository->findByProject($projet);
         $totalInvesti = $this->investmentRepository->getTotalInvestedByProject($projet);
         $pourcentage = $projet->getRequiredBudget() > 0
-            ? min(100, round(($totalInvesti / $projet->getRequiredBudget()) * 100))
+            ? min(100, round(((float)$totalInvesti / (float)$projet->getRequiredBudget()) * 100))
             : 0;
 
         // Vérifier si l'investisseur a déjà investi dans ce projet

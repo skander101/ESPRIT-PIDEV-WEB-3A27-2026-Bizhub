@@ -172,7 +172,7 @@ class FrontProjetController extends AbstractController
         $investissements = $this->investmentRepository->findByProject($projet);
         $totalInvesti    = $this->investmentRepository->getTotalInvestedByProject($projet);
         $pourcentage     = $projet->getRequiredBudget() > 0
-            ? min(100, round(($totalInvesti / $projet->getRequiredBudget()) * 100, 1))
+            ? min(100, round(((float)$totalInvesti / (float)$projet->getRequiredBudget()) * 100, 1))
             : 0;
 
         $user        = $this->getUser();

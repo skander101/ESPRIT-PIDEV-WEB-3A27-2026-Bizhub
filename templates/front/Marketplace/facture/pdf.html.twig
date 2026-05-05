@@ -147,10 +147,10 @@
       <div class="label-section">RÉFÉRENCES</div>
       <div class="ref-row"><span class="ref-label">N° Facture</span><span class="ref-value">{{ facture.numeroFacture }}</span></div>
       <div class="ref-row"><span class="ref-label">Date paiement</span><span class="ref-value">{{ commande.paidAt ? commande.paidAt|date('d/m/Y') : facture.dateFacture|date('d/m/Y') }}</span></div>
-      {% if facture.stripeRef %}
+      {% if commande.stripePaymentIntentId or commande.stripeSessionId %}
       <div class="ref-row" style="margin-top:6px; border-top:1px dashed #e2e8f0; padding-top:6px;">
         <span class="ref-label">Réf. Stripe</span>
-        <span class="ref-value" style="font-size:8px; font-family:monospace;">{{ facture.stripeRef|slice(0, 28) }}</span>
+        <span class="ref-value" style="font-size:8px; font-family:monospace;">{{ (commande.stripePaymentIntentId ?: commande.stripeSessionId)|slice(0, 28) }}</span>
       </div>
       {% endif %}
     </div>
@@ -179,18 +179,18 @@
             {% endif %}
           </td>
           <td class="center">{{ ligne ? ligne.quantite : 1 }}</td>
-          <td class="right">{{ ligne ? ligne.prixHtUnitaire : facture.totalHt }} TND</td>
+          <td class="right">{{ ligne ? ligne.prixHtUnitaire : commande.totalHt }} TND</td>
           <td class="right" style="color:#64748b;">{{ ligne ? ligne.tvaRate : '19.00' }}%</td>
           <td class="right" style="color:#64748b;">
             {% if ligne %}
               {{ (ligne.prixHtUnitaire * ligne.quantite)|number_format(3, '.', ' ') }}
             {% else %}
-              {{ facture.totalHt }}
+            {{ commande.totalHt }}
             {% endif %}
             TND
           </td>
           <td class="right bold" style="padding-right:36px;">
-            {{ ligne ? ligne.totalTtc|number_format(3, '.', ' ') : facture.totalTtc }} TND
+            {{ ligne ? ligne.totalTtc|number_format(3, '.', ' ') : commande.totalTtc }} TND
           </td>
         </tr>
       {% endfor %}
@@ -201,15 +201,15 @@
   <div class="totaux">
     <div class="totaux-row">
       <span class="totaux-label">Sous-total HT</span>
-      <span class="totaux-value">{{ facture.totalHt }} TND</span>
+      <span class="totaux-value">{{ commande.totalHt }} TND</span>
     </div>
     <div class="totaux-row">
       <span class="totaux-label">TVA (19%)</span>
-      <span class="totaux-value">{{ facture.totalTva }} TND</span>
+      <span class="totaux-value">{{ commande.totalTva }} TND</span>
     </div>
     <div class="totaux-total-row">
       <span class="totaux-total-label">Total TTC</span>
-      <span class="totaux-total-value">{{ facture.totalTtc }} <span class="totaux-total-cur">TND</span></span>
+      <span class="totaux-total-value">{{ commande.totalTtc }} <span class="totaux-total-cur">TND</span></span>
     </div>
   </div>
 

@@ -49,6 +49,8 @@ class AutoConfirmNotification
     public function getOrder(): ?Commande { return $this->order; }
     public function setOrder(?Commande $order): static { $this->order = $order; return $this; }
 
+    public function getCommandeId(): ?int { return $this->order?->getIdCommande(); }
+
     public function getStartupName(): string { return $this->startupName; }
     public function setStartupName(string $v): static { $this->startupName = $v; return $this; }
 

@@ -37,30 +37,6 @@ parameters:
 			path: src/Controller/Admin/Marketplace/AdminMarketplaceController.php
 
 		-
-			message: '#^Access to undefined constant App\\Entity\\Elearning\\Participation\:\:STATUS_CANCELLED\.$#'
-			identifier: classConstant.notFound
-			count: 1
-			path: src/Controller/Admin/ParticipationController.php
-
-		-
-			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:getCertificatePath\(\)\.$#'
-			identifier: method.notFound
-			count: 3
-			path: src/Controller/Admin/ParticipationController.php
-
-		-
-			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:isPaidEnrollment\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Controller/Admin/ParticipationController.php
-
-		-
-			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:setStatus\(\)\.$#'
-			identifier: method.notFound
-			count: 3
-			path: src/Controller/Admin/ParticipationController.php
-
-		-
 			message: '#^Instanceof between App\\Entity\\UsersAvis\\User and App\\Entity\\UsersAvis\\User will always evaluate to true\.$#'
 			identifier: instanceof.alwaysTrue
 			count: 1
@@ -79,6 +55,66 @@ parameters:
 			path: src/Controller/Auth/AuthController.php
 
 		-
+			message: '#^Call to an undefined method App\\Entity\\Community\\Commentaire\:\:getPostId\(\)\.$#'
+			identifier: method.notFound
+			count: 5
+			path: src/Controller/Community/PostController.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\Community\\Commentaire\:\:getUserId\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Controller/Community/PostController.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\Community\\Commentaire\:\:setCreatedAt\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Community/PostController.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\Community\\Commentaire\:\:setPostId\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Community/PostController.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\Community\\Commentaire\:\:setUserId\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Community/PostController.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\Community\\Post\:\:setCreatedAt\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Community/PostController.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\Community\\Post\:\:setUserId\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/Community/PostController.php
+
+		-
+			message: '#^Offset 1 on array\{non\-falsy\-string, string\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/Controller/Community/PostController.php
+
+		-
+			message: '#^Parameter \#1 \$locationLat of method App\\Entity\\Community\\Post\:\:setLocationLat\(\) expects string\|null, float\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Community/PostController.php
+
+		-
+			message: '#^Parameter \#1 \$locationLon of method App\\Entity\\Community\\Post\:\:setLocationLon\(\) expects string\|null, float\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Controller/Community/PostController.php
+
+		-
 			message: '#^Instanceof between App\\Entity\\UsersAvis\\User and App\\Entity\\UsersAvis\\User will always evaluate to true\.$#'
 			identifier: instanceof.alwaysTrue
 			count: 3
@@ -91,44 +127,8 @@ parameters:
 			path: src/Controller/FaceVerificationController.php
 
 		-
-			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:isPaidEnrollment\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Controller/Front/CertificateVerificationController.php
-
-		-
-			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:setStatus\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Controller/Front/FormationController.php
-
-		-
-			message: '#^Call to protected method setCreatedAt\(\) of class App\\Entity\\Elearning\\FormationRecommendationEvent\.$#'
-			identifier: method.protected
-			count: 1
-			path: src/Controller/Front/FormationController.php
-
-		-
-			message: '#^Call to protected method setCreatedAt\(\) of class App\\Entity\\UsersAvis\\Avis\.$#'
-			identifier: method.protected
-			count: 1
-			path: src/Controller/Front/FormationController.php
-
-		-
-			message: '#^Offset ''ok'' on array\{ok\: bool, message\?\: string, formation_id\?\: int, title\?\: string, reason\?\: string, en_ligne\?\: bool, source\?\: string\} on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: src/Controller/Front/FormationController.php
-
-		-
-			message: '#^Call to protected method setCreatedAt\(\) of class App\\Entity\\Elearning\\FormationRecommendationEvent\.$#'
-			identifier: method.protected
-			count: 1
-			path: src/Controller/Front/FormationRecommendationController.php
-
-		-
-			message: '#^Call to protected method setCreatedAt\(\) of class App\\Entity\\Investissement\\Investment\.$#'
-			identifier: method.protected
+			message: '#^Binary operation "/" between float and string results in an error\.$#'
+			identifier: binaryOp.invalid
 			count: 1
 			path: src/Controller/Front/InvestissementFrontController.php
 
@@ -139,52 +139,10 @@ parameters:
 			path: src/Controller/Front/InvestissementFrontController.php
 
 		-
-			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:isAwaitingPayment\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: src/Controller/Front/PaymentController.php
-
-		-
-			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:isPaidEnrollment\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Controller/Front/PaymentController.php
-
-		-
-			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:setCertificatePath\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Controller/Front/PaymentController.php
-
-		-
-			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:setPaidAt\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Controller/Front/PaymentController.php
-
-		-
-			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:setStatus\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Controller/Front/PaymentController.php
-
-		-
-			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:setTransactionId\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Controller/Front/PaymentController.php
-
-		-
 			message: '#^Offset ''discount_rate'' on array\{ok\: true, message\: string\|null, promo\: App\\Entity\\Elearning\\PromoCode\|null, discount_rate\: float, amount_ttc\: float\|null\} on left side of \?\? always exists and is not nullable\.$#'
 			identifier: nullCoalesce.offset
 			count: 2
 			path: src/Controller/Front/PaymentController.php
-
-		-
-			message: '#^Call to protected method setCreatedAt\(\) of class App\\Entity\\Investissement\\Project\.$#'
-			identifier: method.protected
-			count: 1
-			path: src/Controller/Front/ProjetFrontController.php
 
 		-
 			message: '#^Method App\\Controller\\Investissement\\DashboardController\:\:dashboardInvestisseur\(\) is unused\.$#'
@@ -235,12 +193,6 @@ parameters:
 			path: src/Controller/Investissement/DealController.php
 
 		-
-			message: '#^Call to protected method setCreated_at\(\) of class App\\Entity\\Investissement\\Investment\.$#'
-			identifier: method.protected
-			count: 1
-			path: src/Controller/Investissement/FrontInvestissementController.php
-
-		-
 			message: '#^Call to protected method setInvestment_date\(\) of class App\\Entity\\Investissement\\Investment\.$#'
 			identifier: method.protected
 			count: 1
@@ -251,12 +203,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: src/Controller/Investissement/FrontInvestissementController.php
-
-		-
-			message: '#^Call to protected method setCreated_at\(\) of class App\\Entity\\Investissement\\Project\.$#'
-			identifier: method.protected
-			count: 1
-			path: src/Controller/Investissement/FrontProjetController.php
 
 		-
 			message: '#^Parameter \#1 \$user of method App\\Entity\\Investissement\\Project\:\:setUser\(\) expects App\\Entity\\UsersAvis\\User\|null, Symfony\\Component\\Security\\Core\\User\\UserInterface given\.$#'
@@ -289,21 +235,15 @@ parameters:
 			path: src/Controller/Investissement/InvestissementApiController.php
 
 		-
-			message: '#^Call to protected method setCreated_at\(\) of class App\\Entity\\Investissement\\Negotiation\.$#'
-			identifier: method.protected
-			count: 2
-			path: src/Controller/Investissement/NegociationController.php
-
-		-
 			message: '#^Call to protected method setCreated_at\(\) of class App\\Entity\\Investissement\\NegotiationMessage\.$#'
 			identifier: method.protected
-			count: 5
+			count: 3
 			path: src/Controller/Investissement/NegociationController.php
 
 		-
 			message: '#^Call to protected method setUpdated_at\(\) of class App\\Entity\\Investissement\\Negotiation\.$#'
 			identifier: method.protected
-			count: 5
+			count: 1
 			path: src/Controller/Investissement/NegociationController.php
 
 		-
@@ -373,24 +313,6 @@ parameters:
 			path: src/Controller/Marketplace/CommandeController.php
 
 		-
-			message: '#^Call to method find\(\) on an unknown class App\\Controller\\Marketplace\\ProduitServiceRepository\.$#'
-			identifier: class.notFound
-			count: 2
-			path: src/Controller/Marketplace/MarketAnalysisController.php
-
-		-
-			message: '#^Parameter \$produitRepo of method App\\Controller\\Marketplace\\MarketAnalysisController\:\:commande\(\) has invalid type App\\Controller\\Marketplace\\ProduitServiceRepository\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Controller/Marketplace/MarketAnalysisController.php
-
-		-
-			message: '#^Parameter \$produitRepo of method App\\Controller\\Marketplace\\MarketAnalysisController\:\:produit\(\) has invalid type App\\Controller\\Marketplace\\ProduitServiceRepository\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Controller/Marketplace/MarketAnalysisController.php
-
-		-
 			message: '#^Call to protected method setPaidAt\(\) of class App\\Entity\\Marketplace\\Commande\.$#'
 			identifier: method.protected
 			count: 1
@@ -415,8 +337,8 @@ parameters:
 			path: src/Controller/TotpController.php
 
 		-
-			message: '#^Call to protected method setCreated_at\(\) of class App\\Entity\\UsersAvis\\Avis\.$#'
-			identifier: method.protected
+			message: '#^Call to an undefined method App\\Entity\\UsersAvis\\Avis\:\:setCreated_at\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Controller/UsersAvis/AvisController.php
 
@@ -431,6 +353,12 @@ parameters:
 			identifier: notIdentical.alwaysTrue
 			count: 1
 			path: src/Controller/UsersAvis/AvisController.php
+
+		-
+			message: '#^Call to an undefined method App\\Entity\\UsersAvis\\User\:\:setCreated_at\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controller/UsersAvis/UserController.php
 
 		-
 			message: '#^Offset ''mimeType'' on array\{bytes\: string, mimeType\: string\} on left side of \?\? always exists and is not nullable\.$#'
@@ -449,6 +377,24 @@ parameters:
 			identifier: nullCoalesce.variable
 			count: 1
 			path: src/Controller/UsersAvis/UserController.php
+
+		-
+			message: '#^Property App\\Entity\\Community\\Commentaire\:\:\$id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Community/Commentaire.php
+
+		-
+			message: '#^Property App\\Entity\\Community\\Post\:\:\$id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Community/Post.php
+
+		-
+			message: '#^Property App\\Entity\\Community\\Reaction\:\:\$id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Community/Reaction.php
 
 		-
 			message: '#^Instanceof between Doctrine\\Common\\Collections\\Collection and Doctrine\\Common\\Collections\\Collection will always evaluate to true\.$#'
@@ -481,6 +427,24 @@ parameters:
 			path: src/Entity/Investissement/Deal.php
 
 		-
+			message: '#^Property App\\Entity\\Investissement\\Deal\:\:\$email_sent \(bool\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Investissement/Deal.php
+
+		-
+			message: '#^Property App\\Entity\\Investissement\\Deal\:\:\$stripe_payment_status \(string\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Investissement/Deal.php
+
+		-
+			message: '#^Property App\\Entity\\Investissement\\Deal\:\:\$yousign_status \(string\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Investissement/Deal.php
+
+		-
 			message: '#^Property App\\Entity\\Investissement\\Investment\:\:\$amount \(string\) does not accept float\.$#'
 			identifier: assign.propertyType
 			count: 1
@@ -493,15 +457,45 @@ parameters:
 			path: src/Entity/Investissement/Investment.php
 
 		-
+			message: '#^Property App\\Entity\\Investissement\\Investment\:\:\$payment_mode \(string\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Investissement/Investment.php
+
+		-
+			message: '#^Property App\\Entity\\Investissement\\Investment\:\:\$statut \(string\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Investissement/Investment.php
+
+		-
 			message: '#^Instanceof between Doctrine\\Common\\Collections\\Collection and Doctrine\\Common\\Collections\\Collection will always evaluate to true\.$#'
 			identifier: instanceof.alwaysTrue
 			count: 1
 			path: src/Entity/Investissement/Negotiation.php
 
 		-
+			message: '#^Property App\\Entity\\Investissement\\Negotiation\:\:\$status \(string\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Investissement/Negotiation.php
+
+		-
+			message: '#^Property App\\Entity\\Investissement\\NegotiationMessage\:\:\$message_type \(string\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Investissement/NegotiationMessage.php
+
+		-
 			message: '#^Instanceof between Doctrine\\Common\\Collections\\Collection and Doctrine\\Common\\Collections\\Collection will always evaluate to true\.$#'
 			identifier: instanceof.alwaysTrue
 			count: 3
+			path: src/Entity/Investissement/Project.php
+
+		-
+			message: '#^Property App\\Entity\\Investissement\\Project\:\:\$status \(string\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
 			path: src/Entity/Investissement/Project.php
 
 		-
@@ -569,6 +563,24 @@ parameters:
 			identifier: identical.alwaysFalse
 			count: 2
 			path: src/Entity/Marketplace/Facture.php
+
+		-
+			message: '#^Property App\\Entity\\Marketplace\\Order\:\:\$quantity \(int\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Marketplace/Order.php
+
+		-
+			message: '#^Property App\\Entity\\Marketplace\\Order\:\:\$status \(string\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Marketplace/Order.php
+
+		-
+			message: '#^Property App\\Entity\\Marketplace\\Order\:\:\$total_price \(string\|null\) is never assigned string so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Entity/Marketplace/Order.php
 
 		-
 			message: '#^Property App\\Entity\\Marketplace\\Panier\:\:\$idPanier \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
@@ -667,34 +679,10 @@ parameters:
 			path: src/Service/AI/AiDatabaseAssistantService.php
 
 		-
-			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:getCreatedAt\(\)\.$#'
-			identifier: method.notFound
+			message: '#^Offset ''route'' on non\-empty\-array\<mixed, mixed\> on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
 			count: 1
-			path: src/Service/Elearning/FormationAiBestPickService.php
-
-		-
-			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:getStatus\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Service/Elearning/FormationAiBestPickService.php
-
-		-
-			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:isPaidEnrollment\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Service/Elearning/FormationAiBestPickService.php
-
-		-
-			message: '#^Call to an undefined method App\\Service\\Marketplace\\GrokService\:\:chatWithMessages\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Service/Elearning/FormationAiBestPickService.php
-
-		-
-			message: '#^PHPDoc tag @param references unknown parameter\: \$candidates$#'
-			identifier: parameter.notFound
-			count: 1
-			path: src/Service/Elearning/FormationAiBestPickService.php
+			path: src/Service/Chatbot/NavAgent.php
 
 		-
 			message: '#^Property DateInterval\:\:\$days \(int\|false\) on left side of \?\? is not nullable\.$#'
@@ -703,20 +691,32 @@ parameters:
 			path: src/Service/Elearning/LocalFormationRecommender.php
 
 		-
-			message: '#^Call to an undefined method App\\Entity\\Elearning\\Participation\:\:getTransactionId\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Service/Elearning/ParticipationConfirmationMailService.php
-
-		-
-			message: '#^Call to protected method setCreatedAt\(\) of class App\\Entity\\Elearning\\PromoCode\.$#'
-			identifier: method.protected
+			message: '#^Call to private method setCreatedAt\(\) of class App\\Entity\\Elearning\\PromoCode\.$#'
+			identifier: method.private
 			count: 1
 			path: src/Service/Elearning/PromoCodeService.php
 
 		-
-			message: '#^Call to protected method setExpiresAt\(\) of class App\\Entity\\Elearning\\PromoCode\.$#'
-			identifier: method.protected
+			message: '#^Parameter \#1 \$at of method App\\Entity\\Elearning\\PromoCode\:\:markUsed\(\) expects DateTimeImmutable, DateTime given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Service/Elearning/PromoCodeService.php
+
+		-
+			message: '#^Parameter \#1 \$createdAt of method App\\Entity\\Elearning\\PromoCode\:\:setCreatedAt\(\) expects DateTimeImmutable, DateTime given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Service/Elearning/PromoCodeService.php
+
+		-
+			message: '#^Parameter \#1 \$expiresAt of method App\\Entity\\Elearning\\PromoCode\:\:setExpiresAt\(\) expects DateTimeImmutable, DateTime given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Service/Elearning/PromoCodeService.php
+
+		-
+			message: '#^Parameter \#1 \$now of method App\\Entity\\Elearning\\PromoCode\:\:isUsableNow\(\) expects DateTimeImmutable, DateTime given\.$#'
+			identifier: argument.type
 			count: 1
 			path: src/Service/Elearning/PromoCodeService.php
 
@@ -736,12 +736,6 @@ parameters:
 			message: '#^Call to protected method setCompleted_at\(\) of class App\\Entity\\Investissement\\Deal\.$#'
 			identifier: method.protected
 			count: 2
-			path: src/Service/Investissement/DealWorkflowService.php
-
-		-
-			message: '#^Call to protected method setCreated_at\(\) of class App\\Entity\\Investissement\\Deal\.$#'
-			identifier: method.protected
-			count: 1
 			path: src/Service/Investissement/DealWorkflowService.php
 
 		-

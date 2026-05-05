@@ -48,12 +48,7 @@ class FactureService
         $facture = new Facture();
         $facture
             ->setCommande($commande)
-            ->setNumeroFacture($this->generateNumero($commande))
-            ->setDateFacture(new \DateTime())
-            ->setTotalHt($commande->getTotalHt() ?? '0.000')
-            ->setTotalTva($commande->getTotalTva() ?? '0.000')
-            ->setTotalTtc($commande->getTotalTtc() ?? '0.000')
-            ->setStripeRef($commande->getPaymentRef() ?? $commande->getStripeSessionId());
+            ->setNumeroFacture($this->generateNumero($commande));
 
         $this->em->persist($facture);
         $this->em->flush();

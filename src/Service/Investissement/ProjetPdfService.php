@@ -19,7 +19,7 @@ class ProjetPdfService
     {
         $totalInvesti    = $this->investmentRepository->getTotalInvestedByProject($projet);
         $pourcentage     = $projet->getRequiredBudget() > 0
-            ? min(100, round(($totalInvesti / $projet->getRequiredBudget()) * 100, 1))
+            ? min(100, round(((float)$totalInvesti / (float)$projet->getRequiredBudget()) * 100, 1))
             : 0;
         $investissements = $this->investmentRepository->findByProject($projet);
 

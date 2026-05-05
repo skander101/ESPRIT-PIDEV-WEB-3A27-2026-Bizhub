@@ -9,7 +9,6 @@ use App\Entity\UsersAvis\User;
 use App\Repository\InvestmentRepository;
 use App\Repository\NegotiationRepository;
 use App\Service\Investissement\DealWorkflowService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,7 +25,6 @@ class WorkflowController extends AbstractController
         private InvestmentRepository  $investmentRepo,
         private NegotiationRepository $negotiationRepo,
         private DealWorkflowService   $workflow,
-        private EntityManagerInterface $em,
     ) {}
 
     #[Route('/investissement/{id}', name: 'app_workflow_investissement', methods: ['GET'], requirements: ['id' => '\d+'])]

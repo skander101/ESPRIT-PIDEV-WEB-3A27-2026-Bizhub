@@ -155,14 +155,14 @@ final class PaymentController extends AbstractController
         }
 
         $txn = $this->fakeCardPaymentValidator->generateTransactionId();
-        $now = new \DateTime();
+        $now = new \DateTimeImmutable();
 
         $participation->setAmount((string) $charged);
         $participation->setTransactionId($txn);
         $participation->setPaymentStatus('PAID');
         $participation->setPaymentProvider('FAKE_GATEWAY');
         $participation->setPaymentRef($txn);
-        $participation->setPaidAt($now);
+        $participation->setPaidAt(\DateTime::createFromImmutable($now));
         $participation->setStatus(Participation::STATUS_PAID);
 
         if ($appliedDbPromo !== null) {
