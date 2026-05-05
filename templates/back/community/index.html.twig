@@ -1,0 +1,106 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Gestion Communauté - Admin{% endblock %}
+{% block breadcrumb %}Communauté - Posts{% endblock %}
+
+{% block content %}
+<div style="padding:2rem;">
+
+  <!-- Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;">
+    <div>
+      <h2 style="font-size:1.5rem;color:var(--pg-text);margin:0 0 0.25rem 0;">Gestion de la Communauté</h2>
+      <p style="color:var(--pg-muted);margin:0;font-size:0.85rem;">{{ total_posts }} post(s) au total</p>
+    </div>
+  </div>
+
+  <!-- Search & Filters -->
+  <div style="display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;">
+    <form method="get" style="display:flex;gap:0.5rem;flex:1;max-width:500px;">
+      <input type="text" name="search" value="{{ search }}" placeholder="Rechercher un post..."
+             style="flex:1;height:38px;background:var(--pg-surface2);border:1px solid var(--pg-border);border-radius:9px;color:var(--pg-text);font-size:13px;padding:0 12px;font-family:'DM Sans',sans-serif;outline:none;" />
+      <button type="submit" style="height:38px;padding:0 16px;background:#5b6ef5;border:none;border-radius:9px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;">Rechercher</button>
+    </form>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+      <a href="{{ path('admin_community_index') }}"
+         style="padding:0.5rem 1rem;border:1px solid var(--pg-border);background:{% if category == '' %}#5b6ef5;border-color:#5b6ef5;{% else %}var(--pg-surface2);{% endif %}border-radius:4px;text-decoration:none;color:{% if category == '' %}#fff{% else %}var(--pg-text){% endif %};font-size:0.85rem;transition:all 0.2s;">Tous</a>
+      <a href="{{ path('admin_community_index', {category: 'General'}) }}"
+         style="padding:0.5rem 1rem;border:1px solid var(--pg-border);background:{% if category == 'General' %}#5b6ef5;border-color:#5b6ef5;{% else %}var(--pg-surface2);{% endif %}border-radius:4px;text-decoration:none;color:{% if category == 'General' %}#fff{% else %}var(--pg-text){% endif %};font-size:0.85rem;transition:all 0.2s;">Général</a>
+      <a href="{{ path('admin_community_index', {category: 'Question'}) }}"
+         style="padding:0.5rem 1rem;border:1px solid var(--pg-border);background:{% if category == 'Question' %}#5b6ef5;border-color:#5b6ef5;{% else %}var(--pg-surface2);{% endif %}border-radius:4px;text-decoration:none;color:{% if category == 'Question' %}#fff{% else %}var(--pg-text){% endif %};font-size:0.85rem;transition:all 0.2s;">Questions</a>
+      <a href="{{ path('admin_community_index', {category: 'Announcement'}) }}"
+         style="padding:0.5rem 1rem;border:1px solid var(--pg-border);background:{% if category == 'Announcement' %}#5b6ef5;border-color:#5b6ef5;{% else %}var(--pg-surface2);{% endif %}border-radius:4px;text-decoration:none;color:{% if category == 'Announcement' %}#fff{% else %}var(--pg-text){% endif %};font-size:0.85rem;transition:all 0.2s;">Annonces</a>
+    </div>
+  </div>
+
+  <!-- Posts Table -->
+  <div class="dash-panel">
+    {% if posts|length > 0 %}
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;color:var(--pg-text);font-size:13px;">
+          <thead>
+            <tr style="border-bottom:1px solid var(--pg-border);background:var(--pg-surface2);">
+              <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);">#</th>
+              <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);">Titre</th>
+              <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);">Auteur</th>
+              <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);">Catégorie</th>
+              <th style="text-align:left;padding:1rem;font-weight:700;color:var(--pg-muted);">Date</th>
+              <th style="text-align:center;padding:1rem;font-weight:700;color:var(--pg-muted);">Commentaires</th>
+              <th style="text-align:center;padding:1rem;font-weight:700;color:var(--pg-muted);">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for post in posts %}
+              <tr style="border-bottom:1px solid var(--pg-border);transition:background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='transparent'">
+                <td style="padding:1rem;font-weight:600;">#{{ post.post_id }}</td>
+                <td style="padding:1rem;">
+                  <a href="{{ path('admin_community_show', {id: post.post_id}) }}" style="color:var(--pg-text);text-decoration:none;font-weight:500;">{{ post.title|length > 50 ? post.title|slice(0, 50) ~ '...' : post.title }}</a>
+                  {% if post.media_url %}<span style="color:#5b6ef5;font-size:11px;"> 📎</span>{% endif %}
+                </td>
+                <td style="padding:1rem;color:var(--pg-muted);">{{ post.author_name ?? 'Inconnu' }}</td>
+                <td style="padding:1rem;">
+                  <span style="display:inline-block;background:rgba(91,110,245,0.12);color:#5b6ef5;padding:3px 10px;border-radius:6px;font-size:0.72rem;font-weight:700;">{{ post.category }}</span>
+                </td>
+                <td style="padding:1rem;font-size:0.82rem;">{{ post.created_at|date('d/m/Y H:i') }}</td>
+                <td style="padding:1rem;text-align:center;">
+                  <span style="background:rgba(6,214,160,0.12);color:#06d6a0;padding:3px 10px;border-radius:6px;font-size:0.72rem;font-weight:700;">{{ comment_counts[post.post_id] ?? 0 }}</span>
+                </td>
+                <td style="padding:1rem;text-align:center;">
+                  <div style="display:flex;gap:0.5rem;justify-content:center;">
+                    <a href="{{ path('admin_community_show', {id: post.post_id}) }}"
+                       style="background:#17a2b8;color:white;padding:0.4rem 0.8rem;border-radius:4px;text-decoration:none;font-size:0.85rem;font-weight:700;">Voir</a>
+                    <a href="{{ path('admin_community_edit', {id: post.post_id}) }}"
+                       style="background:#ffc107;color:#000;padding:0.4rem 0.8rem;border-radius:4px;text-decoration:none;font-size:0.85rem;font-weight:700;">Éditer</a>
+                    <form method="post" action="{{ path('admin_community_delete', {id: post.post_id}) }}" onsubmit="return confirm('Confirmer la suppression de ce post ?');" style="display:inline;">
+                      <input type="hidden" name="_token" value="{{ csrf_token('delete_post_' ~ post.post_id) }}">
+                      <button type="submit" style="background:#dc3545;color:white;border:none;padding:0.4rem 0.8rem;border-radius:4px;font-size:0.85rem;font-weight:700;cursor:pointer;">Supprimer</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      {% if total_pages > 1 %}
+        <div style="display:flex;justify-content:center;gap:0.5rem;padding:1.5rem;">
+          {% if page > 1 %}
+            <a href="{{ path('admin_community_index', {page: page-1, search: search, category: category}) }}"
+               style="padding:0.5rem 1rem;border:1px solid var(--pg-border);background:var(--pg-surface2);border-radius:4px;text-decoration:none;color:var(--pg-text);font-size:0.85rem;">← Précédent</a>
+          {% endif %}
+          <span style="padding:0.5rem 1rem;color:var(--pg-muted);font-size:0.85rem;">Page {{ page }} sur {{ total_pages }}</span>
+          {% if page < total_pages %}
+            <a href="{{ path('admin_community_index', {page: page+1, search: search, category: category}) }}"
+               style="padding:0.5rem 1rem;border:1px solid var(--pg-border);background:var(--pg-surface2);border-radius:4px;text-decoration:none;color:var(--pg-text);font-size:0.85rem;">Suivant →</a>
+          {% endif %}
+        </div>
+      {% endif %}
+
+    {% else %}
+      <p style="text-align:center;padding:2rem;color:var(--pg-muted);">Aucun post trouvé.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

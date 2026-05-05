@@ -6,6 +6,11 @@ use App\Entity\UsersAvis\User;
 use App\Entity\UsersAvis\Avis;
 use App\Repository\UsersAvis\UserRepository;
 use App\Repository\UsersAvis\AvisRepository;
+use App\Repository\Elearning\FormationRepository;
+use App\Repository\ProjectRepository;
+use App\Repository\InvestmentRepository;
+use App\Repository\Community\PostRepository;
+use App\Service\Marketplace\StatisticsService;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,13 +28,132 @@ class AdminController extends AbstractController
         private EntityManagerInterface $entityManager,
         private UserRepository $userRepository,
         private AvisRepository $avisRepository,
+        private FormationRepository $formationRepository,
+        private ProjectRepository $projectRepository,
+        private InvestmentRepository $investmentRepository,
+        private PostRepository $postRepository,
+        private StatisticsService $statisticsService,
     ) {
     }
 
     #[Route('', name: 'app_admin_index', methods: ['GET'])]
     public function index(): Response
     {
-        return $this->render('back/index.html.twig');
+        // User stats
+        $totalUsers = $this->userRepository->countAll();
+        $activeUsers = $this->userRepository->countActive();
+        $inactiveUsers = $this->userRepository->countInactive();
+        $roleDistribution = $this->userRepository->getRoleDistribution();
+        $monthlyRegistrations = $this->userRepository->getMonthlyRegistrations(6);
+
+        // Formation stats
+        $totalFormations = count($this->formationRepository->findAllOrderedByStartDate());
+        $popularFormationIds = $this->formationRepository->findPopularFormationIds(5);
+        $trendingFormationIds = $this->formationRepository->findTrendingFormationIds(30, 5);
+        $newestFormationIds = $this->formationRepository->findNewestFormationIds(5);
+
+        // Marketplace stats (using StatisticsService)
+        $marketplaceStats = $this->statisticsService->getDashboardSummary(5, 6);
+
+        // Prepare marketplace revenue chart data
+        $marketplaceRevenueLabels = [];
+        $marketplaceRevenueData = [];
+        foreach ($marketplaceStats['monthlyRevenue'] as $item) {
+            $marketplaceRevenueLabels[] = $item['mois'];
+            $marketplaceRevenueData[] = $item['total'];
+        }
+
+        // Prepare statsByStatut for template
+        $statsByStatutFormatted = [
+            'statuts' => [],
+            'total_commandes' => 0,
+            'total_ttc' => 0
+        ];
+        foreach ($marketplaceStats['statsByStatut'] as $stat) {
+            $statsByStatutFormatted['statuts'][$stat['statut']] = [
+                'count' => $stat['nb'],
+                'total_ttc' => $stat['totalTtc']
+            ];
+            $statsByStatutFormatted['total_commandes'] += $stat['nb'];
+            $statsByStatutFormatted['total_ttc'] += $stat['totalTtc'];
+        }
+        $marketplaceStats['statsByStatut'] = $statsByStatutFormatted;
+
+        // Prepare orders evolution chart data
+        $ordersEvolutionLabels = [];
+        $ordersEvolutionData = [];
+        $ordersEvolution = $this->statisticsService->getOrdersEvolution(6);
+        foreach ($ordersEvolution as $item) {
+            $ordersEvolutionLabels[] = $item['mois'];
+            $ordersEvolutionData[] = $item['nb'];
+        }
+
+        // Product categories
+        $productCategories = $this->statisticsService->getProductCategoryDistribution();
+
+        // Investment stats
+        $totalInvestments = $this->investmentRepository->countAll();
+        $totalInvested = $this->investmentRepository->getTotalInvested();
+        $totalProjects = $this->projectRepository->countAll();
+        $totalBudgetRequired = $this->projectRepository->getTotalBudgetRequired();
+        $projectsBySector = $this->projectRepository->countBySecteur();
+
+        // Community stats
+        $totalPosts = $this->postRepository->countPosts('', '');
+        $recentPosts = $this->postRepository->findAllWithAuthor();
+
+        // Prepare chart data
+        $userRoleLabels = [];
+        $userRoleData = [];
+        $userRoleColors = ['#5b6ef5', '#8b5cf6', '#06d6a0', '#f59e0b', '#ef4444', '#ec4899', '#14b8a6'];
+        foreach ($roleDistribution as $i => $role) {
+            $label = trim((string) $role['role']);
+            $userRoleLabels[] = $label !== '' ? $label : 'Non défini';
+            $userRoleData[] = (int) $role['total'];
+        }
+
+        $monthlyLabels = [];
+        $monthlyData = [];
+        foreach (array_reverse($monthlyRegistrations) as $reg) {
+            $monthlyLabels[] = $reg['period'];
+            $monthlyData[] = $reg['total'];
+        }
+
+        $sectorLabels = [];
+        $sectorData = [];
+        foreach ($projectsBySector as $secteur => $total) {
+            $label = trim((string) $secteur);
+            $sectorLabels[] = $label !== '' ? $label : 'Non défini';
+            $sectorData[] = (int) $total;
+        }
+
+        return $this->render('back/index.html.twig', [
+            'total_users' => $totalUsers,
+            'active_users' => $activeUsers,
+            'inactive_users' => $inactiveUsers,
+            'total_formations' => $totalFormations,
+            'popular_formation_ids' => $popularFormationIds,
+            'trending_formation_ids' => $trendingFormationIds,
+            'newest_formation_ids' => $newestFormationIds,
+            'marketplace_stats' => $marketplaceStats,
+            'total_investments' => $totalInvestments,
+            'total_invested' => $totalInvested,
+            'total_projects' => $totalProjects,
+            'total_budget_required' => $totalBudgetRequired,
+            'user_role_labels' => $userRoleLabels,
+            'user_role_data' => $userRoleData,
+            'user_role_colors' => array_slice($userRoleColors, 0, count($userRoleLabels)),
+            'monthly_labels' => $monthlyLabels,
+            'monthly_data' => $monthlyData,
+            'sector_labels' => $sectorLabels,
+            'sector_data' => $sectorData,
+            'total_posts' => $totalPosts,
+            'recent_posts' => $recentPosts,
+            'marketplace_revenue_labels' => $marketplaceRevenueLabels,
+            'marketplace_revenue_data' => $marketplaceRevenueData,
+            'orders_evolution_labels' => $ordersEvolutionLabels,
+            'orders_evolution_data' => $ordersEvolutionData,
+        ]);
     }
 
     #[Route('/dashboard', name: 'app_admin_dashboard', methods: ['GET'])]
@@ -170,7 +294,7 @@ class AdminController extends AbstractController
     private function buildPieSlices(array $distribution, int $cx, int $cy, int $radius): array
     {
         $palette = ['#2563eb', '#f97316', '#10b981', '#8b5cf6', '#ef4444', '#14b8a6', '#eab308'];
-        $total = array_sum(array_map(static fn (array $item): int => max(0, (int) ($item['total'] ?? 0)), $distribution));
+        $total = array_sum(array_map(static fn (array $item): int => max(0, (int) $item['total']), $distribution));
 
         if ($total <= 0) {
             return [
@@ -186,13 +310,13 @@ class AdminController extends AbstractController
         $index = 0;
 
         foreach ($distribution as $item) {
-            $value = max(0, (int) ($item['total'] ?? 0));
+            $value = max(0, (int) $item['total']);
             if ($value === 0) {
                 ++$index;
                 continue;
             }
 
-            $label = (string) ($item['role'] ?? 'Unknown');
+            $label = (string) $item['role'];
             $color = $palette[$index % count($palette)];
             $percent = ($value / $total) * 100;
             $sweep = ($value / $total) * 360;
@@ -504,7 +628,6 @@ class AdminController extends AbstractController
         }
 
         $avi->setIsRemoved(true);
-        $avi->setComment(null);
         $this->entityManager->flush();
         $this->addFlash('success', 'Review soft-banned successfully!');
 

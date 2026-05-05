@@ -1,0 +1,133 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Post #{{ post.post_id }} - Admin{% endblock %}
+{% block breadcrumb %}Communauté / Post #{{ post.post_id }}{% endblock %}
+
+{% block content %}
+<div style="padding:2rem;">
+
+  <!-- Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;">
+    <div>
+      <h2 style="font-size:1.5rem;color:var(--pg-text);margin:0 0 0.25rem 0;">Post #{{ post.post_id }}</h2>
+      <p style="color:var(--pg-muted);margin:0;font-size:0.85rem;">Par {{ post.author_name ?? 'Inconnu' }} · {{ post.created_at|date('d/m/Y H:i') }}</p>
+    </div>
+    <div style="display:flex;gap:0.6rem;">
+      <a href="{{ path('admin_community_edit', {id: post.post_id}) }}"
+         style="background:#ffc107;color:#000;padding:8px 16px;border-radius:6px;text-decoration:none;font-size:0.8rem;font-weight:700;">Éditer</a>
+      <form method="post" action="{{ path('admin_community_delete', {id: post.post_id}) }}" onsubmit="return confirm('Confirmer la suppression ?');" style="display:inline;">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete_post_' ~ post.post_id) }}">
+        <button type="submit" style="background:#dc3545;color:#fff;border:none;padding:8px 16px;border-radius:6px;font-size:0.8rem;font-weight:700;cursor:pointer;">Supprimer</button>
+      </form>
+      <a href="{{ path('admin_community_index') }}" style="background:var(--pg-surface2);color:var(--pg-text);padding:8px 16px;border-radius:6px;text-decoration:none;font-size:0.8rem;font-weight:700;">← Retour</a>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;">
+    <!-- Post Content -->
+    <div class="dash-panel" style="padding:1.5rem;">
+      <div style="margin-bottom:1.5rem;">
+        <span style="display:inline-block;background:rgba(91,110,245,0.12);color:#5b6ef5;padding:4px 12px;border-radius:6px;font-size:0.75rem;font-weight:700;text-transform:capitalize;">{{ post.category }}</span>
+      </div>
+
+      <h3 style="font-size:1.2rem;color:var(--pg-text);margin:0 0 1rem 0;">{{ post.title }}</h3>
+
+      <div style="color:var(--pg-muted2);line-height:1.6;font-size:0.9rem;white-space:pre-wrap;">{{ post.content }}</div>
+
+      {% if post.media_url %}
+        <div style="margin-top:1.5rem;padding:1rem;background:var(--pg-surface2);border-radius:10px;text-align:center;">
+          {% if post.media_type starts with 'image/' %}
+            <img src="{{ post.media_url }}" alt="Media" style="max-width:100%;border-radius:8px;" />
+          {% elseif post.media_type starts with 'video/' %}
+            <video controls style="max-width:100%;border-radius:8px;">
+              <source src="{{ post.media_url }}" type="{{ post.media_type }}">
+            </video>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {% if post.location %}
+        <div style="margin-top:1.5rem;padding:0.75rem 1rem;background:rgba(6,214,160,0.08);border:1px solid rgba(6,214,160,0.2);border-radius:8px;font-size:0.85rem;color:#06d6a0;">
+          📍 {{ post.location }}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Sidebar: Stats + Reactions -->
+    <div style="display:flex;flex-direction:column;gap:1.5rem;">
+      <!-- Stats Card -->
+      <div class="dash-panel" style="padding:1.5rem;">
+        <h4 style="font-size:1rem;color:var(--pg-text);margin:0 0 1rem 0;">Statistiques</h4>
+        <div style="display:flex;flex-direction:column;gap:0.75rem;">
+          <div style="display:flex;justify-content:space-between;">
+            <span style="font-size:0.85rem;color:var(--pg-muted);">Commentaires</span>
+            <span style="font-size:0.85rem;color:var(--pg-text);font-weight:700;">{{ post.reaction_total|default(0) }}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;">
+            <span style="font-size:0.85rem;color:var(--pg-muted);">Réactions</span>
+            <span style="font-size:0.85rem;color:var(--pg-text);font-weight:700;">{{ comments|length }}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;">
+            <span style="font-size:0.85rem;color:var(--pg-muted);">Date de création</span>
+            <span style="font-size:0.85rem;color:var(--pg-text);">{{ post.created_at|date('d/m/Y') }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reactions Card -->
+      {% if post.reaction_counts is defined %}
+        <div class="dash-panel" style="padding:1.5rem;">
+          <h4 style="font-size:1rem;color:var(--pg-text);margin:0 0 1rem 0;">Réactions</h4>
+          <div style="display:flex;flex-direction:column;gap:0.5rem;">
+            {% set reaction_emojis = {'LIKE': '👍', 'LOVE': '❤️', 'CELEBRATE': '🎉', 'SUPPORT': '🤝', 'INSIGHTFUL': '💡', 'CURIOUS': '🤔'} %}
+            {% for type, count in post.reaction_counts %}
+              {% if count > 0 %}
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <span style="font-size:0.85rem;color:var(--pg-muted);">{{ reaction_emojis[type] ?? type }}</span>
+                  <span style="font-size:0.85rem;color:var(--pg-text);font-weight:700;">{{ count }}</span>
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Comments Section -->
+  <div class="dash-panel" style="margin-top:2rem;">
+    <div style="padding:1rem 1.5rem;border-bottom:1px solid var(--pg-border);display:flex;align-items:center;justify-content:space-between;">
+      <h3 style="margin:0;font-size:1rem;color:var(--pg-text);">Commentaires ({{ comments|length }})</h3>
+    </div>
+
+    {% if comments|length > 0 %}
+      <div style="padding:1.5rem;">
+        {% for comment in comments %}
+          <div style="padding:1rem 0;{% if not loop.last %}border-bottom:1px solid var(--pg-border);{% endif %}">
+            <div style="display:flex;gap:1rem;">
+              <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#5b6ef5,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0;">
+                {{ (comment.author_name ?? '?')|first|upper }}
+              </div>
+              <div style="flex:1;min-width:0;">
+                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
+                  <span style="font-size:0.85rem;color:var(--pg-text);font-weight:600;">{{ comment.author_name ?? 'Inconnu' }}</span>
+                  <span style="font-size:0.75rem;color:var(--pg-muted);">{{ comment.created_at|date('d/m/Y H:i') }}</span>
+                </div>
+                <div style="color:var(--pg-muted2);font-size:0.9rem;line-height:1.5;white-space:pre-wrap;">{{ comment.content_text ?? comment.content }}</div>
+                {% if comment.image_url %}
+                  <div style="margin-top:0.75rem;">
+                    <img src="{{ comment.image_url }}" alt="Comment image" style="max-width:300px;border-radius:8px;" />
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align:center;padding:2rem;color:var(--pg-muted);">Aucun commentaire.</div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

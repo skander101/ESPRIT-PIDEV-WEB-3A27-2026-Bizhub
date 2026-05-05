@@ -1,0 +1,66 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Éditer Post #{{ post.post_id }} - Admin{% endblock %}
+{% block breadcrumb %}Communauté / Éditer Post #{{ post.post_id }}{% endblock %}
+
+{% block content %}
+<div style="padding:2rem;max-width:800px;">
+
+  <!-- Header -->
+  <div style="margin-bottom:2rem;">
+    <h2 style="font-size:1.5rem;color:var(--pg-text);margin:0 0 0.25rem 0;">Éditer le Post #{{ post.post_id }}</h2>
+    <p style="color:var(--pg-muted);margin:0;font-size:0.85rem;">Par {{ post.user.fullName ?? post.user.email ?? 'Inconnu' }}</p>
+  </div>
+
+  <div class="dash-panel" style="padding:1.5rem;">
+    <form method="post" action="{{ path('admin_community_edit', {id: post.post_id}) }}">
+      <div style="margin-bottom:1.5rem;">
+        <label style="display:block;font-size:0.85rem;color:var(--pg-text);font-weight:600;margin-bottom:0.5rem;">Titre</label>
+        <input type="text" name="title" value="{{ post.title }}" required
+               style="width:100%;height:42px;background:var(--pg-surface2);border:1px solid var(--pg-border);border-radius:8px;color:var(--pg-text);font-size:0.9rem;padding:0 12px;font-family:'DM Sans',sans-serif;outline:none;" />
+      </div>
+
+      <div style="margin-bottom:1.5rem;">
+        <label style="display:block;font-size:0.85rem;color:var(--pg-text);font-weight:600;margin-bottom:0.5rem;">Contenu</label>
+        <textarea name="content" rows="8" required
+                  style="width:100%;background:var(--pg-surface2);border:1px solid var(--pg-border);border-radius:8px;color:var(--pg-text);font-size:0.9rem;padding:12px;font-family:'DM Sans',sans-serif;outline:none;resize:vertical;">{{ post.content }}</textarea>
+      </div>
+
+      <div style="margin-bottom:1.5rem;">
+        <label style="display:block;font-size:0.85rem;color:var(--pg-text);font-weight:600;margin-bottom:0.5rem;">Catégorie</label>
+        <select name="category"
+                style="width:100%;height:42px;background:var(--pg-surface2);border:1px solid var(--pg-border);border-radius:8px;color:var(--pg-text);font-size:0.9rem;padding:0 12px;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer;">
+          <option value="General" {% if post.category == 'General' %}selected{% endif %}>Général</option>
+          <option value="Question" {% if post.category == 'Question' %}selected{% endif %}>Question</option>
+          <option value="Announcement" {% if post.category == 'Announcement' %}selected{% endif %}>Annonce</option>
+        </select>
+      </div>
+
+      {% if post.media_url %}
+        <div style="margin-bottom:1.5rem;padding:1rem;background:var(--pg-surface2);border-radius:10px;">
+          <p style="font-size:0.85rem;color:var(--pg-muted);margin:0 0 0.5rem 0;">Média actuel :</p>
+          {% if post.media_type starts with 'image/' %}
+            <img src="{{ post.media_url }}" alt="Media" style="max-width:200px;border-radius:8px;" />
+          {% elseif post.media_type starts with 'video/' %}
+            <video controls style="max-width:200px;border-radius:8px;">
+              <source src="{{ post.media_url }}" type="{{ post.media_type }}">
+            </video>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <div style="display:flex;gap:1rem;justify-content:flex-end;">
+        <a href="{{ path('admin_community_index') }}"
+           style="height:42px;padding:0 20px;background:var(--pg-surface2);border:1px solid var(--pg-border);border-radius:8px;color:var(--pg-text);font-size:0.9rem;font-weight:600;text-decoration:none;display:flex;align-items:center;transition:all 0.2s;"
+           onmouseover="this.style.borderColor='rgba(255,255,255,0.22)';this.style.color='var(--pg-text)';"
+           onmouseout="this.style.borderColor='var(--pg-border)';">Annuler</a>
+        <button type="submit"
+                style="height:42px;padding:0 20px;background:linear-gradient(135deg,#5b6ef5,#8b5cf6);border:none;border-radius:8px;color:#fff;font-size:0.9rem;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;transition:all 0.2s;"
+                onmouseover="this.style.opacity='0.9';this.style.transform='translateY(-1px)';"
+                onmouseout="this.style.opacity='1';this.style.transform='translateY(0)';">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}
