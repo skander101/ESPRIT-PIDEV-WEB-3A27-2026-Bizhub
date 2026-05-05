@@ -4,6 +4,7 @@ namespace App\Controller\Community;
 
 use App\Entity\Community\Post;
 use App\Entity\Community\Commentaire;
+use App\Entity\UsersAvis\User;
 use App\Repository\Community\PostRepository;
 use App\Repository\Community\CommentaireRepository;
 use App\Service\Community\ReactionManager;
@@ -25,9 +26,21 @@ class PostController extends AbstractController
 {
     private const COMMUNITY_UPLOAD_DIR = 'uploads/community';
 
+    private function requireAppUser(): User
+    {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException('Utilisateur non authentifié.');
+        }
+
+        return $user;
+    }
+
     #[Route('/', name: 'community_index', methods: ['GET'])]
     public function index(Request $request, PostRepository $postRepo, CommentaireRepository $commentRepo, ReactionManager $reactionManager): Response
     {
+        $user = $this->requireAppUser();
+
         $search = (string) $request->query->get('search', '');
         $category = (string) $request->query->get('category', '');
         $page = max(1, (int) $request->query->get('page', 1));
@@ -39,7 +52,7 @@ class PostController extends AbstractController
         $commentCountsByPost = $postRepo->getCommentCountsByPostIds($postIds);
 
         $countsByPost = $reactionManager->getCountsForPosts($postIds)['counts'];
-        $userReactions = $reactionManager->getUserReactionsForPosts($postIds, $this->getUser()->getUserId());
+        $userReactions = $reactionManager->getUserReactionsForPosts($postIds, $user->getUserId());
 
         $reactionEmojis = [
             'LIKE' => '👍',
@@ -83,6 +96,10 @@ class PostController extends AbstractController
         if ($request->isXmlHttpRequest()) {
             return $this->render('community/_posts.html.twig', [
                 'posts' => $posts,
+                'page' => $page,
+                'total_pages' => $totalPages,
+                'search' => $search,
+                'category' => $category,
             ]);
         }
 
@@ -99,6 +116,8 @@ class PostController extends AbstractController
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function new(Request $request, EntityManagerInterface $em): Response
     {
+        $user = $this->requireAppUser();
+
         $title = $request->request->get('title');
         $content = $request->request->get('content');
         $category = $request->request->get('category');
@@ -114,14 +133,13 @@ class PostController extends AbstractController
         $postMedia = $request->files->get('media') ?? $request->files->get('image') ?? $request->files->get('video');
 
         $post = new Post();
-        $post->setUserId($this->getUser()->getUserId());
+        $post->setUser($user);
         $post->setTitle($title);
         $post->setContent($content);
         $post->setCategory($category ?: 'General');
-        $post->setCreatedAt(new \DateTime());
         $post->setLocation($location ? trim((string) $location) : null);
-        $post->setLocationLat($locationLat !== null && $locationLat !== '' ? (float) $locationLat : null);
-        $post->setLocationLon($locationLon !== null && $locationLon !== '' ? (float) $locationLon : null);
+        $post->setLocationLat($locationLat !== null && trim((string) $locationLat) !== '' ? trim((string) $locationLat) : null);
+        $post->setLocationLon($locationLon !== null && trim((string) $locationLon) !== '' ? trim((string) $locationLon) : null);
         if ($postMedia instanceof UploadedFile) {
             $publicPath = $this->storeCommunityMedia($postMedia);
             if ($publicPath !== null) {
@@ -147,8 +165,8 @@ class PostController extends AbstractController
         }
 
         // Vérification ownership
-        $user = $this->getUser();
-        if ($post->getUserId() !== $user->getUserId() && !$this->isGranted('ROLE_ADMIN')) {
+        $user = $this->requireAppUser();
+        if ($post->getUser()?->getUserId() !== $user->getUserId() && !$this->isGranted('ROLE_ADMIN')) {
             $this->addFlash('error', 'Vous n\'êtes pas autorisé à modifier ce post.');
             return $this->redirectToRoute('community_index');
         }
@@ -170,8 +188,8 @@ class PostController extends AbstractController
             $post->setContent($content);
             $post->setCategory($category ?: 'General');
             $post->setLocation($location ? trim((string) $location) : null);
-            $post->setLocationLat($locationLat !== null && $locationLat !== '' ? (float) $locationLat : null);
-            $post->setLocationLon($locationLon !== null && $locationLon !== '' ? (float) $locationLon : null);
+            $post->setLocationLat($locationLat !== null && trim((string) $locationLat) !== '' ? trim((string) $locationLat) : null);
+            $post->setLocationLon($locationLon !== null && trim((string) $locationLon) !== '' ? trim((string) $locationLon) : null);
             $postMedia = $request->files->get('media') ?? $request->files->get('image') ?? $request->files->get('video');
             if ($postMedia instanceof UploadedFile) {
                 $publicPath = $this->storeCommunityMedia($postMedia);
@@ -202,15 +220,15 @@ class PostController extends AbstractController
             throw $this->createNotFoundException('Post non trouvé');
         }
 
-        $user = $this->getUser();
-        if ($post->getUserId() !== $user->getUserId() && !$this->isGranted('ROLE_ADMIN')) {
+        $user = $this->requireAppUser();
+        if ($post->getUser()?->getUserId() !== $user->getUserId() && !$this->isGranted('ROLE_ADMIN')) {
             $this->addFlash('error', 'Vous n\'êtes pas autorisé à supprimer ce post.');
             return $this->redirectToRoute('community_index');
         }
 
         // Supprimer les commentaires associés manuellement (ou par cascade si configuré)
         $commentRepo = $em->getRepository(Commentaire::class);
-        $comments = $commentRepo->findBy(['postId' => $id]);
+        $comments = $commentRepo->findBy(['post' => $post]);
         foreach ($comments as $comment) {
             $em->remove($comment);
         }
@@ -225,6 +243,8 @@ class PostController extends AbstractController
     #[Route('/{id}', name: 'community_show', methods: ['GET'])]
     public function show(int $id, PostRepository $postRepo, CommentaireRepository $commentRepo, ReactionManager $reactionManager): Response
     {
+        $user = $this->requireAppUser();
+
         $post = $postRepo->findOneWithAuthor($id);
         if (!$post) {
             throw $this->createNotFoundException('Post non trouvé');
@@ -255,7 +275,7 @@ class PostController extends AbstractController
         ];
 
         $counts = $reactionManager->getCountsForPost($id);
-        $userReaction = $reactionManager->getUserReactionsForPosts([$id], $this->getUser()->getUserId())[$id] ?? null;
+    $userReaction = $reactionManager->getUserReactionsForPosts([$id], $user->getUserId())[$id] ?? null;
 
         $post['reaction_counts'] = $counts;
         $post['reaction_total'] = array_sum($counts);
@@ -274,6 +294,13 @@ class PostController extends AbstractController
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function commentNew(int $postId, Request $request, EntityManagerInterface $em): Response
     {
+        $user = $this->requireAppUser();
+
+        $post = $em->getRepository(Post::class)->find($postId);
+        if (!$post) {
+            throw $this->createNotFoundException('Post non trouvé.');
+        }
+
         $content = trim((string) $request->request->get('content', ''));
         $commentImage = $request->files->get('image');
         if ($content === '' && !($commentImage instanceof UploadedFile)) {
@@ -289,10 +316,9 @@ class PostController extends AbstractController
         }
 
         $comment = new Commentaire();
-        $comment->setPostId($postId);
-        $comment->setUserId($this->getUser()->getUserId());
+        $comment->setPost($post);
         $comment->setContent($content);
-        $comment->setCreatedAt(new \DateTime());
+    $comment->setUser($user);
 
         $em->persist($comment);
         $em->flush();
@@ -305,15 +331,16 @@ class PostController extends AbstractController
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function commentEdit(int $id, Request $request, EntityManagerInterface $em): Response
     {
+        $user = $this->requireAppUser();
+
         $comment = $em->getRepository(Commentaire::class)->find($id);
         if (!$comment) {
             throw $this->createNotFoundException('Commentaire non trouvé');
         }
 
-        $user = $this->getUser();
-        if ($comment->getUserId() !== $user->getUserId() && !$this->isGranted('ROLE_ADMIN')) {
+        if ($comment->getUser()?->getUserId() !== $user->getUserId() && !$this->isGranted('ROLE_ADMIN')) {
             $this->addFlash('error', 'Vous n\'êtes pas autorisé à modifier ce commentaire.');
-            return $this->redirectToRoute('community_show', ['id' => $comment->getPostId()]);
+            return $this->redirectToRoute('community_show', ['id' => $comment->getPost()?->getId()]);
         }
 
         $newContent = trim((string) $request->request->get('content', ''));
@@ -330,32 +357,33 @@ class PostController extends AbstractController
 
         if ($newContent === '' && $existingImage === null) {
             $this->addFlash('error', 'Le commentaire ou une image est obligatoire.');
-            return $this->redirectToRoute('community_show', ['id' => $comment->getPostId()]);
+            return $this->redirectToRoute('community_show', ['id' => $comment->getPost()?->getId()]);
         }
 
         $comment->setContent($this->injectCommentImage($newContent, $existingImage));
         $em->flush();
 
         $this->addFlash('success', 'Commentaire modifié.');
-        return $this->redirectToRoute('community_show', ['id' => $comment->getPostId()]);
+        return $this->redirectToRoute('community_show', ['id' => $comment->getPost()?->getId()]);
     }
 
     #[Route('/comment/{id}/delete', name: 'community_comment_delete', methods: ['POST'])]
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function commentDelete(int $id, EntityManagerInterface $em): Response
     {
+        $user = $this->requireAppUser();
+
         $comment = $em->getRepository(Commentaire::class)->find($id);
         if (!$comment) {
             throw $this->createNotFoundException('Commentaire non trouvé');
         }
 
-        $user = $this->getUser();
-        if ($comment->getUserId() !== $user->getUserId() && !$this->isGranted('ROLE_ADMIN')) {
+        if ($comment->getUser()?->getUserId() !== $user->getUserId() && !$this->isGranted('ROLE_ADMIN')) {
             $this->addFlash('error', 'Vous n\'êtes pas autorisé à supprimer ce commentaire.');
-            return $this->redirectToRoute('community_show', ['id' => $comment->getPostId()]);
+            return $this->redirectToRoute('community_show', ['id' => $comment->getPost()?->getId()]);
         }
 
-        $postId = $comment->getPostId();
+        $postId = $comment->getPost()?->getId();
         $em->remove($comment);
         $em->flush();
 
@@ -370,6 +398,8 @@ class PostController extends AbstractController
         ReactionManager $reactionManager,
         CsrfTokenManagerInterface $csrfTokenManager
     ): JsonResponse {
+        $user = $this->requireAppUser();
+
         $payload = json_decode($request->getContent(), true) ?: [];
         $type = (string) ($payload['type'] ?? '');
         $tokenValue = (string) ($payload['_token'] ?? '');
@@ -379,7 +409,7 @@ class PostController extends AbstractController
         }
 
         try {
-            $result = $reactionManager->toggleReaction($id, $this->getUser()->getUserId(), $type);
+            $result = $reactionManager->toggleReaction($id, $user->getUserId(), $type);
             return new JsonResponse($result);
         } catch (\InvalidArgumentException $e) {
             return new JsonResponse(['error' => 'Invalid reaction type'], 400);

@@ -1,7 +1,7 @@
 {% extends 'back/base.html.twig' %}
 
-{% block title %}Marketplace Dashboard - Admin{% endblock %}
-{% block breadcrumb %}Marketplace Dashboard{% endblock %}
+{% block title %}Tableau de bord Marché - Admin{% endblock %}
+{% block breadcrumb %}Tableau de bord Marché{% endblock %}
 
 {% block content %}
 <div style="padding:2rem;">
@@ -18,8 +18,8 @@
   {# ── HEADER ── #}
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;">
     <div>
-      <h2 style="font-size:1.5rem;color:var(--pg-text);margin:0 0 0.25rem 0;">Marketplace Dashboard</h2>
-      <p style="color:var(--pg-muted);margin:0;font-size:0.85rem;">Statistiques & gestion du marketplace en temps réel</p>
+      <h2 style="font-size:1.5rem;color:var(--pg-text);margin:0 0 0.25rem 0;">Tableau de bord Marché</h2>
+      <p style="color:var(--pg-muted);margin:0;font-size:0.85rem;">Statistiques & gestion du marché en temps réel</p>
     </div>
     <div style="display:flex;gap:.6rem;">
       <a href="{{ path('admin_marketplace_clients_index') }}" style="background:#5b6ef5;color:#fff;padding:8px 16px;border-radius:6px;text-decoration:none;font-size:0.8rem;font-weight:700;">👤 Clients</a>
@@ -31,9 +31,9 @@
   {# ── KPI CARDS ── #}
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.2rem;margin-bottom:2rem;">
     {% set kpis = [
-      {v: stats.total_produits,  l: 'Produits Total',  c: '#5b6ef5', i: '📦'},
+      {v: stats.total_produits,  l: 'Total Produits',  c: '#5b6ef5', i: '📦'},
       {v: stats.produits_dispo,  l: 'Disponibles',     c: '#06d6a0', i: '✅'},
-      {v: stats.total_commandes, l: 'Commandes Total', c: '#8b5cf6', i: '🛍️'},
+      {v: stats.total_commandes, l: 'Total Commandes', c: '#8b5cf6', i: '🛍️'},
       {v: stats.en_attente,      l: 'En Attente',      c: '#fbbf24', i: '⏳'},
       {v: stats.confirmees,      l: 'Confirmées',      c: '#34d399', i: '✔️'},
       {v: stats.paniers_actifs,  l: 'Paniers Actifs',  c: '#f472b6', i: '🛒'},
@@ -53,19 +53,20 @@
     {# Revenue bar chart #}
     <div class="dash-panel" style="padding:1.5rem;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;">
-        <h3 style="margin:0;font-size:1rem;color:var(--pg-text);">💰 Chiffre d'affaires mensuel</h3>
+        <h3 style="margin:0;font-size:1rem;color:var(--pg-text);">💰 Revenu mensuel</h3>
         <span style="font-size:0.72rem;color:var(--pg-muted);">6 derniers mois — commandes payées</span>
       </div>
-      {% if revenue_labels|length > 0 %}
-        <canvas id="revenueChart" style="width:100%;max-height:220px;"></canvas>
-      {% else %}
-        <div style="text-align:center;padding:3rem;color:var(--pg-muted);font-size:0.85rem;">Aucune donnée de revenu disponible</div>
-      {% endif %}
-    </div>
+        <div style="position:relative; height:220px; width:100%;">
+          <canvas id="revenueChart" width="400" height="220"></canvas>
+        </div>
+        {% if revenue_labels|length == 0 %}
+          <div style="text-align:center;padding:1rem;color:var(--pg-muted);font-size:0.85rem;">Aucune donnée de revenu disponible</div>
+        {% endif %}
+      </div>
 
     {# Statuts breakdown #}
     <div class="dash-panel" style="padding:1.5rem;">
-      <h3 style="margin:0 0 1rem;font-size:1rem;color:var(--pg-text);">📊 Répartition par statut</h3>
+      <h3 style="margin:0 0 1rem;font-size:1rem;color:var(--pg-text);">📊 Répartition par état</h3>
       {% for statut, count in statuts %}
         {% set pct = stats.total_commandes > 0 ? ((count / stats.total_commandes) * 100)|round(0) : 0 %}
         {% set color = statut == 'en_attente' ? '#fbbf24'
@@ -86,7 +87,48 @@
       {% endfor %}
     </div>
 
-  </div>
+   </div>
+
+   {# ── NEW CHARTS ROW: Pie chart + Evolution line chart ── #}
+   <div style="display:grid;grid-template-columns:1fr 2fr;gap:1.5rem;margin-bottom:2rem;">
+
+     {# Product categories pie chart #}
+     <div class="dash-panel" style="padding:1.5rem;">
+       <h3 style="margin:0 0 1rem;font-size:1rem;color:var(--pg-text);">🥧 Répartition par catégorie</h3>
+          <div style="position:relative; height:220px; width:100%;">
+            <canvas id="catPieChart" width="400" height="220"></canvas>
+          </div>
+          {% if cat_labels|length == 0 %}
+            <div style="text-align:center;padding:1rem;color:var(--pg-muted);font-size:0.85rem;">Aucune donnée de catégorie disponible</div>
+          {% else %}
+            <div style="margin-top:1rem; display:flex; flex-direction:column; gap:.5rem;">
+              {% set cat_colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#C9CBCF', '#7BC67B', '#FF6B6B', '#4ECDC4'] %}
+              {% for i in range(0, cat_labels|length - 1) %}
+                <div style="display:flex; align-items:center; gap:.6rem; font-size:.8rem;">
+                  <div style="width:10px; height:10px; border-radius:3px; background:{{ cat_colors[i % cat_colors|length] }}; flex-shrink:0;"></div>
+                  <span style="flex:1; color:var(--pg-text);">{{ cat_labels[i] ?: 'Non classé' }}</span>
+                  <span style="font-family:'Josefin Sans',sans-serif; font-weight:700; color:var(--pg-text);">{{ cat_data[i] }}</span>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+     {# Orders evolution line chart #}
+     <div class="dash-panel" style="padding:1.5rem;">
+       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;">
+         <h3 style="margin:0;font-size:1rem;color:var(--pg-text);">📈 Évolution des commandes</h3>
+         <span style="font-size:0.72rem;color:var(--pg-muted);">6 derniers mois</span>
+       </div>
+          <div style="position:relative; height:220px; width:100%;">
+            <canvas id="evoLineChart" width="400" height="220"></canvas>
+          </div>
+          {% if evo_labels|length == 0 %}
+            <div style="text-align:center;padding:1rem;color:var(--pg-muted);font-size:0.85rem;">Aucune donnée d'évolution disponible</div>
+          {% endif %}
+        </div>
+
+   </div>
 
   {# ── TOP 5 COMMANDES (by amount) ── #}
   <div class="dash-panel" style="margin-bottom:2rem;">
@@ -186,7 +228,7 @@
 
     {# Navigation principale #}
     <div class="dash-panel" style="padding:1.5rem;">
-      <h3 style="margin:0 0 1.2rem;font-size:1rem;color:var(--pg-text);">🗂️ Gestion Marketplace</h3>
+      <h3 style="margin:0 0 1.2rem;font-size:1rem;color:var(--pg-text);">🗂️ Gestion Marché</h3>
       <div style="display:flex;flex-direction:column;gap:1rem;">
 
         {# Clients #}
@@ -235,57 +277,177 @@
 
 </div>
 
-{# Chart.js — Revenue bar chart #}
-{% if revenue_labels|length > 0 %}
+{# Chart.js — Tous les graphiques #}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-(function () {
-  var ctx = document.getElementById('revenueChart');
-  if (!ctx) return;
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: {{ revenue_labels|json_encode|raw }},
-      datasets: [{
-        label: 'CA TTC (TND)',
-        data: {{ revenue_data|json_encode|raw }},
-        backgroundColor: 'rgba(91,110,245,0.7)',
-        borderColor: '#5b6ef5',
-        borderWidth: 2,
-        borderRadius: 6,
-        hoverBackgroundColor: 'rgba(91,110,245,0.9)',
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: function(ctx) {
-              return ' ' + Number(ctx.parsed.y).toLocaleString('fr-TN', {minimumFractionDigits: 3}) + ' TND';
+document.addEventListener('DOMContentLoaded', function() {
+  
+  // ── Revenue bar chart ────────────────────────────────
+  var revenueCanvas = document.getElementById('revenueChart');
+  if (revenueCanvas) {
+    var revenueLabels = {{ revenue_labels|json_encode|raw }};
+    var revenueData = {{ revenue_data|json_encode|raw }};
+    if (revenueLabels.length > 0) {
+      new Chart(revenueCanvas, {
+        type: 'bar',
+        data: { 
+          labels: revenueLabels, 
+          datasets: [{
+            label: 'CA TTC (TND)',
+            data: revenueData,
+            backgroundColor: 'rgba(91,110,245,0.7)',
+            borderColor: '#5b6ef5',
+            borderWidth: 2,
+            borderRadius: 6
+          }] 
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(ctx) {
+                  return Number(ctx.parsed.y).toLocaleString('fr-TN', {minimumFractionDigits: 3}) + ' TND';
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255,255,255,0.05)' },
+              ticks: { color: '#6b7280', font: { size: 11 } }
+            },
+            y: {
+              grid: { color: 'rgba(255,255,255,0.05)' },
+              ticks: {
+                color: '#6b7280',
+                font: { size: 11 },
+                callback: function(v) { return v.toLocaleString() + ' TND'; }
+              },
+              beginAtZero: true
             }
           }
         }
-      },
-      scales: {
-        x: {
-          grid: { color: 'rgba(255,255,255,0.05)' },
-          ticks: { color: '#6b7280', font: { size: 11 } }
-        },
-        y: {
-          grid: { color: 'rgba(255,255,255,0.05)' },
-          ticks: {
-            color: '#6b7280', font: { size: 11 },
-            callback: function(v) { return v.toLocaleString() + ' TND'; }
-          },
-          beginAtZero: true
-        }
-      }
+      });
     }
-  });
-})();
+  }
+
+  // ── Product categories pie chart ──────────────────────────────────
+  var catCanvas = document.getElementById('catPieChart');
+  if (catCanvas) {
+    var catLabels = {{ cat_labels|json_encode|raw }};
+    var catData = {{ cat_data|json_encode|raw }};
+    if (catLabels.length > 0) {
+      new Chart(catCanvas, {
+        type: 'pie',
+        data: {
+          labels: catLabels,
+          datasets: [{
+            data: catData,
+            backgroundColor: ['#FF6384','#36A2EB','#FFCE56','#4BC0C0','#9966FF','#FF9F40','#C9CBCF','#7BC67B','#FF6B6B','#4ECDC4'],
+            borderColor: '#fff',
+            borderWidth: 2,
+            hoverOffset: 10
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: {
+                color: '#6b7280',
+                font: { size: 11 },
+                padding: 12,
+                usePointStyle: true,
+                pointStyle: 'circle'
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(ctx) {
+                  var total = ctx.dataset.data.reduce(function(a,b){return a+b;},0);
+                  var pct = total > 0 ? Math.round(ctx.parsed / total * 100) : 0;
+                  return ctx.label + ': ' + ctx.parsed + ' produit(s) (' + pct + '%)';
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+  }
+
+  // ── Orders evolution line chart ──────────────────────────────────
+  var evoCanvas = document.getElementById('evoLineChart');
+  if (evoCanvas) {
+    var evoLabels = {{ evo_labels|json_encode|raw }};
+    var evoData = {{ evo_data|json_encode|raw }};
+    if (evoLabels.length > 0) {
+      new Chart(evoCanvas, {
+        type: 'line',
+        data: {
+          labels: evoLabels,
+          datasets: [{
+            label: 'Nombre de commandes',
+            data: evoData,
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16,185,129,0.1)',
+            borderWidth: 3,
+            pointRadius: 5,
+            pointBackgroundColor: '#10b981',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointHoverRadius: 7,
+            tension: 0.3,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                color: '#6b7280',
+                font: { size: 11 },
+                usePointStyle: true,
+                pointStyle: 'line'
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(ctx) {
+                  return ctx.dataset.label + ': ' + ctx.parsed.y + ' commande(s)';
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255,255,255,0.05)' },
+              ticks: { color: '#6b7280', font: { size: 11 } }
+            },
+            y: {
+              grid: { color: 'rgba(255,255,255,0.05)' },
+              ticks: {
+                color: '#6b7280',
+                font: { size: 11 },
+                callback: function(v) { return v + ' cmd'; },
+                stepSize: 1
+              },
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+  }
+
+});
 </script>
-{% endif %}
 {% endblock %}

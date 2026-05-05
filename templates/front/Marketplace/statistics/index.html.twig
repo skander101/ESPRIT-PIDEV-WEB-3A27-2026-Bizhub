@@ -25,19 +25,19 @@
   {# KPI CARDS #}
   <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1.2rem; margin-bottom:2.5rem;">
     <div style="background:#fff; border-radius:14px; border:1.5px solid var(--border); padding:1.5rem; border-top:4px solid var(--primary); box-shadow:0 2px 12px rgba(0,0,0,.05);">
-      <div style="font-family:'Josefin Sans',sans-serif; font-size:0.62rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:.6rem;">Total commandes</div>
+          <div style="font-family:'Josefin Sans',sans-serif; font-size:0.62rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:.6rem;">Total commandes</div>
       <div style="font-family:'Josefin Sans',sans-serif; font-size:2rem; font-weight:800; color:var(--primary);">{{ total_commandes }}</div>
     </div>
     <div style="background:#fff; border-radius:14px; border:1.5px solid var(--border); padding:1.5rem; border-top:4px solid #10b981; box-shadow:0 2px 12px rgba(0,0,0,.05);">
-      <div style="font-family:'Josefin Sans',sans-serif; font-size:0.62rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:.6rem;">CA Total TTC</div>
+          <div style="font-family:'Josefin Sans',sans-serif; font-size:0.62rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:.6rem;">CA Total TTC</div>
       <div style="font-family:'Josefin Sans',sans-serif; font-size:1.5rem; font-weight:800; color:#10b981;">{{ total_revenue|number_format(3, '.', ' ') }} <span style="font-size:.75rem;">TND</span></div>
     </div>
     <div style="background:#fff; border-radius:14px; border:1.5px solid var(--border); padding:1.5rem; border-top:4px solid #6366f1; box-shadow:0 2px 12px rgba(0,0,0,.05);">
-      <div style="font-family:'Josefin Sans',sans-serif; font-size:0.62rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:.6rem;">Mois analysés</div>
+          <div style="font-family:'Josefin Sans',sans-serif; font-size:0.62rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:.6rem;">Mois analysés</div>
       <div style="font-family:'Josefin Sans',sans-serif; font-size:2rem; font-weight:800; color:#6366f1;">{{ months }}</div>
     </div>
     <div style="background:#fff; border-radius:14px; border:1.5px solid var(--border); padding:1.5rem; border-top:4px solid #f59e0b; box-shadow:0 2px 12px rgba(0,0,0,.05);">
-      <div style="font-family:'Josefin Sans',sans-serif; font-size:0.62rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:.6rem;">Top commande</div>
+          <div style="font-family:'Josefin Sans',sans-serif; font-size:0.62rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:.6rem;">Top commande</div>
       {% if top_commandes|length > 0 %}
         <div style="font-family:'Josefin Sans',sans-serif; font-size:1.4rem; font-weight:800; color:#f59e0b;">{{ top_commandes[0].totalTtc|number_format(3, '.', ' ') }} <span style="font-size:.7rem;">TND</span></div>
       {% else %}
@@ -70,8 +70,8 @@
 
     {# Status donut #}
     <div style="background:#fff; border-radius:14px; border:1.5px solid var(--border); padding:1.8rem; box-shadow:0 4px 20px rgba(0,0,0,.06);">
-      <div style="font-family:'Josefin Sans',sans-serif; font-size:0.62rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:.4rem;">Répartition</div>
-      <div style="font-family:'Lora',serif; font-size:1rem; font-weight:700; color:var(--dark); margin-bottom:1.2rem;">Statuts des commandes</div>
+          <div style="font-family:'Josefin Sans',sans-serif; font-size:0.62rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:.4rem;">Répartition</div>
+          <div style="font-family:'Lora',serif; font-size:1rem; font-weight:700; color:var(--dark); margin-bottom:1.2rem;">Statuts des commandes</div>
       {% if statut_labels|length > 0 %}
         <canvas id="statutChart" style="max-height:180px;"></canvas>
         <div style="margin-top:1rem; display:flex; flex-direction:column; gap:.5rem;">
@@ -89,9 +89,9 @@
       {% endif %}
     </div>
 
-  </div>
+   </div>
 
-  {# ── TOP 5 COMMANDES ── #}
+   {# ── TOP 5 COMMANDES ── #}
   <div style="background:#fff; border-radius:14px; border:1.5px solid var(--border); margin-bottom:2.5rem; box-shadow:0 4px 20px rgba(0,0,0,.06); overflow:hidden;">
     <div style="padding:1.4rem 1.8rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; background:linear-gradient(135deg,#fffbee,#fff);">
       <div>

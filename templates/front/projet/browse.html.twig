@@ -253,11 +253,11 @@
                                 <i class="fa fa-eye"></i> Voir
                             </a>
 
-                            {# Bouton Investir — seulement si projet ouvert aux investissements #}
+                            {# Bouton Négocier — seulement si projet ouvert aux investissements #}
                             {% if projet.status in ['publie', 'en_cours'] %}
-                                <a href="{{ path('app_front_investir', {'id': projet.project_id}) }}"
+                                <a href="{{ path('app_negociation_creer_par_projet', {'id': projet.project_id}) }}"
                                    class="btn-yellow" style="padding:8px 16px;font-size:0.75rem;display:inline-flex;align-items:center;gap:5px;">
-                                    <i class="fa fa-hand-holding-usd"></i> Investir
+                                    <i class="fa fa-handshake"></i> Négocier
                                 </a>
 
                             {% elseif projet.status == 'finance' %}

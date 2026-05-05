@@ -511,9 +511,9 @@
     <li><a href="{{ path('app_avis_list') }}" class="{{ currentRoute == 'app_avis_list' ? 'active' : '' }}"><i class="fa fa-comment"></i> Mes Avis</a></li>
 
     <li class="nav-dropdown">
-      <a href="{{ path('produit_index') }}" class="{{ 'produit' in currentRoute or 'commande' in currentRoute or 'panier' in currentRoute or 'tracking' in currentRoute ? 'active' : '' }}"><i class="fa fa-store"></i> Marketplace <i class="fa fa-chevron-down caret"></i></a>
-      <div class="dropdown-menu">
-        <a href="{{ path('produit_index') }}" class="{{ 'produit' in currentRoute ? 'active' : '' }}"><i class="fa fa-store"></i> Module Marketplace</a>
+        <a href="{{ path('produit_index') }}" class="{{ 'produit' in currentRoute or 'commande' in currentRoute or 'panier' in currentRoute or 'tracking' in currentRoute ? 'active' : '' }}"><i class="fa fa-store"></i> Marketplace <i class="fa fa-chevron-down caret"></i></a>
+        <div class="dropdown-menu">
+          <a href="{{ path('produit_index') }}" class="{{ 'produit' in currentRoute ? 'active' : '' }}"><i class="fa fa-store"></i> Module Marketplace</a>
         {% if app.user and app.user.userType == 'startup' %}
           <a href="{{ path('commande_index') }}" class="{{ 'commande' in currentRoute and currentRoute != 'commande_investisseur_recues' ? 'active' : '' }}"><i class="fa fa-file-invoice"></i> Mes Commandes</a>
           <a href="{{ path('tracking_index') }}" class="{{ 'tracking' in currentRoute ? 'active' : '' }}"><i class="fa fa-route"></i> Suivi</a>

@@ -6,7 +6,6 @@ use App\Entity\Investissement\Investment;
 use App\Entity\UsersAvis\User;
 use App\Entity\Investissement\Negotiation;
 use App\Entity\Investissement\NegotiationMessage;
-use App\Repository\InvestmentRepository;
 use App\Repository\NegotiationMessageRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\NegotiationRepository;
@@ -25,13 +24,22 @@ class NegociationController extends AbstractController
 {
     public function __construct(
         private EntityManagerInterface      $em,
-        private InvestmentRepository        $investmentRepo,
         private NegotiationRepository       $negotiationRepo,
         private NegotiationMessageRepository $messageRepo,
         private DealWorkflowService         $workflow,
         private ProjectRepository           $projectRepo,
         private AiNegotiationService        $aiService,
     ) {}
+
+    private function requireAppUser(): User
+    {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException('Vous devez être connecté.');
+        }
+
+        return $user;
+    }
 
     // ────────────────────────────────────────────────────────────────────────
     // LISTE DES NÉGOCIATIONS
@@ -40,12 +48,9 @@ class NegociationController extends AbstractController
     #[Route('', name: 'app_negociation_index', methods: ['GET'])]
     public function index(): Response
     {
-        $user = $this->getUser();
-        if (!$user) {
-            return $this->redirectToRoute('app_login');
-        }
+        $user = $this->requireAppUser();
 
-        if (($user instanceof User ? $user->getUserType() : null) === 'startup') {
+        if ($user->getUserType() === 'startup') {
             $negociations = $this->negotiationRepo->findByStartup($user);
         } else {
             $negociations = $this->negotiationRepo->findByInvestor($user);
@@ -53,92 +58,18 @@ class NegociationController extends AbstractController
 
         return $this->render('front/negociation/index.html.twig', [
             'negociations' => $negociations,
-            'user_type'   => ($user instanceof User ? $user->getUserType() : null),
+            'user_type'   => $user->getUserType(),
         ]);
     }
 
     // ────────────────────────────────────────────────────────────────────────
-    // CRÉER OU VOIR LA NÉGOCIATION LIÉE À UN INVESTISSEMENT
-    // ────────────────────────────────────────────────────────────────────────
-
-    #[Route('/creer/{id}', name: 'app_negociation_creer', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
-    public function creer(Request $request, int $id): Response
-    {
-        $user = $this->getUser();
-        if (!$user) {
-            return $this->redirectToRoute('app_login');
-        }
-
-        /** @var \App\Entity\Investissement\Investment|null $investment */
-        $investment = $this->investmentRepo->find($id);
-        if (!$investment) {
-            $this->addFlash('error', 'Investissement introuvable.');
-            return $this->redirectToRoute('app_front_investissement_index');
-        }
-
-        // Seul l'investisseur propriétaire peut initier
-        if ($investment->getUser()?->getUserId() !== ($user instanceof User ? $user->getUserId() : null)) {
-            throw $this->createAccessDeniedException();
-        }
-
-        // Vérifier si une négociation existe déjà
-        $existing = $this->negotiationRepo->findOneBy([
-            'project'  => $investment->getProject(),
-            'investor' => $investment->getUser(),
-        ]);
-
-        if ($existing) {
-            return $this->redirectToRoute('app_negociation_show', ['id' => $existing->getNegotiation_id()]);
-        }
-
-        // Créer la négociation
-        $project  = $investment->getProject();
-        $startup  = $project?->getUser();
-
-        if (!$startup) {
-            $this->addFlash('error', 'Impossible de trouver la startup propriétaire du projet.');
-            return $this->redirectToRoute('app_front_investissement_index');
-        }
-
-        $negociation = new Negotiation();
-        $negociation->setProject($project);
-        $negociation->setInvestor($user);
-        $negociation->setStartup($startup);
-        $negociation->setStatus(Negotiation::STATUS_OPEN);
-        $negociation->setProposed_amount($investment->getAmount());
-
-        $this->em->persist($negociation);
-
-        // Message d'ouverture automatique
-        $msg = new NegotiationMessage();
-        $msg->setNegotiation($negociation);
-        $msg->setUser($user);
-        $msg->setMessage('Bonjour, je souhaite investir ' . number_format((float)$investment->getAmount(), 0, ',', ' ') . ' TND dans votre projet.');
-        $msg->setMessage_type('offer');
-        $msg->setProposed_amount($investment->getAmount());
-
-        $this->em->persist($msg);
-        $this->em->flush();
-
-        // Mettre à jour le statut de l'investissement
-        $investment->setStatut('en_negociation');
-        $this->em->flush();
-
-        $this->addFlash('success', 'Négociation ouverte avec succès.');
-        return $this->redirectToRoute('app_negociation_show', ['id' => $negociation->getNegotiation_id()]);
-    }
-
-    // ────────────────────────────────────────────────────────────────────────
-    // CRÉER UNE NÉGOCIATION DIRECTEMENT DEPUIS UN PROJET (sans investissement)
+    // CRÉER UNE NÉGOCIATION DIRECTEMENT DEPUIS UN PROJET (avec investissement automatique)
     // ────────────────────────────────────────────────────────────────────────
 
     #[Route('/projet/{id}', name: 'app_negociation_creer_par_projet', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function creerParProjet(int $id): Response
     {
-        $user = $this->getUser();
-        if (!$user) {
-            return $this->redirectToRoute('app_login');
-        }
+        $user = $this->requireAppUser();
 
         $project = $this->projectRepo->find($id);
         if (!$project) {
@@ -153,28 +84,26 @@ class NegociationController extends AbstractController
         }
 
         // L'investisseur ne peut pas négocier son propre projet
-        if ($startup->getUserId() === ($user instanceof User ? $user->getUserId() : null)) {
+        if ($startup->getUserId() === $user->getUserId()) {
             $this->addFlash('error', 'Vous ne pouvez pas négocier votre propre projet.');
             return $this->redirectToRoute('app_front_projet_show', ['id' => $id]);
         }
 
-        // Vérifier si une négociation existe déjà pour ce projet+investisseur
-        $existing = $this->negotiationRepo->findOneBy([
-            'project'  => $project,
-            'investor' => $user,
-        ]);
+        // Créer l'investissement avec statut "en_negociation" (montant par défaut 0, sera mis à jour via la négociation)
+        $investment = new Investment();
+        $investment->setProject($project);
+        $investment->setUser($user);
+        $investment->setStatut('en_negociation');
+        $investment->setAmount('0'); // Montant par défaut, sera mis à jour via la négociation
+        $this->em->persist($investment);
 
-        if ($existing) {
-            return $this->redirectToRoute('app_negociation_show', ['id' => $existing->getNegotiation_id()]);
-        }
-
-        // Créer la négociation (montant proposé à 0 — sera précisé dans la discussion)
+        // Créer la négociation liée à cet investissement
         $negociation = new Negotiation();
         $negociation->setProject($project);
         $negociation->setInvestor($user);
         $negociation->setStartup($startup);
         $negociation->setStatus(Negotiation::STATUS_OPEN);
-        $negociation->setProposed_amount(0);
+        $negociation->setProposed_amount('0');
 
         $this->em->persist($negociation);
 
@@ -201,19 +130,15 @@ class NegociationController extends AbstractController
         #[MapEntity(mapping: ['id' => 'negotiation_id'])]
         Negotiation $negociation
     ): Response {
-        $user = $this->getUser();
-        if (!$user) {
-            return $this->redirectToRoute('app_login');
-        }
-
-        $this->assertParticipant($negociation, ($user instanceof User ? $user->getUserId() : null));
+        $user = $this->requireAppUser();
+        $this->assertParticipant($negociation, (int) $user->getUserId());
 
         $deal     = $this->workflow->findDealByNegotiation($negociation);
         // Utiliser le repository dédié avec LEFT JOIN sur le sender pour
         // éviter les proxies Doctrine non initialisés (bug côté startup)
         $messages = $this->messageRepo->findByNegotiation($negociation);
 
-        $myId      = (int) ($user instanceof User ? $user->getUserId() : null);
+        $myId      = (int) $user->getUserId();
         $isStartup = $negociation->getStartup()  && (int)$negociation->getStartup()->getUserId()  === $myId;
         $isInvestor = $negociation->getInvestor() && (int)$negociation->getInvestor()->getUserId() === $myId;
 
@@ -237,12 +162,8 @@ class NegociationController extends AbstractController
         #[MapEntity(mapping: ['id' => 'negotiation_id'])]
         Negotiation $negociation
     ): Response {
-        $user = $this->getUser();
-        if (!$user) {
-            return $this->redirectToRoute('app_login');
-        }
-
-        $this->assertParticipant($negociation, ($user instanceof User ? $user->getUserId() : null));
+        $user = $this->requireAppUser();
+        $this->assertParticipant($negociation, (int) $user->getUserId());
 
         if (!$this->isCsrfTokenValid('msg_' . $negociation->getNegotiation_id(), $request->request->get('_token'))) {
             $this->addFlash('error', 'Token invalide.');
@@ -267,10 +188,13 @@ class NegociationController extends AbstractController
         $msg->setUser($user);
         $msg->setMessage($text);
         $msg->setMessage_type($amount ? 'offer' : 'text');
-            if ($amount && is_numeric($amount) && (float)$amount > 0) {
-                $msg->setProposed_amount((float)$amount);
-                $negociation->setProposed_amount((float)$amount);
+        if ($amount !== null) {
+            $amountStr = trim((string) $amount);
+            if ($amountStr !== '' && is_numeric($amountStr) && (float) $amountStr > 0) {
+                $msg->setProposed_amount($amountStr);
+                $negociation->setProposed_amount($amountStr);
             }
+        }
 
             $this->em->persist($msg);
             $this->em->flush();
@@ -288,8 +212,8 @@ class NegociationController extends AbstractController
         #[MapEntity(mapping: ['id' => 'negotiation_id'])]
         Negotiation $negociation
     ): Response {
-        $user = $this->getUser();
-        if (!$user || !$negociation->getStartup() || (int)($user instanceof User ? $user->getUserId() : null) !== (int)$negociation->getStartup()->getUserId()) {
+        $user = $this->requireAppUser();
+        if (!$negociation->getStartup() || (int) $user->getUserId() !== (int) $negociation->getStartup()->getUserId()) {
             throw $this->createAccessDeniedException('Seule la startup peut valider la négociation.');
         }
 
@@ -304,8 +228,13 @@ class NegociationController extends AbstractController
         }
 
         $finalAmount = $request->request->get('final_amount');
-        if ($finalAmount && is_numeric($finalAmount) && (float)$finalAmount > 0) {
-            $negociation->setFinal_amount((float)$finalAmount);
+        if ($finalAmount !== null) {
+            $finalAmountStr = trim((string) $finalAmount);
+            if ($finalAmountStr !== '' && is_numeric($finalAmountStr) && (float) $finalAmountStr > 0) {
+                $negociation->setFinal_amount($finalAmountStr);
+            } else {
+                $negociation->setFinal_amount($negociation->getProposed_amount());
+            }
         } else {
             $negociation->setFinal_amount($negociation->getProposed_amount());
         }
@@ -339,8 +268,8 @@ class NegociationController extends AbstractController
         #[MapEntity(mapping: ['id' => 'negotiation_id'])]
         Negotiation $negociation
     ): Response {
-        $user = $this->getUser();
-        if (!$user || !$negociation->getStartup() || (int)($user instanceof User ? $user->getUserId() : null) !== (int)$negociation->getStartup()->getUserId()) {
+        $user = $this->requireAppUser();
+        if (!$negociation->getStartup() || (int) $user->getUserId() !== (int) $negociation->getStartup()->getUserId()) {
             throw $this->createAccessDeniedException('Seule la startup peut rejeter la négociation.');
         }
 
@@ -373,12 +302,8 @@ class NegociationController extends AbstractController
         #[MapEntity(mapping: ['id' => 'negotiation_id'])]
         Negotiation $negociation
     ): JsonResponse {
-        $user = $this->getUser();
-        if (!$user) {
-            return $this->json(['error' => 'Non authentifié.'], 401);
-        }
-
-        $this->assertParticipant($negociation, ($user instanceof User ? $user->getUserId() : null));
+        $user = $this->requireAppUser();
+        $this->assertParticipant($negociation, (int) $user->getUserId());
 
         if (!$this->isCsrfTokenValid('ai_analyse_' . $negociation->getNegotiation_id(), $request->request->get('_token'))) {
             return $this->json(['error' => 'Token invalide.'], 403);
@@ -387,7 +312,7 @@ class NegociationController extends AbstractController
         $messages = $this->messageRepo->findByNegotiation($negociation);
 
         // Detect role: is the current user the investor or the startup?
-        $userType = ($negociation->getInvestor() && $negociation->getInvestor()->getUserId() === ($user instanceof User ? $user->getUserId() : null))
+        $userType = ($negociation->getInvestor() && $negociation->getInvestor()->getUserId() === $user->getUserId())
             ? 'investor'
             : 'startup';
 
@@ -406,12 +331,8 @@ class NegociationController extends AbstractController
         #[MapEntity(mapping: ['id' => 'negotiation_id'])]
         Negotiation $negociation
     ): JsonResponse {
-        $user = $this->getUser();
-        if (!$user) {
-            return $this->json(['error' => 'Non authentifié.'], 401);
-        }
-
-        $this->assertParticipant($negociation, ($user instanceof User ? $user->getUserId() : null));
+        $user = $this->requireAppUser();
+        $this->assertParticipant($negociation, (int) $user->getUserId());
 
         if (!$this->isCsrfTokenValid('neg_draft_' . $negociation->getNegotiation_id(), $request->request->get('_token', ''))) {
             return $this->json(['error' => 'Token invalide. Rechargez la page.'], 403);

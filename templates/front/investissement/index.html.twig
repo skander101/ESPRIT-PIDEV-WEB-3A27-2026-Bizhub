@@ -91,7 +91,7 @@
 
         <div style="background:rgba(255,190,51,0.07);border:1px solid rgba(255,190,51,0.2);border-radius:10px;padding:12px 18px;margin-bottom:1.5rem;font-size:0.84rem;color:#b8860b;display:flex;align-items:center;gap:8px;">
             <i class="fa fa-info-circle"></i>
-            Vous pouvez <strong>modifier ou supprimer</strong> uniquement les investissements avec le statut <strong>En attente</strong>.
+            Pour investir dans un projet, vous devez d'abord <strong>passer par une négociation</strong> avec la startup.
         </div>
 
         {% for inv in investissements %}
@@ -169,34 +169,11 @@
                     </div>
                 </div>
 
-                {% if editable or negotiable %}
+                {% if inv.statut == 'en_negociation' %}
                 <div class="inv-actions">
-                    {% if negotiable %}
-                        <a href="{{ path('app_negociation_creer', {'id': inv.investment_id}) }}" class="btn-sm btn-negociation">
-                            <i class="fa fa-comments"></i>
-                            {% if inv.statut == 'en_negociation' %}
-                                Continuer la négociation
-                            {% else %}
-                                Démarrer la négociation
-                            {% endif %}
-                        </a>
-                    {% endif %}
-
-                    {% if editable %}
-                    <a href="{{ path('app_front_investissement_edit', {'id': inv.investment_id}) }}" class="btn-sm btn-edit">
-                        <i class="fa fa-pen"></i> Modifier
+                    <a href="{{ path('app_negociation_index') }}" class="btn-sm btn-negociation">
+                        <i class="fa fa-comments"></i> Voir mes négociations
                     </a>
-                    <form method="post"
-                          action="{{ path('app_front_investissement_delete', {'id': inv.investment_id}) }}"
-                          style="margin:0;"
-                          data-confirm="Votre investissement de {{ inv.amount|money_fmt }} dans « {{ inv.project ? inv.project.title : 'ce projet' }} » sera supprimé définitivement."
-                          data-confirm-title="Supprimer cet investissement ?">
-                        <input type="hidden" name="_token" value="{{ csrf_token('delete_investment_' ~ inv.investment_id) }}">
-                        <button type="submit" class="btn-sm btn-delete">
-                            <i class="fa fa-trash"></i> Supprimer
-                        </button>
-                    </form>
-                    {% endif %}
                 </div>
                 {% endif %}
             </div>

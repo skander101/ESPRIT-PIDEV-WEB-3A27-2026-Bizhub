@@ -34,6 +34,16 @@ class AdminMarketplaceController extends AbstractController
         $monthlyRevenue  = $statisticsService->getMonthlyRevenue(6);
         $revenueLabels   = array_column($monthlyRevenue, 'mois');
         $revenueData     = array_column($monthlyRevenue, 'total');
+        
+        // Category distribution for pie chart
+        $catDist         = $statisticsService->getProductCategoryDistribution();
+        $catLabels       = array_column($catDist, 'categorie');
+        $catData         = array_column($catDist, 'nb_produits');
+        
+        // Orders evolution
+        $ordersEvo       = $statisticsService->getOrdersEvolution(6);
+        $evoLabels       = array_column($ordersEvo, 'mois');
+        $evoData         = array_column($ordersEvo, 'nb');
 
         return $this->render('back/marketplace/dashboard.html.twig', [
             'stats' => [
@@ -50,6 +60,10 @@ class AdminMarketplaceController extends AbstractController
             'top_produits'         => $statisticsService->getTopProductsByFrequency(5),
             'revenue_labels'       => $revenueLabels,
             'revenue_data'         => $revenueData,
+            'cat_labels'           => $catLabels,
+            'cat_data'             => $catData,
+            'evo_labels'           => $evoLabels,
+            'evo_data'             => $evoData,
         ]);
     }
 

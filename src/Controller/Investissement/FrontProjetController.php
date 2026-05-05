@@ -136,7 +136,7 @@ class FrontProjetController extends AbstractController
         $reflection = new \ReflectionClass($projet);
         $property = $reflection->getProperty('created_at');
         $property->setAccessible(true);
-        $property->setValue($projet, new \DateTime());
+            $property->setValue($projet, new \DateTimeImmutable());
         $projet->setStatus(Project::STATUS_BROUILLON);
 
         if ($this->getUser()) {

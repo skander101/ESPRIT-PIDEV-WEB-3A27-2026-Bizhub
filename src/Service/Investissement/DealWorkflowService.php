@@ -239,7 +239,7 @@ class DealWorkflowService
     // ── Internal ──────────────────────────────────────────────────────────────
 
     /**
-     * Find the Investment linked to a Deal and update its statut.
+     * Find the Investment linked to a Deal and update its statut and amount.
      * Silent: never throws if no Investment is found (orphaned deal edge case).
      */
     private function syncInvestmentByDeal(Deal $deal, string $statut): void
@@ -249,8 +249,14 @@ class DealWorkflowService
             $deal->getBuyer()?->getUserId()
         );
 
-        if ($investment !== null && $investment->getStatut() !== $statut) {
-            $investment->setStatut($statut);
+        if ($investment !== null) {
+            if ($investment->getStatut() !== $statut) {
+                $investment->setStatut($statut);
+            }
+            // Mettre à jour le montant de l'investissement avec le montant final de la négociation/deal
+            if ($deal->getAmount() > 0 && (float)$investment->getAmount() !== (float)$deal->getAmount()) {
+                $investment->setAmount($deal->getAmount());
+            }
             $this->em->flush();
         }
     }

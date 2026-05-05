@@ -267,16 +267,14 @@
                     <div style="padding:14px;background:rgba(91,110,245,0.07);border-radius:8px;text-align:center;color:#5b6ef5;font-size:0.88rem;border:1px solid rgba(91,110,245,0.2);">
                         <i class="fa fa-clock" style="margin-right:5px;"></i>Ce projet n'est pas encore ouvert aux investissements.
                     </div>
-                {% elseif deja_investi %}
-                    <div style="padding:14px;background:rgba(6,214,160,0.08);border-radius:8px;text-align:center;color:#06d6a0;font-size:0.88rem;font-weight:600;border:1px solid rgba(6,214,160,0.2);">
-                        <i class="fa fa-check-circle" style="margin-right:6px;"></i>Vous avez déjà investi dans ce projet.
-                    </div>
-                    <a href="{{ path('app_front_investir', {'id': projet.project_id}) }}" class="btn-yellow" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:0.8rem;width:100%;">
-                        <i class="fa fa-plus"></i> Investir à nouveau
-                    </a>
                 {% else %}
-                    <a href="{{ path('app_front_investir', {'id': projet.project_id}) }}" class="btn-yellow" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font-size:1rem;padding:16px;">
-                        <i class="fa fa-hand-holding-usd"></i> Investir maintenant
+                    {% if deja_investi %}
+                        <div style="padding:14px;background:rgba(6,214,160,0.08);border-radius:8px;text-align:center;color:#06d6a0;font-size:0.88rem;font-weight:600;border:1px solid rgba(6,214,160,0.2);">
+                            <i class="fa fa-check-circle" style="margin-right:6px;"></i>Vous avez déjà investi dans ce projet.
+                        </div>
+                    {% endif %}
+                    <a href="{{ path('app_negociation_creer_par_projet', {'id': projet.project_id}) }}" class="btn-yellow" style="display:flex;align-items:center;justify-content:center;gap:8px;{% if deja_investi %}margin-top:0.8rem;{% else %}width:100%;font-size:1rem;padding:16px;{% endif %}">
+                        <i class="fa {% if deja_investi %}fa-plus{% else %}fa-handshake{% endif %}"></i> {% if deja_investi %}Négocier un nouvel investissement{% else %}Négocier pour investir{% endif %}
                     </a>
                 {% endif %}
 

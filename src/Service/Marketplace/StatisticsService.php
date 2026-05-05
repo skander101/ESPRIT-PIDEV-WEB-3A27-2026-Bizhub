@@ -4,6 +4,7 @@ namespace App\Service\Marketplace;
 
 use App\Repository\Marketplace\CommandeRepository;
 use App\Repository\Marketplace\CommandeLigneRepository;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * Service centralisant les statistiques marketplace.
@@ -15,6 +16,7 @@ class StatisticsService
     public function __construct(
         private readonly CommandeRepository      $commandeRepository,
         private readonly CommandeLigneRepository $commandeLigneRepository,
+        private readonly EntityManagerInterface  $entityManager,
     ) {}
 
     /**
@@ -179,5 +181,40 @@ class StatisticsService
             'monthlyRevenue'         => $this->getMonthlyRevenue($months),
             'statsByStatut'          => $this->getStatsByStatut(),
         ];
+    }
+
+    /**
+     * Distribution des produits par catégorie.
+     *
+     * @return array<int, array{categorie: string|null, nbProduits: int}>
+     */
+    public function getProductCategoryDistribution(): array
+    {
+        $conn = $this->entityManager->getConnection();
+        $sql = 'SELECT ps.categorie, COUNT(DISTINCT ps.id_produit) as nb_produits
+                FROM produit_service ps
+                WHERE ps.disponible = 1
+                GROUP BY ps.categorie
+                ORDER BY nb_produits DESC';
+        
+        return $conn->executeQuery($sql)->fetchAllAssociative();
+    }
+
+    /**
+     * Évolution du nombre de commandes sur les N derniers mois.
+     *
+     * @return array<int, array{mois: string, nb: int}>
+     */
+    public function getOrdersEvolution(int $months = 6): array
+    {
+        $conn = $this->entityManager->getConnection();
+        $sql = 'SELECT DATE_FORMAT(date_commande, "%Y-%m") as mois, COUNT(*) as nb
+                FROM commande
+                WHERE date_commande >= DATE_SUB(NOW(), INTERVAL :months MONTH)
+                GROUP BY DATE_FORMAT(date_commande, "%Y-%m")
+                ORDER BY mois ASC';
+        
+        return $conn->executeQuery($sql, ['months' => $months])
+                    ->fetchAllAssociative();
     }
 }

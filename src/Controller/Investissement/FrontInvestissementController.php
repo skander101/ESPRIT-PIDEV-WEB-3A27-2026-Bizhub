@@ -3,14 +3,7 @@
 namespace App\Controller\Investissement;
 
 use App\Entity\Investissement\Investment;
-use App\Entity\UsersAvis\User;
-use App\Entity\Investissement\Project;
-use App\Form\Investissement\InvestisseurType;
-use App\Form\Investissement\InvestissementFrontType;
 use App\Repository\InvestmentRepository;
-use App\Repository\ProjectRepository;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,9 +13,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class FrontInvestissementController extends AbstractController
 {
     public function __construct(
-        private InvestmentRepository   $investmentRepository,
-        private ProjectRepository      $projectRepository,
-        private EntityManagerInterface $entityManager,
+        private InvestmentRepository $investmentRepository,
     ) {}
 
     // ────────────────────────────────────────────────────────────────────────
@@ -56,140 +47,35 @@ class FrontInvestissementController extends AbstractController
     }
 
     // ────────────────────────────────────────────────────────────────────────
-    // INVESTIR (formulaire d'investissement pour un projet)
+    // INVESTIR (redirige vers la négociation - investissement direct interdit)
     // ────────────────────────────────────────────────────────────────────────
 
     #[Route('/{id}/investir', name: 'app_front_investir', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
-    public function investir(Request $request, int $id): Response
+    public function investir(int $id): Response
     {
-        // 1. Connexion obligatoire
-        $user = $this->getUser();
-        if (!$user) {
-            $this->addFlash('warning', 'Vous devez être connecté pour investir.');
-            return $this->redirectToRoute('app_login');
-        }
-
-        // 2. Projet existant
-        $projet = $this->projectRepository->find($id);
-        if (!$projet) {
-            $this->addFlash('error', 'Projet introuvable.');
-            return $this->redirectToRoute('app_front_projet_index');
-        }
-
-        // 3. Seuls les projets publiés / en cours acceptent des investissements.
-        // Support des anciens statuts (publie, en_cours) pendant la transition.
-        $statutsOuverts = [
-            Project::STATUS_PUBLIE,
-            Project::STATUS_EN_COURS,
-            'publie',
-            'en_cours',
-        ];
-        if (!in_array($projet->getStatus(), $statutsOuverts)) {
-            $this->addFlash('error', 'Ce projet n\'accepte pas d\'investissements pour l\'instant.');
-            return $this->redirectToRoute('app_front_projet_show', ['id' => $id]);
-        }
-
-        // 4. Une startup ne peut pas investir dans son propre projet
-        if ($projet->getUser() && $projet->getUser()->getUserId() === ($user instanceof User ? $user->getUserId() : null)) {
-            $this->addFlash('error', 'Vous ne pouvez pas investir dans votre propre projet.');
-            return $this->redirectToRoute('app_front_projet_show', ['id' => $id]);
-        }
-
-        // 5. Créer l'investissement avec statut par défaut
-        $investment = new Investment();
-        $investment->setProject($projet);
-        $investment->setUser($user);
-        $investment->setStatut('en_attente');
-
-        $form = $this->createForm(InvestisseurType::class, $investment);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->entityManager->persist($investment);
-            $this->entityManager->flush();
-
-            $this->addFlash('success', 'Votre investissement a été enregistré avec succès ! Merci pour votre confiance.');
-            return $this->redirectToRoute('app_front_investissement_index');
-        }
-
-        $totalInvesti = $this->investmentRepository->getTotalInvestedByProject($projet);
-        $pourcentage  = $projet->getRequiredBudget() > 0
-            ? min(100, round(((float)$totalInvesti / (float)$projet->getRequiredBudget()) * 100, 1))
-            : 0;
-
-        return $this->render('front/investissement/invest.html.twig', [
-            'form'          => $form->createView(),
-            'projet'        => $projet,
-            'total_investi' => $totalInvesti,
-            'pourcentage'   => $pourcentage,
-        ]);
+        $this->addFlash('info', 'L\'investissement direct n\'est plus possible. Veuillez passer par une négociation avec la startup.');
+        return $this->redirectToRoute('app_negociation_creer_par_projet', ['id' => $id]);
     }
 
     // ────────────────────────────────────────────────────────────────────────
-    // MODIFIER UN INVESTISSEMENT
+    // MODIFIER UN INVESTISSEMENT (redirige vers la négociation)
     // ────────────────────────────────────────────────────────────────────────
 
     #[Route('/mes-investissements/{id}/modifier', name: 'app_front_investissement_edit', methods: ['GET', 'POST'])]
-    public function edit(
-        Request $request,
-        #[MapEntity(mapping: ['id' => 'investment_id'])]
-        Investment $investment
-    ): Response {
-        $user = $this->getUser();
-
-        if (!$user || $investment->getUser() !== $user) {
-            throw $this->createAccessDeniedException('Accès refusé.');
-        }
-
-        // Seuls les investissements EN ATTENTE peuvent être modifiés
-        if ($investment->getStatut() !== 'en_attente') {
-            $this->addFlash('error', 'Seuls les investissements en attente peuvent être modifiés.');
-            return $this->redirectToRoute('app_front_investissement_index');
-        }
-
-        $form = $this->createForm(InvestissementFrontType::class, $investment);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->entityManager->flush();
-            $this->addFlash('success', 'Investissement modifié avec succès.');
-            return $this->redirectToRoute('app_front_investissement_index');
-        }
-
-        return $this->render('front/investissement/edit.html.twig', [
-            'investment' => $investment,
-            'form'       => $form->createView(),
-        ]);
+    public function edit(): Response
+    {
+        $this->addFlash('info', 'La modification d\'investissement se fait via la négociation.');
+        return $this->redirectToRoute('app_negociation_index');
     }
 
     // ────────────────────────────────────────────────────────────────────────
-    // SUPPRIMER UN INVESTISSEMENT
+    // SUPPRIMER UN INVESTISSEMENT (redirige vers la négociation)
     // ────────────────────────────────────────────────────────────────────────
 
     #[Route('/mes-investissements/{id}/supprimer', name: 'app_front_investissement_delete', methods: ['POST'])]
-    public function delete(
-        Request $request,
-        #[MapEntity(mapping: ['id' => 'investment_id'])]
-        Investment $investment
-    ): Response {
-        $user = $this->getUser();
-
-        if (!$user || $investment->getUser() !== $user) {
-            throw $this->createAccessDeniedException('Accès refusé.');
-        }
-
-        // Seuls les investissements EN ATTENTE peuvent être supprimés
-        if ($investment->getStatut() !== 'en_attente') {
-            $this->addFlash('error', 'Seuls les investissements en attente peuvent être supprimés.');
-            return $this->redirectToRoute('app_front_investissement_index');
-        }
-
-        if ($this->isCsrfTokenValid('delete_investment_' . $investment->getInvestment_id(), $request->request->get('_token'))) {
-            $this->entityManager->remove($investment);
-            $this->entityManager->flush();
-            $this->addFlash('success', 'Investissement supprimé avec succès.');
-        }
-
-        return $this->redirectToRoute('app_front_investissement_index');
+    public function delete(): Response
+    {
+        $this->addFlash('info', 'La suppression d\'investissement se fait via la négociation.');
+        return $this->redirectToRoute('app_negociation_index');
     }
 }

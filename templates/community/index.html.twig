@@ -384,34 +384,8 @@
     {% endif %}
 
     <div id="communityPosts" data-posts-container>
-      {% include 'community/_posts.html.twig' with { posts: posts } %}
+      {% include 'community/_posts.html.twig' with { posts: posts, page: page, total_pages: total_pages, search: search, category: category } %}
     </div>
-
-    {% if total_pages > 1 %}
-    <nav aria-label="Pagination" style="display:flex; justify-content:center; gap:8px; margin:20px 0;">
-      {% set qParams = {} %}
-      {% if search is not empty %}{% set qParams = qParams|merge({search: search}) %}{% endif %}
-      {% if category is not empty %}{% set qParams = qParams|merge({category: category}) %}{% endif %}
-
-      {% if page > 1 %}
-        <a href="{{ path('community_index', qParams|merge({page: page - 1})) }}" class="btn btn-secondary" data-page="{{ page - 1 }}">← Précédent</a>
-      {% endif %}
-
-      {% for p in 1..total_pages %}
-        {% if p == page %}
-          <span class="btn btn-primary" style="pointer-events:none;">{{ p }}</span>
-        {% elseif p == 1 or p == total_pages or (p >= page - 2 and p <= page + 2) %}
-          <a href="{{ path('community_index', qParams|merge({page: p})) }}" class="btn btn-secondary" data-page="{{ p }}">{{ p }}</a>
-        {% elseif p == page - 3 or p == page + 3 %}
-          <span style="color:var(--text-muted);">…</span>
-        {% endif %}
-      {% endfor %}
-
-      {% if page < total_pages %}
-        <a href="{{ path('community_index', qParams|merge({page: page + 1})) }}" class="btn btn-secondary" data-page="{{ page + 1 }}">Suivant →</a>
-      {% endif %}
-    </nav>
-    {% endif %}
 </div>
 {% endblock %}
 

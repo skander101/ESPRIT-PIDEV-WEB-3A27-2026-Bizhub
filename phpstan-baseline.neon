@@ -55,62 +55,8 @@ parameters:
 			path: src/Controller/Auth/AuthController.php
 
 		-
-			message: '#^Call to an undefined method App\\Entity\\Community\\Commentaire\:\:getPostId\(\)\.$#'
-			identifier: method.notFound
-			count: 5
-			path: src/Controller/Community/PostController.php
-
-		-
-			message: '#^Call to an undefined method App\\Entity\\Community\\Commentaire\:\:getUserId\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: src/Controller/Community/PostController.php
-
-		-
-			message: '#^Call to an undefined method App\\Entity\\Community\\Commentaire\:\:setCreatedAt\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Controller/Community/PostController.php
-
-		-
-			message: '#^Call to an undefined method App\\Entity\\Community\\Commentaire\:\:setPostId\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Controller/Community/PostController.php
-
-		-
-			message: '#^Call to an undefined method App\\Entity\\Community\\Commentaire\:\:setUserId\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Controller/Community/PostController.php
-
-		-
-			message: '#^Call to an undefined method App\\Entity\\Community\\Post\:\:setCreatedAt\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Controller/Community/PostController.php
-
-		-
-			message: '#^Call to an undefined method App\\Entity\\Community\\Post\:\:setUserId\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Controller/Community/PostController.php
-
-		-
 			message: '#^Offset 1 on array\{non\-falsy\-string, string\} on left side of \?\? always exists and is not nullable\.$#'
 			identifier: nullCoalesce.offset
-			count: 1
-			path: src/Controller/Community/PostController.php
-
-		-
-			message: '#^Parameter \#1 \$locationLat of method App\\Entity\\Community\\Post\:\:setLocationLat\(\) expects string\|null, float\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Controller/Community/PostController.php
-
-		-
-			message: '#^Parameter \#1 \$locationLon of method App\\Entity\\Community\\Post\:\:setLocationLon\(\) expects string\|null, float\|null given\.$#'
-			identifier: argument.type
 			count: 1
 			path: src/Controller/Community/PostController.php
 
@@ -193,18 +139,6 @@ parameters:
 			path: src/Controller/Investissement/DealController.php
 
 		-
-			message: '#^Call to protected method setInvestment_date\(\) of class App\\Entity\\Investissement\\Investment\.$#'
-			identifier: method.protected
-			count: 1
-			path: src/Controller/Investissement/FrontInvestissementController.php
-
-		-
-			message: '#^Parameter \#1 \$user of method App\\Entity\\Investissement\\Investment\:\:setUser\(\) expects App\\Entity\\UsersAvis\\User\|null, Symfony\\Component\\Security\\Core\\User\\UserInterface given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Controller/Investissement/FrontInvestissementController.php
-
-		-
 			message: '#^Parameter \#1 \$user of method App\\Entity\\Investissement\\Project\:\:setUser\(\) expects App\\Entity\\UsersAvis\\User\|null, Symfony\\Component\\Security\\Core\\User\\UserInterface given\.$#'
 			identifier: argument.type
 			count: 1
@@ -235,66 +169,6 @@ parameters:
 			path: src/Controller/Investissement/InvestissementApiController.php
 
 		-
-			message: '#^Call to protected method setCreated_at\(\) of class App\\Entity\\Investissement\\NegotiationMessage\.$#'
-			identifier: method.protected
-			count: 3
-			path: src/Controller/Investissement/NegociationController.php
-
-		-
-			message: '#^Call to protected method setUpdated_at\(\) of class App\\Entity\\Investissement\\Negotiation\.$#'
-			identifier: method.protected
-			count: 1
-			path: src/Controller/Investissement/NegociationController.php
-
-		-
-			message: '#^Parameter \#1 \$final_amount of method App\\Entity\\Investissement\\Negotiation\:\:setFinal_amount\(\) expects string\|null, float given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Controller/Investissement/NegociationController.php
-
-		-
-			message: '#^Parameter \#1 \$investor of method App\\Entity\\Investissement\\Negotiation\:\:setInvestor\(\) expects App\\Entity\\UsersAvis\\User\|null, Symfony\\Component\\Security\\Core\\User\\UserInterface given\.$#'
-			identifier: argument.type
-			count: 2
-			path: src/Controller/Investissement/NegociationController.php
-
-		-
-			message: '#^Parameter \#1 \$investor of method App\\Repository\\NegotiationRepository\:\:findByInvestor\(\) expects App\\Entity\\UsersAvis\\User, Symfony\\Component\\Security\\Core\\User\\UserInterface given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Controller/Investissement/NegociationController.php
-
-		-
-			message: '#^Parameter \#1 \$proposed_amount of method App\\Entity\\Investissement\\Negotiation\:\:setProposed_amount\(\) expects string\|null, float given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Controller/Investissement/NegociationController.php
-
-		-
-			message: '#^Parameter \#1 \$proposed_amount of method App\\Entity\\Investissement\\Negotiation\:\:setProposed_amount\(\) expects string\|null, int given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Controller/Investissement/NegociationController.php
-
-		-
-			message: '#^Parameter \#1 \$proposed_amount of method App\\Entity\\Investissement\\NegotiationMessage\:\:setProposed_amount\(\) expects string\|null, float given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Controller/Investissement/NegociationController.php
-
-		-
-			message: '#^Parameter \#1 \$startup of method App\\Repository\\NegotiationRepository\:\:findByStartup\(\) expects App\\Entity\\UsersAvis\\User, Symfony\\Component\\Security\\Core\\User\\UserInterface given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Controller/Investissement/NegociationController.php
-
-		-
-			message: '#^Parameter \#1 \$user of method App\\Entity\\Investissement\\NegotiationMessage\:\:setUser\(\) expects App\\Entity\\UsersAvis\\User\|null, Symfony\\Component\\Security\\Core\\User\\UserInterface given\.$#'
-			identifier: argument.type
-			count: 5
-			path: src/Controller/Investissement/NegociationController.php
-
-		-
 			message: '#^Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\:\:getUserId\(\)\.$#'
 			identifier: method.notFound
 			count: 4
@@ -311,12 +185,6 @@ parameters:
 			identifier: return.type
 			count: 1
 			path: src/Controller/Marketplace/CommandeController.php
-
-		-
-			message: '#^Call to protected method setPaidAt\(\) of class App\\Entity\\Marketplace\\Commande\.$#'
-			identifier: method.protected
-			count: 1
-			path: src/Controller/Marketplace/PaymentController.php
 
 		-
 			message: '#^Left side of && is always true\.$#'
@@ -559,12 +427,6 @@ parameters:
 			path: src/Entity/Marketplace/Facture.php
 
 		-
-			message: '#^Strict comparison using \=\=\= between DateTimeInterface and null will always evaluate to false\.$#'
-			identifier: identical.alwaysFalse
-			count: 2
-			path: src/Entity/Marketplace/Facture.php
-
-		-
 			message: '#^Property App\\Entity\\Marketplace\\Order\:\:\$quantity \(int\|null\) is never assigned null so it can be removed from the property type\.$#'
 			identifier: property.unusedType
 			count: 1
@@ -691,36 +553,6 @@ parameters:
 			path: src/Service/Elearning/LocalFormationRecommender.php
 
 		-
-			message: '#^Call to private method setCreatedAt\(\) of class App\\Entity\\Elearning\\PromoCode\.$#'
-			identifier: method.private
-			count: 1
-			path: src/Service/Elearning/PromoCodeService.php
-
-		-
-			message: '#^Parameter \#1 \$at of method App\\Entity\\Elearning\\PromoCode\:\:markUsed\(\) expects DateTimeImmutable, DateTime given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Service/Elearning/PromoCodeService.php
-
-		-
-			message: '#^Parameter \#1 \$createdAt of method App\\Entity\\Elearning\\PromoCode\:\:setCreatedAt\(\) expects DateTimeImmutable, DateTime given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Service/Elearning/PromoCodeService.php
-
-		-
-			message: '#^Parameter \#1 \$expiresAt of method App\\Entity\\Elearning\\PromoCode\:\:setExpiresAt\(\) expects DateTimeImmutable, DateTime given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Service/Elearning/PromoCodeService.php
-
-		-
-			message: '#^Parameter \#1 \$now of method App\\Entity\\Elearning\\PromoCode\:\:isUsableNow\(\) expects DateTimeImmutable, DateTime given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Service/Elearning/PromoCodeService.php
-
-		-
 			message: '#^Match expression does not handle remaining value\: string$#'
 			identifier: match.unhandled
 			count: 1
@@ -731,18 +563,6 @@ parameters:
 			identifier: empty.variable
 			count: 1
 			path: src/Service/Investissement/AiNegotiationService.php
-
-		-
-			message: '#^Call to protected method setCompleted_at\(\) of class App\\Entity\\Investissement\\Deal\.$#'
-			identifier: method.protected
-			count: 2
-			path: src/Service/Investissement/DealWorkflowService.php
-
-		-
-			message: '#^Call to protected method setSignature_token_expires_at\(\) of class App\\Entity\\Investissement\\Deal\.$#'
-			identifier: method.protected
-			count: 1
-			path: src/Service/Investissement/DealWorkflowService.php
 
 		-
 			message: '#^Offset ''sante'' on non\-empty\-array\<mixed, mixed\> on left side of \?\? always exists and is not nullable\.$#'
@@ -757,46 +577,10 @@ parameters:
 			path: src/Service/Investissement/PortfolioAnalysisService.php
 
 		-
-			message: '#^Call to protected method setSignature_sent_at\(\) of class App\\Entity\\Investissement\\Deal\.$#'
-			identifier: method.protected
-			count: 1
-			path: src/Service/Investissement/SignatureEmailService.php
-
-		-
-			message: '#^Call to protected method setSignature_token_expires_at\(\) of class App\\Entity\\Investissement\\Deal\.$#'
-			identifier: method.protected
-			count: 1
-			path: src/Service/Investissement/SignatureEmailService.php
-
-		-
-			message: '#^Call to protected method setCompleted_at\(\) of class App\\Entity\\Investissement\\Deal\.$#'
-			identifier: method.protected
-			count: 2
-			path: src/Service/Investissement/YousignService.php
-
-		-
-			message: '#^Call to protected method setSignature_token_expires_at\(\) of class App\\Entity\\Investissement\\Deal\.$#'
-			identifier: method.protected
-			count: 2
-			path: src/Service/Investissement/YousignService.php
-
-		-
 			message: '#^Offset 0 on non\-empty\-list\<string\> on left side of \?\? always exists and is not nullable\.$#'
 			identifier: nullCoalesce.offset
 			count: 1
 			path: src/Service/Investissement/YousignService.php
-
-		-
-			message: '#^Call to an undefined method App\\Entity\\Marketplace\\Facture\:\:setTotalHt\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Service/Marketplace/FactureService.php
-
-		-
-			message: '#^Call to protected method setDateFacture\(\) of class App\\Entity\\Marketplace\\Facture\.$#'
-			identifier: method.protected
-			count: 1
-			path: src/Service/Marketplace/FactureService.php
 
 		-
 			message: '#^Constant App\\Service\\Marketplace\\OrderScoringService\:\:PENALTY_POINTS is unused\.$#'
