@@ -11,6 +11,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProduitRepository::class)]
 #[ORM\Table(name: 'product_service')]
+#[ORM\Index(name: 'idx_product_service_seller', columns: ['seller_id'])]
 class ProductService
 {
     public const STATUS_ACTIVE   = 'active';

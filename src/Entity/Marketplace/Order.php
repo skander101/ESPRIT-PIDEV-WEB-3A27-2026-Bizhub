@@ -12,6 +12,8 @@ use App\Enum\PaymentMethod;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: 'orders')]
+#[ORM\Index(name: 'idx_orders_buyer', columns: ['buyer_id'])]
+#[ORM\Index(name: 'idx_orders_product', columns: ['product_id'])]
 class Order
 {
     #[ORM\Id]

@@ -15,6 +15,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: FormationRepository::class)]
 #[ORM\Table(name: 'formation')]
+#[ORM\Index(name: 'idx_formation_trainer', columns: ['trainer_id'])]
 #[Assert\Callback(callback: 'validateLocationForPresential')]
 class Formation
 {

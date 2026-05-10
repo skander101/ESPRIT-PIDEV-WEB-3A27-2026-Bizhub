@@ -191,7 +191,7 @@ class UserType extends AbstractType
             ]);
         }
 
-        if ($options['mode'] !== 'edit') {
+        if ($options['mode'] === 'editSpecific') {
             $builder
                 ->add('company_name', TextType::class, [
                     'label' => 'Company Name',

@@ -114,7 +114,7 @@
                   <span style="font-size:0.75rem;color:var(--pg-muted);">{{ comment.created_at|date('d/m/Y H:i') }}</span>
                 </div>
                 <div style="color:var(--pg-muted2);font-size:0.9rem;line-height:1.5;white-space:pre-wrap;">{{ comment.content_text ?? comment.content }}</div>
-                {% if comment.image_url %}
+                {% if comment.image_url is defined and comment.image_url %}
                   <div style="margin-top:0.75rem;">
                     <img src="{{ comment.image_url }}" alt="Comment image" style="max-width:300px;border-radius:8px;" />
                   </div>

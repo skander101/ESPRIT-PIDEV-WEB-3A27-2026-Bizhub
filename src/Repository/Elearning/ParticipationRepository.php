@@ -18,6 +18,8 @@ class ParticipationRepository extends ServiceEntityRepository
     public function findByFormationOrdered(Formation $formation): array
     {
         return $this->createQueryBuilder('p')
+            ->leftJoin('p.formation', 'f')->addSelect('f')
+            ->leftJoin('p.user', 'u')->addSelect('u')
             ->andWhere('p.formation = :formation')
             ->setParameter('formation', $formation)
             ->orderBy('p.created_at', 'DESC')
@@ -72,12 +74,13 @@ class ParticipationRepository extends ServiceEntityRepository
     /**
      * @return list<Participation>
      */
-    public function findAllForAdminDashboard(): array
+    public function findAllForAdminDashboard(int $limit = 100): array
     {
         return $this->createQueryBuilder('p')
             ->leftJoin('p.formation', 'f')->addSelect('f')
             ->leftJoin('p.user', 'u')->addSelect('u')
             ->orderBy('p.created_at', 'DESC')
+            ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
     }

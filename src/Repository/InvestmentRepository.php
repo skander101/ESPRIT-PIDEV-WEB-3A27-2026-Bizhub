@@ -25,6 +25,8 @@ class InvestmentRepository extends ServiceEntityRepository
     public function findByProject(Project $project): array
     {
         return $this->createQueryBuilder('i')
+            ->leftJoin('i.project', 'p')->addSelect('p')
+            ->leftJoin('i.user', 'u')->addSelect('u')
             ->andWhere('i.project = :project')
             ->setParameter('project', $project)
             ->orderBy('i.created_at', 'DESC')
@@ -81,10 +83,13 @@ class InvestmentRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
-    public function findAllWithProject(): array
+    public function findAllWithProject(int $limit = 100): array
     {
         return $this->createQueryBuilder('i')
+            ->leftJoin('i.project', 'p')->addSelect('p')
+            ->leftJoin('i.user', 'u')->addSelect('u')
             ->orderBy('i.created_at', 'DESC')
+            ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
     }
@@ -162,6 +167,8 @@ class InvestmentRepository extends ServiceEntityRepository
     public function findAllByUser(User $user): array
     {
         return $this->createQueryBuilder('i')
+            ->leftJoin('i.project', 'p')->addSelect('p')
+            ->leftJoin('i.user', 'u')->addSelect('u')
             ->andWhere('i.user = :user')
             ->setParameter('user', $user)
             ->orderBy('i.created_at', 'DESC')

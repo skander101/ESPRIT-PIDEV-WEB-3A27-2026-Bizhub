@@ -117,6 +117,15 @@ class DashboardInvestisseurService
         }
 
         // ── Per-investment details ─────────────────────────────────────────
+        $projects = [];
+        foreach ($investments as $inv) {
+            $project = $inv->getProject();
+            if ($project) {
+                $projects[$project->getProject_id()] = $project;
+            }
+        }
+        $negByProjectId = $this->negotiationRepo->findMapByProjectsAndInvestor(array_values($projects), $user);
+
         $investmentDetails = [];
         foreach ($investments as $inv) {
             $amount  = (float) $inv->getAmount();
@@ -124,13 +133,11 @@ class DashboardInvestisseurService
             $sector  = $project ? ($project->getSecteur() ?? 'autre') : 'autre';
             $rate    = (self::SECTOR_RATES[$sector] ?? 11.0) / 100;
             $gain    = $amount * ((1 + $rate) ** 5) - $amount;
-            $roi     = round($gain / $amount * 100, 1);
+            $roi     = $amount > 0 ? round($gain / $amount * 100, 1) : 0.0;
 
             // Find linked negotiation
-            $neg = $project ? $this->negotiationRepo->findOneBy([
-                'project'  => $project,
-                'investor' => $user,
-            ]) : null;
+            $projectId = $project?->getProject_id();
+            $neg = $projectId ? ($negByProjectId[$projectId] ?? null) : null;
 
             // Find linked deal
             $deal = null;

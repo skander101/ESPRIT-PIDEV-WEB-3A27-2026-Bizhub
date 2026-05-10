@@ -10,6 +10,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CommentaireRepository::class)]
 #[ORM\Table(name: 'commentaire')]
+#[ORM\Index(name: 'idx_commentaire_post', columns: ['post_id'])]
+#[ORM\Index(name: 'idx_commentaire_user', columns: ['user_id'])]
 class Commentaire
 {
     #[ORM\Id]

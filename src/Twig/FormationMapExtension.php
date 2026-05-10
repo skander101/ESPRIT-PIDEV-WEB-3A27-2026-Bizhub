@@ -8,6 +8,7 @@ use App\Entity\Elearning\Formation;
 use App\Service\Elearning\FormationLocationPresentationService;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
+use Twig\TwigFilter;
 
 final class FormationMapExtension extends AbstractExtension
 {
@@ -23,5 +24,25 @@ final class FormationMapExtension extends AbstractExtension
                 return $this->formationLocationPresentationService->googleMapsUrlForFormation($formation);
             }),
         ];
+    }
+
+    public function getFilters(): array
+    {
+        return [
+            new TwigFilter('format_lieu', [$this, 'formatLieu']),
+        ];
+    }
+
+    public function formatLieu(?string $lieu): ?string
+    {
+        if ($lieu === null || $lieu === '') {
+            return null;
+        }
+
+        if (preg_match('/^-?\d+\.?\d*,\s*-?\d+\.?\d*$/', $lieu)) {
+            return '📍 Coordonnées uniquement';
+        }
+
+        return $lieu;
     }
 }

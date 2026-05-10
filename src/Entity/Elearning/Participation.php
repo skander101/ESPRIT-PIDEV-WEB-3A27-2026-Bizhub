@@ -12,6 +12,8 @@ use App\Entity\Elearning\Formation;
 
 #[ORM\Entity(repositoryClass: ParticipationRepository::class)]
 #[ORM\Table(name: 'participation')]
+#[ORM\Index(name: 'idx_participation_user', columns: ['user_id'])]
+#[ORM\Index(name: 'idx_participation_formation', columns: ['formation_id'])]
 #[ORM\HasLifecycleCallbacks]
 class Participation
 {

@@ -11,6 +11,12 @@
       background: linear-gradient(180deg, rgba(20,24,38,.86), rgba(12,16,30,.92));
       box-shadow: 0 18px 45px rgba(0,0,0,.24);
       overflow: hidden;
+      padding: .75rem;
+    }
+    .formation-page .dash-panel .table-responsive {
+      border-radius: 12px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
     }
     .formation-page .table {
       --bs-table-bg: transparent;
@@ -83,7 +89,7 @@
               <th>Fin</th>
               <th>Coût</th>
               <th>Lieu</th>
-              <th>En ligne</th>
+              <th class="text-center">En ligne</th>
               <th>Max formateurs</th>
               <th class="text-center">Actions</th>
             </tr>
@@ -96,8 +102,8 @@
                 <td>{{ f.start_date ? f.start_date|date('d/m/Y') : '—' }}</td>
                 <td>{{ f.end_date ? f.end_date|date('d/m/Y') : '—' }}</td>
                 <td><span class="tag tag-money">{{ f.cost ?? '0.00' }} DT</span></td>
-                <td><span class="tag tag-location">{% if f.enLigne %}—{% else %}{{ f.lieu ?: 'N/A' }}{% endif %}</span></td>
-                <td>
+                <td><span class="tag tag-location">{% if f.enLigne %}—{% else %}{{ f.lieu|format_lieu ?: 'N/A' }}{% endif %}</span></td>
+                <td class="text-center">
                   <span class="tag {{ f.enLigne ? 'tag-online' : 'tag-offline' }}">{{ f.enLigne ? 'En ligne' : 'Présentielle' }}</span>
                 </td>
                 <td><span class="tag tag-trainers">{{ f.maxFormateurs }}</span></td>

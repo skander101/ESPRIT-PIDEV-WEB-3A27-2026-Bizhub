@@ -206,6 +206,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     public function getCreatedAt(): \DateTimeInterface { return $this->created_at; }
     public function getCreated_at(): \DateTimeInterface { return $this->created_at; }
     public function setCreatedAt(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
+    public function setCreated_at(\DateTimeInterface $created_at): self { $this->created_at = $created_at; return $this; }
 
     public function getIsActive(): ?bool { return $this->is_active; }
     public function is_active(): ?bool { return $this->is_active; }

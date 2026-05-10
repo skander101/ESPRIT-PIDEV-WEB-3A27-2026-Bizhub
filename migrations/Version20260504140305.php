@@ -21,76 +21,263 @@ final class Version20260504140305 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('DELETE acn FROM auto_confirm_notification acn LEFT JOIN commande c ON acn.commande_id = c.commande_id WHERE c.commande_id IS NULL');
-        $this->addSql('ALTER TABLE auto_confirm_notification ADD CONSTRAINT FK_7A6A4E2382EA2E54 FOREIGN KEY (commande_id) REFERENCES commande (commande_id)');
-        $this->addSql('CREATE INDEX IDX_7A6A4E2382EA2E54 ON auto_confirm_notification (commande_id)');
-        $this->addSql('ALTER TABLE commande_ligne DROP FOREIGN KEY `FK_commande_ligne_commande`');
-        $this->addSql('DROP INDEX fk_commande_ligne_commande ON commande_ligne');
-        $this->addSql('CREATE INDEX IDX_6E98044082EA2E54 ON commande_ligne (commande_id)');
-        $this->addSql('ALTER TABLE commande_ligne ADD CONSTRAINT `FK_commande_ligne_commande` FOREIGN KEY (commande_id) REFERENCES commande (commande_id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE commande_status_history DROP FOREIGN KEY `FK_commande_history`');
+
+        $fkExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND CONSTRAINT_NAME = 'FK_7A6A4E2382EA2E54'");
+        if ($fkExists === 0) {
+            $this->addSql('ALTER TABLE auto_confirm_notification ADD CONSTRAINT FK_7A6A4E2382EA2E54 FOREIGN KEY (commande_id) REFERENCES commande (commande_id)');
+        }
+
+        $indexExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='auto_confirm_notification' AND INDEX_NAME='IDX_7A6A4E2382EA2E54'");
+        if ($indexExists === 0) {
+            $this->addSql('CREATE INDEX IDX_7A6A4E2382EA2E54 ON auto_confirm_notification (commande_id)');
+        }
+        $fkCommandeLigneExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'commande_ligne' AND CONSTRAINT_NAME = 'FK_commande_ligne_commande'");
+        if ($fkCommandeLigneExists > 0) {
+            $this->addSql('ALTER TABLE commande_ligne DROP FOREIGN KEY `FK_commande_ligne_commande`');
+        }
+
+        $fkCommandeLigneIndexExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='commande_ligne' AND INDEX_NAME='fk_commande_ligne_commande'");
+        if ($fkCommandeLigneIndexExists > 0) {
+            $this->addSql('DROP INDEX fk_commande_ligne_commande ON commande_ligne');
+        }
+
+        $commandeLigneIdxExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='commande_ligne' AND INDEX_NAME='IDX_6E98044082EA2E54'");
+        if ($commandeLigneIdxExists === 0) {
+            $this->addSql('CREATE INDEX IDX_6E98044082EA2E54 ON commande_ligne (commande_id)');
+        }
+
+        $fkCommandeLigneExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'commande_ligne' AND CONSTRAINT_NAME = 'FK_commande_ligne_commande'");
+        if ($fkCommandeLigneExists === 0) {
+            $this->addSql('ALTER TABLE commande_ligne ADD CONSTRAINT `FK_commande_ligne_commande` FOREIGN KEY (commande_id) REFERENCES commande (commande_id) ON DELETE CASCADE');
+        }
+        $fkCommandeHistoryExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'commande_status_history' AND CONSTRAINT_NAME = 'FK_commande_history'");
+        if ($fkCommandeHistoryExists > 0) {
+            $this->addSql('ALTER TABLE commande_status_history DROP FOREIGN KEY `FK_commande_history`');
+        }
         $this->addSql('ALTER TABLE commande_status_history CHANGE statut_precedent statut_precedent VARCHAR(50) DEFAULT NULL, CHANGE statut_nouveau statut_nouveau VARCHAR(50) NOT NULL');
-        $this->addSql('DROP INDEX idx_history_commande ON commande_status_history');
-        $this->addSql('CREATE INDEX IDX_EA31081482EA2E54 ON commande_status_history (commande_id)');
-        $this->addSql('ALTER TABLE commande_status_history ADD CONSTRAINT `FK_commande_history` FOREIGN KEY (commande_id) REFERENCES commande (commande_id) ON DELETE CASCADE');
+        $idxHistoryCommandeExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='commande_status_history' AND INDEX_NAME='idx_history_commande'");
+        if ($idxHistoryCommandeExists > 0) {
+            $this->addSql('DROP INDEX idx_history_commande ON commande_status_history');
+        }
+
+        $idxEaExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='commande_status_history' AND INDEX_NAME='IDX_EA31081482EA2E54'");
+        if ($idxEaExists === 0) {
+            $this->addSql('CREATE INDEX IDX_EA31081482EA2E54 ON commande_status_history (commande_id)');
+        }
+
+        $fkCommandeHistoryExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'commande_status_history' AND CONSTRAINT_NAME = 'FK_commande_history'");
+        if ($fkCommandeHistoryExists === 0) {
+            $this->addSql('ALTER TABLE commande_status_history ADD CONSTRAINT `FK_commande_history` FOREIGN KEY (commande_id) REFERENCES commande (commande_id) ON DELETE CASCADE');
+        }
         $this->addSql('ALTER TABLE commentaire CHANGE post_id post_id INT DEFAULT NULL, CHANGE user_id user_id INT DEFAULT NULL, CHANGE created_at created_at DATETIME NOT NULL');
         $this->addSql('UPDATE commentaire c LEFT JOIN post p ON c.post_id = p.post_id SET c.post_id = NULL WHERE c.post_id IS NOT NULL AND p.post_id IS NULL');
         $this->addSql('UPDATE commentaire c LEFT JOIN app_user u ON c.user_id = u.user_id SET c.user_id = NULL WHERE c.user_id IS NOT NULL AND u.user_id IS NULL');
-        $this->addSql('ALTER TABLE commentaire ADD CONSTRAINT FK_67F068BC4B89032C FOREIGN KEY (post_id) REFERENCES post (post_id)');
-        $this->addSql('ALTER TABLE commentaire ADD CONSTRAINT FK_67F068BCA76ED395 FOREIGN KEY (user_id) REFERENCES app_user (user_id)');
-        $this->addSql('CREATE INDEX IDX_67F068BC4B89032C ON commentaire (post_id)');
-        $this->addSql('CREATE INDEX IDX_67F068BCA76ED395 ON commentaire (user_id)');
-        $this->addSql('DROP INDEX idx_deal_status ON deal');
+        $fkCommentairePostExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'commentaire' AND CONSTRAINT_NAME = 'FK_67F068BC4B89032C'");
+        if ($fkCommentairePostExists === 0) {
+            $this->addSql('ALTER TABLE commentaire ADD CONSTRAINT FK_67F068BC4B89032C FOREIGN KEY (post_id) REFERENCES post (post_id)');
+        }
+
+        $fkCommentaireUserExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'commentaire' AND CONSTRAINT_NAME = 'FK_67F068BCA76ED395'");
+        if ($fkCommentaireUserExists === 0) {
+            $this->addSql('ALTER TABLE commentaire ADD CONSTRAINT FK_67F068BCA76ED395 FOREIGN KEY (user_id) REFERENCES app_user (user_id)');
+        }
+
+        $idxCommentairePostExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='commentaire' AND INDEX_NAME='IDX_67F068BC4B89032C'");
+        if ($idxCommentairePostExists === 0) {
+            $this->addSql('CREATE INDEX IDX_67F068BC4B89032C ON commentaire (post_id)');
+        }
+
+        $idxCommentaireUserExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='commentaire' AND INDEX_NAME='IDX_67F068BCA76ED395'");
+        if ($idxCommentaireUserExists === 0) {
+            $this->addSql('CREATE INDEX IDX_67F068BCA76ED395 ON commentaire (user_id)');
+        }
+        $idxDealStatusExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='deal' AND INDEX_NAME='idx_deal_status'");
+        if ($idxDealStatusExists > 0) {
+            $this->addSql('DROP INDEX idx_deal_status ON deal');
+        }
         $this->addSql('ALTER TABLE deal CHANGE status status VARCHAR(64) DEFAULT \'pending_payment\' NOT NULL, CHANGE created_at created_at DATETIME DEFAULT NULL');
         $this->addSql('UPDATE deal d LEFT JOIN negotiation n ON d.negotiation_id = n.negotiation_id SET d.negotiation_id = NULL WHERE d.negotiation_id IS NOT NULL AND n.negotiation_id IS NULL');
         $this->addSql('DELETE d FROM deal d LEFT JOIN project p ON d.project_id = p.project_id WHERE d.project_id IS NOT NULL AND p.project_id IS NULL');
         $this->addSql('DELETE d FROM deal d LEFT JOIN app_user u ON d.buyer_id = u.user_id WHERE d.buyer_id IS NOT NULL AND u.user_id IS NULL');
-        $this->addSql('ALTER TABLE deal ADD CONSTRAINT FK_E3FEC11667A34946 FOREIGN KEY (negotiation_id) REFERENCES negotiation (negotiation_id)');
-        $this->addSql('ALTER TABLE deal ADD CONSTRAINT FK_E3FEC116166D1F9C FOREIGN KEY (project_id) REFERENCES project (project_id)');
-        $this->addSql('ALTER TABLE deal ADD CONSTRAINT FK_E3FEC1166C755722 FOREIGN KEY (buyer_id) REFERENCES app_user (user_id)');
-        $this->addSql('ALTER TABLE deal ADD CONSTRAINT FK_E3FEC1168DE820D9 FOREIGN KEY (seller_id) REFERENCES app_user (user_id)');
-        $this->addSql('DROP INDEX negotiation_id ON deal');
-        $this->addSql('CREATE INDEX IDX_E3FEC11667A34946 ON deal (negotiation_id)');
-        $this->addSql('DROP INDEX idx_deal_project ON deal');
-        $this->addSql('CREATE INDEX IDX_E3FEC116166D1F9C ON deal (project_id)');
-        $this->addSql('DROP INDEX buyer_id ON deal');
-        $this->addSql('CREATE INDEX IDX_E3FEC1166C755722 ON deal (buyer_id)');
-        $this->addSql('DROP INDEX seller_id ON deal');
-        $this->addSql('CREATE INDEX IDX_E3FEC1168DE820D9 ON deal (seller_id)');
-        $this->addSql('ALTER TABLE facture DROP FOREIGN KEY `fk_facture_commande`');
+        $fkDealNegotiationExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'deal' AND CONSTRAINT_NAME = 'FK_E3FEC11667A34946'");
+        if ($fkDealNegotiationExists === 0) {
+            $this->addSql('ALTER TABLE deal ADD CONSTRAINT FK_E3FEC11667A34946 FOREIGN KEY (negotiation_id) REFERENCES negotiation (negotiation_id)');
+        }
+        $fkDealProjectExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'deal' AND CONSTRAINT_NAME = 'FK_E3FEC116166D1F9C'");
+        if ($fkDealProjectExists === 0) {
+            $this->addSql('ALTER TABLE deal ADD CONSTRAINT FK_E3FEC116166D1F9C FOREIGN KEY (project_id) REFERENCES project (project_id)');
+        }
+        $fkDealBuyerExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'deal' AND CONSTRAINT_NAME = 'FK_E3FEC1166C755722'");
+        if ($fkDealBuyerExists === 0) {
+            $this->addSql('ALTER TABLE deal ADD CONSTRAINT FK_E3FEC1166C755722 FOREIGN KEY (buyer_id) REFERENCES app_user (user_id)');
+        }
+        $fkDealSellerExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'deal' AND CONSTRAINT_NAME = 'FK_E3FEC1168DE820D9'");
+        if ($fkDealSellerExists === 0) {
+            $this->addSql('ALTER TABLE deal ADD CONSTRAINT FK_E3FEC1168DE820D9 FOREIGN KEY (seller_id) REFERENCES app_user (user_id)');
+        }
+
+        $idxNegotiationIdExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='deal' AND INDEX_NAME='negotiation_id'");
+        if ($idxNegotiationIdExists > 0 && $fkDealNegotiationExists === 0) {
+            $this->addSql('DROP INDEX negotiation_id ON deal');
+        }
+        $idxDealNegotiationExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='deal' AND INDEX_NAME='IDX_E3FEC11667A34946'");
+        if ($idxDealNegotiationExists === 0 && $idxNegotiationIdExists === 0) {
+            $this->addSql('CREATE INDEX IDX_E3FEC11667A34946 ON deal (negotiation_id)');
+        }
+
+        $idxDealProjectOldExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='deal' AND INDEX_NAME='idx_deal_project'");
+        if ($idxDealProjectOldExists > 0 && $fkDealProjectExists === 0) {
+            $this->addSql('DROP INDEX idx_deal_project ON deal');
+        }
+        $idxDealProjectExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='deal' AND INDEX_NAME='IDX_E3FEC116166D1F9C'");
+        if ($idxDealProjectExists === 0 && $idxDealProjectOldExists === 0) {
+            $this->addSql('CREATE INDEX IDX_E3FEC116166D1F9C ON deal (project_id)');
+        }
+
+        $idxBuyerIdExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='deal' AND INDEX_NAME='buyer_id'");
+        if ($idxBuyerIdExists > 0 && $fkDealBuyerExists === 0) {
+            $this->addSql('DROP INDEX buyer_id ON deal');
+        }
+        $idxDealBuyerExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='deal' AND INDEX_NAME='IDX_E3FEC1166C755722'");
+        if ($idxDealBuyerExists === 0 && $idxBuyerIdExists === 0) {
+            $this->addSql('CREATE INDEX IDX_E3FEC1166C755722 ON deal (buyer_id)');
+        }
+
+        $idxSellerIdExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='deal' AND INDEX_NAME='seller_id'");
+        if ($idxSellerIdExists > 0 && $fkDealSellerExists === 0) {
+            $this->addSql('DROP INDEX seller_id ON deal');
+        }
+        $idxDealSellerExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='deal' AND INDEX_NAME='IDX_E3FEC1168DE820D9'");
+        if ($idxDealSellerExists === 0 && $idxSellerIdExists === 0) {
+            $this->addSql('CREATE INDEX IDX_E3FEC1168DE820D9 ON deal (seller_id)');
+        }
+        $fkFactureCommandeExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'facture' AND CONSTRAINT_NAME = 'fk_facture_commande'");
+        if ($fkFactureCommandeExists > 0) {
+            $this->addSql('ALTER TABLE facture DROP FOREIGN KEY `fk_facture_commande`');
+        }
         $this->addSql('ALTER TABLE facture CHANGE total_ht total_ht NUMERIC(10, 3) NOT NULL, CHANGE total_tva total_tva NUMERIC(10, 3) NOT NULL, CHANGE total_ttc total_ttc NUMERIC(10, 3) NOT NULL');
-        $this->addSql('DROP INDEX uniq_facture_numero ON facture');
-        $this->addSql('CREATE UNIQUE INDEX UNIQ_FE86641038D27AB1 ON facture (numero_facture)');
-        $this->addSql('DROP INDEX uniq_facture_commande ON facture');
-        $this->addSql('CREATE UNIQUE INDEX UNIQ_FE86641082EA2E54 ON facture (commande_id)');
-        $this->addSql('ALTER TABLE facture ADD CONSTRAINT `fk_facture_commande` FOREIGN KEY (commande_id) REFERENCES commande (commande_id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE formation DROP FOREIGN KEY `FK_404021BFFB08EDF6`');
+        $uniqFactureNumeroExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='facture' AND INDEX_NAME='uniq_facture_numero'");
+        if ($uniqFactureNumeroExists > 0) {
+            $this->addSql('DROP INDEX uniq_facture_numero ON facture');
+        }
+        $uniqNumeroNewExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='facture' AND INDEX_NAME='UNIQ_FE86641038D27AB1'");
+        if ($uniqNumeroNewExists === 0) {
+            $this->addSql('CREATE UNIQUE INDEX UNIQ_FE86641038D27AB1 ON facture (numero_facture)');
+        }
+
+        $uniqFactureCommandeExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='facture' AND INDEX_NAME='uniq_facture_commande'");
+        if ($uniqFactureCommandeExists > 0) {
+            $this->addSql('DROP INDEX uniq_facture_commande ON facture');
+        }
+        $uniqCommandeNewExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='facture' AND INDEX_NAME='UNIQ_FE86641082EA2E54'");
+        if ($uniqCommandeNewExists === 0) {
+            $this->addSql('CREATE UNIQUE INDEX UNIQ_FE86641082EA2E54 ON facture (commande_id)');
+        }
+
+        $fkFactureCommandeExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'facture' AND CONSTRAINT_NAME = 'fk_facture_commande'");
+        if ($fkFactureCommandeExists === 0) {
+            $this->addSql('ALTER TABLE facture ADD CONSTRAINT `fk_facture_commande` FOREIGN KEY (commande_id) REFERENCES commande (commande_id) ON DELETE CASCADE');
+        }
+        $fkFormationTrainerExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'formation' AND CONSTRAINT_NAME = 'FK_404021BFFB08EDF6'");
+        if ($fkFormationTrainerExists > 0) {
+            $this->addSql('ALTER TABLE formation DROP FOREIGN KEY `FK_404021BFFB08EDF6`');
+        }
         $this->addSql('ALTER TABLE formation CHANGE en_ligne en_ligne TINYINT DEFAULT 0 NOT NULL');
-        $this->addSql('DROP INDEX idx_formation_trainer ON formation');
-        $this->addSql('CREATE INDEX IDX_404021BFFB08EDF6 ON formation (trainer_id)');
-        $this->addSql('ALTER TABLE formation ADD CONSTRAINT `FK_404021BFFB08EDF6` FOREIGN KEY (trainer_id) REFERENCES app_user (user_id)');
+        $idxFormationTrainerOldExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='formation' AND INDEX_NAME='idx_formation_trainer'");
+        if ($idxFormationTrainerOldExists > 0) {
+            $this->addSql('DROP INDEX idx_formation_trainer ON formation');
+        }
+        $idxFormationTrainerNewExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='formation' AND INDEX_NAME='IDX_404021BFFB08EDF6'");
+        if ($idxFormationTrainerNewExists === 0) {
+            $this->addSql('CREATE INDEX IDX_404021BFFB08EDF6 ON formation (trainer_id)');
+        }
+        $fkFormationTrainerExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'formation' AND CONSTRAINT_NAME = 'FK_404021BFFB08EDF6'");
+        if ($fkFormationTrainerExists === 0) {
+            $this->addSql('ALTER TABLE formation ADD CONSTRAINT `FK_404021BFFB08EDF6` FOREIGN KEY (trainer_id) REFERENCES app_user (user_id)');
+        }
         $this->addSql('ALTER TABLE formation_recommendation_event CHANGE created_at created_at DATETIME NOT NULL');
-        $this->addSql('DROP INDEX idx_fraud_alert_status ON fraud_alert');
-        $this->addSql('DROP INDEX idx_fraud_alert_date ON fraud_alert');
-        $this->addSql('DROP INDEX idx_fraud_alert_investment ON fraud_alert');
-        $this->addSql('DROP INDEX idx_fraud_alert_investor ON fraud_alert');
-        $this->addSql('ALTER TABLE fraud_alert MODIFY alert_id INT NOT NULL');
-        $this->addSql('ALTER TABLE fraud_alert DROP investment_id, DROP investor_id, DROP alert_level, DROP alert_message, DROP created_at, DROP status, CHANGE alert_id id INT AUTO_INCREMENT NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (id)');
-        $this->addSql('DROP INDEX idx_fraud_analysis_investor ON fraud_analysis');
-        $this->addSql('DROP INDEX idx_fraud_analysis_date ON fraud_analysis');
-        $this->addSql('DROP INDEX idx_fraud_analysis_risk_level ON fraud_analysis');
-        $this->addSql('DROP INDEX idx_fraud_analysis_investment ON fraud_analysis');
-        $this->addSql('ALTER TABLE fraud_analysis MODIFY analysis_id INT NOT NULL');
-        $this->addSql('ALTER TABLE fraud_analysis DROP investment_id, DROP investor_id, DROP risk_score, DROP risk_level, DROP analysis_date, DROP risk_factors, CHANGE analysis_id id INT AUTO_INCREMENT NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (id)');
-        $this->addSql('ALTER TABLE investment DROP FOREIGN KEY `investment_ibfk_1`');
-        $this->addSql('ALTER TABLE investment DROP FOREIGN KEY `investment_ibfk_2`');
-        $this->addSql('DROP INDEX idx_investment_date ON investment');
+        $idxFraudAlertStatusExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='fraud_alert' AND INDEX_NAME='idx_fraud_alert_status'");
+        if ($idxFraudAlertStatusExists > 0) {
+            $this->addSql('DROP INDEX idx_fraud_alert_status ON fraud_alert');
+        }
+        $idxFraudAlertDateExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='fraud_alert' AND INDEX_NAME='idx_fraud_alert_date'");
+        if ($idxFraudAlertDateExists > 0) {
+            $this->addSql('DROP INDEX idx_fraud_alert_date ON fraud_alert');
+        }
+        $idxFraudAlertInvestmentExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='fraud_alert' AND INDEX_NAME='idx_fraud_alert_investment'");
+        if ($idxFraudAlertInvestmentExists > 0) {
+            $this->addSql('DROP INDEX idx_fraud_alert_investment ON fraud_alert');
+        }
+        $idxFraudAlertInvestorExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='fraud_alert' AND INDEX_NAME='idx_fraud_alert_investor'");
+        if ($idxFraudAlertInvestorExists > 0) {
+            $this->addSql('DROP INDEX idx_fraud_alert_investor ON fraud_alert');
+        }
+        $fraudAlertAlertIdExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='fraud_alert' AND COLUMN_NAME='alert_id'");
+        if ($fraudAlertAlertIdExists > 0) {
+            $this->addSql('ALTER TABLE fraud_alert MODIFY alert_id INT NOT NULL');
+            $this->addSql('ALTER TABLE fraud_alert DROP investment_id, DROP investor_id, DROP alert_level, DROP alert_message, DROP created_at, DROP status, CHANGE alert_id id INT AUTO_INCREMENT NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (id)');
+        }
+        $idxFraudAnalysisInvestorExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='fraud_analysis' AND INDEX_NAME='idx_fraud_analysis_investor'");
+        if ($idxFraudAnalysisInvestorExists > 0) {
+            $this->addSql('DROP INDEX idx_fraud_analysis_investor ON fraud_analysis');
+        }
+        $idxFraudAnalysisDateExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='fraud_analysis' AND INDEX_NAME='idx_fraud_analysis_date'");
+        if ($idxFraudAnalysisDateExists > 0) {
+            $this->addSql('DROP INDEX idx_fraud_analysis_date ON fraud_analysis');
+        }
+        $idxFraudAnalysisRiskLevelExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='fraud_analysis' AND INDEX_NAME='idx_fraud_analysis_risk_level'");
+        if ($idxFraudAnalysisRiskLevelExists > 0) {
+            $this->addSql('DROP INDEX idx_fraud_analysis_risk_level ON fraud_analysis');
+        }
+        $idxFraudAnalysisInvestmentExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='fraud_analysis' AND INDEX_NAME='idx_fraud_analysis_investment'");
+        if ($idxFraudAnalysisInvestmentExists > 0) {
+            $this->addSql('DROP INDEX idx_fraud_analysis_investment ON fraud_analysis');
+        }
+        $fraudAnalysisAnalysisIdExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='fraud_analysis' AND COLUMN_NAME='analysis_id'");
+        if ($fraudAnalysisAnalysisIdExists > 0) {
+            $this->addSql('ALTER TABLE fraud_analysis MODIFY analysis_id INT NOT NULL');
+            $this->addSql('ALTER TABLE fraud_analysis DROP investment_id, DROP investor_id, DROP risk_score, DROP risk_level, DROP analysis_date, DROP risk_factors, CHANGE analysis_id id INT AUTO_INCREMENT NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (id)');
+        }
+        $investmentIbfk1Exists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'investment' AND CONSTRAINT_NAME = 'investment_ibfk_1'");
+        if ($investmentIbfk1Exists > 0) {
+            $this->addSql('ALTER TABLE investment DROP FOREIGN KEY `investment_ibfk_1`');
+        }
+        $investmentIbfk2Exists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'investment' AND CONSTRAINT_NAME = 'investment_ibfk_2'");
+        if ($investmentIbfk2Exists > 0) {
+            $this->addSql('ALTER TABLE investment DROP FOREIGN KEY `investment_ibfk_2`');
+        }
+
+        $idxInvestmentDateExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='investment' AND INDEX_NAME='idx_investment_date'");
+        if ($idxInvestmentDateExists > 0) {
+            $this->addSql('DROP INDEX idx_investment_date ON investment');
+        }
         $this->addSql('ALTER TABLE investment CHANGE commentaire commentaire LONGTEXT DEFAULT NULL, CHANGE conditions_particulieres conditions_particulieres LONGTEXT DEFAULT NULL, CHANGE created_at created_at DATETIME NOT NULL');
-        $this->addSql('ALTER TABLE investment ADD CONSTRAINT FK_43CA0AD6166D1F9C FOREIGN KEY (project_id) REFERENCES project (project_id)');
-        $this->addSql('ALTER TABLE investment ADD CONSTRAINT FK_43CA0AD69AE528DA FOREIGN KEY (investor_id) REFERENCES app_user (user_id)');
-        $this->addSql('DROP INDEX idx_investment_project ON investment');
-        $this->addSql('CREATE INDEX IDX_43CA0AD6166D1F9C ON investment (project_id)');
-        $this->addSql('DROP INDEX idx_investment_investor ON investment');
-        $this->addSql('CREATE INDEX IDX_43CA0AD69AE528DA ON investment (investor_id)');
+        $fkInvestmentProjectExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'investment' AND CONSTRAINT_NAME = 'FK_43CA0AD6166D1F9C'");
+        if ($fkInvestmentProjectExists === 0) {
+            $this->addSql('ALTER TABLE investment ADD CONSTRAINT FK_43CA0AD6166D1F9C FOREIGN KEY (project_id) REFERENCES project (project_id)');
+        }
+        $fkInvestmentInvestorExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'investment' AND CONSTRAINT_NAME = 'FK_43CA0AD69AE528DA'");
+        if ($fkInvestmentInvestorExists === 0) {
+            $this->addSql('ALTER TABLE investment ADD CONSTRAINT FK_43CA0AD69AE528DA FOREIGN KEY (investor_id) REFERENCES app_user (user_id)');
+        }
+
+        $idxInvestmentProjectExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='investment' AND INDEX_NAME='idx_investment_project'");
+        if ($idxInvestmentProjectExists > 0 && $fkInvestmentProjectExists === 0) {
+            $this->addSql('DROP INDEX idx_investment_project ON investment');
+        }
+        $idxInvestmentProjectNewExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='investment' AND INDEX_NAME='IDX_43CA0AD6166D1F9C'");
+        if ($idxInvestmentProjectNewExists === 0 && $idxInvestmentProjectExists === 0) {
+            $this->addSql('CREATE INDEX IDX_43CA0AD6166D1F9C ON investment (project_id)');
+        }
+
+        $idxInvestmentInvestorExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='investment' AND INDEX_NAME='idx_investment_investor'");
+        if ($idxInvestmentInvestorExists > 0 && $fkInvestmentInvestorExists === 0) {
+            $this->addSql('DROP INDEX idx_investment_investor ON investment');
+        }
+        $idxInvestmentInvestorNewExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='investment' AND INDEX_NAME='IDX_43CA0AD69AE528DA'");
+        if ($idxInvestmentInvestorNewExists === 0 && $idxInvestmentInvestorExists === 0) {
+            $this->addSql('CREATE INDEX IDX_43CA0AD69AE528DA ON investment (investor_id)');
+        }
         $this->addSql('ALTER TABLE negotiation DROP FOREIGN KEY `negotiation_ibfk_1`');
         $this->addSql('ALTER TABLE negotiation DROP FOREIGN KEY `negotiation_ibfk_2`');
         $this->addSql('ALTER TABLE negotiation DROP FOREIGN KEY `negotiation_ibfk_3`');
@@ -183,8 +370,16 @@ final class Version20260504140305 extends AbstractMigration
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE auto_confirm_notification DROP FOREIGN KEY FK_7A6A4E2382EA2E54');
-        $this->addSql('DROP INDEX IDX_7A6A4E2382EA2E54 ON auto_confirm_notification');
+
+        $fkExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND CONSTRAINT_NAME = 'FK_7A6A4E2382EA2E54'");
+        if ($fkExists > 0) {
+            $this->addSql('ALTER TABLE auto_confirm_notification DROP FOREIGN KEY FK_7A6A4E2382EA2E54');
+        }
+
+        $indexExists = (int) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='auto_confirm_notification' AND INDEX_NAME='IDX_7A6A4E2382EA2E54'");
+        if ($indexExists > 0) {
+            $this->addSql('DROP INDEX IDX_7A6A4E2382EA2E54 ON auto_confirm_notification');
+        }
         $this->addSql('ALTER TABLE commande_ligne DROP FOREIGN KEY FK_6E98044082EA2E54');
         $this->addSql('DROP INDEX idx_6e98044082ea2e54 ON commande_ligne');
         $this->addSql('CREATE INDEX FK_commande_ligne_commande ON commande_ligne (commande_id)');

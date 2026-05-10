@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
 #[ORM\Table(name: 'post')]
+#[ORM\Index(name: 'idx_post_user', columns: ['user_id'])]
 class Post
 {
     #[ORM\Id]

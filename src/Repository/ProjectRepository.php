@@ -25,6 +25,8 @@ class ProjectRepository extends ServiceEntityRepository
     public function findAllWithInvestments(): array
     {
         return $this->createQueryBuilder('p')
+            ->leftJoin('p.investments', 'i')->addSelect('i')
+            ->leftJoin('p.user', 'u')->addSelect('u')
             ->andWhere('p.status != :brouillon')
             ->setParameter('brouillon', Project::STATUS_BROUILLON)
             ->orderBy('p.created_at', 'DESC')
@@ -110,6 +112,8 @@ class ProjectRepository extends ServiceEntityRepository
     public function findByUser(User $user): array
     {
         return $this->createQueryBuilder('p')
+            ->leftJoin('p.investments', 'i')->addSelect('i')
+            ->leftJoin('p.user', 'u')->addSelect('u')
             ->andWhere('p.user = :user')
             ->setParameter('user', $user)
             ->orderBy('p.created_at', 'DESC')

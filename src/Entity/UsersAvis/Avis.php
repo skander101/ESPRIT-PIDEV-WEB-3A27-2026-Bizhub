@@ -12,6 +12,8 @@ use App\Entity\Elearning\Formation;
 
 #[ORM\Entity(repositoryClass: AvisRepository::class)]
 #[ORM\Table(name: 'avis')]
+#[ORM\Index(name: 'idx_avis_reviewer', columns: ['reviewer_id'])]
+#[ORM\Index(name: 'idx_avis_formation', columns: ['formation_id'])]
 class Avis
 {
     public function __construct()

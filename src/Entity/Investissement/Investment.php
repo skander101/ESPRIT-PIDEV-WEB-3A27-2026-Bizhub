@@ -14,6 +14,8 @@ use App\Entity\UsersAvis\User;
 
 #[ORM\Entity(repositoryClass: InvestmentRepository::class)]
 #[ORM\Table(name: 'investment')]
+#[ORM\Index(name: 'idx_investment_project', columns: ['project_id'])]
+#[ORM\Index(name: 'idx_investment_investor', columns: ['investor_id'])]
 class Investment
 {
     const TYPE_PRISE_PARTICIPATION = 'prise_participation';

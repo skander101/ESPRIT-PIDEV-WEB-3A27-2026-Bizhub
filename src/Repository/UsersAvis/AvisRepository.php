@@ -21,6 +21,8 @@ class AvisRepository extends ServiceEntityRepository
     public function findByUser(User $user): array
     {
         return $this->createQueryBuilder('a')
+            ->leftJoin('a.user', 'u')->addSelect('u')
+            ->leftJoin('a.formation', 'f')->addSelect('f')
             ->andWhere('a.user = :user')
             ->setParameter('user', $user)
             ->orderBy('a.created_at', 'DESC')
@@ -80,6 +82,8 @@ class AvisRepository extends ServiceEntityRepository
     public function findVerified(): array
     {
         return $this->createQueryBuilder('a')
+            ->leftJoin('a.user', 'u')->addSelect('u')
+            ->leftJoin('a.formation', 'f')->addSelect('f')
             ->andWhere('a.is_verified = :verified')
             ->setParameter('verified', true)
             ->orderBy('a.created_at', 'DESC')
@@ -90,6 +94,8 @@ class AvisRepository extends ServiceEntityRepository
     public function findRecent(int $limit = 10): array
     {
         return $this->createQueryBuilder('a')
+            ->leftJoin('a.user', 'u')->addSelect('u')
+            ->leftJoin('a.formation', 'f')->addSelect('f')
             ->orderBy('a.created_at', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()
@@ -106,12 +112,13 @@ class AvisRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findAllWithUser(): array
+    public function findAllWithUser(int $limit = 100): array
     {
         return $this->createQueryBuilder('a')
-            ->leftJoin('a.user', 'u')
-            ->addSelect('u')
+            ->leftJoin('a.user', 'u')->addSelect('u')
+            ->leftJoin('a.formation', 'f')->addSelect('f')
             ->orderBy('a.created_at', 'DESC')
+            ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
     }

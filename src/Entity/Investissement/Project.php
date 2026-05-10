@@ -13,6 +13,7 @@ use App\Entity\AiAnalysis;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 #[ORM\Table(name: 'project')]
+#[ORM\Index(name: 'idx_project_startup', columns: ['startup_id'])]
 class Project
 {
     public const STATUS_BROUILLON = 'pending';

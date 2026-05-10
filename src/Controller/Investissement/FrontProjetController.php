@@ -106,13 +106,12 @@ class FrontProjetController extends AbstractController
         $browseNegMap  = [];
         $browseDealMap = [];
         if ($user && ($user instanceof User ? $user->getUserType() : null) === 'investisseur') {
+            $negByProjectId = $this->negotiationRepo->findMapByProjectsAndInvestor($projets, $user);
             foreach ($projets as $projet) {
-                $neg = $this->negotiationRepo->findOneBy([
-                    'project'  => $projet,
-                    'investor' => $user,
-                ]);
-                $browseNegMap[$projet->getProject_id()] = $neg;
-                $browseDealMap[$projet->getProject_id()] = $neg
+                $projectId = $projet->getProject_id();
+                $neg = $projectId ? ($negByProjectId[$projectId] ?? null) : null;
+                $browseNegMap[$projectId] = $neg;
+                $browseDealMap[$projectId] = $neg
                     ? $this->workflow->findDealByNegotiation($neg)
                     : null;
             }
@@ -191,13 +190,21 @@ class FrontProjetController extends AbstractController
         // Maps for startup view (received investments)
         $negMap  = [];
         $dealMap = [];
+
+        $investorUsers = [];
+        foreach ($investissements as $inv) {
+            $invUser = $inv->getUser();
+            if ($invUser) {
+                $investorUsers[$invUser->getUserId()] = $invUser;
+            }
+        }
+        $negByInvestorId = $this->negotiationRepo->findMapByProjectAndInvestors($projet, array_values($investorUsers));
+
         foreach ($investissements as $inv) {
             $neg = null;
-            if ($inv->getProject() && $inv->getUser()) {
-                $neg = $this->negotiationRepo->findOneBy([
-                    'project'  => $inv->getProject(),
-                    'investor' => $inv->getUser(),
-                ]);
+            $invUser = $inv->getUser();
+            if ($invUser) {
+                $neg = $negByInvestorId[$invUser->getUserId()] ?? null;
             }
             $negMap[$inv->getInvestment_id()]  = $neg;
             $dealMap[$inv->getInvestment_id()] = $this->workflow->findDealByInvestment($inv);
@@ -208,10 +215,7 @@ class FrontProjetController extends AbstractController
         $myDeal = null;
         $myInvestment = null;
         if ($user && !$isOwner) {
-            $myNeg = $this->negotiationRepo->findOneBy([
-                'project'  => $projet,
-                'investor' => $user,
-            ]);
+            $myNeg = $this->negotiationRepo->findOneByProjectAndInvestor($projet, $user);
             if ($myNeg) {
                 $myDeal = $this->workflow->findDealByNegotiation($myNeg);
             }

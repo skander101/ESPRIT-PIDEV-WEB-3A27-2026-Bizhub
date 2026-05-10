@@ -46,11 +46,11 @@ class WorkflowController extends AbstractController
             throw $this->createAccessDeniedException('Accès refusé à ce workflow.');
         }
 
-        // Find negotiation
-        $negotiation = $this->negotiationRepo->findOneBy([
-            'project'  => $investment->getProject(),
-            'investor' => $investment->getUser(),
-        ]);
+        // Find negotiation (using result cache)
+        $negotiation = $this->negotiationRepo->findOneByProjectAndInvestor(
+            $investment->getProject(),
+            $investment->getUser()
+        );
 
         // Find deal
         $deal = $negotiation
