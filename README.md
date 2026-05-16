@@ -1,5 +1,11 @@
 # BizHub – Business Hub Platform
 
+
+
+https://github.com/user-attachments/assets/b8c2efc2-c6eb-4bca-922d-988218df54d1
+
+
+
 ## Overview
 This project was developed as part of the **PIDEV – 3rd Year Engineering Program** at **Esprit School of Engineering** (Academic Year **2025–2026**).
 
